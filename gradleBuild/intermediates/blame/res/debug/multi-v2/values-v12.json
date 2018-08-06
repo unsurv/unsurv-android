@@ -1,0 +1,36 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/bjorn/Documents/tensorflow/tensorflow/examples/android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-v12/values-v12.xml",
+            "map": [
+                {
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-v12/values-v12.xml",
+                    "from": {
+                        "startLines": "2,5,8,9",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,279,479,598",
+                        "endLines": "4,7,8,9",
+                        "endColumns": "12,12,118,94",
+                        "endOffsets": "274,474,593,688"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "/home/bjorn/Documents/nsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-v12/values-v12.xml",
+            "map": [
+                {
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-v12/values-v12.xml",
+                    "from": {
+                        "startLines": "2,5,8,9",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,279,479,598",
+                        "endLines": "4,7,8,9",
+                        "endColumns": "12,12,118,94",
+                        "endOffsets": "274,474,593,688"
+                    }
+                }
+            ]
+        }
+    ]
+}

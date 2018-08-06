@@ -1,0 +1,131 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:16:1-58:12
+MERGED from [org.tensorflow:tensorflow-android:1.10.0-rc1] /home/bjorn/.gradle/caches/transforms-1/files-1.1/tensorflow-android-1.10.0-rc1.aar/1ac32b1e6c0a9a144b1b1db14f46f796/AndroidManifest.xml:2:1-8:12
+MERGED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:2:1-14:12
+MERGED from [com.android.support:appcompat-v7:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/AndroidManifest.xml:17:1-27:12
+MERGED from [com.android.support.constraint:constraint-layout:1.1.2] /home/bjorn/.gradle/caches/transforms-1/files-1.1/constraint-layout-1.1.2.aar/e01c5e8379844bb0d4ba7c2b6f77b59b/AndroidManifest.xml:2:1-11:12
+MERGED from [com.android.support:exifinterface:27.1.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/exifinterface-27.1.0.aar/c9ccd5283e5a706a788bbc093c6f2d90/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/b72344c529b5247e3b216007feda26ac/AndroidManifest.xml:2:1-9:12
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/667ad8dc09bc7a2df61169e70f3cfbc4/AndroidManifest.xml:2:1-9:12
+MERGED from [com.android.support:support-v4:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/ccfdde5d49f4d1a8348cec8373e9a545/AndroidManifest.xml:17:1-24:12
+	package
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:17:5-34
+	xmlns:android
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:16:11-69
+uses-sdk
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:19:5-21:41
+MERGED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:5:5-44
+MERGED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:5:5-44
+MERGED from [com.android.support:appcompat-v7:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:appcompat-v7:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support.constraint:constraint-layout:1.1.2] /home/bjorn/.gradle/caches/transforms-1/files-1.1/constraint-layout-1.1.2.aar/e01c5e8379844bb0d4ba7c2b6f77b59b/AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support.constraint:constraint-layout:1.1.2] /home/bjorn/.gradle/caches/transforms-1/files-1.1/constraint-layout-1.1.2.aar/e01c5e8379844bb0d4ba7c2b6f77b59b/AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support:exifinterface:27.1.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/exifinterface-27.1.0.aar/c9ccd5283e5a706a788bbc093c6f2d90/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:exifinterface:27.1.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/exifinterface-27.1.0.aar/c9ccd5283e5a706a788bbc093c6f2d90/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/b72344c529b5247e3b216007feda26ac/AndroidManifest.xml:5:5-44
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/b72344c529b5247e3b216007feda26ac/AndroidManifest.xml:5:5-44
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/667ad8dc09bc7a2df61169e70f3cfbc4/AndroidManifest.xml:5:5-43
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/667ad8dc09bc7a2df61169e70f3cfbc4/AndroidManifest.xml:5:5-43
+MERGED from [com.android.support:support-v4:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/ccfdde5d49f4d1a8348cec8373e9a545/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/ccfdde5d49f4d1a8348cec8373e9a545/AndroidManifest.xml:20:5-43
+	tools:overrideLibrary
+		ADDED from [com.android.support:appcompat-v7:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/AndroidManifest.xml:23:9-75
+	android:targetSdkVersion
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:21:9-38
+	android:minSdkVersion
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:20:9-35
+uses-permission#android.permission.CAMERA
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:23:5-65
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:23:22-62
+uses-feature#android.hardware.camera
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:25:5-60
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:25:19-57
+uses-feature#android.hardware.camera.autofocus
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:26:5-70
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:26:19-67
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:28:5-81
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:28:22-78
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:29:5-71
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:29:22-68
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:30:5-79
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:30:22-76
+uses-feature#android.hardware.location.gps
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:32:5-66
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:32:19-63
+uses-permission#android.permission.READ_PHONE_STATE
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:34:5-75
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:34:22-72
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:35:5-80
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:35:22-77
+application
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:37:5-56:19
+MERGED from [org.tensorflow:tensorflow-android:1.10.0-rc1] /home/bjorn/.gradle/caches/transforms-1/files-1.1/tensorflow-android-1.10.0-rc1.aar/1ac32b1e6c0a9a144b1b1db14f46f796/AndroidManifest.xml:5:5-6:19
+MERGED from [org.tensorflow:tensorflow-android:1.10.0-rc1] /home/bjorn/.gradle/caches/transforms-1/files-1.1/tensorflow-android-1.10.0-rc1.aar/1ac32b1e6c0a9a144b1b1db14f46f796/AndroidManifest.xml:5:5-6:19
+MERGED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:7:5-12:19
+MERGED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:7:5-12:19
+MERGED from [com.android.support:appcompat-v7:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:appcompat-v7:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/AndroidManifest.xml:25:5-20
+MERGED from [com.android.support.constraint:constraint-layout:1.1.2] /home/bjorn/.gradle/caches/transforms-1/files-1.1/constraint-layout-1.1.2.aar/e01c5e8379844bb0d4ba7c2b6f77b59b/AndroidManifest.xml:9:5-20
+MERGED from [com.android.support.constraint:constraint-layout:1.1.2] /home/bjorn/.gradle/caches/transforms-1/files-1.1/constraint-layout-1.1.2.aar/e01c5e8379844bb0d4ba7c2b6f77b59b/AndroidManifest.xml:9:5-20
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/b72344c529b5247e3b216007feda26ac/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:animated-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-23.4.0.aar/b72344c529b5247e3b216007feda26ac/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/667ad8dc09bc7a2df61169e70f3cfbc4/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:support-vector-drawable:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-23.4.0.aar/667ad8dc09bc7a2df61169e70f3cfbc4/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:support-v4:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/ccfdde5d49f4d1a8348cec8373e9a545/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.4.0] /home/bjorn/.gradle/caches/transforms-1/files-1.1/support-v4-23.4.0.aar/ccfdde5d49f4d1a8348cec8373e9a545/AndroidManifest.xml:22:5-20
+	android:label
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:41:9-41
+	android:debuggable
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:39:9-34
+	android:icon
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:40:9-45
+	android:allowBackup
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:38:9-35
+	android:theme
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:42:9-45
+activity#org.tensorflow.demo.DetectorActivity
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:43:9-52:20
+	android:screenOrientation
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:46:13-49
+	android:label
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:45:13-38
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:44:13-45
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:47:13-51:29
+action#android.intent.action.MAIN
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:48:17-69
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:48:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:50:17-77
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:50:27-74
+activity#org.tensorflow.demo.HistoryActivity
+ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:53:9-55:68
+	android:label
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:55:13-56
+	android:name
+		ADDED from /home/bjorn/Documents/nsurv-android/AndroidManifest.xml:54:13-44
+provider#com.squareup.picasso.PicassoProvider
+ADDED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:8:9-11:40
+	android:authorities
+		ADDED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:10:13-72
+	android:exported
+		ADDED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:11:13-37
+	android:name
+		ADDED from [com.squareup.picasso:picasso:2.71828] /home/bjorn/.gradle/caches/transforms-1/files-1.1/picasso-2.71828.aar/710be3c7b09a5929f70d21b25a2348ff/AndroidManifest.xml:9:13-64

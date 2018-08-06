@@ -1,0 +1,124 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/bjorn/Documents/tensorflow/tensorflow/examples/android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-v11/values-v11.xml",
+            "map": [
+                {
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-v11/values-v11.xml",
+                    "from": {
+                        "startLines": "2,8,14,20,26,32,38,39,40,45,50,52,54,55,56,107,159",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,474,899,1327,1753,2180,2605,2694,2795,3203,3623,3730,3859,3930,4013,7721,11569",
+                        "endLines": "7,13,19,25,31,37,38,39,44,49,51,53,54,55,106,158,159",
+                        "endColumns": "12,12,12,12,12,12,88,100,12,12,12,12,70,82,12,12,90",
+                        "endOffsets": "469,894,1322,1748,2175,2600,2689,2790,3198,3618,3725,3854,3925,4008,7716,11564,11655"
+                    },
+                    "to": {
+                        "startLines": "5,11,17,23,29,35,41,42,43,48,53,55,67,68,69,120,172",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "186,605,1030,1458,1884,2311,2736,2825,2926,3334,3754,3861,4583,4654,4737,8445,12293",
+                        "endLines": "10,16,22,28,34,40,41,42,47,52,54,56,67,68,119,171,172",
+                        "endColumns": "12,12,12,12,12,12,88,100,12,12,12,12,70,82,12,12,90",
+                        "endOffsets": "600,1025,1453,1879,2306,2731,2820,2921,3329,3749,3856,3985,4649,4732,8440,12288,12379"
+                    }
+                },
+                {
+                    "source": "/home/bjorn/Documents/tensorflow/tensorflow/examples/android/res/values-v11/styles.xml",
+                    "from": {
+                        "startLines": "7,19,11",
+                        "startColumns": "2,2,2",
+                        "startOffsets": "210,763,340",
+                        "endLines": "9,21,17",
+                        "endColumns": "10,10,10",
+                        "endOffsets": "336,927,759"
+                    },
+                    "to": {
+                        "startLines": "2,57,60",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,3990,4159",
+                        "endLines": "4,59,66",
+                        "endColumns": "10,10,10",
+                        "endOffsets": "181,4154,4578"
+                    }
+                },
+                {
+                    "source": "/home/bjorn/Documents/tensorflow/tensorflow/examples/android/res/values-v11/template-styles.xml",
+                    "from": {
+                        "startLines": "19",
+                        "startColumns": "4",
+                        "startOffsets": "663",
+                        "endColumns": "65",
+                        "endOffsets": "724"
+                    },
+                    "to": {
+                        "startLines": "173",
+                        "startColumns": "4",
+                        "startOffsets": "12384",
+                        "endColumns": "64",
+                        "endOffsets": "12444"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "/home/bjorn/Documents/nsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-v11/values-v11.xml",
+            "map": [
+                {
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-v11/values-v11.xml",
+                    "from": {
+                        "startLines": "2,8,14,20,26,32,38,39,40,45,50,52,54,55,56,107,159",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,474,899,1327,1753,2180,2605,2694,2795,3203,3623,3730,3859,3930,4013,7721,11569",
+                        "endLines": "7,13,19,25,31,37,38,39,44,49,51,53,54,55,106,158,159",
+                        "endColumns": "12,12,12,12,12,12,88,100,12,12,12,12,70,82,12,12,90",
+                        "endOffsets": "469,894,1322,1748,2175,2600,2689,2790,3198,3618,3725,3854,3925,4008,7716,11564,11655"
+                    },
+                    "to": {
+                        "startLines": "5,11,17,23,29,35,41,42,43,48,53,55,67,68,69,120,172",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "186,605,1030,1458,1884,2311,2736,2825,2926,3334,3754,3861,4583,4654,4737,8445,12293",
+                        "endLines": "10,16,22,28,34,40,41,42,47,52,54,56,67,68,119,171,172",
+                        "endColumns": "12,12,12,12,12,12,88,100,12,12,12,12,70,82,12,12,90",
+                        "endOffsets": "600,1025,1453,1879,2306,2731,2820,2921,3329,3749,3856,3985,4649,4732,8440,12288,12379"
+                    }
+                },
+                {
+                    "source": "/home/bjorn/Documents/nsurv-android/res/values-v11/styles.xml",
+                    "from": {
+                        "startLines": "7,19,11",
+                        "startColumns": "2,2,2",
+                        "startOffsets": "210,763,340",
+                        "endLines": "9,21,17",
+                        "endColumns": "10,10,10",
+                        "endOffsets": "336,927,759"
+                    },
+                    "to": {
+                        "startLines": "2,57,60",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,3990,4159",
+                        "endLines": "4,59,66",
+                        "endColumns": "10,10,10",
+                        "endOffsets": "181,4154,4578"
+                    }
+                },
+                {
+                    "source": "/home/bjorn/Documents/nsurv-android/res/values-v11/template-styles.xml",
+                    "from": {
+                        "startLines": "19",
+                        "startColumns": "4",
+                        "startOffsets": "663",
+                        "endColumns": "65",
+                        "endOffsets": "724"
+                    },
+                    "to": {
+                        "startLines": "173",
+                        "startColumns": "4",
+                        "startOffsets": "12384",
+                        "endColumns": "64",
+                        "endOffsets": "12444"
+                    }
+                }
+            ]
+        }
+    ]
+}
