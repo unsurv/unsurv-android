@@ -15,13 +15,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/darker_gray"
+    android:background="@android:color/holo_orange_dark"
     android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/thumbnail_image"
         android:layout_width="88dp"
         android:layout_height="88dp"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"
         android:src="@drawable/ic_launcher"/>
 
     <LinearLayout
@@ -38,7 +40,7 @@
             android:layout_weight="1"
             android:gravity="bottom"
             android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:textStyle="bold"
             tools:text="lutti" />
 
@@ -49,7 +51,7 @@
             android:layout_weight="1"
             android:gravity="top"
             android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             tools:text="one" />
     </LinearLayout>
 

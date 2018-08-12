@@ -17,7 +17,11 @@
 package org.tensorflow.demo;
 
 import android.Manifest;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -37,6 +41,9 @@ import android.media.ImageReader.OnImageAvailableListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
@@ -44,6 +51,7 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,14 +86,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(null);
-    surveillanceCameras.add(new SurveillanceCamera(picturesPath + "/nsurv/227312830_thumbnail.jpg", picturesPath + "/nsurv/227312830.jpg", new RectF(1.22f, 1.44f, 1.62f, 1.61f), new Location("")));
-    SurveillanceCameraAdapter adapter = new SurveillanceCameraAdapter(DetectorActivity.this, surveillanceCameras);
-    ListView cameraListView = (ListView) findViewById(R.id.list);
-    cameraListView.setAdapter(adapter);
-    adapter.notifyDataSetChanged();
-
+    //surveillanceCameras.add(new SurveillanceCamera(picturesPath + "/nsurv/227312830_thumbnail.jpg", picturesPath + "/nsurv/227312830.jpg", new RectF(1.22f, 1.44f, 1.62f, 1.61f), new Location("")));
+    //SurveillanceCamera surveillanceCamera = new SurveillanceCamera(picturesPath + "/73457629_thumbnail.jpg", picturesPath + "/nsurv//73457629.jpg", 10, 20, 0, 40, 50.0005, 8.2832, 10.3345, "no comment");
+    cameraRoomDatabase = CameraRoomDatabase.getDatabase(this);
 
   }
+
+  private CameraRoomDatabase cameraRoomDatabase;
+
 
   private static final Logger LOGGER = new Logger();
   // Configuration values for the prepackaged multibox model.
@@ -98,7 +106,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private static final String MB_MODEL_FILE = "file:///android_asset/multibox_model.pb";
   private static final String MB_LOCATION_FILE =
       "file:///android_asset/multibox_location_priors.txt";
-
   private static final int TF_OD_API_INPUT_SIZE = 300;
   private static final String TF_OD_API_MODEL_FILE =
       "file:///android_asset/ssd_mobilenet_v1_android_export.pb";
@@ -159,7 +166,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private BorderedText borderedText;
 
   // MY CHANGES
-
+  private SurveillanceCamera currentCamera;
   private static String picturesPath = Environment.getExternalStoragePublicDirectory(
   Environment.DIRECTORY_PICTURES).getAbsolutePath();
   private static long TIME_LAST_PICTURE_TAKEN = SystemClock.uptimeMillis();
@@ -167,10 +174,15 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   Location currentBestLocation;
   private Location currentLocation;
+  private double cameraLatitude;
+  private double cameraLongitude;
+  private double cameraAccuracy;
   private String locationProvider = LocationManager.GPS_PROVIDER;
   AsyncLocationGetter gpsLocation = new AsyncLocationGetter(DetectorActivity.this);
 
   ArrayList<SurveillanceCamera> surveillanceCameras = new ArrayList<>();
+
+
 
 
 
@@ -393,7 +405,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             final List<Classifier.Recognition> mappedRecognitions =
                 new LinkedList<Classifier.Recognition>();
 
-
+            Button toHistoryButton = (Button) findViewById(R.id.to_history);
+            toHistoryButton.setOnClickListener(new View.OnClickListener() {
+              @Override
+              public void onClick(View view) {
+                Intent historyIntent = new Intent(DetectorActivity.this, HistoryActivity.class);
+                startActivity(historyIntent);
+              }
+            });
 
 
             for (final Classifier.Recognition result : results) {
@@ -441,9 +460,22 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     Bitmap thumbnail = Bitmap.createBitmap(croppedBitmap, xThumbnail, yThumbnail, widthThumbnail, heightThumbnail);
                     thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, thumbnailOut);
 
+                    int cameraLeft = Math.round(location.left);
+                    int cameraRight = Math.round(location.right);
+                    int cameraTop = Math.round(location.top);
+                    int cameraBottom = Math.round(location.bottom);
+                    if (currentBestLocation != null){
+                      cameraLatitude = currentBestLocation.getLatitude();
+                      cameraLongitude = currentBestLocation.getLongitude();
+                      cameraAccuracy = currentBestLocation.getAccuracy();
 
+                    }
 
-                    surveillanceCameras.add(new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(), location, currentBestLocation));
+                    currentCamera = new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(), cameraLeft, cameraRight, cameraTop, cameraBottom, cameraLatitude, cameraLongitude, cameraAccuracy, "no comment");
+                    surveillanceCameras.add(currentCamera);
+
+                    cameraRoomDatabase.surveillanceCameraDao().insert(currentCamera);
+
 
                     if (gpsLocation.getStatus() != AsyncTask.Status.RUNNING){
                       AsyncLocationGetter gpsLocation = new AsyncLocationGetter(DetectorActivity.this);

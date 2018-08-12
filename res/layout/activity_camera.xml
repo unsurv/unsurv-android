@@ -31,11 +31,11 @@
         android:padding="8dp"
         tools:context="org.tensorflow.demo.CameraActivity" />
 
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/list"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+    <Button
+        android:id="@+id/to_history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TO HISTORY"/>
+
 
 </LinearLayout>
