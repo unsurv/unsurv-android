@@ -1,25 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/home/bjorn/Documents/tensorflow/tensorflow/examples/android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-mn-rMN/values-mn-rMN.xml",
+            "outputFile": "/home/bjorn/Documents/unsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-mn-rMN/values-mn-rMN.xml",
             "map": [
                 {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-mn-rMN/values-mn-rMN.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,168,276,399,499,612,699,805,917,999,1081,1163,1272,1376,1473,1581,1682,1785,1907,2004",
-                        "endColumns": "112,107,122,99,112,86,105,111,81,81,81,108,103,96,107,100,102,121,96,100",
-                        "endOffsets": "163,271,394,494,607,694,800,912,994,1076,1158,1267,1371,1468,1576,1677,1780,1902,1999,2100"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "/home/bjorn/Documents/nsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-mn-rMN/values-mn-rMN.xml",
-            "map": [
-                {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-mn-rMN/values-mn-rMN.xml",
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/6915a56909ec933cd91ce447f3873c11/res/values-mn-rMN/values-mn-rMN.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

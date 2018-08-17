@@ -1,8 +1,6 @@
 package org.tensorflow.demo;
 
 import android.content.Context;
-import android.location.Location;
-import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.List;

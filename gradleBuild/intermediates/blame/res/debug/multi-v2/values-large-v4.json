@@ -1,25 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/home/bjorn/Documents/nsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-large-v4/values-large-v4.xml",
+            "outputFile": "/home/bjorn/Documents/unsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-large-v4/values-large-v4.xml",
             "map": [
                 {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-large-v4/values-large-v4.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,117,189,248,319,390,460,530,598,666,730,785,889",
-                        "endColumns": "61,71,58,70,70,69,69,67,67,63,54,103,115",
-                        "endOffsets": "112,184,243,314,385,455,525,593,661,725,780,884,1000"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "/home/bjorn/Documents/tensorflow/tensorflow/examples/android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-large-v4/values-large-v4.xml",
-            "map": [
-                {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-large-v4/values-large-v4.xml",
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/6915a56909ec933cd91ce447f3873c11/res/values-large-v4/values-large-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",

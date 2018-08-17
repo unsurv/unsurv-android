@@ -1,25 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/home/bjorn/Documents/nsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-h320dp-v13/values-h320dp-v13.xml",
+            "outputFile": "/home/bjorn/Documents/unsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-h320dp-v13/values-h320dp-v13.xml",
             "map": [
                 {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-h320dp-v13/values-h320dp-v13.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "57",
-                        "endOffsets": "108"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "/home/bjorn/Documents/tensorflow/tensorflow/examples/android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-h320dp-v13/values-h320dp-v13.xml",
-            "map": [
-                {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-h320dp-v13/values-h320dp-v13.xml",
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/6915a56909ec933cd91ce447f3873c11/res/values-h320dp-v13/values-h320dp-v13.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

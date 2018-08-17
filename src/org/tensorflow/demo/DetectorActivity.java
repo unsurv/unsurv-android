@@ -16,13 +16,8 @@
 
 package org.tensorflow.demo;
 
-import android.Manifest;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -30,10 +25,12 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -41,18 +38,11 @@ import android.media.ImageReader.OnImageAvailableListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
-import android.view.Display;
-import android.view.Surface;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,7 +58,6 @@ import org.tensorflow.demo.env.BorderedText;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
 import org.tensorflow.demo.tracking.MultiBoxTracker;
-import org.tensorflow.demo.R; // Explicit import needed for internal Google builds.
 
 // MY CHANGES
 import java.io.FileOutputStream;
@@ -81,7 +70,7 @@ import static android.content.ContentValues.TAG;
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
  * objects.
  */
-public class DetectorActivity extends CameraActivity implements OnImageAvailableListener {
+public class DetectorActivity extends CameraActivity implements OnImageAvailableListener,SensorEventListener  {
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
@@ -89,6 +78,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     //surveillanceCameras.add(new SurveillanceCamera(picturesPath + "/nsurv/227312830_thumbnail.jpg", picturesPath + "/nsurv/227312830.jpg", new RectF(1.22f, 1.44f, 1.62f, 1.61f), new Location("")));
     //SurveillanceCamera surveillanceCamera = new SurveillanceCamera(picturesPath + "/73457629_thumbnail.jpg", picturesPath + "/nsurv//73457629.jpg", 10, 20, 0, 40, 50.0005, 8.2832, 10.3345, "no comment");
     cameraRoomDatabase = CameraRoomDatabase.getDatabase(this);
+    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
   }
 
@@ -134,7 +126,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.6f;
   private static final float MINIMUM_CONFIDENCE_MULTIBOX = 0.1f;
   private static final float MINIMUM_CONFIDENCE_YOLO = 0.25f;
-  
+
 
   private static final boolean MAINTAIN_ASPECT = MODE == DetectorMode.YOLO;
 
@@ -170,20 +162,28 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private static String picturesPath = Environment.getExternalStoragePublicDirectory(
   Environment.DIRECTORY_PICTURES).getAbsolutePath();
   private static long TIME_LAST_PICTURE_TAKEN = SystemClock.uptimeMillis();
-  private static final int DELAY_BETWEEN_CAPTURES = 5000;
+  private static final int DELAY_BETWEEN_CAPTURES = 500;
 
   Location currentBestLocation;
-  private Location currentLocation;
   private double cameraLatitude;
   private double cameraLongitude;
   private double cameraAccuracy;
-  private String locationProvider = LocationManager.GPS_PROVIDER;
   AsyncLocationGetter gpsLocation = new AsyncLocationGetter(DetectorActivity.this);
 
   ArrayList<SurveillanceCamera> surveillanceCameras = new ArrayList<>();
+  private SensorManager mSensorManager;
+  private Sensor accelerometer;
+  private Sensor magneticField;
 
+  private float[] mAccelerometerReading = new float[3];
+  private float[] mMagnetometerReading = new float[3];
 
+  private float[] mRotationMatrix = new float[9];
+  private float[] mOrientationAngles = new float[3];
 
+  private double azimuth;
+  private double pitch;
+  private double roll;
 
 
 
@@ -192,6 +192,70 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
   // MY CHANGES
+
+  @Override
+  public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    // Do something here if sensor accuracy changes.
+    // You must implement this callback in your code.
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    // Get updates from the accelerometer and magnetometer at a constant rate.
+    // To make batch operations more efficient and reduce power consumption,
+    // provide support for delaying updates to the application.
+    //
+    // In this example, the sensor reporting delay is small enough such that
+    // the application receives an update before the system checks the sensor
+    // readings again.
+
+    if (accelerometer != null) {
+      mSensorManager.registerListener(this, accelerometer,
+              SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+    }
+
+    if (magneticField != null) {
+      mSensorManager.registerListener(this, magneticField,
+              SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+    }
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+
+    // Don't receive any more updates from either sensor.
+    mSensorManager.unregisterListener(this);
+  }
+
+  // Get readings from accelerometer and magnetometer. To simplify calculations,
+  // consider storing these readings as unit vectors.
+  @Override
+  public void onSensorChanged(SensorEvent event) {
+    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+      System.arraycopy(event.values, 0, mAccelerometerReading,
+              0, mAccelerometerReading.length);
+    } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+      System.arraycopy(event.values, 0, mMagnetometerReading,
+              0, mMagnetometerReading.length);
+    }
+  }
+
+  // Compute the three orientation angles based on the most recent readings from
+  // the device's accelerometer and magnetometer.
+  public void updateOrientationAngles() {
+    // Update rotation matrix, which is needed to update orientation angles.
+    SensorManager.getRotationMatrix(mRotationMatrix, null,
+            mAccelerometerReading, mMagnetometerReading);
+
+    // "mRotationMatrix" now has up-to-date information.
+
+    SensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
+
+    // "mOrientationAngles" now has up-to-date information.
+  }
 
 
 
@@ -450,7 +514,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                     LOGGER.i(String.format("function coords %s %s %s %s", xThumbnail, yThumbnail, widthThumbnail, heightThumbnail));
 
-                    // TODO FIX THUMBNAIL! POSS CAUSES: ORIENTATION? xy width height? USE CROPPED BITMAP!!!
 
                     //Bitmap inputPicture = Bitmap.createBitmap(croppedBitmap, 0, 0, croppedBitmap.getWidth(), croppedBitmap.getHeight());
                     croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
@@ -471,7 +534,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                     }
 
-                    currentCamera = new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(), cameraLeft, cameraRight, cameraTop, cameraBottom, cameraLatitude, cameraLongitude, cameraAccuracy, "no comment");
+
+                    updateOrientationAngles();
+                    azimuth = mOrientationAngles[0]*(180/Math.PI);
+                    pitch = mOrientationAngles[1]*(180/Math.PI);
+                    roll = mOrientationAngles[2]*(180/Math.PI);
+
+                    //Log.i(TAG, "orientation:" + "\n" + String.valueOf(mOrientationAngles[0]) + "\n" + String.valueOf(mOrientationAngles[1]) + "\n" + String.valueOf(mOrientationAngles[2]) + "\n");
+                    currentCamera = new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(), cameraLeft, cameraRight, cameraTop, cameraBottom, cameraLatitude, cameraLongitude, cameraAccuracy, azimuth, pitch, roll, "no comment");
                     surveillanceCameras.add(currentCamera);
 
                     cameraRoomDatabase.surveillanceCameraDao().insert(currentCamera);

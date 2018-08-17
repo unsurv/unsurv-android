@@ -1,25 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/home/bjorn/Documents/tensorflow/tensorflow/examples/android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-az-rAZ/values-az-rAZ.xml",
+            "outputFile": "/home/bjorn/Documents/unsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-az-rAZ/values-az-rAZ.xml",
             "map": [
                 {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-az-rAZ/values-az-rAZ.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,153,261,384,483,593,681,788,902,983,1062,1147,1254,1361,1461,1570,1674,1784,1881",
-                        "endColumns": "97,107,122,98,109,87,106,113,80,78,84,106,106,99,108,103,109,96,100",
-                        "endOffsets": "148,256,379,478,588,676,783,897,978,1057,1142,1249,1356,1456,1565,1669,1779,1876,1977"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "/home/bjorn/Documents/nsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-az-rAZ/values-az-rAZ.xml",
-            "map": [
-                {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/a404a3b3a7a1dc2d20b761c728fc645b/res/values-az-rAZ/values-az-rAZ.xml",
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/6915a56909ec933cd91ce447f3873c11/res/values-az-rAZ/values-az-rAZ.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

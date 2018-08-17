@@ -25,6 +25,8 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" />
+    <uses-feature android:name="android.hardware.sensor.compass" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -39,12 +41,12 @@
         android:allowBackup="true"
         android:debuggable="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
+        android:label="unsurv"
         android:testOnly="true"
-        android:theme="@style/MaterialTheme" >
+        android:theme="@style/Theme.AppCompat" >
         <activity
             android:name="org.tensorflow.demo.DetectorActivity"
-            android:label="TF Detect"
+            android:label="unsurv"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -54,12 +56,21 @@
         </activity>
         <activity
             android:name="org.tensorflow.demo.HistoryActivity"
-            android:label="@string/title_activity_main" />
+            android:label="History" />
 
         <provider
             android:name="com.squareup.picasso.PicassoProvider"
             android:authorities="org.tensorflow.demo.com.squareup.picasso"
             android:exported="false" />
+        <provider
+            android:name="android.arch.lifecycle.ProcessLifecycleOwnerInitializer"
+            android:authorities="org.tensorflow.demo.lifecycle-trojan"
+            android:exported="false"
+            android:multiprocess="true" />
+
+        <meta-data
+            android:name="android.support.VERSION"
+            android:value="26.1.0" />
     </application>
 
 </manifest>

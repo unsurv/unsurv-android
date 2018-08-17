@@ -57,7 +57,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
     @Override
     protected Void doInBackground(final Void... params) {
       mDao.deleteAll();
-      SurveillanceCamera surveillanceCamera = new SurveillanceCamera(picturesPath + "/73457629_thumbnail.jpg", picturesPath + "/nsurv//73457629.jpg", 10, 120, 50, 140, 50.0005, 8.2832, 10.3345, "no comment");
+      SurveillanceCamera surveillanceCamera = new SurveillanceCamera(picturesPath + "/73457629_thumbnail.jpg", picturesPath + "/nsurv//73457629.jpg", 10, 120, 50, 140, 50.0005, 8.2832, 10.3345, 0.3653, 12.3313, 170.3332, "no comment");
 
       mDao.insert(surveillanceCamera);
       return null;
