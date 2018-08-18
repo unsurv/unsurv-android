@@ -24,8 +24,8 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature android:name="android.hardware.sensor.accelerometer"/>
-    <uses-feature android:name="android.hardware.sensor.compass"/>
+    <uses-feature android:name="android.hardware.sensor.accelerometer" />
+    <uses-feature android:name="android.hardware.sensor.compass" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -41,10 +41,9 @@
         android:debuggable="true"
         android:icon="@drawable/ic_launcher"
         android:label="unsurv"
-        android:theme="@style/Theme.AppCompat"
-        >
+        android:theme="@style/Theme.AppCompat">
         <activity
-            android:name="org.tensorflow.demo.DetectorActivity"
+            android:name=".DetectorActivity"
             android:label="unsurv"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -54,8 +53,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.tensorflow.demo.HistoryActivity"
-            android:label="History"></activity>
+            android:name=".HistoryActivity"
+            android:label="History" />
+        <activity android:name=".MapActivity" />
+        <activity android:name=".StatisticsActivity"></activity>
     </application>
 
 </manifest>

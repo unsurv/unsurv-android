@@ -4,7 +4,7 @@
             "outputFile": "/home/bjorn/Documents/unsurv-android/gradleBuild/intermediates/incremental/mergeDebugResources/merged.dir/values-v17/values-v17.xml",
             "map": [
                 {
-                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-23.4.0.aar/6915a56909ec933cd91ce447f3873c11/res/values-v17/values-v17.xml",
+                    "source": "/home/bjorn/.gradle/caches/transforms-1/files-1.1/appcompat-v7-26.1.0.aar/97037ef79b93617184fac260c4700e92/res/values-v17/values-v17.xml",
                     "from": {
                         "startLines": "2,5,9,12,15,18,22,26,29,32,35,39,42,46",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",

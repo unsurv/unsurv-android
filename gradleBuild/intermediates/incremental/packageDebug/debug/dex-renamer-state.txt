@@ -1,4 +1,4 @@
-#Wed Aug 15 22:42:40 CEST 2018
+#Sat Aug 18 16:23:40 CEST 2018
 base.0=/home/bjorn/Documents/unsurv-android/gradleBuild/intermediates/transforms/dexMerger/debug/0
 path.0=classes.dex
 renamed.0=classes.dex

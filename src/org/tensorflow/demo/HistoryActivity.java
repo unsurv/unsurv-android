@@ -2,11 +2,17 @@ package org.tensorflow.demo;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
+import android.view.View;
 
 import java.util.List;
 
@@ -34,10 +40,49 @@ public class HistoryActivity extends AppCompatActivity {
       }
     });
 
+    bottomNavigationView = findViewById(R.id.navigation);
+    bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+      @Override
+      public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+
+          case R.id.bottom_navigation_history:
+            Intent historyIntent = new Intent(HistoryActivity.this, HistoryActivity.class);
+            startActivity(historyIntent);
+            return true;
+
+          case R.id.bottom_navigation_camera:
+            Intent cameraIntent = new Intent(HistoryActivity.this, DetectorActivity.class);
+            startActivity(cameraIntent);
+            return true;
+
+          case R.id.bottom_navigation_map:
+            Intent mapIntent = new Intent(HistoryActivity.this, MapActivity.class);
+            startActivity(mapIntent);
+            return true;
+
+          case R.id.bottom_navigation_stats:
+            Intent statsIntent = new Intent(HistoryActivity.this, StatisticsActivity.class);
+            startActivity(statsIntent);
+            return true;
+
+        }
+
+        return false;
+
+      }
+    });
+
+    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_history).setChecked(true);
+
+
   }
 
-
-
-
-
+  private BottomNavigationView bottomNavigationView;
 }
+
+
+
+

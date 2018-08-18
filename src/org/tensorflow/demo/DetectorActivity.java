@@ -38,9 +38,13 @@ import android.media.ImageReader.OnImageAvailableListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -81,6 +85,44 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+
+    bottomNavigationView = findViewById(R.id.navigation);
+    bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+      @Override
+      public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+
+          case R.id.bottom_navigation_history:
+            Intent historyIntent = new Intent(DetectorActivity.this, HistoryActivity.class);
+            startActivity(historyIntent);
+            return true;
+
+          case R.id.bottom_navigation_camera:
+            Intent cameraIntent = new Intent(DetectorActivity.this, DetectorActivity.class);
+            startActivity(cameraIntent);
+            return true;
+
+          case R.id.bottom_navigation_map:
+            Intent mapIntent = new Intent(DetectorActivity.this, MapActivity.class);
+            startActivity(mapIntent);
+            return true;
+
+          case R.id.bottom_navigation_stats:
+            Intent statsIntent = new Intent(DetectorActivity.this, StatisticsActivity.class);
+            startActivity(statsIntent);
+            return true;
+
+        }
+
+        return false;
+
+      }
+    });
+
+    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_camera).setChecked(true);
 
   }
 
@@ -185,6 +227,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private double pitch;
   private double roll;
 
+  private BottomNavigationView bottomNavigationView;
 
 
   // CHANGES END
@@ -468,16 +511,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
             final List<Classifier.Recognition> mappedRecognitions =
                 new LinkedList<Classifier.Recognition>();
-
-            Button toHistoryButton = (Button) findViewById(R.id.to_history);
-            toHistoryButton.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View view) {
-                Intent historyIntent = new Intent(DetectorActivity.this, HistoryActivity.class);
-                startActivity(historyIntent);
-              }
-            });
-
 
             for (final Classifier.Recognition result : results) {
               final RectF location = result.getLocation();

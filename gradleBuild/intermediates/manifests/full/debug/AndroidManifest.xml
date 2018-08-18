@@ -57,20 +57,23 @@
         <activity
             android:name="org.tensorflow.demo.HistoryActivity"
             android:label="History" />
+        <activity android:name="org.tensorflow.demo.MapActivity" />
+        <activity android:name="org.tensorflow.demo.StatisticsActivity" />
 
         <provider
             android:name="com.squareup.picasso.PicassoProvider"
             android:authorities="org.tensorflow.demo.com.squareup.picasso"
             android:exported="false" />
+
+        <meta-data
+            android:name="android.support.VERSION"
+            android:value="26.1.0" />
+
         <provider
             android:name="android.arch.lifecycle.ProcessLifecycleOwnerInitializer"
             android:authorities="org.tensorflow.demo.lifecycle-trojan"
             android:exported="false"
             android:multiprocess="true" />
-
-        <meta-data
-            android:name="android.support.VERSION"
-            android:value="26.1.0" />
     </application>
 
 </manifest>
