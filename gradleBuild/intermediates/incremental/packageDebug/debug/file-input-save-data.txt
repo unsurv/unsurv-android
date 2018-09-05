@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Wed Aug 15 22:42:42 CEST 2018
+#Thu Aug 30 01:02:24 CEST 2018
 17.baseType=DIRECTORY
 4.path=lib/x86_64/libtensorflow_inference.so
 25.base=/home/bjorn/Documents/unsurv-android/gradleBuild/intermediates/assets/debug

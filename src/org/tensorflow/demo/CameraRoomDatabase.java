@@ -9,6 +9,8 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 
+import java.util.Random;
+
 @Database(entities = {SurveillanceCamera.class}, version = 1)
 public abstract class CameraRoomDatabase extends RoomDatabase {
 
@@ -48,7 +50,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
 
     private final CameraDao mDao;
     private static String picturesPath = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES).getAbsolutePath();
+            Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
             PopulateDbAsync(CameraRoomDatabase db) {
       mDao = db.surveillanceCameraDao();
@@ -57,9 +59,15 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
     @Override
     protected Void doInBackground(final Void... params) {
       mDao.deleteAll();
-      SurveillanceCamera surveillanceCamera = new SurveillanceCamera(picturesPath + "/73457629_thumbnail.jpg", picturesPath + "/nsurv//73457629.jpg", 10, 120, 50, 140, 50.0005, 8.2832, 10.3345, 0.3653, 12.3313, 170.3332, "no comment");
 
-      mDao.insert(surveillanceCamera);
+      for (int i = 0; i < 200; i++) {
+        Random rng = new Random();
+        double randomLat = (rng.nextDouble() * 2 - 1) / 10;
+        double randomLong = (rng.nextDouble() * 2 - 1) / 10;
+        SurveillanceCamera surveillanceCamera = new SurveillanceCamera(picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg", 10, 120, 50, 140, 50.0005 + randomLat, 8.2832 + randomLong, 10.3345, 0.3653, 12.3313, 170.3332, "no comment");
+        mDao.insert(surveillanceCamera);
+      }
+
       return null;
     }
   }

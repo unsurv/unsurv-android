@@ -13,47 +13,49 @@ public class SurveillanceCamera {
 
   @NonNull
 
-  private String mThumbnailPath;
+  private String thumbnailPath;
 
-  private String mImagePath;
+  private String imagePath;
 
   //private RectF mCameraLocation;
-  private int mCameraLeft;
-  private int mCameraRight;
-  private int mCameraTop;
-  private int mCameraBottom;
+  private int cameraLeft;
+  private int cameraRight;
+  private int cameraTop;
+  private int cameraBottom;
 
 
   //private Location mLocation;
-  private double mLatitude;
-  private double mLongitude;
-  private double mAccuracy; // radius of 68% confidence in meters
+  private double latitude;
+  private double longitude;
+  private double accuracy; // radius of 68% confidence in meters
 
-  private double mAzimuth;
-  private double mPitch;
-  private double mRoll;
+  private double azimuth;
+  private double pitch;
+  private double roll;
 
-  private String mComment;
+  private String comment;
 
 
   public SurveillanceCamera (String thumbnailPath, String imagePath, int cameraLeft, int cameraRight, int cameraTop, int cameraBottom, double latitude, double longitude, double accuracy, double azimuth, double pitch, double roll, String comment){
 
-    mThumbnailPath = thumbnailPath;
-    mImagePath = imagePath;
-    mCameraLeft = cameraLeft;
-    mCameraRight = cameraRight;
-    mCameraTop = cameraTop;
-    mCameraBottom = cameraBottom;
+    this.thumbnailPath = thumbnailPath;
+    this.imagePath = imagePath;
+    this.cameraLeft = cameraLeft;
+    this.cameraRight = cameraRight;
+    this.cameraTop = cameraTop;
+    this.cameraBottom = cameraBottom;
 
-    mLatitude = latitude;
-    mLongitude = longitude;
-    mAccuracy = accuracy;
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.accuracy = accuracy;
 
-    mAzimuth = azimuth;
-    mPitch = pitch;
-    mRoll = roll;
+    this.azimuth = azimuth;
+    this.pitch = pitch;
+    this.roll = roll;
 
-    mComment = comment;
+    this.comment = comment;
+
+
   }
 
 
@@ -63,55 +65,55 @@ public class SurveillanceCamera {
   }
 
   public String getThumbnailPath() {
-    return mThumbnailPath;
+    return thumbnailPath;
   }
 
   public String getImagePath() {
-    return mImagePath;
+    return imagePath;
   }
 
   public int getCameraLeft() {
-    return mCameraLeft;
+    return cameraLeft;
   }
 
   public int getCameraRight() {
-    return mCameraRight;
+    return cameraRight;
   }
 
   public int getCameraTop() {
-    return mCameraTop;
+    return cameraTop;
   }
 
   public int getCameraBottom() {
-    return mCameraBottom;
+    return cameraBottom;
   }
 
   public double getLatitude() {
-    return mLatitude;
+    return latitude;
   }
 
   public double getLongitude() {
-    return mLongitude;
+    return longitude;
   }
 
   public double getAccuracy() {
-    return mAccuracy;
+    return accuracy;
   }
 
   public double getAzimuth() {
-    return mAzimuth;
+    return azimuth;
   }
 
   public double getPitch() {
-    return mPitch;
+    return pitch;
   }
 
   public double getRoll() {
-    return mRoll;
+    return roll;
   }
 
   public String getComment() {
-    return mComment;
+    return comment;
   }
 
 
@@ -119,55 +121,55 @@ public class SurveillanceCamera {
     this.id = id;
   }
 
-  public void setThumbnailPath(@NonNull String mThumbnailPath) {
-    this.mThumbnailPath = mThumbnailPath;
+  public void setThumbnailPath(String mThumbnailPath) {
+    this.thumbnailPath = mThumbnailPath;
   }
 
   public void setImagePath(String ImagePath) {
-    this.mImagePath = ImagePath;
+    this.imagePath = ImagePath;
   }
 
   public void setCameraLeft(int CameraLeft) {
-    this.mCameraLeft = CameraLeft;
+    this.cameraLeft = CameraLeft;
   }
 
   public void setCameraRight(int CameraRight) {
-    this.mCameraRight = CameraRight;
+    this.cameraRight = CameraRight;
   }
 
   public void setCameraTop(int CameraTop) {
-    this.mCameraTop = CameraTop;
+    this.cameraTop = CameraTop;
   }
 
   public void setCameraBottom(int CameraBottom) {
-    this.mCameraBottom = CameraBottom;
+    this.cameraBottom = CameraBottom;
   }
 
   public void setLatitude(double Latitude) {
-    this.mLatitude = Latitude;
+    this.latitude = Latitude;
   }
 
   public void setLongitude(double Longitude) {
-    this.mLongitude = Longitude;
+    this.longitude = Longitude;
   }
 
   public void setAccuracy(double Accuracy) {
-    this.mAccuracy = Accuracy;
+    this.accuracy = Accuracy;
   }
 
   public void setAzimuth(double Azimuth) {
-    this.mAzimuth = Azimuth;
+    this.azimuth = Azimuth;
   }
 
   public void setPitch(double Pitch) {
-    this.mPitch = Pitch;
+    this.pitch = Pitch;
   }
 
   public void setRoll(double Roll) {
-    this.mRoll = Roll;
+    this.roll = Roll;
   }
 
   public void setComment(String Comment) {
-    this.mComment = Comment;
+    this.comment = Comment;
   }
 }

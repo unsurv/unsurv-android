@@ -34,11 +34,6 @@
         android:padding="8dp"
         tools:context="org.tensorflow.demo.CameraActivity" />
 
-    <Button
-        android:id="@+id/to_history"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TO HISTORY" />
 
     <android.support.design.widget.BottomNavigationView
 

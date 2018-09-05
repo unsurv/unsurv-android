@@ -10,6 +10,7 @@ public class CameraRepository {
 
   private CameraDao mCameraDao;
   private LiveData<List<SurveillanceCamera>> mAllSurveillanceCameras;
+  private List<SurveillanceCamera> mSurveillanceCamerasInArea;
 
   CameraRepository(Application application) {
     CameraRoomDatabase db = CameraRoomDatabase.getDatabase(application);

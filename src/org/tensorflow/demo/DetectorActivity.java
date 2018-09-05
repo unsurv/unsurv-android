@@ -39,14 +39,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,6 +66,7 @@ import android.os.Environment;
 
 import static android.content.ContentValues.TAG;
 
+//TODO ASK for location permission
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
@@ -519,7 +517,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                 // MY CHANGES
                 LOGGER.i("Box Coordinates: " + location.toShortString() + "\nConfidence: " + result.getConfidence());
-                File pictureDirectory = new File(picturesPath + "/nsurv/");
+                File pictureDirectory = new File(picturesPath + "/unsurv/");
                 pictureDirectory.mkdirs();
 
                 File outputFile = new File(pictureDirectory, SystemClock.uptimeMillis() + ".jpg");
@@ -641,6 +639,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
   private class AsyncLocationGetter extends AsyncTask<Void, Integer, Location> {
+
+    //TODO put location handling in own class, maybe use osmdroid implementation
 
     private final Context mContext;
     private Location currentLocation;

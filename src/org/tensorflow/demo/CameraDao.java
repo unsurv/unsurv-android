@@ -21,6 +21,8 @@ public interface CameraDao {
 
   //TODO add time taken to database to order by
 
-
+  @Query("SELECT * from local_surveillance_cameras WHERE latitude BETWEEN :latMin AND :latMax  " +
+          "AND longitude BETWEEN :lonMin AND :lonMax")
+  List<SurveillanceCamera> getCamerasInArea(double latMin, double latMax, double lonMin, double lonMax);
 
 }

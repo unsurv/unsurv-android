@@ -1,0 +1,19 @@
+# This file is based on https://github.com/github/gitignore/blob/master/Android.gitignore
+*.iml
+.gradle
+local.properties
+.DS_Store
+build/
+gradleBuild/
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+*.log
+.navigation/
+/captures
+.externalNativeBuild
+.idea/
