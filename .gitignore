@@ -17,3 +17,4 @@ out/
 /captures
 .externalNativeBuild
 .idea/
+local.properties
