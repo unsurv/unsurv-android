@@ -353,7 +353,7 @@ public class MapActivity extends AppCompatActivity {
         mapView.getOverlays().remove(cameraOverlay);
         mapView.invalidate();
 
-        // TODO dont loop through whole database -> add timestamp in database + query and save/update @ each onCreate (global var? / saved preferences key value pair?)
+        // TODO add timestamp in database
         for (int i = 0; i < camerasToDisplay.size(); i++) {
           itemsToDisplay.add(new OverlayItem("test_camera", camerasToDisplay.get(i).getComment(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
         }
