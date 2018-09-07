@@ -26,12 +26,11 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature android:name="android.hardware.sensor.accelerometer" />
     <uses-feature android:name="android.hardware.sensor.compass" />
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -42,7 +41,7 @@
     <application
         android:allowBackup="true"
         android:debuggable="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/unsurv_logo"
         android:label="unsurv"
         android:theme="@style/Theme.AppCompat">
         <activity
@@ -58,8 +57,12 @@
         <activity
             android:name=".HistoryActivity"
             android:label="History" />
-        <activity android:name=".MapActivity" />
-        <activity android:name=".StatisticsActivity"></activity>
+        <activity
+            android:name=".MapActivity"
+            android:label="Map"/>
+        <activity
+            android:name=".StatisticsActivity"
+            android:label="Statistics"/>
     </application>
 
 </manifest>

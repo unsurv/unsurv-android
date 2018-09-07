@@ -3,14 +3,13 @@ package org.tensorflow.demo;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.db.SupportSQLiteOpenHelper;
-import android.arch.persistence.room.DatabaseConfiguration;
-import android.arch.persistence.room.InvalidationTracker;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +19,6 @@ import android.view.View;
 
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -114,33 +112,8 @@ public class MapActivity extends AppCompatActivity {
     mapView.setBuiltInZoomControls(true);
     mapView.setMultiTouchControls(true);
 
-
-    /* OnTapListener for the Markers, shows a simple Toast.
-    cameraOverlay = new ItemizedIconOverlay<>(itemsToDisplay,
-            new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-              @Override
-              public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
-                Toast.makeText(
-                        MapActivity.this,
-                        "Item '" + item.getTitle() + "' (index=" + index
-                                + ") got single tapped up", Toast.LENGTH_LONG).show();
-                return true; // We 'handled' this event.
-              }
-
-              @Override
-              public boolean onItemLongPress(final int index, final OverlayItem item) {
-                Toast.makeText(
-                        MapActivity.this,
-                        "Item '" + item.getTitle() + "' (index=" + index
-                                + ") got long pressed", Toast.LENGTH_LONG).show();
-                return false;
-              }
-            }, getApplicationContext());
-    mapView.getOverlays().add(cameraOverlay);
-    */
-
-
     final IMapController mapController = mapView.getController();
+
     mapController.setZoom(12.0);
     GeoPoint startPoint = new GeoPoint(49.9960, 8.2772);
     mapController.setCenter(startPoint);
@@ -160,9 +133,7 @@ public class MapActivity extends AppCompatActivity {
 
     cameraViewModel.getAllCameras().observe(this, localCameraObserver);
 
-
     // myLocationOverlay
-
     myLocationOverlay = new MyLocationNewOverlay(mapView);
     myLocationOverlay.enableMyLocation();
     myLocationOverlay.enableFollowLocation();
@@ -224,10 +195,10 @@ public class MapActivity extends AppCompatActivity {
   }
 
 
-  //---------------------------------------------------------------
+  //--------------------------------- from osm example app
   /**
-   * Load {@link ItemizedOverlay}  in a Background Task {@link BackgroundMarkerLoaderTask}.
-   * mCurrentBackgroundMarkerLoaderTask.cancel() allows aboarding the loading task on screen rotation.
+   * Load {@link SurveillanceCamera} in area  in a Background Task {@link BackgroundMarkerLoaderTask}.
+   * mCurrentBackgroundMarkerLoaderTask.cancel() allows aborting the loading task on screen rotation.
    * There are 0 or one tasks running at a time.
    */
   private BackgroundMarkerLoaderTask mCurrentBackgroundMarkerLoaderTask = null;
@@ -266,13 +237,14 @@ public class MapActivity extends AppCompatActivity {
 
   }
 
+
   private class BackgroundMarkerLoaderTask extends AsyncTask<Double, Integer, List<SurveillanceCamera>> {
 
     /**
      * Computation of the map itmes in the non-gui background thread. .
      *
      * @param params latMin, latMax, lonMin, longMax, zoom.
-     * @return A new FolderOverlay that contain map data for latMin, latMax, lonMin, longMax, zoom.
+     * @return List of Surveillance Cameras in the current Map window.
      * @see #onPreExecute()
      * @see #onPostExecute
      * @see #publishProgress
@@ -358,8 +330,9 @@ public class MapActivity extends AppCompatActivity {
           itemsToDisplay.add(new OverlayItem("test_camera", camerasToDisplay.get(i).getComment(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
         }
 
-
-        cameraOverlay = new ItemizedIconOverlay<>(itemsToDisplay,
+        Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
+        //TODO scaling marker
+        cameraOverlay = new ItemizedIconOverlay<>(itemsToDisplay, customMarker,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 
                   @Override
