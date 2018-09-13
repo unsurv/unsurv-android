@@ -35,8 +35,25 @@ public class SurveillanceCamera {
 
   private String comment;
 
+  private String timestamp;
+  private String timeToSync; // time where photo was taken + random delay for privacy reasons
 
-  public SurveillanceCamera (String thumbnailPath, String imagePath, int cameraLeft, int cameraRight, int cameraTop, int cameraBottom, double latitude, double longitude, double accuracy, double azimuth, double pitch, double roll, String comment){
+
+  public SurveillanceCamera (String thumbnailPath,
+                             String imagePath,
+                             int cameraLeft,
+                             int cameraRight,
+                             int cameraTop,
+                             int cameraBottom,
+                             double latitude,
+                             double longitude,
+                             double accuracy,
+                             double azimuth,
+                             double pitch,
+                             double roll,
+                             String comment,
+                             String timestamp,
+                             String timeToSync){
 
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;
@@ -54,6 +71,9 @@ public class SurveillanceCamera {
     this.roll = roll;
 
     this.comment = comment;
+
+    this.timestamp = timestamp;
+    this.timeToSync = timeToSync;
 
 
   }
@@ -116,6 +136,9 @@ public class SurveillanceCamera {
     return comment;
   }
 
+  public String getTimestamp() { return timestamp; }
+
+  public String getTimeToSync() { return timeToSync; }
 
   public void setId(int id) {
     this.id = id;
@@ -172,4 +195,8 @@ public class SurveillanceCamera {
   public void setComment(String Comment) {
     this.comment = Comment;
   }
+
+  public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
+
+  public void setTimeToSync(String timeToSync) { this.timeToSync = timeToSync; }
 }

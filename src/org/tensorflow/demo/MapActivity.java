@@ -373,8 +373,9 @@ public class MapActivity extends AppCompatActivity {
                         Picasso.get().load(thumbnail)
                                 .into(infoImage);
 
-                        infoLatestTimestamp.setText("01.09.2018, 13:24");
-                        infoComment.setText(cameraItem.getSnippet());
+                        //TODO show real values
+                        infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getTimestamp());
+                        infoComment.setText(allCamerasInArea.get(cameraIndex).getComment());
                         infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
 
 
@@ -434,7 +435,5 @@ public class MapActivity extends AppCompatActivity {
     return earthRadius * c;
   }
 
-  private void reloadItemOverlay(List<SurveillanceCamera> camerasToDisplay) {
 
-  }
 }

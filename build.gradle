@@ -30,7 +30,8 @@ buildscript {
             // For Room Persistence Library
             url "https://maven.google.com"
         }
-    }
+
+
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -42,6 +43,9 @@ allprojects {
     repositories {
         jcenter()
         google()
+        //MPAndroidCHart
+        maven { url 'https://jitpack.io' }
+    }
     }
 }
 
@@ -196,13 +200,6 @@ dependencies {
     // android support fixes ?
     /*
 
-
-                            implementation "com.android.support:exifinterface:23.4.0"
-                            implementation "com.android.support:support-annotations:23.4.0"
-                            implementation "com.android.support:support-core-utils:23.4.0"
-                            implementation "com.android.support:support-compat:23.4.0"
-                            implementation "com.android.support:support-fragment:23.4.0"            //{exclude module(support-annotations, support-compat, support-core-ui, support-core-utils)}
-                            implementation "com.android.support:support-annotations:23.4.0"
                             */
     //RecyclerView
     implementation 'com.android.support:cardview-v7:26.1.0'
@@ -219,7 +216,11 @@ dependencies {
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 
+    //osmdroid
     implementation 'org.osmdroid:osmdroid-android:6.0.2'
+
+    //MPAndroidChart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 
 }
 

@@ -49,10 +49,13 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.Vector;
 import org.tensorflow.demo.OverlayView.DrawCallback;
 import org.tensorflow.demo.env.BorderedText;
@@ -226,6 +229,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private double roll;
 
   private BottomNavigationView bottomNavigationView;
+
+  private long syncDelay = 0; // delay to sync with server in ms
 
 
   // CHANGES END
@@ -572,7 +577,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     roll = mOrientationAngles[2]*(180/Math.PI);
 
                     //Log.i(TAG, "orientation:" + "\n" + String.valueOf(mOrientationAngles[0]) + "\n" + String.valueOf(mOrientationAngles[1]) + "\n" + String.valueOf(mOrientationAngles[2]) + "\n");
-                    currentCamera = new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(), cameraLeft, cameraRight, cameraTop, cameraBottom, cameraLatitude, cameraLongitude, cameraAccuracy, azimuth, pitch, roll, "no comment");
+                    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
+                    Long currentTime = System.currentTimeMillis();
+                    currentCamera = new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(),
+                            cameraLeft, cameraRight, cameraTop, cameraBottom,
+                            cameraLatitude, cameraLongitude, cameraAccuracy,
+                            azimuth, pitch, roll,
+                            "no comment",
+                            timestampIso8601.format(new Date(currentTime)),
+                            timestampIso8601.format(new Date(currentTime + new Random().nextInt(100000)))
+                            );
+
                     surveillanceCameras.add(currentCamera);
 
                     cameraRoomDatabase.surveillanceCameraDao().insert(currentCamera);
