@@ -6,7 +6,7 @@
 
     <item android:id="@+id/bottom_navigation_camera"
         android:title="Camera"
-        android:icon="@drawable/ic_camera_alt_black_24dp" />
+        android:icon="@drawable/ic_camera_alt_green_24dp" />
 
     <item android:id="@+id/bottom_navigation_map"
         android:title="Map"

@@ -34,6 +34,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Image;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,7 +88,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
 
     bottomNavigationView = findViewById(R.id.navigation);
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -205,7 +206,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private static String picturesPath = Environment.getExternalStoragePublicDirectory(
   Environment.DIRECTORY_PICTURES).getAbsolutePath();
   private static long TIME_LAST_PICTURE_TAKEN = SystemClock.uptimeMillis();
-  private static final int DELAY_BETWEEN_CAPTURES = 500;
+  private static final int DELAY_BETWEEN_CAPTURES = 3000;
 
   Location currentBestLocation;
   private double cameraLatitude;
@@ -230,7 +231,15 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private BottomNavigationView bottomNavigationView;
 
-  private long syncDelay = 0; // delay to sync with server in ms
+  private ImageView locationStatusView;
+  private ImageView photoStatusView;
+  private TextView locationDebugTextView;
+
+  private int STATUS_RED = 0;
+  private int STATUS_GREEN = 2;
+
+  private int photoStatus = STATUS_GREEN;
+
 
 
   // CHANGES END
@@ -266,6 +275,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       mSensorManager.registerListener(this, magneticField,
               SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
     }
+
+    gpsLocation.execute();
   }
 
   @Override
@@ -274,6 +285,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     // Don't receive any more updates from either sensor.
     mSensorManager.unregisterListener(this);
+    gpsLocation.cancel(true);
   }
 
   // Get readings from accelerometer and magnetometer. To simplify calculations,
@@ -528,8 +540,32 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 File outputFile = new File(pictureDirectory, SystemClock.uptimeMillis() + ".jpg");
                 File thumbnailFile = new File(pictureDirectory, SystemClock.uptimeMillis() + "_thumbnail.jpg");
 
+                photoStatusView = findViewById(R.id.photo_status_view);
+
+                runOnUiThread(new Runnable(){
+                  @Override
+                  public void run(){
+                    if (SystemClock.uptimeMillis() - TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES
+                            && photoStatus != STATUS_GREEN) {
+                      photoStatusView.setImageResource(R.drawable.ic_camera_alt_green_24dp);
+                      photoStatus = STATUS_GREEN;
+                    }
+
+                    if (result.getConfidence() > 0.95 && SystemClock.uptimeMillis() -
+                            TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES) {
+                      photoStatusView.setImageResource(R.drawable.ic_camera_alt_red_24dp);
+                      photoStatus = STATUS_RED;
+
+                    }
+                  }
+                });
+
+
+
+
                 if (result.getConfidence() > 0.95 && SystemClock.uptimeMillis() -
                         TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES) {
+
 
                   LOGGER.i("TOOK PICTURE -------------------------------------- ");
 
@@ -660,11 +696,11 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     private final Context mContext;
     private Location currentLocation;
 
+
     private String locationProvider = LocationManager.GPS_PROVIDER;
 
     private LocationManager locationManager;
     private myLocationListener locationListener;
-    TextView locationUpdater;
 
 
     @Override
@@ -689,9 +725,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     protected void onPostExecute(Location location) {
       super.onPostExecute(location);
       currentBestLocation = location;
-      if (currentLocation != null){
-        locationUpdater.setText(String.format(Locale.GERMANY ,"lat: %f \nlong: %f \nacc: %f", currentLocation.getLatitude(), currentLocation.getLongitude(), currentLocation.getAccuracy()));
-      }
 
 
     }
@@ -748,8 +781,35 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         try {
 
           currentLocation = location;
+          final float locationAccuracy = location.getAccuracy();
 
-          Log.i(TAG, "onLocationChanged:\n" + location.getLatitude() + "\n" + location.getLongitude());
+          locationStatusView = findViewById(R.id.location_status_view);
+
+
+
+
+          photoStatusView = findViewById(R.id.photo_status_view);
+          locationDebugTextView = findViewById(R.id.location_debug);
+
+          runOnUiThread(new Runnable(){
+            @Override
+            public void run(){
+              locationDebugTextView.setText(String.valueOf(locationAccuracy));
+              if (locationAccuracy > 10) {
+                locationStatusView.setImageResource(R.drawable.ic_my_location_red_24dp);
+              } else if (locationAccuracy < 10 && locationAccuracy > 3 ) {
+                locationStatusView.setImageResource(R.drawable.ic_my_location_orange_24dp);
+              } else if (locationAccuracy < 3) {
+                locationStatusView.setImageResource(R.drawable.ic_my_location_green_24dp);
+              }
+
+              }
+            }
+          );
+
+
+
+          Log.i(TAG, "onLocationChanged:\n" + location.getLatitude() + "\n" + location.getLongitude() + "\n" + location.getAccuracy());
 
           // compare best location vs current location
           if (isBetterLocation(currentLocation, currentBestLocation)) {

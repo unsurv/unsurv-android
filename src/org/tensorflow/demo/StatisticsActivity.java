@@ -305,7 +305,7 @@ public class StatisticsActivity extends AppCompatActivity {
     protected void onPostExecute(List<Pair<Integer, Integer>> pairs) {
       super.onPostExecute(pairs);
 
-      if (pairs.get(0).first == ASYNC_BAR_MODE & pairs.get(0).second == ASYNC_BAR_MODE){
+      if (pairs.get(0).first == ASYNC_BAR_MODE && pairs.get(0).second == ASYNC_BAR_MODE){
         barEntries.clear();
 
         for (int i = 1; i < pairs.size(); i++) {
@@ -314,13 +314,13 @@ public class StatisticsActivity extends AppCompatActivity {
 
         }
 
-        BarDataSet barDataSet = new BarDataSet(barEntries, "Surveillance cameras");
+        BarDataSet barDataSet = new BarDataSet(barEntries, "");
         BarData barData = new BarData(barDataSet);
         barData.setValueTextColor(Color.WHITE);
         statisticsBarChart.setData(barData);
         statisticsBarChart.invalidate();
 
-      } else if (pairs.get(0).first == ASYNC_LINE_MODE & pairs.get(0).second == ASYNC_LINE_MODE) {
+      } else if (pairs.get(0).first == ASYNC_LINE_MODE && pairs.get(0).second == ASYNC_LINE_MODE) {
         lineEntries.clear();
 
         for (int i = 1; i < pairs.size(); i++) {
@@ -329,7 +329,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         }
 
-        LineDataSet lineDataSet = new LineDataSet(lineEntries, "total surveillance cameras");
+        LineDataSet lineDataSet = new LineDataSet(lineEntries, "");
         LineData lineData = new LineData(lineDataSet);
         lineData.setValueTextColor(Color.WHITE);
         statisticsLineChart.setData(lineData);
