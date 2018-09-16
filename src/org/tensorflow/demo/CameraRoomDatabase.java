@@ -69,6 +69,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
         double randomLat = (rng.nextDouble() * 2 - 1) / 10;
         double randomLong = (rng.nextDouble() * 2 - 1) / 10;
 
+        // Populate database with placeholder data.
         SurveillanceCamera surveillanceCamera = new SurveillanceCamera(
                 picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
                 10, 120, 50, 140,

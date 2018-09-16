@@ -74,22 +74,23 @@ import static android.content.ContentValues.TAG;
 //TODO ASK for location permission
 
 /**
- * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
- * objects.
+ * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect objects.
  */
 public class DetectorActivity extends CameraActivity implements OnImageAvailableListener,SensorEventListener  {
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(null);
-    //surveillanceCameras.add(new SurveillanceCamera(picturesPath + "/nsurv/227312830_thumbnail.jpg", picturesPath + "/nsurv/227312830.jpg", new RectF(1.22f, 1.44f, 1.62f, 1.61f), new Location("")));
-    //SurveillanceCamera surveillanceCamera = new SurveillanceCamera(picturesPath + "/73457629_thumbnail.jpg", picturesPath + "/nsurv//73457629.jpg", 10, 20, 0, 40, 50.0005, 8.2832, 10.3345, "no comment");
+
     cameraRoomDatabase = CameraRoomDatabase.getDatabase(this);
+
     mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
     bottomNavigationView = findViewById(R.id.navigation);
+
+    // Handle bottom navigation bar clicks
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 
       @Override
@@ -201,11 +202,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private BorderedText borderedText;
 
-  // MY CHANGES
   private SurveillanceCamera currentCamera;
   private static String picturesPath = Environment.getExternalStoragePublicDirectory(
   Environment.DIRECTORY_PICTURES).getAbsolutePath();
-  private static long TIME_LAST_PICTURE_TAKEN = SystemClock.uptimeMillis();
+  private static long TIME_LAST_PICTURE_TAKEN = 0;
   private static final int DELAY_BETWEEN_CAPTURES = 3000;
 
   Location currentBestLocation;
@@ -235,18 +235,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private ImageView photoStatusView;
   private TextView locationDebugTextView;
 
-  private int STATUS_RED = 0;
-  private int STATUS_GREEN = 2;
+  private final int STATUS_RED = 0;
+  private final int STATUS_GREEN = 1;
 
   private int photoStatus = STATUS_GREEN;
-
-
-
-  // CHANGES END
-
-
-
-  // MY CHANGES
 
   @Override
   public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -285,6 +277,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     // Don't receive any more updates from either sensor.
     mSensorManager.unregisterListener(this);
+
     gpsLocation.cancel(true);
   }
 
@@ -314,15 +307,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     // "mOrientationAngles" now has up-to-date information.
   }
-
-
-
-
-  // END CHANGES
-
-
-
-
 
   @Override
   public void onPreviewSizeChosen(final Size size, final int rotation) {
@@ -486,7 +470,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       ImageUtils.saveBitmap(croppedBitmap);
     }
 
-
     runInBackground(
         new Runnable() {
           @Override
@@ -502,14 +485,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             paint.setColor(Color.RED);
             paint.setStyle(Style.STROKE);
             paint.setStrokeWidth(2.0f);
-
-            // MY CHANGES
-
-
-
-            // CHANGES END
-
-
 
             float minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
             switch (MODE) {
@@ -532,26 +507,23 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               if (location != null && result.getConfidence() >= minimumConfidence) {
                 canvas.drawRect(location, paint);
 
-                // MY CHANGES
-                LOGGER.i("Box Coordinates: " + location.toShortString() + "\nConfidence: " + result.getConfidence());
+                // Create folder structure in storage/.../Pictures/
                 File pictureDirectory = new File(picturesPath + "/unsurv/");
                 pictureDirectory.mkdirs();
 
-                File outputFile = new File(pictureDirectory, SystemClock.uptimeMillis() + ".jpg");
-                File thumbnailFile = new File(pictureDirectory, SystemClock.uptimeMillis() + "_thumbnail.jpg");
-
                 photoStatusView = findViewById(R.id.photo_status_view);
 
+                // Change photoStatusView depending on delay. photoStatusView starts as green from xml.
                 runOnUiThread(new Runnable(){
                   @Override
                   public void run(){
-                    if (SystemClock.uptimeMillis() - TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES
+                    if (System.currentTimeMillis() - TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES
                             && photoStatus != STATUS_GREEN) {
                       photoStatusView.setImageResource(R.drawable.ic_camera_alt_green_24dp);
                       photoStatus = STATUS_GREEN;
                     }
 
-                    if (result.getConfidence() > 0.95 && SystemClock.uptimeMillis() -
+                    if (result.getConfidence() > 0.95 && System.currentTimeMillis() -
                             TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES) {
                       photoStatusView.setImageResource(R.drawable.ic_camera_alt_red_24dp);
                       photoStatus = STATUS_RED;
@@ -560,10 +532,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                   }
                 });
 
-
-
-
-                if (result.getConfidence() > 0.95 && SystemClock.uptimeMillis() -
+                if (result.getConfidence() > 0.95 && System.currentTimeMillis() -
                         TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES) {
 
 
@@ -576,21 +545,20 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     Matrix turnMatrix = new Matrix();
                     turnMatrix.postRotate(90);
 
+                    // Create files, for now with timestamp as name
+                    File outputFile = new File(pictureDirectory, System.currentTimeMillis() + ".jpg");
+                    File thumbnailFile = new File(pictureDirectory, System.currentTimeMillis() + "_thumbnail.jpg");
+
                     out = new FileOutputStream(outputFile);
 
+                    // Get detection edges in px values.
                     int xThumbnail = Math.round(location.left);
                     int yThumbnail =  Math.round(location.top);
                     int widthThumbnail = Math.round(location.width());
                     int heightThumbnail = Math.round(location.height());
 
-
-                    LOGGER.i(String.format("function coords %s %s %s %s", xThumbnail, yThumbnail, widthThumbnail, heightThumbnail));
-
-
-                    //Bitmap inputPicture = Bitmap.createBitmap(croppedBitmap, 0, 0, croppedBitmap.getWidth(), croppedBitmap.getHeight());
                     croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
 
-                    // Bitmap thumbnail = Bitmap.createBitmap(rgbFrameBitmap, xThumbnail, yThumbnail, widthThumbnail, heightThumbnail);
                     thumbnailOut = new FileOutputStream(thumbnailFile);
                     Bitmap thumbnail = Bitmap.createBitmap(croppedBitmap, xThumbnail, yThumbnail, widthThumbnail, heightThumbnail);
                     thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, thumbnailOut);
@@ -606,13 +574,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                     }
 
-
                     updateOrientationAngles();
+                    // rad to degree
                     azimuth = mOrientationAngles[0]*(180/Math.PI);
                     pitch = mOrientationAngles[1]*(180/Math.PI);
                     roll = mOrientationAngles[2]*(180/Math.PI);
 
-                    //Log.i(TAG, "orientation:" + "\n" + String.valueOf(mOrientationAngles[0]) + "\n" + String.valueOf(mOrientationAngles[1]) + "\n" + String.valueOf(mOrientationAngles[2]) + "\n");
                     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
                     Long currentTime = System.currentTimeMillis();
                     currentCamera = new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(),
@@ -634,15 +601,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                       gpsLocation.execute();
                     }
 
-
-                    // END CHANGES
-
-
-
                   } catch (Exception e) {
                     e.printStackTrace();
                   } finally {
-                    TIME_LAST_PICTURE_TAKEN = SystemClock.uptimeMillis();
+                    TIME_LAST_PICTURE_TAKEN = System.currentTimeMillis();
                     try {
                       if (out != null) {
                         out.close();
@@ -653,9 +615,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                   }
 
                 }
-
-                // CHNAGES END
-
 
                 cropToFrameTransform.mapRect(location);
                 result.setLocation(location);
@@ -690,6 +649,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
   private class AsyncLocationGetter extends AsyncTask<Void, Integer, Location> {
+
+    /**
+     * Retrieves user location and updates currentBestLocation if sensor data is
+     * more accurate / recent.
+     *
+     * @param params none.
+     * @return Location.
+     * @see #onPreExecute()
+     * @see #onPostExecute
+     * @see #publishProgress
+     */
 
     //TODO put location handling in own class, maybe use osmdroid implementation
 
@@ -779,25 +749,22 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         }
 
         try {
-
           currentLocation = location;
           final float locationAccuracy = location.getAccuracy();
 
           locationStatusView = findViewById(R.id.location_status_view);
-
-
-
-
           photoStatusView = findViewById(R.id.photo_status_view);
           locationDebugTextView = findViewById(R.id.location_debug);
 
           runOnUiThread(new Runnable(){
             @Override
             public void run(){
-              locationDebugTextView.setText(String.valueOf(locationAccuracy));
-              if (locationAccuracy > 10) {
+              // Displays location accuracy (radius with 68 % confidence) for debugging purposes.
+              locationDebugTextView.setText("Accuracy:\n" + String.valueOf(locationAccuracy));
+
+              if (locationAccuracy > 15) {
                 locationStatusView.setImageResource(R.drawable.ic_my_location_red_24dp);
-              } else if (locationAccuracy < 10 && locationAccuracy > 3 ) {
+              } else if (locationAccuracy < 15 && locationAccuracy > 3 ) {
                 locationStatusView.setImageResource(R.drawable.ic_my_location_orange_24dp);
               } else if (locationAccuracy < 3) {
                 locationStatusView.setImageResource(R.drawable.ic_my_location_green_24dp);
@@ -807,11 +774,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             }
           );
 
-
-
           Log.i(TAG, "onLocationChanged:\n" + location.getLatitude() + "\n" + location.getLongitude() + "\n" + location.getAccuracy());
 
-          // compare best location vs current location
+          // Compare best location vs current location.
           if (isBetterLocation(currentLocation, currentBestLocation)) {
             currentBestLocation = currentLocation;
           }

@@ -47,6 +47,12 @@
             android:layout_weight="4"
             android:src="@drawable/ic_my_location_red_24dp"/>
 
+        <TextView
+            android:id="@+id/location_debug"
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"/>
+
         <ImageView
             android:id="@+id/photo_status_view"
             android:layout_width="0sp"
@@ -54,11 +60,9 @@
             android:layout_weight="4"
             android:src="@drawable/ic_camera_alt_green_24dp"/>
 
-        <TextView
-            android:id="@+id/location_debug"
-            android:layout_width="0sp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"/>
+
+
+
 
 
     </LinearLayout>

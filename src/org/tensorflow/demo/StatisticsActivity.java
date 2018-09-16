@@ -41,6 +41,8 @@ public class StatisticsActivity extends AppCompatActivity {
   private AsyncCamerasInTimeframe mAsyncCamerasInTimeframe;
   private BarChart statisticsBarChart;
   private LineChart statisticsLineChart;
+
+  // Operating modes for AsyncTask to fetch data. Needs more detail for further graphs.
   private final int ASYNC_BAR_MODE = 0;
   private final int ASYNC_LINE_MODE = 1;
 
@@ -51,11 +53,12 @@ public class StatisticsActivity extends AppCompatActivity {
     setContentView(R.layout.activity_statistics);
     cameraDb = CameraRoomDatabase.getDatabase(getApplicationContext());
 
-
     Spinner timeframeBarSpinner = findViewById(R.id.statistics_bar_spinner);
     Spinner timeframeLineSpinner = findViewById(R.id.statistics_line_spinner);
 
+
     statisticsBarChart = findViewById(R.id.statistics_barchart);
+
     statisticsBarChart.setPinchZoom(false);
     statisticsBarChart.setDoubleTapToZoomEnabled(false);
     statisticsBarChart.setScaleXEnabled(false);
@@ -64,12 +67,14 @@ public class StatisticsActivity extends AppCompatActivity {
     XAxis barXAxis = statisticsBarChart.getXAxis();
     YAxis barYAxis = statisticsBarChart.getAxisLeft();
 
+    // Disable right-side axis.
     statisticsBarChart.getAxisRight().setEnabled(false);
 
     barXAxis.setTextColor(Color.WHITE);
     barYAxis.setTextColor(Color.WHITE);
 
     barXAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
 
     statisticsLineChart = findViewById(R.id.statistics_linechart);
 
@@ -80,10 +85,9 @@ public class StatisticsActivity extends AppCompatActivity {
     lineYAxis.setTextColor(Color.WHITE);
     lineXAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
+
     barEntries = new ArrayList<BarEntry>();
     lineEntries = new ArrayList<Entry>();
-
-
 
     // Create an ArrayAdapter using the string array and a default spinner layout
     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -99,8 +103,8 @@ public class StatisticsActivity extends AppCompatActivity {
       @Override
       public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
+        // Listen for item selected in spinner. AsyncTask input is (operating mode, time, ... , time).
         switch (i) {
-
           case 0:
             mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
             mAsyncCamerasInTimeframe.execute("BAR", "-3 days", "-2 days", "-1 day");
@@ -189,17 +193,15 @@ public class StatisticsActivity extends AppCompatActivity {
             mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
             mAsyncCamerasInTimeframe.execute(
                     "LINE", "-12 months", "-11 months", "-10 months", "-9 months", "-8 months",
-                    "-8 months", "-7 months", "-6 months", "-5 months", "-4 months", "-3 months", "-2 months",
-                    "-1 month");
+                    "-8 months", "-7 months", "-6 months", "-5 months", "-4 months", "-3 months",
+                    "-2 months", "-1 month");
             break;
+
         }
-
-
       }
 
       @Override
       public void onNothingSelected(AdapterView<?> adapterView) {
-
       }
     });
 
@@ -233,16 +235,14 @@ public class StatisticsActivity extends AppCompatActivity {
             return true;
 
         }
-
         return false;
-
       }
     });
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_stats).setChecked(true);
-
   }
 
+  // Helper methods for querying database.
   private List<SurveillanceCamera> getCamerasInTimeframe(String sqlliteTimeStartpoint, String sqlliteTimeEndpoint) {
     return cameraDb.surveillanceCameraDao().getCamerasAddedInTimeframe(sqlliteTimeStartpoint, sqlliteTimeEndpoint);
   }
@@ -252,19 +252,26 @@ public class StatisticsActivity extends AppCompatActivity {
   }
 
 
-  /**
-   * input: "MODE", "interval", "interval", "interval"
-   */
-
-
   private class AsyncCamerasInTimeframe extends AsyncTask<String, Integer, List<Pair<Integer, Integer>>> {
+    /**
+     * Fetches data for graphs from database in background task.
+     *
+     * @param strings ("MODE", "sqltime",..., "sqltime").
+     *                modes = "BAR", "LINE"
+     *                sqltime see https://www.sqlite.org/lang_datefunc.html
+     * @return list of xy value pairs where first Pair describes mode again:
+     * (Pair(MODE, MODE), Pair(xValue0, yValue0), Pair(xValue1, yValue1), ...).
+     * @see #onPreExecute()
+     * @see #onPostExecute iterates through Pairs and populates graphs depending on mode.
+     * @see #publishProgress
+     */
 
     @Override
     protected List<Pair<Integer, Integer>> doInBackground(String... strings) {
       List<Pair<Integer, Integer>> outputPairs = new ArrayList<>();
       List<String> parameters = Arrays.asList(strings);
 
-
+      // Fetching data depending on mode. Different modes are for different graphs.
       if (parameters.get(0).equals("BAR")) {
         outputPairs.add(Pair.create(ASYNC_BAR_MODE, ASYNC_BAR_MODE));
 
@@ -292,11 +299,8 @@ public class StatisticsActivity extends AppCompatActivity {
             currentTotalCameras += currentTotalCameras + getCamerasInTimeframe(parameters.get(k), "localtime").size();
 
           }
-
         }
-
         }
-
 
       return outputPairs;
     }
@@ -305,6 +309,7 @@ public class StatisticsActivity extends AppCompatActivity {
     protected void onPostExecute(List<Pair<Integer, Integer>> pairs) {
       super.onPostExecute(pairs);
 
+      // Adds output from querying to corresponding graphs and refreshes them.
       if (pairs.get(0).first == ASYNC_BAR_MODE && pairs.get(0).second == ASYNC_BAR_MODE){
         barEntries.clear();
 
@@ -318,6 +323,7 @@ public class StatisticsActivity extends AppCompatActivity {
         BarData barData = new BarData(barDataSet);
         barData.setValueTextColor(Color.WHITE);
         statisticsBarChart.setData(barData);
+        // refresh
         statisticsBarChart.invalidate();
 
       } else if (pairs.get(0).first == ASYNC_LINE_MODE && pairs.get(0).second == ASYNC_LINE_MODE) {
@@ -333,11 +339,10 @@ public class StatisticsActivity extends AppCompatActivity {
         LineData lineData = new LineData(lineDataSet);
         lineData.setValueTextColor(Color.WHITE);
         statisticsLineChart.setData(lineData);
+        // refresh
         statisticsLineChart.invalidate();
 
-
       }
-
     }
   }
 

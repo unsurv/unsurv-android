@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 
@@ -80,12 +81,13 @@ public class MapActivity extends AppCompatActivity {
     cameraDb = CameraRoomDatabase.getDatabase(getApplicationContext());
 
     mapView = findViewById(R.id.map);
+    //TODO find solution to do the same at the beginning of a gesture.
+    // Reloads markers in visible area after scrolling. Closes infowindow if open.
     mapView.addMapListener(new DelayedMapListener(new MapListener() {
       @Override
       public boolean onScroll(ScrollEvent event) {
         reloadMarker();
         closeAllInfoWindowsOn(mapView);
-
         return false;
       }
 
@@ -93,7 +95,6 @@ public class MapActivity extends AppCompatActivity {
       public boolean onZoom(ZoomEvent event) {
         reloadMarker();
         closeAllInfoWindowsOn(mapView);
-
         return false;
       }
     }, 50)); // delay in ms after zooming/scrolling
@@ -101,7 +102,8 @@ public class MapActivity extends AppCompatActivity {
     mapView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        infoWindow.close();
+        reloadMarker();
+        closeAllInfoWindowsOn(mapView);
       }
     });
 
@@ -114,15 +116,16 @@ public class MapActivity extends AppCompatActivity {
 
     final IMapController mapController = mapView.getController();
 
+    // Setting starting position and zoom level.
+    GeoPoint startPoint = new GeoPoint(50.10704, 8.66213);
     mapController.setZoom(12.0);
-    GeoPoint startPoint = new GeoPoint(49.9960, 8.2772);
     mapController.setCenter(startPoint);
 
     //get livedata from local room database
     cameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
-
     allCameras = cameraViewModel.getAllCameras();
 
+    // Refresh markers when database changes
     Observer<List<SurveillanceCamera>> localCameraObserver = new Observer<List<SurveillanceCamera>>() {
       @Override
       public void onChanged(@Nullable List<SurveillanceCamera> surveillanceCameras) {
@@ -130,7 +133,7 @@ public class MapActivity extends AppCompatActivity {
       }
 
     };
-
+    // Set observer for LiveData
     cameraViewModel.getAllCameras().observe(this, localCameraObserver);
 
     // myLocationOverlay
@@ -138,11 +141,12 @@ public class MapActivity extends AppCompatActivity {
     myLocationOverlay.enableMyLocation();
     myLocationOverlay.enableFollowLocation();
     myLocationOverlay.setDrawAccuracyEnabled(true);
-
+    // Set
     mapController.setCenter(myLocationOverlay.getMyLocation());
     mapController.setZoom(14.00);
-
     mapView.getOverlays().add(myLocationOverlay);
+
+    // Button in to find user location.
     myLocationButton = findViewById(R.id.my_location_button);
     myLocationButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -195,7 +199,7 @@ public class MapActivity extends AppCompatActivity {
   }
 
 
-  //--------------------------------- from osm example app
+  // modified from osm example app
   /**
    * Load {@link SurveillanceCamera} in area  in a Background Task {@link BackgroundMarkerLoaderTask}.
    * mCurrentBackgroundMarkerLoaderTask.cancel() allows aborting the loading task on screen rotation.
@@ -212,7 +216,7 @@ public class MapActivity extends AppCompatActivity {
 
 
   private void reloadMarker() {
-    // initialized
+
     if (mCurrentBackgroundMarkerLoaderTask == null) {
       // start background load
       double zoom = this.mapView.getZoomLevelDouble();
@@ -286,22 +290,13 @@ public class MapActivity extends AppCompatActivity {
                 " ,lonMax=" + lonMax +
                 ", zoom=" + zoom);
 
-
-        // i.e.
-        // SELECT poi.lat, poi.lon, poi.id, poi.name FROM poi
-        //    WHERE poi.lat >= {latMin} AND poi.lat <= {latMax}
-        //          AND poi.lon >= {lonMin} AND poi.lon <= {lonMax}
-        //          AND {zoom} >= poi.zoomMin AND {zoom} <= poi.zoomMax
-
         allCamerasInArea = cameraDb.surveillanceCameraDao().getCamerasInArea(latMin, latMax, lonMin, lonMax);
         Log.d(TAG, "doInBackground: " + allCamerasInArea.size());
         itemsToDisplay.clear();
         for (int i = 0; i < allCamerasInArea.size(); i++) {
-          //itemsToDisplay.add(new OverlayItem("test_camera", allCamerasInArea.get(i).getComment(), new GeoPoint(allCamerasInArea.get(i).getLatitude(), allCamerasInArea.get(i).getLongitude())));
           itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", allCamerasInArea.get(i).getComment(), new GeoPoint(allCamerasInArea.get(i).getLatitude(), allCamerasInArea.get(i).getLongitude())));
 
         }
-
 
       } catch (Exception ex) {
         // TODO more specific error handling
@@ -317,7 +312,6 @@ public class MapActivity extends AppCompatActivity {
       return null;
     }
 
-    // This is called in gui-thread when doInBackground() is finished.
     @Override
     protected void onPostExecute(List<SurveillanceCamera> camerasToDisplay) {
       if (!isCancelled() && (camerasToDisplay != null)) {
@@ -351,34 +345,24 @@ public class MapActivity extends AppCompatActivity {
 
                         infoWindow.setRelatedObject(allCamerasInArea.get(cameraIndex));
 
+                        // Setting content for infoWindow.
                         infoImage = infoWindow.getView().findViewById(R.id.info_image);
                         infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
                         infoComment = infoWindow.getView().findViewById(R.id.info_comment);
                         infoEscape = infoWindow.getView().findViewById(R.id.info_escape_button);
 
+                        File thumbnail = new File(allCamerasInArea.get(cameraIndex).getThumbnailPath());
+                        Picasso.get().load(thumbnail)
+                                .into(infoImage);
+                        infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getTimestamp());
+                        infoComment.setText(allCamerasInArea.get(cameraIndex).getComment());
 
+                        infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
                         infoEscape.setOnClickListener(new View.OnClickListener() {
                           @Override
                           public void onClick(View view) {
-                            //ArrayList<InfoWindow> allInfoWindowsOpen = getOpenedInfoWindowsOn(mapView);
-                            //TODO add support for multiple windows?
-
                             infoWindow.close();
-
-                        }});
-
-
-                        File thumbnail = new File(allCamerasInArea.get(cameraIndex).getThumbnailPath());
-
-                        Picasso.get().load(thumbnail)
-                                .into(infoImage);
-
-                        //TODO show real values
-                        infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getTimestamp());
-                        infoComment.setText(allCamerasInArea.get(cameraIndex).getComment());
-                        infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
-
-
+                          }});
                       }
 
                       @Override
@@ -421,7 +405,7 @@ public class MapActivity extends AppCompatActivity {
     }
   }
 
-
+// Calculate distance between 2 GeoPoints, not tested yet.
   public double distFrom(double lat1, double lng1, double lat2, double lng2) {
     double earthRadius = 6371.0; // earth radius
     double dLat = Math.toRadians(lat2 - lat1);
