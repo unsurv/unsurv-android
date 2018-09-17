@@ -589,7 +589,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                             cameraLatitude, cameraLongitude, cameraAccuracy,
                             azimuth, pitch, roll,
                             "no comment",
-                            timestampIso8601.format(new Date(currentTime -1000*60*60*7)),
+                            timestampIso8601.format(new Date(currentTime)),
                             timestampIso8601.format(new Date(currentTime + new Random().nextInt(100000)))
                             );
                     Log.d(TAG, "datetimestamp: " + timestampIso8601.format(new Date(currentTime)));
