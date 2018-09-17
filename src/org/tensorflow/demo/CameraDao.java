@@ -28,6 +28,7 @@ public interface CameraDao {
   List<SurveillanceCamera> getCamerasAddedInTimeframe(String startpoint, String endpoint);
 
   @Query("SELECT count(*) FROM local_surveillance_cameras WHERE timestamp " +
-          "BETWEEN datetime('2018-01-01') AND datetime('now', :endpoint)") //
+          "BETWEEN datetime('2018-01-01') AND datetime('now', :endpoint)")
   int getTotalCamerasUpTo(String endpoint);
 }
+// example db timestamp 2018-09-17T15:26:33+0000

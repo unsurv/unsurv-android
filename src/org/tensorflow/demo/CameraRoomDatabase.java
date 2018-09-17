@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 
 @Database(entities = {SurveillanceCamera.class}, version = 1)
 public abstract class CameraRoomDatabase extends RoomDatabase {
@@ -64,7 +65,8 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
       mDao.deleteAll();
 
       for (int i = 0; i < 200; i++) {
-        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
+        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
         Random rng = new Random();
         double randomLat = (rng.nextDouble() * 2 - 1) / 10;
         double randomLong = (rng.nextDouble() * 2 - 1) / 10;
@@ -80,6 +82,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
                 timestampIso8601.format(new Date(System.currentTimeMillis() + rng.nextInt(1000*60*60*24))));
         mDao.insert(surveillanceCamera);
       }
+
 
       return null;
     }

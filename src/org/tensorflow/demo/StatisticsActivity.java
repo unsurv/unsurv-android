@@ -186,7 +186,7 @@ public class StatisticsActivity extends AppCompatActivity {
           case 4:
             mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
             mAsyncCamerasInTimeframe.execute(
-                    "LINE", "-3 months", "-2 months", "-1 month");
+                    "LINE", "-3 months", "-2 months", "-1 month1");
             break;
 
           case 5:
@@ -274,12 +274,12 @@ public class StatisticsActivity extends AppCompatActivity {
       // Fetching data depending on mode. Different modes are for different graphs.
       if (parameters.get(0).equals("BAR")) {
         outputPairs.add(Pair.create(ASYNC_BAR_MODE, ASYNC_BAR_MODE));
-
+        // TODO Add query in CameraDao with sql COUNT operator.
         for (int j = 1; j < parameters.size(); j++) {
           if (j < parameters.size() - 1) {
             outputPairs.add(Pair.create(j, getCamerasInTimeframe(parameters.get(j), parameters.get(j + 1)).size()));
           } else {
-            outputPairs.add(Pair.create(j, getCamerasInTimeframe(parameters.get(j), "localtime").size()));
+            outputPairs.add(Pair.create(j, getCamerasInTimeframe(parameters.get(j), "-1 second").size()));
 
           }
 
@@ -295,8 +295,8 @@ public class StatisticsActivity extends AppCompatActivity {
             outputPairs.add(Pair.create(k, currentTotalCameras + getCamerasInTimeframe(parameters.get(k), parameters.get(k + 1)).size()));
             currentTotalCameras += getCamerasInTimeframe(parameters.get(k), parameters.get(k + 1)).size();
           } else {
-            outputPairs.add(Pair.create(k, currentTotalCameras + getCamerasInTimeframe(parameters.get(k), "localtime").size()));
-            currentTotalCameras += currentTotalCameras + getCamerasInTimeframe(parameters.get(k), "localtime").size();
+            outputPairs.add(Pair.create(k, currentTotalCameras + getCamerasInTimeframe(parameters.get(k), "-1 second").size()));
+            currentTotalCameras += currentTotalCameras + getCamerasInTimeframe(parameters.get(k), "-1 second").size();
 
           }
         }

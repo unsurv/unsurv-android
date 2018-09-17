@@ -58,6 +58,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.Vector;
 import org.tensorflow.demo.OverlayView.DrawCallback;
 import org.tensorflow.demo.env.BorderedText;
@@ -580,16 +581,18 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     pitch = mOrientationAngles[1]*(180/Math.PI);
                     roll = mOrientationAngles[2]*(180/Math.PI);
 
-                    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
+                    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
                     Long currentTime = System.currentTimeMillis();
                     currentCamera = new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(),
                             cameraLeft, cameraRight, cameraTop, cameraBottom,
                             cameraLatitude, cameraLongitude, cameraAccuracy,
                             azimuth, pitch, roll,
                             "no comment",
-                            timestampIso8601.format(new Date(currentTime)),
+                            timestampIso8601.format(new Date(currentTime -1000*60*60*7)),
                             timestampIso8601.format(new Date(currentTime + new Random().nextInt(100000)))
                             );
+                    Log.d(TAG, "datetimestamp: " + timestampIso8601.format(new Date(currentTime)));
 
                     surveillanceCameras.add(currentCamera);
 
@@ -760,7 +763,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             @Override
             public void run(){
               // Displays location accuracy (radius with 68 % confidence) for debugging purposes.
-              locationDebugTextView.setText("Accuracy:\n" + String.valueOf(locationAccuracy));
+              locationDebugTextView.setText("GPS Accuracy:\n" + String.valueOf(locationAccuracy));
+              locationDebugTextView.setTextSize(10);
+
 
               if (locationAccuracy > 15) {
                 locationStatusView.setImageResource(R.drawable.ic_my_location_red_24dp);
