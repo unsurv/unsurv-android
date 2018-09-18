@@ -132,7 +132,7 @@ public class StatisticsActivity extends AppCompatActivity {
           case 4:
             mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
             mAsyncCamerasInTimeframe.execute(
-                    "BAR", "-3 months", "-2 months", "-1 month");
+                    "BAR", "-6 months", "-5 months", "-4 months", "-3 months", "-2 months", "-1 month");
             break;
 
           case 5:
@@ -186,7 +186,7 @@ public class StatisticsActivity extends AppCompatActivity {
           case 4:
             mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
             mAsyncCamerasInTimeframe.execute(
-                    "LINE", "-3 months", "-2 months", "-1 month1");
+                    "LINE", "-6 months", "-5 months", "-4 months", "-3 months", "-2 months", "-1 month");
             break;
 
           case 5:
