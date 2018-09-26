@@ -117,8 +117,8 @@ public class MapActivity extends AppCompatActivity {
     final IMapController mapController = mapView.getController();
 
     // Setting starting position and zoom level.
-    GeoPoint startPoint = new GeoPoint(50.10704, 8.66213);
-    mapController.setZoom(12.0);
+    GeoPoint startPoint = new GeoPoint(50.0027, 8.2771);
+    mapController.setZoom(7.0);
     mapController.setCenter(startPoint);
 
     //get livedata from local room database
@@ -319,7 +319,6 @@ public class MapActivity extends AppCompatActivity {
         mapView.getOverlays().remove(cameraOverlay);
         mapView.invalidate();
 
-        // TODO add timestamp in database
         for (int i = 0; i < camerasToDisplay.size(); i++) {
           itemsToDisplay.add(new OverlayItem("test_camera", camerasToDisplay.get(i).getComment(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
         }
