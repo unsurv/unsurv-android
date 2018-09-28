@@ -199,7 +199,7 @@ public class MapActivity extends AppCompatActivity {
   }
 
 
-  // modified from osm example app
+  // Modified from osm example app.
   /**
    * Load {@link SurveillanceCamera} in area  in a Background Task {@link BackgroundMarkerLoaderTask}.
    * mCurrentBackgroundMarkerLoaderTask.cancel() allows aborting the loading task on screen rotation.
