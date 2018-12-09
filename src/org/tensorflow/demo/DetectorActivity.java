@@ -34,7 +34,6 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Image;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -56,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -72,7 +70,7 @@ import android.os.Environment;
 
 import static android.content.ContentValues.TAG;
 
-//TODO ASK for location permission
+//TODO ASK for location permission, do in tutorial
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect objects.
@@ -436,6 +434,25 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   @Override
   protected void processImage() {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+
+        updateOrientationAngles();
+
+        azimuth = mOrientationAngles[0];
+        pitch = mOrientationAngles[1];
+        roll = mOrientationAngles[2];
+
+        locationDebugTextView = findViewById(R.id.location_debug);
+        locationDebugTextView.setText("az: " + String.valueOf(azimuth)
+                + "\npi: " + String.valueOf(pitch)
+                + "\nro: " + String.valueOf(roll));
+        locationDebugTextView.setTextSize(5);
+
+      }
+    });
+
     ++timestamp;
     final long currTimestamp = timestamp;
     byte[] originalLuminance = getLuminance();
@@ -575,16 +592,18 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                     }
 
-                    updateOrientationAngles();
+                    //updateOrientationAngles();
                     // rad to degree
-                    azimuth = mOrientationAngles[0]*(180/Math.PI);
-                    pitch = mOrientationAngles[1]*(180/Math.PI);
-                    roll = mOrientationAngles[2]*(180/Math.PI);
+                    //azimuth = mOrientationAngles[0]*(180/Math.PI);
+                    //pitch = mOrientationAngles[1]*(180/Math.PI);
+                    //roll = mOrientationAngles[2]*(180/Math.PI);
 
                     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
                     Long currentTime = System.currentTimeMillis();
-                    currentCamera = new SurveillanceCamera(thumbnailFile.getPath(), outputFile.getPath(),
+                    currentCamera = new SurveillanceCamera(
+                            thumbnailFile.getPath(),
+                            outputFile.getPath(),
                             cameraLeft, cameraRight, cameraTop, cameraBottom,
                             cameraLatitude, cameraLongitude, cameraAccuracy,
                             azimuth, pitch, roll,
@@ -592,6 +611,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                             timestampIso8601.format(new Date(currentTime)),
                             timestampIso8601.format(new Date(currentTime + new Random().nextInt(100000)))
                             );
+
                     Log.d(TAG, "datetimestamp: " + timestampIso8601.format(new Date(currentTime)));
 
                     surveillanceCameras.add(currentCamera);
@@ -763,8 +783,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             @Override
             public void run(){
               // Displays location accuracy (radius with 68 % confidence) for debugging purposes.
-              locationDebugTextView.setText("GPS Accuracy:\n" + String.valueOf(locationAccuracy));
-              locationDebugTextView.setTextSize(10);
+              // locationDebugTextView.setText("GPS Accuracy:\n" + String.valueOf(locationAccuracy));
+              // locationDebugTextView.setTextSize(10);
 
 
               if (locationAccuracy > 15) {

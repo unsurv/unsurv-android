@@ -45,8 +45,9 @@
         android:label="unsurv"
         android:theme="@style/Theme.AppCompat">
         <activity
-            android:name=".DetectorActivity"
+            android:name=".DebugActivity"
             android:label="unsurv"
+
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -54,6 +55,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".HistoryActivity"
             android:label="History" />
@@ -63,6 +65,11 @@
         <activity
             android:name=".StatisticsActivity"
             android:label="Statistics"/>
+
+        <activity
+            android:name=".DetectorActivity"
+            android:label="unsurv"
+            />
     </application>
 
 </manifest>

@@ -222,6 +222,9 @@ dependencies {
     //MPAndroidChart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 
+    //Volley google request library
+    implementation 'com.android.volley:volley:1.1.1'
+
 }
 
 

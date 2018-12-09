@@ -405,10 +405,10 @@ public class MapActivity extends AppCompatActivity {
   }
 
 // Calculate distance between 2 GeoPoints, not tested yet.
-  public double distFrom(double lat1, double lng1, double lat2, double lng2) {
+  public double distFrom(double lat1, double lon1, double lat2, double lon2) {
     double earthRadius = 6371.0; // earth radius
     double dLat = Math.toRadians(lat2 - lat1);
-    double dLng = Math.toRadians(lng2 - lng1);
+    double dLng = Math.toRadians(lon2 - lon1);
     double sindLat = Math.sin(dLat / 2);
     double sindLng = Math.sin(dLng / 2);
     double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
