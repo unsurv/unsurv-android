@@ -10,6 +10,9 @@ import java.util.List;
 @Dao
 public interface SynchronizedCameraDao {
 
+  @Query("DELETE FROM synchronized_cameras")
+  void deleteAll();
+
   @Insert
   void insert(SynchronizedCamera synchronizedCamera);
 

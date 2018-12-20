@@ -29,11 +29,10 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
@@ -43,7 +42,7 @@
         android:debuggable="true"
         android:icon="@drawable/unsurv_logo"
         android:label="unsurv"
-        android:theme="@style/Theme.AppCompat">
+        android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
             android:name=".DebugActivity"
             android:label="unsurv"
@@ -58,18 +57,27 @@
 
         <activity
             android:name=".HistoryActivity"
-            android:label="History" />
+            android:label="History"
+            android:parentActivityName=".DebugActivity"/>
         <activity
-            android:name=".MapActivity"
-            android:label="Map"/>
-        <activity
-            android:name=".StatisticsActivity"
-            android:label="Statistics"/>
 
-        <activity
             android:name=".DetectorActivity"
             android:label="unsurv"
-            />
+            android:parentActivityName=".DebugActivity"/>
+        <activity
+            android:name=".MapActivity"
+            android:label="Map"
+            android:parentActivityName=".DebugActivity"/>
+        <activity
+            android:name=".StatisticsActivity"
+            android:label="Statistics"
+            android:parentActivityName=".DebugActivity"/>
+
+        <activity android:name=".SettingsActivity"
+            android:label="Settings"
+            android:parentActivityName=".DebugActivity"/>
+
+
     </application>
 
 </manifest>

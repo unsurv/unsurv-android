@@ -64,8 +64,9 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
 
     @Override
     protected Void doInBackground(final Void... params) {
+      //mDao.deleteAll();
 
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 10; i++) {
         SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
         Random rng = new Random();
@@ -79,7 +80,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
                 "no comments",
                 timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24)))
                 );
-        mDao.insert(synchronizedCamera);
+        //mDao.insert(synchronizedCamera);
 
       }
 

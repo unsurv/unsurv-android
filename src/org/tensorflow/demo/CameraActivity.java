@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Size;
 import android.view.KeyEvent;
 import android.view.Surface;
@@ -44,7 +45,7 @@ import java.nio.ByteBuffer;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
 
-public abstract class CameraActivity extends Activity
+public abstract class CameraActivity extends AppCompatActivity
     implements OnImageAvailableListener, Camera.PreviewCallback {
   private static final Logger LOGGER = new Logger();
 

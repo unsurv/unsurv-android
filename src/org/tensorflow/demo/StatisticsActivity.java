@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -206,6 +207,9 @@ public class StatisticsActivity extends AppCompatActivity {
     });
 
 
+    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
+    setSupportActionBar(myToolbar);
+
     bottomNavigationView = findViewById(R.id.navigation);
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -240,6 +244,33 @@ public class StatisticsActivity extends AppCompatActivity {
     });
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_stats).setChecked(true);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    //return super.onCreateOptionsMenu(menu);
+    getMenuInflater().inflate(R.menu.actionbar, menu);
+    return true;
+  }
+
+
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+
+      case R.id.action_settings:
+        Intent settingsIntent = new Intent(StatisticsActivity.this, SettingsActivity.class);
+        startActivity(settingsIntent);
+
+        return true;
+
+
+
+      default:
+        // Fall back on standard behaviour when user choice not recognized.
+        return super.onOptionsItemSelected(item);
+    }
   }
 
   // Helper methods for querying database.

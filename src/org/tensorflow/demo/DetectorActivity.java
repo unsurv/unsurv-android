@@ -43,6 +43,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -86,6 +87,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
+    setSupportActionBar(myToolbar);
 
     bottomNavigationView = findViewById(R.id.navigation);
 
@@ -238,6 +242,33 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private final int STATUS_GREEN = 1;
 
   private int photoStatus = STATUS_GREEN;
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    //return super.onCreateOptionsMenu(menu);
+    getMenuInflater().inflate(R.menu.actionbar, menu);
+    return true;
+  }
+
+
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+
+      case R.id.action_settings:
+        Intent settingsIntent = new Intent(DetectorActivity.this, SettingsActivity.class);
+        startActivity(settingsIntent);
+
+        return true;
+
+
+
+      default:
+        // Fall back on standard behaviour when user choice not recognized.
+        return super.onOptionsItemSelected(item);
+    }
+  }
 
   @Override
   public void onAccuracyChanged(Sensor sensor, int accuracy) {

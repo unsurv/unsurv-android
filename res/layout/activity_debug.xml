@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,17 +9,47 @@
     android:background="#000"
     android:orientation="vertical">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+
+        />
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0sp"
-        android:layout_weight="9">
+        android:layout_weight="9"
+        android:orientation="vertical">
 
-    <TextView
+        <TextView
             android:id="@+id/debug_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="This is a debug-activity"/>
+
+        <Button
+            android:id="@+id/sync_db"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SYNC DB"/>
+
+        <Button
+            android:id="@+id/check_db"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CHECK DB SIZE"/>
+
+        <Button
+            android:id="@+id/delete_db"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DELETE DB"/>
 
 
     </LinearLayout>
@@ -31,6 +63,7 @@
         android:layout_weight="1"
         android:layout_gravity="start"
         android:background="#000"
+        app:itemTextColor="@color/cardview_dark_background"
         app:menu="@menu/bottom_navigation_items"/>
 
 </LinearLayout>

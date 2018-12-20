@@ -13,7 +13,7 @@ public class SynchronizedCameraViewModel extends AndroidViewModel {
   public SynchronizedCameraViewModel (Application application) {
     super(application);
     mSynchronizedCameraRepository = new SynchronizedCameraRepository(application);
-    mAllSynchronizedCameras = mSynchronizedCameraRepository.getAllSynchronizedCameras();
+    //mAllSynchronizedCameras = mSynchronizedCameraRepository.getAllSynchronizedCameras();
 
   }
 

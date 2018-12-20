@@ -11,6 +11,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -39,6 +40,9 @@ public class HistoryActivity extends AppCompatActivity {
         adapter.setCameras(surveillanceCameras);
       }
     });
+
+    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
+    setSupportActionBar(myToolbar);
 
     bottomNavigationView = findViewById(R.id.navigation);
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -78,6 +82,33 @@ public class HistoryActivity extends AppCompatActivity {
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_history).setChecked(true);
 
 
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    //return super.onCreateOptionsMenu(menu);
+    getMenuInflater().inflate(R.menu.actionbar, menu);
+    return true;
+  }
+
+
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+
+      case R.id.action_settings:
+        Intent settingsIntent = new Intent(HistoryActivity.this, SettingsActivity.class);
+        startActivity(settingsIntent);
+
+        return true;
+
+
+
+      default:
+        // Fall back on standard behaviour when user choice not recognized.
+        return super.onOptionsItemSelected(item);
+    }
   }
 
   private BottomNavigationView bottomNavigationView;

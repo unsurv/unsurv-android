@@ -13,16 +13,20 @@ public class SynchronizedCameraRepository {
   SynchronizedCameraRepository (Application application) {
     SynchronizedCameraRoomDatabase synchronizedDb = SynchronizedCameraRoomDatabase.getDatabase(application);
     mSynchronizedCameraDao = synchronizedDb.synchronizedCameraDao();
-    mAllCameras = mSynchronizedCameraDao.getAllCameras();
+    //mAllCameras = mSynchronizedCameraDao.getAllCameras();
 
   }
 
   List<SynchronizedCamera> getAllSynchronizedCameras() {
-    return mAllCameras;
+    return mSynchronizedCameraDao.getAllCameras();
   }
 
   public void insert(SynchronizedCamera synchronizedCamera) {
-    new insertAsyncTask(mSynchronizedCameraDao).execute();
+    new insertAsyncTask(mSynchronizedCameraDao).execute(synchronizedCamera);
+  }
+
+  public void deleteAll() {
+    mSynchronizedCameraDao.deleteAll();
   }
 
 

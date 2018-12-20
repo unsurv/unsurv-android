@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:summary="Settings for unsurv">
+
+
+    <SwitchPreference
+
+        app:title="Enable message notifications"
+        android:summary= "Test Switch Preference"/>
+
+    <Preference
+
+        app:title="Send feedback"
+        android:summary="Report technical issues or suggest new features"/>
+
+
+
+
+</PreferenceScreen>
