@@ -19,7 +19,7 @@ public class SynchronizedCameraViewModel extends AndroidViewModel {
 
   List<SynchronizedCamera> getAllSynchronizedCameras() { return mAllSynchronizedCameras; }
 
-  public void insert(SynchronizedCamera synchronizedCamera) {
+  public void insert(List<SynchronizedCamera> synchronizedCamera) {
     mSynchronizedCameraRepository.insert(synchronizedCamera);
   }
 }

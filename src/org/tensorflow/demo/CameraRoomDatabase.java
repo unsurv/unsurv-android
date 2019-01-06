@@ -64,9 +64,10 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
     protected Void doInBackground(final Void... params) {
       mDao.deleteAll();
 
+      SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+      timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
       for (int i = 0; i < 200; i++) {
-        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
         Random rng = new Random();
         double randomLat = (rng.nextDouble() * 2 - 1) / 10;
         double randomLong = (rng.nextDouble() * 2 - 1) / 10;

@@ -6,7 +6,7 @@
 
 
     <SwitchPreference
-
+        android:key="notifications"
         app:title="Enable message notifications"
         android:summary= "Test Switch Preference"/>
 
@@ -14,6 +14,11 @@
 
         app:title="Send feedback"
         android:summary="Report technical issues or suggest new features"/>
+
+    <EditTextPreference
+        android:key="synchronizationUrl"
+        android:title="Server to synchronize with"
+        />
 
 
 

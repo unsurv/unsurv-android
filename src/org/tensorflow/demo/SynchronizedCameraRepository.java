@@ -21,7 +21,7 @@ public class SynchronizedCameraRepository {
     return mSynchronizedCameraDao.getAllCameras();
   }
 
-  public void insert(SynchronizedCamera synchronizedCamera) {
+  public void insert(List<SynchronizedCamera> synchronizedCamera) {
     new insertAsyncTask(mSynchronizedCameraDao).execute(synchronizedCamera);
   }
 
@@ -30,7 +30,7 @@ public class SynchronizedCameraRepository {
   }
 
 
-  private static class insertAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
+  private static class insertAsyncTask extends AsyncTask<List<SynchronizedCamera>, Void, Void> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
 
@@ -39,8 +39,10 @@ public class SynchronizedCameraRepository {
     }
 
     @Override
-    protected Void doInBackground(final SynchronizedCamera... params) {
-      mAsyncTaskDao.insert(params[0]);
+    protected Void doInBackground(final List<SynchronizedCamera>... params) {
+      for (int i = 0; i < params[0].size(); i++)
+
+      mAsyncTaskDao.insert(params[0].get(i));
       return null;
     }
   }

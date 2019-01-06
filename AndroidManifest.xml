@@ -17,7 +17,7 @@
     package="org.tensorflow.demo">
 
     <uses-sdk
-        android:minSdkVersion="21"
+        android:minSdkVersion="23"
         android:targetSdkVersion="23" />
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -36,6 +36,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"  />
 
     <application
         android:allowBackup="true"
@@ -77,7 +78,18 @@
             android:label="Settings"
             android:parentActivityName=".DebugActivity"/>
 
+        <service android:name=".SyncJobService"
+            android:label="SynchronizationService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+        />
+
+        <service android:name=".SyncIntervalSchedulerJobService"
+            android:label="SynchronizationScheduler"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
 
     </application>
+    
+    
 
 </manifest>

@@ -92,8 +92,8 @@ android {
     if (nativeBuildSystem == 'cmake') {
         defaultConfig {
             applicationId = 'org.tensorflow.demo'
-            minSdkVersion 21
-            targetSdkVersion 23
+            minSdkVersion 23
+            targetSdkVersion 26
             ndk {
                 abiFilters "${cpuType}"
             }
@@ -225,7 +225,8 @@ dependencies {
     //Volley google request library
     implementation 'com.android.volley:volley:1.1.1'
 
-
+    // UnitTests
+    implementation 'junit:junit:4.12'
 }
 
 
