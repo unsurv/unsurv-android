@@ -360,11 +360,13 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
+        //JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
-        List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
+        //List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
 
-        //debugTextView.setText(String.valueOf(allJobsPending.get(0).getFlexMillis()));
+        Intent tutorialIntent = new Intent(DebugActivity.this, TutorialActivity.class);
+        startActivity(tutorialIntent);
+
 
       }
     });
