@@ -23,14 +23,10 @@
     <org.osmdroid.views.MapView android:id="@+id/debug_map"
         android:layout_width="match_parent"
         android:layout_height="0sp"
-        android:layout_weight="7"
+        android:layout_weight="10"
         />
 
-    <TextView
-        android:id="@+id/debug_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="This is a debug-activity"/>
+
 
 
     <LinearLayout
@@ -38,8 +34,6 @@
         android:layout_height="0sp"
         android:layout_weight="1"
         android:orientation="horizontal">
-
-
 
         <Button
             android:id="@+id/sync_db"
@@ -67,6 +61,13 @@
 
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/debug_textview"
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="6"
+        android:text="This is a debug-activity"/>
 
 
     <android.support.design.widget.BottomNavigationView

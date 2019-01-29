@@ -1,26 +1,26 @@
 package org.tensorflow.demo;
 
-import android.app.AlarmManager;
+import android.Manifest;
 import android.app.Application;
-import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -96,11 +96,10 @@ public class DebugActivity extends AppCompatActivity {
   private TextView infoComment;
   private ImageButton infoEscape;
 
-  private List<SurveillanceCamera> allCamerasInArea;
+  private List<CameraCapture> allCamerasInArea;
   private List<SynchronizedCamera> camerasToSync;
 
-  private PendingIntent pendingSyncIntent;
-  private AlarmManager syncAlarmManager;
+  private WifiManager wifiManager;
 
 
 
@@ -158,6 +157,9 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
     sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.2.159:5000/cameras/?").apply();
     sharedPreferences.edit().putString("area", "8.2699,50.0201,8.2978,50.0005").apply();
+    sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
+
+    wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
 
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
@@ -287,11 +289,6 @@ public class DebugActivity extends AppCompatActivity {
 
         new DbAsyncTask(getApplication(), CHECK_DB_SIZE).execute();
 
-        if (syncAlarmManager != null) {
-          syncAlarmManager.cancel(pendingSyncIntent);
-
-        }
-
       }
     });
 
@@ -312,48 +309,42 @@ public class DebugActivity extends AppCompatActivity {
 
 
 
-    SurveillanceCamera surveillanceCamera1 = new SurveillanceCamera(
+    CameraCapture cameraCapture1 = new CameraCapture(99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99452, 8.24688,
-            10.3345, 3.1414 - 3.14/10, 12.3313, 170.3332,
-            "no comment",
-            timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),
-            timestampIso8601.format(new Date(System.currentTimeMillis() + rng.nextInt(1000*60*60*24))));
+            10.3345, 3.1414 - 3.14/10, 12.3313, 170.3332);
 
-
-    SurveillanceCamera surveillanceCamera2 = new SurveillanceCamera(
+    CameraCapture cameraCapture2 = new CameraCapture(99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99455, 8.24705,
-            10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332,
-            "no comment",
-            timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),
-            timestampIso8601.format(new Date(System.currentTimeMillis() + rng.nextInt(1000*60*60*24))));
+            10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
 
-
-    List<SurveillanceCamera> captureListTest = Arrays.asList(surveillanceCamera1, surveillanceCamera2);
-
-    Location testEstimate = estimateCameraLocationFromCaptures(captureListTest);
-
-    SurveillanceCamera surveillanceCamera3 = new SurveillanceCamera(
+    CameraCapture cameraCapture3 = new CameraCapture(99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
-            testEstimate.getLatitude(), testEstimate.getLongitude(),
-            10.3345, - 3.14/2, 12.3313, 170.3332,
-            "no comment",
-            timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),
-            timestampIso8601.format(new Date(System.currentTimeMillis() + rng.nextInt(1000*60*60*24))));
+            49.99458, 8.24725,
+            10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
+
+    CameraCapture cameraCapture4 = new CameraCapture(99.9f,
+            picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+            10, 120, 50, 140,
+            49.99455, 8.24740,
+            10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
+
+    List<CameraCapture> captureListTest = Arrays.asList(cameraCapture1, cameraCapture2, cameraCapture3, cameraCapture4);
 
 
-    allCamerasInArea = Arrays.asList(surveillanceCamera1, surveillanceCamera2, surveillanceCamera3);
+
+    allCamerasInArea = captureListTest;
 
     reloadMarker();
 
 
     // reoccuring task
 
-    Synchronization.scheduleSyncIntervalJob(getApplicationContext(), null);
+    //Synchronization.scheduleSyncIntervalJob(getApplicationContext(), null);
 
 
     debugAlarm.setOnClickListener(new View.OnClickListener() {
@@ -370,6 +361,32 @@ public class DebugActivity extends AppCompatActivity {
 
       }
     });
+
+
+    final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
+          Boolean scanComplete = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
+          List<ScanResult> mScanResult = wifiManager.getScanResults();
+
+          StringBuilder allNetworksAvailable = new StringBuilder();
+          for (int i=0; i<mScanResult.size(); i++) {
+            allNetworksAvailable.append(mScanResult.get(i).SSID + "\n");
+          }
+
+          debugTextView.setText(allNetworksAvailable.toString());
+        }
+
+      }
+    };
+
+    registerReceiver(mWifiScanReceiver,
+            new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+
+    wifiManager.startScan();
+    int pasd = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+    List<ScanResult> masdScanResult = wifiManager.getScanResults();
 
 
 
@@ -470,123 +487,6 @@ public class DebugActivity extends AppCompatActivity {
     }
   }
 
-  public Location estimateCameraLocationFromCaptures(List<SurveillanceCamera> recordedCameras) {
-
-    Location estimatedCameraLocation;
-
-    SurveillanceCamera camera1 = recordedCameras.get(0);
-    SurveillanceCamera camera2 = recordedCameras.get(1);
-
-    Location camera1Location = new Location("camera1");
-    Location camera2Location = new Location("camera2");
-
-    camera1Location.setLatitude(camera1.getLatitude());
-    camera1Location.setLongitude(camera1.getLongitude());
-
-    camera2Location.setLatitude(camera2.getLatitude());
-    camera2Location.setLongitude(camera2.getLongitude());
-
-    // Approximate in 2D coordinates in meters with straight lines as headings.
-
-    // points
-    double x1;
-    double y1;
-
-    double x2;
-    double y2;
-
-    // slope
-    double m1;
-    double m2;
-
-    // y intersect
-    double c1;
-    double c2;
-
-    // calculate slope with cotangent
-    m1 = Math.cos(camera1.getAzimuth()) / Math.sin(camera1.getAzimuth());
-    m2 = Math.cos(camera2.getAzimuth()) / Math.sin(camera2.getAzimuth());
-
-
-    // camera1 in approximation is positioned at (0|0)
-    x1 = 0;
-    y1 = 0;
-
-    c1 = 0;
-
-
-    // distance to another capture in m
-    float distanceToSecondCapture = camera1Location.distanceTo(camera2Location);
-
-    // bearing to another capture in degrees east from true north
-    float bearingToSecondCapture = camera1Location.bearingTo(camera2Location);
-
-
-    // approximate second point in 2D coordinates
-
-    // 1 degree of latitude is equal to different distances depending on longitude.
-    // 1 degree equals 110574 m at the equator. Doesn't change much further north/south
-    y2 = (camera2.getLatitude() - camera1.getLatitude())*110574;
-
-    // get x2 from pythagoras with distance and y distance.
-    x2 = Math.sqrt(Math.pow(distanceToSecondCapture, 2) - Math.pow(y2, 2));
-
-
-
-
-
-    c2 = (m2*-x2) - y2;
-
-
-    // intersect coordinates
-
-    double intersectX = (c2-c1) / (m1-m2);
-    double intersectY = m1*intersectX + c1;
-
-
-    estimatedCameraLocation = metersFromLocationToLocation(intersectY, intersectX,
-            camera1.getLatitude(), camera1.getLongitude());
-
-
-
-    return estimatedCameraLocation;
-
-  }
-
-
-
-  public double longitudeDegreeToMetersRatio(double latitude) {
-    // in m
-    int earthRadius = 6371000;
-
-    return Math.PI/180*earthRadius*Math.cos(Math.toRadians(latitude));
-  }
-
-  public Location metersFromLocationToLocation(double metersNorth, double metersEast,
-                                               double latStart, double lonStart) {
-
-    double latDiff = metersNorth / 110574;
-    double lonDiff = metersEast / longitudeDegreeToMetersRatio(latStart);
-
-    Location updatedLocation = new Location("locationFromLocationAndMeters");
-
-    updatedLocation.setLatitude(latStart + latDiff);
-    updatedLocation.setLongitude(lonStart + lonDiff);
-
-    return updatedLocation;
-
-  }
-
-
-
-
-
-
-
-
-
-
-
 
 
   private DebugActivity.BackgroundMarkerLoaderTask mCurrentBackgroundMarkerLoaderTask = null;
@@ -612,7 +512,7 @@ public class DebugActivity extends AppCompatActivity {
 
   }
 
-  private class BackgroundMarkerLoaderTask extends AsyncTask<Double, Integer, List<SurveillanceCamera>> {
+  private class BackgroundMarkerLoaderTask extends AsyncTask<Double, Integer, List<CameraCapture>> {
 
     /**
      * Computation of the map itmes in the non-gui background thread. .
@@ -624,7 +524,7 @@ public class DebugActivity extends AppCompatActivity {
      * @see #publishProgress
      */
     @Override
-    protected List<SurveillanceCamera> doInBackground(Double... params) {
+    protected List<CameraCapture> doInBackground(Double... params) {
       FolderOverlay result = new FolderOverlay();
 
       try {
@@ -663,7 +563,7 @@ public class DebugActivity extends AppCompatActivity {
 
         itemsToDisplay.clear();
         for (int i = 0; i < allCamerasInArea.size(); i++) {
-          itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", allCamerasInArea.get(i).getComment(), new GeoPoint(allCamerasInArea.get(i).getLatitude(), allCamerasInArea.get(i).getLongitude())));
+          itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", "no comment", new GeoPoint(allCamerasInArea.get(i).getLatitude(), allCamerasInArea.get(i).getLongitude())));
 
         }
 
@@ -682,14 +582,14 @@ public class DebugActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostExecute(List<SurveillanceCamera> camerasToDisplay) {
+    protected void onPostExecute(List<CameraCapture> camerasToDisplay) {
       if (!isCancelled() && (camerasToDisplay != null)) {
 
         mapView.getOverlays().remove(cameraOverlay);
         mapView.invalidate();
 
         for (int i = 0; i < camerasToDisplay.size(); i++) {
-          itemsToDisplay.add(new OverlayItem("test_camera", camerasToDisplay.get(i).getComment(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+          itemsToDisplay.add(new OverlayItem("test_camera", "no comment", new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
         }
 
         Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
@@ -722,8 +622,8 @@ public class DebugActivity extends AppCompatActivity {
                         File thumbnail = new File(allCamerasInArea.get(cameraIndex).getThumbnailPath());
                         Picasso.get().load(thumbnail)
                                 .into(infoImage);
-                        infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getTimestamp());
-                        infoComment.setText(allCamerasInArea.get(cameraIndex).getComment());
+                        infoLatestTimestamp.setText("cameraCaptures have no timestamp now");
+                        infoComment.setText("no comment");
 
                         infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
                         infoEscape.setOnClickListener(new View.OnClickListener() {

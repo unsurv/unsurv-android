@@ -40,7 +40,6 @@ class Synchronization {
 
     //API parameters for background Service.
 
-
     String areaQuery = "";
     String startQuery = "";
 

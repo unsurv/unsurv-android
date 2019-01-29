@@ -18,6 +18,7 @@ package org.tensorflow.demo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -38,13 +39,18 @@ import android.media.ImageReader.OnImageAvailableListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
+import android.util.Pair;
 import android.util.Size;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,7 +82,7 @@ import static android.content.ContentValues.TAG;
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect objects.
  */
-public class DetectorActivity extends CameraActivity implements OnImageAvailableListener,SensorEventListener  {
+public class DetectorActivity extends CameraActivity implements OnImageAvailableListener, SensorEventListener  {
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
@@ -91,7 +97,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
 
-    bottomNavigationView = findViewById(R.id.navigation);
+    BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
 
     // Handle bottom navigation bar clicks
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -129,6 +135,33 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     });
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_camera).setChecked(true);
+
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    buttonCaptureEnabled = sharedPreferences.getBoolean("buttonCapture", false);
+
+    // Create folder structure in storage/.../Pictures/
+    pictureDirectory.mkdirs();
+
+    photoStatusView = findViewById(R.id.photo_status_view);
+
+    photoStatusView.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View view, MotionEvent motionEvent) {
+
+        switch (motionEvent.getAction()) {
+          case MotionEvent.ACTION_DOWN:
+            captureButtonIsBeingHeld = true;
+            return true;
+
+          case MotionEvent.ACTION_UP:
+            captureButtonIsBeingHeld = false;
+            return true;
+        }
+
+
+        return false;
+      }
+    });
 
   }
 
@@ -205,11 +238,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private BorderedText borderedText;
 
-  private SurveillanceCamera currentCamera;
   private static String picturesPath = Environment.getExternalStoragePublicDirectory(
   Environment.DIRECTORY_PICTURES).getAbsolutePath();
-  private static long TIME_LAST_PICTURE_TAKEN = 0;
-  private static final int DELAY_BETWEEN_CAPTURES = 3000;
+  private static long timeLastPictureTaken = 0;
+  private static final int DELAY_BETWEEN_CAPTURES = 500;
 
   Location currentBestLocation;
   private double cameraLatitude;
@@ -217,7 +249,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private double cameraAccuracy;
   AsyncLocationGetter gpsLocation = new AsyncLocationGetter(DetectorActivity.this);
 
-  ArrayList<SurveillanceCamera> surveillanceCameras = new ArrayList<>();
   private SensorManager mSensorManager;
   private Sensor accelerometer;
   private Sensor magneticField;
@@ -232,16 +263,34 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private double pitch;
   private double roll;
 
-  private BottomNavigationView bottomNavigationView;
+
 
   private ImageView locationStatusView;
-  private ImageView photoStatusView;
+  private ImageButton photoStatusView;
   private TextView locationDebugTextView;
 
   private final int STATUS_RED = 0;
   private final int STATUS_GREEN = 1;
 
   private int photoStatus = STATUS_GREEN;
+
+  private Boolean buttonCaptureEnabled;
+
+  final File pictureDirectory = new File(picturesPath + "/unsurv/");
+
+  private Boolean captureButtonIsBeingHeld = false;
+
+  private ArrayList<CameraCapture> pooledCameraCaptures = new ArrayList<>();
+
+  private long timePoolCaptureStarted = 0;
+  private int poolDurationInMillis = 3000; //TODO add setting to set duration.
+  private int delayBetweenPoolsInMillis = 10000; //TODO add setting to set duration.
+
+  private Long currentTime;
+
+  private Boolean isTimeToCapture = false;
+
+
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -551,29 +600,96 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             final List<Classifier.Recognition> mappedRecognitions =
                 new LinkedList<Classifier.Recognition>();
 
+
+            currentTime = System.currentTimeMillis();
+
+            // TODO add single capture mode
+
+
+            if (!buttonCaptureEnabled) {
+
+              // Abort in time after duration completed and before delay completed
+              if (timePoolCaptureStarted + delayBetweenPoolsInMillis > currentTime &&
+                      timePoolCaptureStarted + poolDurationInMillis < currentTime) {
+
+                // End pooling, analyze pool and clear list.
+                if (!pooledCameraCaptures.isEmpty()) {
+
+                  pooledCameraCaptures.clear();
+
+                  CameraCapture cameraCapture1 = new CameraCapture(99.9f,
+                          picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                          10, 120, 50, 140,
+                          49.99452, 8.24688,
+                          10.3345, 0 + 3.14/18, 12.3313, 170.3332);
+
+                  CameraCapture cameraCapture2 = new CameraCapture(99.9f,
+                          picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                          10, 120, 50, 140,
+                          49.99455, 8.24715,
+                          10.3345, 0 + 3.14/36, 12.3313, 170.3332);
+
+                  CameraCapture cameraCapture3 = new CameraCapture(99.9f,
+                          picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                          10, 120, 50, 140,
+                          49.99458, 8.24735,
+                          10.3345, 0 - 3.14/36, 12.3313, 170.3332);
+
+                  CameraCapture cameraCapture4 = new CameraCapture(99.9f,
+                          picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                          10, 120, 50, 140,
+                          49.99455, 8.24750,
+                          10.3345, 0 - 3.14/18, 12.3313, 170.3332);
+
+                  pooledCameraCaptures.add(cameraCapture1);
+                  pooledCameraCaptures.add(cameraCapture2);
+                  pooledCameraCaptures.add(cameraCapture3);
+                  pooledCameraCaptures.add(cameraCapture4);
+
+                  processCapturePool(pooledCameraCaptures);
+                }
+
+              } else
+                // Set new startpoint if old startpoint is longer than delayBetweenPoolsinMillis ago.
+                // This starts a new pool.
+                if (timePoolCaptureStarted + delayBetweenPoolsInMillis < currentTime) {
+                  timePoolCaptureStarted = currentTime;
+
+                } else
+                  //time in
+                  if (timePoolCaptureStarted + poolDurationInMillis > currentTime) {
+                    isTimeToCapture = true;
+
+                  }
+
+
+            } else {
+              // If Button is held, enable pooling
+              captureButtonIsBeingHeld = isTimeToCapture;
+            }
+
+
+
             for (final Classifier.Recognition result : results) {
               final RectF location = result.getLocation();
               if (location != null && result.getConfidence() >= minimumConfidence) {
                 canvas.drawRect(location, paint);
 
-                // Create folder structure in storage/.../Pictures/
-                File pictureDirectory = new File(picturesPath + "/unsurv/");
-                pictureDirectory.mkdirs();
 
-                photoStatusView = findViewById(R.id.photo_status_view);
 
+                //TODO move this to processImage()
                 // Change photoStatusView depending on delay. photoStatusView starts as green from xml.
                 runOnUiThread(new Runnable(){
                   @Override
                   public void run(){
-                    if (System.currentTimeMillis() - TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES
+                    if (System.currentTimeMillis() - timeLastPictureTaken > DELAY_BETWEEN_CAPTURES
                             && photoStatus != STATUS_GREEN) {
                       photoStatusView.setImageResource(R.drawable.ic_camera_alt_green_24dp);
                       photoStatus = STATUS_GREEN;
                     }
 
                     if (result.getConfidence() > 0.95 && System.currentTimeMillis() -
-                            TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES) {
+                            timeLastPictureTaken > DELAY_BETWEEN_CAPTURES) {
                       photoStatusView.setImageResource(R.drawable.ic_camera_alt_red_24dp);
                       photoStatus = STATUS_RED;
 
@@ -581,93 +697,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                   }
                 });
 
-                if (result.getConfidence() > 0.95 && System.currentTimeMillis() -
-                        TIME_LAST_PICTURE_TAKEN > DELAY_BETWEEN_CAPTURES) {
-
-
-                  LOGGER.i("TOOK PICTURE -------------------------------------- ");
-
-                  FileOutputStream out = null;
-                  FileOutputStream thumbnailOut;
-
-                  try {
-                    Matrix turnMatrix = new Matrix();
-                    turnMatrix.postRotate(90);
-
-                    // Create files, for now with timestamp as name
-                    File outputFile = new File(pictureDirectory, System.currentTimeMillis() + ".jpg");
-                    File thumbnailFile = new File(pictureDirectory, System.currentTimeMillis() + "_thumbnail.jpg");
-
-                    out = new FileOutputStream(outputFile);
-
-                    // Get detection edges in px values.
-                    int xThumbnail = Math.round(location.left);
-                    int yThumbnail =  Math.round(location.top);
-                    int widthThumbnail = Math.round(location.width());
-                    int heightThumbnail = Math.round(location.height());
-
-                    croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-
-                    thumbnailOut = new FileOutputStream(thumbnailFile);
-                    Bitmap thumbnail = Bitmap.createBitmap(croppedBitmap, xThumbnail, yThumbnail, widthThumbnail, heightThumbnail);
-                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, thumbnailOut);
-
-                    int cameraLeft = Math.round(location.left);
-                    int cameraRight = Math.round(location.right);
-                    int cameraTop = Math.round(location.top);
-                    int cameraBottom = Math.round(location.bottom);
-                    if (currentBestLocation != null){
-                      cameraLatitude = currentBestLocation.getLatitude();
-                      cameraLongitude = currentBestLocation.getLongitude();
-                      cameraAccuracy = currentBestLocation.getAccuracy();
-
-                    }
-
-                    //updateOrientationAngles();
-                    // rad to degree
-                    //azimuth = mOrientationAngles[0]*(180/Math.PI);
-                    //pitch = mOrientationAngles[1]*(180/Math.PI);
-                    //roll = mOrientationAngles[2]*(180/Math.PI);
-
-                    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    Long currentTime = System.currentTimeMillis();
-                    currentCamera = new SurveillanceCamera(
-                            thumbnailFile.getPath(),
-                            outputFile.getPath(),
-                            cameraLeft, cameraRight, cameraTop, cameraBottom,
-                            cameraLatitude, cameraLongitude, cameraAccuracy,
-                            azimuth, pitch, roll,
-                            "no comment",
-                            timestampIso8601.format(new Date(currentTime)),
-                            timestampIso8601.format(new Date(currentTime + new Random().nextInt(100000)))
-                            );
-
-                    Log.d(TAG, "datetimestamp: " + timestampIso8601.format(new Date(currentTime)));
-
-                    surveillanceCameras.add(currentCamera);
-
-                    cameraRoomDatabase.surveillanceCameraDao().insert(currentCamera);
-
-
-                    if (gpsLocation.getStatus() != AsyncTask.Status.RUNNING){
-                      AsyncLocationGetter gpsLocation = new AsyncLocationGetter(DetectorActivity.this);
-                      gpsLocation.execute();
-                    }
-
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  } finally {
-                    TIME_LAST_PICTURE_TAKEN = System.currentTimeMillis();
-                    try {
-                      if (out != null) {
-                        out.close();
-                      }
-                    } catch (IOException e) {
-                      e.printStackTrace();
-                    }
-                  }
-
+                if (isTimeToCapture) {
+                  processSurveillanceCameraCapture(result, location, pictureDirectory);
                 }
 
                 cropToFrameTransform.mapRect(location);
@@ -675,6 +706,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 mappedRecognitions.add(result);
               }
             }
+
+
 
             tracker.trackResults(mappedRecognitions, luminanceCopy, currTimestamp);
             trackingOverlay.postInvalidate();
@@ -684,6 +717,174 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
           }
         });
   }
+
+
+
+
+  void processSurveillanceCameraCapture(Classifier.Recognition result, RectF location, File pictureDirectory) {
+
+
+    if (result.getConfidence() > 0.95 && currentTime -
+            timeLastPictureTaken > DELAY_BETWEEN_CAPTURES) {
+
+
+      LOGGER.i("TOOK PICTURE -------------------------------------- ");
+
+      FileOutputStream out = null;
+      FileOutputStream thumbnailOut;
+
+      try {
+        Matrix turnMatrix = new Matrix();
+        turnMatrix.postRotate(90);
+
+        // Create files, for now with timestamp as name
+        File outputFile = new File(pictureDirectory, System.currentTimeMillis() + ".jpg");
+        File thumbnailFile = new File(pictureDirectory, System.currentTimeMillis() + "_thumbnail.jpg");
+
+        out = new FileOutputStream(outputFile);
+
+        // Get detection edges in px values.
+        int xThumbnail = Math.round(location.left);
+        int yThumbnail =  Math.round(location.top);
+        int widthThumbnail = Math.round(location.width());
+        int heightThumbnail = Math.round(location.height());
+
+        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+
+        thumbnailOut = new FileOutputStream(thumbnailFile);
+        Bitmap thumbnail = Bitmap.createBitmap(croppedBitmap, xThumbnail, yThumbnail, widthThumbnail, heightThumbnail);
+        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, thumbnailOut);
+
+        int cameraLeft = Math.round(location.left);
+        int cameraRight = Math.round(location.right);
+        int cameraTop = Math.round(location.top);
+        int cameraBottom = Math.round(location.bottom);
+        if (currentBestLocation != null){
+          cameraLatitude = currentBestLocation.getLatitude();
+          cameraLongitude = currentBestLocation.getLongitude();
+          cameraAccuracy = currentBestLocation.getAccuracy();
+
+        }
+
+        //updateOrientationAngles();
+        // rad to degree
+        //azimuth = mOrientationAngles[0]*(180/Math.PI);
+        //pitch = mOrientationAngles[1]*(180/Math.PI);
+        //roll = mOrientationAngles[2]*(180/Math.PI);
+
+        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        CameraCapture currentCamera = new CameraCapture(
+                result.getConfidence(),
+                thumbnailFile.getPath(),
+                outputFile.getPath(),
+                cameraLeft, cameraRight, cameraTop, cameraBottom,
+                cameraLatitude, cameraLongitude, cameraAccuracy,
+                azimuth, pitch, roll
+
+        );
+
+        Log.d(TAG, "datetimestamp: " + timestampIso8601.format(new Date(currentTime)));
+
+        pooledCameraCaptures.add(currentCamera);
+
+        //cameraRoomDatabase.surveillanceCameraDao().insert(currentCamera);
+
+
+        if (gpsLocation.getStatus() != AsyncTask.Status.RUNNING){
+          AsyncLocationGetter gpsLocation = new AsyncLocationGetter(DetectorActivity.this);
+          gpsLocation.execute();
+        }
+
+
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        timeLastPictureTaken = System.currentTimeMillis();
+        try {
+          if (out != null) {
+            out.close();
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+      }
+
+    }
+  }
+
+  void processCapturePool(List<CameraCapture> cameraPool){
+    // Intersects all capture headings to find true position of a surveillance camera.
+    // Adds a new CameraCapture to database when done processing.
+
+    // repository to get db access
+    CameraRepository cameraRepository = new CameraRepository(getApplication());
+
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+    List<Location> allIntersectsfromCaptures = new ArrayList<>();
+
+    CameraCapture biggestConfidence = cameraPool.get(0);
+
+
+    // Get Capture with biggest confidence for thumbnail/picture.
+    for (int k=0; k < cameraPool.size(); k++) {
+      if (cameraPool.get(k).getConfidence() > biggestConfidence.getConfidence()) {
+        biggestConfidence = cameraPool.get(k);
+      }
+    }
+
+    // Get all combinations. Loop through all except last.
+    for (int i=0; i < cameraPool.size() - 1; i++) {
+
+      CameraCapture firstCaptureToIntersect = cameraPool.get(i);
+
+
+      // Combine every ith element with remaining ones.
+      for (int j=i+1; j < cameraPool.size(); j++){
+
+        CameraCapture secondCaptureToIntersect = cameraPool.get(j);
+
+        allIntersectsfromCaptures.add(firstCaptureToIntersect.intersectWith(secondCaptureToIntersect));
+      }
+    }
+
+    Location intersectReference = allIntersectsfromCaptures.get(0);
+    List<Pair<Double, Double>> intersectsInCoordinates = LocationUtils.transferLocationsTo2dCoordinates(allIntersectsfromCaptures);
+
+    Location cameraEstimate = LocationUtils.approximateCameraPosition(intersectsInCoordinates, intersectReference);
+
+
+    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
+    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+    Random random = new Random();
+
+    long randomDelay = Math.round(sharedPreferences.getLong("syncDelay", 1000*60*60*24) * random.nextDouble());
+
+    cameraRepository.insert(new SurveillanceCamera(
+            biggestConfidence.getThumbnailPath(),
+            biggestConfidence.getImagePath(),
+            cameraEstimate.getLatitude(),
+            cameraEstimate.getLongitude(),
+            sharedPreferences.getString("comment", "no comment"),
+            timestampIso8601.format(new Date(System.currentTimeMillis())),
+            timestampIso8601.format(new Date(System.currentTimeMillis() + randomDelay))
+
+            ));
+
+
+  }
+
+
+
+  // TODO delete method in capture to delete picture + thumbnail
+
+
+
+
 
 
   @Override

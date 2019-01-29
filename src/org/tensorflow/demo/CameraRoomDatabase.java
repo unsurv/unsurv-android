@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -75,10 +74,8 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
         // Populate database with placeholder data.
         SurveillanceCamera surveillanceCamera = new SurveillanceCamera(
                 picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
-                10, 120, 50, 140,
                 50.0005 + randomLat, 8.2832 + randomLong,
-                10.3345, 0.3653, 12.3313, 170.3332,
-                "no comment",
+                "",
                 timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),
                 timestampIso8601.format(new Date(System.currentTimeMillis() + rng.nextInt(1000*60*60*24))));
         mDao.insert(surveillanceCamera);

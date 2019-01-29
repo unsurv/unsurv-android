@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 
 
@@ -74,6 +73,8 @@ public class MapActivity extends AppCompatActivity {
   private TextView infoComment;
   private ImageButton infoEscape;
 
+
+  // TODO set max amount visible
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

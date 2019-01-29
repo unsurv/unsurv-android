@@ -20,6 +20,10 @@
         android:title="Server to synchronize with"
         />
 
+    <SwitchPreference
+        android:key="buttonCapture"
+        android:title="Enable hold to capture" />
+
 
 
 
