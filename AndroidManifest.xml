@@ -17,7 +17,7 @@
     package="org.tensorflow.demo">
 
     <uses-sdk
-        android:minSdkVersion="23"
+        android:minSdkVersion="24"
         android:targetSdkVersion="26" />
 
     <uses-permission android:name="android.permission.CAMERA" />

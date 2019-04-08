@@ -92,7 +92,7 @@ android {
     if (nativeBuildSystem == 'cmake') {
         defaultConfig {
             applicationId = 'org.tensorflow.demo'
-            minSdkVersion 23
+            minSdkVersion 24
             targetSdkVersion 26
             ndk {
                 abiFilters "${cpuType}"
@@ -216,8 +216,8 @@ dependencies {
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 
-    //osmdroid
-    implementation 'org.osmdroid:osmdroid-android:6.0.2'
+    //osmdroid openstreetmap
+    implementation 'org.osmdroid:osmdroid-android:6.1.0'
 
     //MPAndroidChart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'

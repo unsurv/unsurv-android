@@ -14,6 +14,7 @@ public class TutorialActivity extends AppCompatActivity {
 
   ViewPager viewPager = findViewById(R.id.tutorial_viewpager);
 
+
   TutorialFragmentAdapter adapter = new TutorialFragmentAdapter(this, getSupportFragmentManager());
 
   viewPager.setAdapter(adapter);

@@ -2,6 +2,8 @@ package org.tensorflow.demo;
 
 import android.Manifest;
 import android.app.Application;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -48,6 +51,7 @@ import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -146,6 +150,7 @@ public class DebugActivity extends AppCompatActivity {
     final Button debugDbCheck = findViewById(R.id.check_db);
     final Button debugDbDelete = findViewById(R.id.delete_db);
     final Button debugAlarm = findViewById(R.id.alarm_test);
+    final Button debugTutorial = findViewById(R.id.start_tutorial);
 
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
 
@@ -170,8 +175,10 @@ public class DebugActivity extends AppCompatActivity {
     mapView.setTilesScaledToDpi(true);
     mapView.setClickable(true);
 
+    mapView.setTileSource(TileSourceFactory.OpenTopo);
+
+
     //enable pinch to zoom
-    mapView.setBuiltInZoomControls(true);
     mapView.setMultiTouchControls(true);
 
     final IMapController mapController = mapView.getController();
@@ -219,8 +226,8 @@ public class DebugActivity extends AppCompatActivity {
         // Start the queue
         mRequestQueue.start();
 
-        //String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
-        String url = sharedPreferences.getString("synchronizationAddress", "") + "/cameras/?area=8.2699,50.0201,8.2978,50.0005";
+        String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
+        // String url = sharedPreferences.getString("synchronizationAddress", "") + "/cameras/?area=8.2699,50.0201,8.2978,50.0005";
 
         camerasToSync = new ArrayList<SynchronizedCamera>();
 
@@ -239,11 +246,13 @@ public class DebugActivity extends AppCompatActivity {
                       for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
                         JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
-                        cameraToAdd = new SynchronizedCamera(JSONToSynchronize.getString("image_url"),
+                        cameraToAdd = new SynchronizedCamera(
+                                JSONToSynchronize.getString("image_url"),
                                 JSONToSynchronize.getDouble("lat"),
                                 JSONToSynchronize.getDouble("lon"),
                                 JSONToSynchronize.getString("comments"),
-                                JSONToSynchronize.getString("last_updated")
+                                JSONToSynchronize.getString("id")
+
 
 
                         );
@@ -301,9 +310,32 @@ public class DebugActivity extends AppCompatActivity {
       }
     });
 
+    debugAlarm.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
+
+        // JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
+
+        // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
+
+      }
+    });
+
+
+    debugTutorial.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent tutorialIntent = new Intent(DebugActivity.this, TutorialActivity.class);
+        startActivity(tutorialIntent);
+      }
+    });
+
+
+
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-    Random rng = new Random();
     String picturesPath = Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
@@ -344,23 +376,9 @@ public class DebugActivity extends AppCompatActivity {
 
     // reoccuring task
 
-    //Synchronization.scheduleSyncIntervalJob(getApplicationContext(), null);
 
 
-    debugAlarm.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
 
-        //JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
-
-        //List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
-
-        Intent tutorialIntent = new Intent(DebugActivity.this, TutorialActivity.class);
-        startActivity(tutorialIntent);
-
-
-      }
-    });
 
 
     final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
@@ -371,7 +389,7 @@ public class DebugActivity extends AppCompatActivity {
           List<ScanResult> mScanResult = wifiManager.getScanResults();
 
           StringBuilder allNetworksAvailable = new StringBuilder();
-          for (int i=0; i<mScanResult.size(); i++) {
+          for (int i=0; i < mScanResult.size(); i++) {
             allNetworksAvailable.append(mScanResult.get(i).SSID + "\n");
           }
 
@@ -384,7 +402,7 @@ public class DebugActivity extends AppCompatActivity {
     registerReceiver(mWifiScanReceiver,
             new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 
-    wifiManager.startScan();
+    // wifiManager.startScan();
     int pasd = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
     List<ScanResult> masdScanResult = wifiManager.getScanResults();
 

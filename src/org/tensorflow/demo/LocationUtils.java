@@ -84,8 +84,6 @@ class LocationUtils {
   static Location approximateCameraPosition(List<Pair<Double, Double>> points, Location reference) {
     // Finds a point where distances to every other point is minimal. Returns a Location created with a reference Location.
 
-    Location approximatedLocation = new Location("2dApproximation");
-
     double sumOfDistances;
     double newSumOfDistances;
 
@@ -99,7 +97,7 @@ class LocationUtils {
 
 
     // Value to move around at first step.
-    double stepSize = 1;
+    double stepSize = 3;
 
     // find center of gravity as starting point
     double xTest = 0;
@@ -121,6 +119,7 @@ class LocationUtils {
 
       for (int j = 0; j < movementVectors2d.size(); j++) {
 
+        // Move point and calc new sum of distances.
         int xMovement = movementVectors2d.get(j).first;
         int yMovement = movementVectors2d.get(j).second;
 
@@ -129,6 +128,7 @@ class LocationUtils {
 
         newSumOfDistances = sumOfDistancesIn2d(newX, newY, points);
 
+        // Set new point as new start point if sum is smaller
         if (newSumOfDistances < sumOfDistances){
           xTest = newX;
           yTest = newY;
@@ -137,6 +137,7 @@ class LocationUtils {
 
         } else {
 
+          // try smaller movements
           stepSize = stepSize / 2;
 
         }

@@ -16,10 +16,11 @@ public class TutorialFragmentAdapter extends FragmentPagerAdapter {
 
   @Override
   public Fragment getItem(int position) {
-    if (position == 0) {
-      return new RecordingTutorialFragment();
-    } else {
+    if (position == 0) { // TODO case statement here
       return new MapTutorialFragment();
+
+    } else {
+      return new RecordingTutorialFragment();
     }
   }
 

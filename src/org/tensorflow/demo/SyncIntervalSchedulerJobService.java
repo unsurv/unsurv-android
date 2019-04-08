@@ -15,12 +15,10 @@ public class SyncIntervalSchedulerJobService extends JobService {
     PersistableBundle syncJobExtras = new PersistableBundle();
     PersistableBundle asd = (PersistableBundle) intervalSchedulerExtras.clone();
 
-
-    syncJobExtras.putString("start", intervalSchedulerExtras.getString("start"));
     syncJobExtras.putString("area", intervalSchedulerExtras.getString("area"));
 
 
-    Synchronization.scheduleSynchronizationJob(getApplicationContext(), syncJobExtras);
+    SynchronizationUtils.scheduleSynchronizationJob(getApplicationContext(), syncJobExtras);
 
     return false;
   }

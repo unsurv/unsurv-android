@@ -44,16 +44,12 @@ public class SyncJobService extends JobService {
 
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-    PersistableBundle jobExtras = jobParameters.getExtras();
-
-    // API query key + value
-    String areaValue = jobExtras.getString("area");
-    String startValue = jobExtras.getString("start");
+    final PersistableBundle jobExtras = jobParameters.getExtras();
 
     RequestQueue mRequestQueue;
 
     // Instantiate the cache
-    Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+    Cache cache = new DiskBasedCache(getCacheDir(), 0); // 1MB cap
 
     // Set up the network to use HttpURLConnection as the HTTP client.
     Network network = new BasicNetwork(new HurlStack());
@@ -64,12 +60,12 @@ public class SyncJobService extends JobService {
     // Start the queue
     mRequestQueue.start();
 
-    //String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
-    String baseURL = sharedPreferences.getString("synchronizationUrl", "");
+    String baseURL = "http://192.168.2.159:5000/cameras/?";
+    //String baseURL = sharedPreferences.getString("synchronizationUrl", "");
 
-    String completeQueryURL = baseURL + jobExtras.get("queryString");
+    String completeQueryURL = baseURL + jobExtras.get("queryString") + "&";
 
-    final List<SynchronizedCamera> camerasToSync = new ArrayList<>();
+    final List<SynchronizedCamera> camerasSynced = new ArrayList<>();
 
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.GET,
@@ -86,16 +82,17 @@ public class SyncJobService extends JobService {
                   for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
-                    cameraToAdd = new SynchronizedCamera(JSONToSynchronize.getString("image_url"),
+                    cameraToAdd = new SynchronizedCamera(
+                            JSONToSynchronize.getString("image_url"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("last_updated")
+                            JSONToSynchronize.getString("id")
 
 
                     );
 
-                    camerasToSync.add(cameraToAdd);
+                    camerasSynced.add(cameraToAdd);
 
                     // TODO same db entry just gets appended. Check if already there. time based? value based?
                     //new checkDbAsyncTask(getApplication()).execute();
@@ -103,8 +100,9 @@ public class SyncJobService extends JobService {
 
                   }
 
+                  //TODO add refresh function for areas not in "home" zone
+                  synchronizedCameraRepository.insert(camerasSynced);
 
-                  synchronizedCameraRepository.insert(camerasToSync);
 
 
                 } catch (Exception e) {
