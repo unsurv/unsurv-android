@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Cache;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -158,10 +159,10 @@ public class DebugActivity extends AppCompatActivity {
     notificationPreference = sharedPreferences.getBoolean("notifications", false);
     debugTextView.setText(String.valueOf(notificationPreference));
 
-    sharedPreferences.edit().putString("lastUpdated", "2018-01-01T13:00+0000").apply();
+    sharedPreferences.edit().putString("lastUpdated", "2018-01-01 13:00").apply();
     sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
     sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.2.159:5000/cameras/?").apply();
-    sharedPreferences.edit().putString("area", "8.2699,50.0201,8.2978,50.0005").apply();
+    sharedPreferences.edit().putString("area", "area=7.8648,50.3638,8.6888,49.6391").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
 
     wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -226,8 +227,11 @@ public class DebugActivity extends AppCompatActivity {
         // Start the queue
         mRequestQueue.start();
 
-        String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
+        // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
         // String url = sharedPreferences.getString("synchronizationAddress", "") + "/cameras/?area=8.2699,50.0201,8.2978,50.0005";
+        String url = sharedPreferences.getString("synchronizationUrl", "") + sharedPreferences.getString("area", "");
+
+        debugTextView.setText(url);
 
         camerasToSync = new ArrayList<SynchronizedCamera>();
 
@@ -238,7 +242,7 @@ public class DebugActivity extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
                   @Override
                   public void onResponse(JSONObject response) {
-                    //debugTextView.setText("Response: " + response.toString());
+                    // debugTextView.setText("Response: " + response.toString());
 
                     try {
 
@@ -246,12 +250,12 @@ public class DebugActivity extends AppCompatActivity {
                       for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
                         JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
-                        cameraToAdd = new SynchronizedCamera(
-                                JSONToSynchronize.getString("image_url"),
+                        cameraToAdd = new SynchronizedCamera(JSONToSynchronize.getString("imageURL"),
+                                JSONToSynchronize.getString("id"),
                                 JSONToSynchronize.getDouble("lat"),
                                 JSONToSynchronize.getDouble("lon"),
                                 JSONToSynchronize.getString("comments"),
-                                JSONToSynchronize.getString("id")
+                                JSONToSynchronize.getString("lastUpdated")
 
 
 
@@ -269,9 +273,11 @@ public class DebugActivity extends AppCompatActivity {
                       synchronizedCameraRepository.insert(camerasToSync);
 
 
+
                     } catch (Exception e) {
                       Log.i(TAG, "onResponse: " + e.toString());
                       debugTextView.setText(e.toString());
+
 
                     }
 
@@ -285,6 +291,12 @@ public class DebugActivity extends AppCompatActivity {
           }
         }
         );
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+           30000,
+           0,
+           DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
 
         mRequestQueue.add(jsonObjectRequest);
 

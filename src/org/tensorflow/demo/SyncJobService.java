@@ -60,8 +60,8 @@ public class SyncJobService extends JobService {
     // Start the queue
     mRequestQueue.start();
 
-    String baseURL = "http://192.168.2.159:5000/cameras/?";
-    //String baseURL = sharedPreferences.getString("synchronizationUrl", "");
+    //String baseURL = "http://192.168.2.159:5000/cameras/?";
+    String baseURL = sharedPreferences.getString("synchronizationUrl", "");
 
     String completeQueryURL = baseURL + jobExtras.get("queryString") + "&";
 
@@ -83,11 +83,13 @@ public class SyncJobService extends JobService {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
                     cameraToAdd = new SynchronizedCamera(
-                            JSONToSynchronize.getString("image_url"),
+                            JSONToSynchronize.getString("imageURL"),
+                            JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("id")
+                            JSONToSynchronize.getString("lastUpdated")
+
 
 
                     );

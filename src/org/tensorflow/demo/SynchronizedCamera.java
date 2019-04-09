@@ -10,6 +10,8 @@ public class SynchronizedCamera {
   @PrimaryKey(autoGenerate = true)
   private int id;
 
+  private String externalID;
+
   private String imagePath;
 
   private double latitude;
@@ -21,12 +23,14 @@ public class SynchronizedCamera {
 
 
   public SynchronizedCamera (String imagePath,
+                             String externalID,
                              double latitude,
                              double longitude,
                              String comments,
                              String lastUpdated) {
 
     this.imagePath = imagePath;
+    this.externalID = externalID;
     this.latitude = latitude;
     this.longitude = longitude;
     this.comments = comments;
@@ -35,6 +39,10 @@ public class SynchronizedCamera {
 
   public int getId() {
     return id;
+  }
+
+  public String getExternalID() {
+    return externalID;
   }
 
   public String getImagePath() {
@@ -59,6 +67,10 @@ public class SynchronizedCamera {
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  public void setExternalID(String externalID) {
+    this.externalID = externalID;
   }
 
   public void setImagePath(String imagePath) {

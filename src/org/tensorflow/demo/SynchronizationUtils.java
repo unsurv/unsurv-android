@@ -50,6 +50,8 @@ class SynchronizationUtils {
 
     String lastUpdated = sharedPreferences.getString("lastUpdated", "");
 
+    String areaQuery = sharedPreferences.getString("area", "");
+
     PersistableBundle serviceJobExtras = new PersistableBundle();
 
 
@@ -57,16 +59,9 @@ class SynchronizationUtils {
 
     //API parameters for background Service.
 
-    String areaQuery = "";
+
     String startQuery = "";
     String endQuery = "";
-
-
-    //TODO Do for every key/value pair.
-    if (jobExtras.getString("area") != null) {
-      String areaKey = "area=";
-      areaQuery += areaKey +  "8.2699,50.0201,8.2978,50.0005"; // hardcoded for debugging
-    }
 
 
     String[] queryParts = new String[]{areaQuery, startQuery, endQuery}; //TODO add for each query key
@@ -211,11 +206,13 @@ class SynchronizationUtils {
                   for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
-                    cameraToAdd = new SynchronizedCamera(JSONToSynchronize.getString("image_url"),
+                    cameraToAdd = new SynchronizedCamera(
+                            JSONToSynchronize.getString("imageURL"),
+                            JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("id")
+                            JSONToSynchronize.getString("lastUpdated")
 
 
                     );

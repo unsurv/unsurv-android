@@ -77,6 +77,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
         // Populate database with placeholder data.
         SynchronizedCamera synchronizedCamera = new SynchronizedCamera(
                 picturesPath + "190754878_thumbnail.jpg",
+                "asjdnjasdqwdmqwlo",
                 50.0005 + randomLat, 8.2832 + randomLong,
                 "no comments",
                 timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24)))

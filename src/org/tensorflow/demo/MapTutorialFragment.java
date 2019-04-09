@@ -86,15 +86,22 @@ public class MapTutorialFragment extends android.support.v4.app.Fragment {
 
         BoundingBox mapBorders = tutorialMapView.getBoundingBox(); // S N E W
 
+        String westBorder = String.valueOf(mapBorders.getLonWest());
+        String northBorder = String.valueOf(mapBorders.getLatNorth());
+        String eastBorder = String.valueOf(mapBorders.getLonEast());
+        String southBorder = String.valueOf(mapBorders.getLatSouth());
+
+
+        // I DON'T KNOW WTF IS GOING ON, VOLLEY REQUEST LIB DOESN'T LIKE PRECISE BORDERS
         String areaString =
-                String.valueOf(mapBorders.getLonWest()) + "," +
-                String.valueOf(mapBorders.getLatNorth()) + "," +
-                String.valueOf(mapBorders.getLonEast()) + "," +
-                String.valueOf(mapBorders.getLatSouth());
+                westBorder.substring(0, westBorder.length() - 11) + "," +
+                northBorder.substring(0, northBorder.length() - 11) + "," +
+                eastBorder.substring(0, eastBorder.length() - 11) + "," +
+                southBorder.substring(0, southBorder.length() - 11);
 
 
         mapTutorialTextView.setText(areaString);
-        sharedPreferences.edit().putString("area", areaString).apply(); // W N E S
+        sharedPreferences.edit().putString("area", "area=" + areaString).apply(); // W N E S
 
         mapScrollingEnabled = false;
         tutorialViewPager.setFragmentScrollingEnabled(true);
