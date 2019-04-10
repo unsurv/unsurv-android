@@ -63,8 +63,29 @@
             android:layout_height="wrap_content"
             android:text="TUTORIAL"/>
 
+        <Button
+            android:id="@+id/check_jobs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CHECK JOBS"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/show_preferences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SHOW PREFS"/>
 
     </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/debug_textview"

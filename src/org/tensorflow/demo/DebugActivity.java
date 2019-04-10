@@ -152,6 +152,8 @@ public class DebugActivity extends AppCompatActivity {
     final Button debugDbDelete = findViewById(R.id.delete_db);
     final Button debugAlarm = findViewById(R.id.alarm_test);
     final Button debugTutorial = findViewById(R.id.start_tutorial);
+    final Button debugCheckJobs = findViewById(R.id.check_jobs);
+    final Button debugShowPrefs = findViewById(R.id.show_preferences);
 
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
 
@@ -159,10 +161,10 @@ public class DebugActivity extends AppCompatActivity {
     notificationPreference = sharedPreferences.getBoolean("notifications", false);
     debugTextView.setText(String.valueOf(notificationPreference));
 
-    sharedPreferences.edit().putString("lastUpdated", "2018-01-01 13:00").apply();
+    sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
-    sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.2.159:5000/cameras/?").apply();
-    sharedPreferences.edit().putString("area", "area=7.8648,50.3638,8.6888,49.6391").apply();
+    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.2.159:5000/cameras/?").apply();
+    sharedPreferences.edit().putString("area", "7.8648,50.3638,8.6888,49.6391").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
 
     wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -211,94 +213,9 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        //new DbAsyncTask(getApplication(), SYNC_DB).execute();
-
-        RequestQueue mRequestQueue;
-
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
-
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
-
-        // Instantiate the RequestQueue with the cache and network.
-        mRequestQueue = new RequestQueue(cache, network);
-
-        // Start the queue
-        mRequestQueue.start();
-
-        // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
-        // String url = sharedPreferences.getString("synchronizationAddress", "") + "/cameras/?area=8.2699,50.0201,8.2978,50.0005";
-        String url = sharedPreferences.getString("synchronizationUrl", "") + sharedPreferences.getString("area", "");
-
-        debugTextView.setText(url);
-
-        camerasToSync = new ArrayList<SynchronizedCamera>();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
-                  @Override
-                  public void onResponse(JSONObject response) {
-                    // debugTextView.setText("Response: " + response.toString());
-
-                    try {
-
-
-                      for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
-                        JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
-
-                        cameraToAdd = new SynchronizedCamera(JSONToSynchronize.getString("imageURL"),
-                                JSONToSynchronize.getString("id"),
-                                JSONToSynchronize.getDouble("lat"),
-                                JSONToSynchronize.getDouble("lon"),
-                                JSONToSynchronize.getString("comments"),
-                                JSONToSynchronize.getString("lastUpdated")
-
-
-
-                        );
-
-                        camerasToSync.add(cameraToAdd);
-
-                        // TODO same db entry just gets appended. Check if already there. time based? value based?
-                        //new checkDbAsyncTask(getApplication()).execute();
-
-
-                      }
-
-
-                      synchronizedCameraRepository.insert(camerasToSync);
-
-
-
-                    } catch (Exception e) {
-                      Log.i(TAG, "onResponse: " + e.toString());
-                      debugTextView.setText(e.toString());
-
-
-                    }
-
-
-                  }
-                }, new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-            // TODO: Handle Errors
-            debugTextView.setText(error.toString());
-          }
-        }
-        );
-
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-           30000,
-           0,
-           DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-
-        mRequestQueue.add(jsonObjectRequest);
+        SynchronizationUtils.synchronizeWithServer(sharedPreferences.getString("synchronizationUrl", null),
+                "area=" + sharedPreferences.getString("area", null),
+                true, null, synchronizedCameraRepository);
 
 
       }
@@ -341,6 +258,32 @@ public class DebugActivity extends AppCompatActivity {
       public void onClick(View view) {
         Intent tutorialIntent = new Intent(DebugActivity.this, TutorialActivity.class);
         startActivity(tutorialIntent);
+      }
+    });
+
+    debugCheckJobs.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
+
+        List<JobInfo> b = jobScheduler.getAllPendingJobs();
+
+        debugTextView.setText(b.toString());
+      }
+    });
+
+    debugShowPrefs.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        debugTextView.setText(
+        sharedPreferences.getString("lastUpdated", "2018-01-01") + "\n" +
+        sharedPreferences.getLong("synchronizationInterval", 15*60*1000)+ "\n" +
+        sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?")+ "\n" +
+        sharedPreferences.getString("area", "7.8648,50.3638,8.6888,49.6391")+ "\n" +
+        sharedPreferences.getBoolean("buttonCapture", false) );
+
+
       }
     });
 
@@ -389,10 +332,7 @@ public class DebugActivity extends AppCompatActivity {
     // reoccuring task
 
 
-
-
-
-
+    /*
     final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
@@ -417,6 +357,10 @@ public class DebugActivity extends AppCompatActivity {
     // wifiManager.startScan();
     int pasd = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
     List<ScanResult> masdScanResult = wifiManager.getScanResults();
+
+
+     */
+
 
 
 

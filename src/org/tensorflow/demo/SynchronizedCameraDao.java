@@ -19,8 +19,8 @@ public interface SynchronizedCameraDao {
   @Query("SELECT * FROM synchronized_cameras")
   List<SynchronizedCamera> getAllCameras();
 
-  @Query("SELECT * FROM synchronized_cameras WHERE id = :id")
-  SynchronizedCamera findID(String id);
+  @Query("SELECT * FROM synchronized_cameras WHERE externalID = :externalID")
+  SynchronizedCamera findID(String externalID);
 
 
 }

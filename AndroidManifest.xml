@@ -82,11 +82,6 @@
 
         <activity android:name=".TutorialActivity"/>
 
-        <service android:name=".SyncJobService"
-            android:label="SynchronizationService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-        />
-
         <service android:name=".SyncIntervalSchedulerJobService"
             android:label="SynchronizationScheduler"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
