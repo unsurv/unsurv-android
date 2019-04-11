@@ -167,7 +167,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
-    sharedPreferences.edit().putBoolean("allowServerQueries", false).apply();
+    sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
 
 
     wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

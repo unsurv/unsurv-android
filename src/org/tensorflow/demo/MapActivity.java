@@ -100,8 +100,8 @@ public class MapActivity extends AppCompatActivity {
   private boolean allowOneServerQuery;
   private boolean mapScrollingEnabled;
 
-  List<SynchronizedCamera> camerasToSync = new ArrayList<>();
-
+  private List<SynchronizedCamera> camerasInAreaFromServer = new ArrayList<>();
+  private String lastQuery = "";
 
   // TODO set max amount visible
 
@@ -319,17 +319,13 @@ public class MapActivity extends AppCompatActivity {
 
   }
 
-  List<SynchronizedCamera> queryServer(String areaQuery, @Nullable String startQuery) {
+  void queryServer(String queryString) {
 
-    camerasToSync.clear();
+    camerasInAreaFromServer.clear();
 
     RequestQueue mRequestQueue;
 
-    SharedPreferences sharedPreferences;
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    final SynchronizedCameraRepository synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
-
-
+    final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
     // Set up the network to use HttpURLConnection as the HTTP client.
     Network network = new BasicNetwork(new HurlStack());
@@ -343,11 +339,7 @@ public class MapActivity extends AppCompatActivity {
     // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
     String baseURL = sharedPreferences.getString("synchronizationURL", null);
 
-    String url = baseURL + areaQuery;
-
-    if (startQuery != null) {
-      url.concat("&" + startQuery);
-    }
+    String url = baseURL + queryString;
 
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.GET,
@@ -374,7 +366,7 @@ public class MapActivity extends AppCompatActivity {
 
                     );
 
-                    camerasToSync.add(cameraToAdd);
+                    camerasInAreaFromServer.add(cameraToAdd);
 
                   }
 
@@ -388,6 +380,9 @@ public class MapActivity extends AppCompatActivity {
                 }
 
               }
+
+
+
             }, new Response.ErrorListener() {
       @Override
       public void onErrorResponse(VolleyError error) {
@@ -407,8 +402,14 @@ public class MapActivity extends AppCompatActivity {
     if (allowOneServerQuery) {
       allowOneServerQuery = false; // used up single permission for querying
     }
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
 
-    return camerasToSync;
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+        reloadMarker();
+      }
+    });
+
   }
 
 
@@ -427,7 +428,7 @@ public class MapActivity extends AppCompatActivity {
     @Override
     protected List<SynchronizedCamera> doInBackground(Double... params) {
       FolderOverlay result = new FolderOverlay();
-      List<SynchronizedCamera> camerasInAreaFromServer = new ArrayList<>();
+
       List<SynchronizedCamera> allCamerasInAreaFromDb;
 
       try {
@@ -518,6 +519,7 @@ public class MapActivity extends AppCompatActivity {
 
                     allowOneServerQuery = true;
                     popupWindow.dismiss();
+                    reloadMarker();
                     mapScrollingEnabled = true;
 
                   }
@@ -554,14 +556,20 @@ public class MapActivity extends AppCompatActivity {
                     + lonMinString + ","
                     + lonMaxString;
 
-            // TODO add start value to only update not download all everytime. need per area lastUpdated
-            camerasInAreaFromServer.clear();
-            camerasInAreaFromServer = queryServer(areaQuery, null);
+            // TODO add start value to only update not download all everytime. need per area lastUpdated in own db
+
+            String currentQuery = areaQuery; // add startQuery
+
+            if (!lastQuery.equals(currentQuery)) {
+
+              queryServer(currentQuery);
+              lastQuery = currentQuery;
+            }
+
 
           }
 
         }
-
 
 
         allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInArea(latMin, latMax, lonMin, lonMax);
