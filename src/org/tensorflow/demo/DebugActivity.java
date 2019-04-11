@@ -164,8 +164,11 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
     sharedPreferences.edit().putString("synchronizationURL", "http://192.168.2.159:5000/cameras/?").apply();
-    sharedPreferences.edit().putString("area", "7.8648,50.3638,8.6888,49.6391").apply();
+    sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
+    sharedPreferences.edit().putBoolean("offlineMode", false).apply();
+    sharedPreferences.edit().putBoolean("allowServerQueries", false).apply();
+
 
     wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
@@ -280,7 +283,7 @@ public class DebugActivity extends AppCompatActivity {
         sharedPreferences.getString("lastUpdated", "2018-01-01") + "\n" +
         sharedPreferences.getLong("synchronizationInterval", 15*60*1000)+ "\n" +
         sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?")+ "\n" +
-        sharedPreferences.getString("area", "7.8648,50.3638,8.6888,49.6391")+ "\n" +
+        sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888")+ "\n" +
         sharedPreferences.getBoolean("buttonCapture", false) );
 
 
@@ -409,7 +412,6 @@ public class DebugActivity extends AppCompatActivity {
 
     final TextView debugTextView = findViewById(R.id.debug_textview);
     private SynchronizedCameraRepository synchronizedCameraRepository;
-    private List<SynchronizedCamera> allSynchronizedCameras;
     private int dbSize;
     private int MODE;
 

@@ -3,9 +3,12 @@ package org.tensorflow.demo;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -13,23 +16,41 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Network;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.NoCache;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -43,7 +64,9 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
 
@@ -64,14 +87,20 @@ public class MapActivity extends AppCompatActivity {
   private ImageButton myLocationButton;
 
 
-  private CameraRoomDatabase cameraDb;
-  private List<SurveillanceCamera> allCamerasInArea;
+  private SynchronizedCameraRepository synchronizedCameraRepository;
+
+  private List<SynchronizedCamera> allCamerasInArea = new ArrayList<>();
 
   private InfoWindow infoWindow;
   private ImageView infoImage;
   private TextView infoLatestTimestamp;
   private TextView infoComment;
   private ImageButton infoEscape;
+
+  private boolean allowOneServerQuery;
+  private boolean mapScrollingEnabled;
+
+  List<SynchronizedCamera> camerasToSync = new ArrayList<>();
 
 
   // TODO set max amount visible
@@ -80,9 +109,12 @@ public class MapActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map);
-    cameraDb = CameraRoomDatabase.getDatabase(getApplicationContext());
+    synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
+
 
     mapView = findViewById(R.id.map);
+    mapScrollingEnabled = true;
+
     //TODO find solution to do the same at the beginning of a gesture.
     // Reloads markers in visible area after scrolling. Closes infowindow if open.
     mapView.addMapListener(new DelayedMapListener(new MapListener() {
@@ -99,7 +131,7 @@ public class MapActivity extends AppCompatActivity {
         closeAllInfoWindowsOn(mapView);
         return false;
       }
-    }, 5)); // delay in ms after zooming/scrolling
+    }, 200)); // delay in ms after zooming/scrolling
 
     mapView.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -109,12 +141,26 @@ public class MapActivity extends AppCompatActivity {
       }
     });
 
+    mapView.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View view, MotionEvent motionEvent) {
+        if (mapScrollingEnabled) {
+          return false;
+        } else {
+          return true;
+        }
+
+      }
+    });
+
     mapView.setTilesScaledToDpi(true);
     mapView.setClickable(true);
 
     //enable pinch to zoom
     mapView.setBuiltInZoomControls(true);
     mapView.setMultiTouchControls(true);
+
+    mapView.setTileSource(TileSourceFactory.OpenTopo);
 
     final IMapController mapController = mapView.getController();
 
@@ -254,6 +300,7 @@ public class MapActivity extends AppCompatActivity {
       BoundingBox world = this.mapView.getBoundingBox();
 
       reloadMarker(world, zoom);
+
     } else {
       // background load is already active. Remember that at least one scroll/zoom was missing
       mMissedMapZoomScrollUpdates++;
@@ -272,8 +319,101 @@ public class MapActivity extends AppCompatActivity {
 
   }
 
+  List<SynchronizedCamera> queryServer(String areaQuery, @Nullable String startQuery) {
 
-  private class BackgroundMarkerLoaderTask extends AsyncTask<Double, Integer, List<SurveillanceCamera>> {
+    camerasToSync.clear();
+
+    RequestQueue mRequestQueue;
+
+    SharedPreferences sharedPreferences;
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    final SynchronizedCameraRepository synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
+
+
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
+    String baseURL = sharedPreferences.getString("synchronizationURL", null);
+
+    String url = baseURL + areaQuery;
+
+    if (startQuery != null) {
+      url.concat("&" + startQuery);
+    }
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+
+                JSONObject JSONToSynchronize;
+
+                try {
+
+                  for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
+                    JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
+
+                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(JSONToSynchronize.getString("imageURL"),
+                            JSONToSynchronize.getString("id"),
+                            JSONToSynchronize.getDouble("lat"),
+                            JSONToSynchronize.getDouble("lon"),
+                            JSONToSynchronize.getString("comments"),
+                            JSONToSynchronize.getString("lastUpdated")
+
+                    );
+
+                    camerasToSync.add(cameraToAdd);
+
+                  }
+
+                } catch (Exception e) {
+                  Log.i(TAG, "onResponse: " + e.toString());
+
+                  Toast.makeText(
+                          MapActivity.this,
+                          "Error retrieving data from Server. Try again later.", Toast.LENGTH_LONG).show();
+
+                }
+
+              }
+            }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        // TODO: Handle http Errors
+      }
+    }
+    );
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.add(jsonObjectRequest);
+
+    if (allowOneServerQuery) {
+      allowOneServerQuery = false; // used up single permission for querying
+    }
+
+    return camerasToSync;
+  }
+
+
+
+  private class BackgroundMarkerLoaderTask extends AsyncTask<Double, Integer, List<SynchronizedCamera>> {
 
     /**
      * Computation of the map itmes in the non-gui background thread. .
@@ -285,8 +425,10 @@ public class MapActivity extends AppCompatActivity {
      * @see #publishProgress
      */
     @Override
-    protected List<SurveillanceCamera> doInBackground(Double... params) {
+    protected List<SynchronizedCamera> doInBackground(Double... params) {
       FolderOverlay result = new FolderOverlay();
+      List<SynchronizedCamera> camerasInAreaFromServer = new ArrayList<>();
+      List<SynchronizedCamera> allCamerasInAreaFromDb;
 
       try {
         if (params.length != 5)
@@ -321,13 +463,133 @@ public class MapActivity extends AppCompatActivity {
                 " ,lonMax=" + lonMax +
                 ", zoom=" + zoom);
 
-        allCamerasInArea = cameraDb.surveillanceCameraDao().getCamerasInArea(latMin, latMax, lonMin, lonMax);
-        Log.d(TAG, "doInBackground: " + allCamerasInArea.size());
-        itemsToDisplay.clear();
-        for (int i = 0; i < allCamerasInArea.size(); i++) {
-          itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", allCamerasInArea.get(i).getComment(), new GeoPoint(allCamerasInArea.get(i).getLatitude(), allCamerasInArea.get(i).getLongitude())));
+        final SharedPreferences sharedPreferences;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        String offlineArea = sharedPreferences.getString("area", null); // SNWE
+        String[] splitBorders = offlineArea.split(",");
+
+        double offlineLatMin = Double.parseDouble(splitBorders[0]);
+        double offlineLatMax = Double.parseDouble(splitBorders[1]);
+        double offlineLonMin = Double.parseDouble(splitBorders[2]);
+        double offlineLonMax = Double.parseDouble(splitBorders[3]);
+
+        boolean offlineMode = sharedPreferences.getBoolean("offlineMode", true);
+        final boolean allowServerQueries = sharedPreferences.getBoolean("allowServerQueries", false);
+
+        boolean outsideOfflineArea = latMin < offlineLatMin ||
+                latMax > offlineLatMax ||
+                lonMin < offlineLonMin ||
+                lonMax > offlineLonMax;
+
+        if (!offlineMode && outsideOfflineArea) {
+
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+              LayoutInflater layoutInflater = (LayoutInflater) MapActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+              View popupView = layoutInflater.inflate(R.layout.leaving_offline_popup, null);
+
+              final CheckBox dontAskAgainACheckBox = popupView.findViewById(R.id.map_popup_dont_show_again_checkbox);
+
+              Button yesButton = popupView.findViewById(R.id.map_popup_yes_button);
+              Button noButton = popupView.findViewById(R.id.map_popup_no_button);
+
+              final PopupWindow popupWindow =
+                      new PopupWindow(popupView,
+                      MapView.LayoutParams.WRAP_CONTENT,
+                      MapView.LayoutParams.WRAP_CONTENT);
+
+
+              if (!popupWindow.isShowing() && !allowServerQueries) {
+
+                mapScrollingEnabled = false;
+
+                popupWindow.showAtLocation(mapView, Gravity.CENTER, 0, 0);
+                yesButton.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View view) {
+
+
+                    if (dontAskAgainACheckBox.isChecked()) {
+                      sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
+                    }
+
+                    allowOneServerQuery = true;
+                    popupWindow.dismiss();
+                    mapScrollingEnabled = true;
+
+                  }
+                });
+
+                noButton.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View view) {
+
+                    if (dontAskAgainACheckBox.isChecked()) {
+                      sharedPreferences.edit().putBoolean("allowServerQueries", false).apply();
+                    }
+                    popupWindow.dismiss();
+                    mapScrollingEnabled = true;
+
+
+                  }
+                });
+              }
+            }
+          });
+
+
+          if (allowServerQueries || allowOneServerQuery) {
+
+            String latMinString = String.valueOf(latMin);
+            String latMaxString = String.valueOf(latMax);
+            String lonMinString = String.valueOf(lonMin);
+            String lonMaxString = String.valueOf(lonMax);
+
+            String areaQuery = "area="
+                    + latMinString + ","
+                    + latMaxString + ","
+                    + lonMinString + ","
+                    + lonMaxString;
+
+            // TODO add start value to only update not download all everytime. need per area lastUpdated
+            camerasInAreaFromServer.clear();
+            camerasInAreaFromServer = queryServer(areaQuery, null);
+
+          }
 
         }
+
+
+
+        allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInArea(latMin, latMax, lonMin, lonMax);
+
+        List<SynchronizedCamera> camerasNotInDb = new ArrayList<>();
+
+        allCamerasInArea.clear();
+
+        if (outsideOfflineArea) {
+
+          Set<SynchronizedCamera> setFromDb = new HashSet<>(allCamerasInAreaFromDb);
+
+          for (SynchronizedCamera item : camerasInAreaFromServer) {
+            if (!setFromDb.contains(item)) {
+              camerasNotInDb.add(item);
+            }
+          }
+
+          synchronizedCameraRepository.insert(camerasNotInDb);
+          allCamerasInArea.addAll(camerasNotInDb);
+          camerasNotInDb.clear();
+
+        }
+
+        allCamerasInArea.addAll(allCamerasInAreaFromDb);
+
+        Log.d(TAG, "doInBackground: " + allCamerasInArea.size());
+
 
       } catch (Exception ex) {
         // TODO more specific error handling
@@ -344,14 +606,15 @@ public class MapActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostExecute(List<SurveillanceCamera> camerasToDisplay) {
+    protected void onPostExecute(List<SynchronizedCamera> camerasToDisplay) {
       if (!isCancelled() && (camerasToDisplay != null)) {
 
         mapView.getOverlays().remove(cameraOverlay);
         mapView.invalidate();
 
+        itemsToDisplay.clear();
         for (int i = 0; i < camerasToDisplay.size(); i++) {
-          itemsToDisplay.add(new OverlayItem("test_camera", camerasToDisplay.get(i).getComment(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+          itemsToDisplay.add(new OverlayItem(String.valueOf(i),"test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
         }
 
         Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
@@ -381,11 +644,12 @@ public class MapActivity extends AppCompatActivity {
                         infoComment = infoWindow.getView().findViewById(R.id.info_comment);
                         infoEscape = infoWindow.getView().findViewById(R.id.info_escape_button);
 
-                        File thumbnail = new File(allCamerasInArea.get(cameraIndex).getThumbnailPath());
+                        File thumbnail = new File(allCamerasInArea.get(cameraIndex).getImagePath());
+
                         Picasso.get().load(thumbnail)
                                 .into(infoImage);
-                        infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getTimestamp());
-                        infoComment.setText(allCamerasInArea.get(cameraIndex).getComment());
+                        infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getLastUpdated());
+                        infoComment.setText(allCamerasInArea.get(cameraIndex).getComments());
 
                         infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
                         infoEscape.setOnClickListener(new View.OnClickListener() {

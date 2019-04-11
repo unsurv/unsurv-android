@@ -2,6 +2,7 @@ package org.tensorflow.demo;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.Nullable;
 
 
 @Entity (tableName = "synchronized_cameras")

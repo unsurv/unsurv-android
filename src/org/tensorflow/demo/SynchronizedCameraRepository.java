@@ -22,6 +22,10 @@ public class SynchronizedCameraRepository {
     return mSynchronizedCameraDao.getAllCameras();
   }
 
+  List<SynchronizedCamera> getSynchronizedCamerasInArea(double latMin, double latMax, double lonMin, double lonMax) {
+    return mSynchronizedCameraDao.getCamerasInArea(latMin, latMax, lonMin, lonMax);
+  }
+
   public void insert(List<SynchronizedCamera> synchronizedCamera) {
     new insertAsyncTask(mSynchronizedCameraDao).execute(synchronizedCamera);
   }

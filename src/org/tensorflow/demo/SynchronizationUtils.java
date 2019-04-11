@@ -97,8 +97,6 @@ class SynchronizationUtils {
 
     final SynchronizedCameraRepository crep = synchronizedCameraRepository;
 
-
-
     RequestQueue mRequestQueue;
 
     // Set up the network to use HttpURLConnection as the HTTP client.
@@ -131,8 +129,6 @@ class SynchronizationUtils {
 
                 try {
 
-
-
                   for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
@@ -143,27 +139,19 @@ class SynchronizationUtils {
                             JSONToSynchronize.getString("comments"),
                             JSONToSynchronize.getString("lastUpdated")
 
-
-
                     );
 
                     camerasToSync.add(cameraToAdd);
-
-                    // TODO same db entry just gets appended. Check if already there. time based? value based?
-                    //new checkDbAsyncTask(getApplication()).execute();
-
 
                   }
 
                   if (insertIntoDb) {
                     crep.insert(camerasToSync);
-
                   }
 
 
                 } catch (Exception e) {
                   Log.i(TAG, "onResponse: " + e.toString());
-
 
                 }
 

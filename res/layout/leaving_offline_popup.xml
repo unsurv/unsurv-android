@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="180dp"
+    android:layout_height="wrap_content"
+    android:background="#c8333333"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="You are leaving your offline area."
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="Start downloading from the server?"
+        />
+
+    <CheckBox
+        android:id="@+id/map_popup_dont_show_again_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:padding="4dp"
+        android:text="Don't ask again"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/map_popup_no_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NO"/>
+
+        <Button
+            android:id="@+id/map_popup_yes_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="YES"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

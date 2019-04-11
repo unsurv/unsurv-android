@@ -22,5 +22,9 @@ public interface SynchronizedCameraDao {
   @Query("SELECT * FROM synchronized_cameras WHERE externalID = :externalID")
   SynchronizedCamera findID(String externalID);
 
+  @Query("SELECT * FROM synchronized_cameras " +
+          "WHERE latitude BETWEEN :latMin AND :latMax AND longitude BETWEEN :lonMin AND :lonMax")
+  List<SynchronizedCamera> getCamerasInArea(double latMin, double latMax, double lonMin, double lonMax);
+
 
 }
