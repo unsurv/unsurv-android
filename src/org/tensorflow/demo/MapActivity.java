@@ -283,11 +283,12 @@ public class MapActivity extends AppCompatActivity {
               if (isInitialSpinnerSelection) {
                 isInitialSpinnerSelection = false;
 
-                cal.set(2018, 1, 1);
+                cal.set(2018, 0, 1);
                 timemachineMaxInterval = cal.getTime();
                 daysBetween = daysBetween(timemachineMaxInterval, currentDate);
                 timemachineSeekBar.invalidate();
-                timemachineSeekBar.setMax(daysBetween - 1);
+                timemachineSeekBar.setMax(daysBetween + 1);
+                timemachineSeekBar.setProgress(daysBetween + 1);
 
               } else {
 
@@ -297,7 +298,8 @@ public class MapActivity extends AppCompatActivity {
                     cal.add(Calendar.DATE, -7);
                     timemachineMaxInterval = cal.getTime();
                     timemachineSeekBar.invalidate();
-                    timemachineSeekBar.setMax(6);
+                    timemachineSeekBar.setMax(7);
+                    timemachineSeekBar.setProgress(7);
                     reloadMarker();
                     break;
 
@@ -306,7 +308,8 @@ public class MapActivity extends AppCompatActivity {
                     cal.add(Calendar.DATE, -28);
                     timemachineMaxInterval = cal.getTime();
                     timemachineSeekBar.invalidate();
-                    timemachineSeekBar.setMax(27);
+                    timemachineSeekBar.setMax(28);
+                    timemachineSeekBar.setProgress(28);
                     reloadMarker();
                     break;
 
@@ -315,7 +318,8 @@ public class MapActivity extends AppCompatActivity {
                     timemachineMaxInterval = cal.getTime();
                     daysBetween = daysBetween(timemachineMaxInterval, currentDate);
                     timemachineSeekBar.invalidate();
-                    timemachineSeekBar.setMax(daysBetween - 1);
+                    timemachineSeekBar.setMax(daysBetween );
+                    timemachineSeekBar.setProgress(daysBetween);
                     reloadMarker();
                     break;
 
@@ -324,7 +328,8 @@ public class MapActivity extends AppCompatActivity {
                     timemachineMaxInterval = cal.getTime();
                     daysBetween = daysBetween(timemachineMaxInterval, currentDate);
                     timemachineSeekBar.invalidate();
-                    timemachineSeekBar.setMax(daysBetween - 1);
+                    timemachineSeekBar.setMax(daysBetween);
+                    timemachineSeekBar.setProgress(daysBetween);
                     reloadMarker();
                     break;
 
@@ -333,7 +338,8 @@ public class MapActivity extends AppCompatActivity {
                     timemachineMaxInterval = cal.getTime();
                     daysBetween = daysBetween(timemachineMaxInterval, currentDate);
                     timemachineSeekBar.invalidate();
-                    timemachineSeekBar.setMax(daysBetween - 1);
+                    timemachineSeekBar.setMax(daysBetween);
+                    timemachineSeekBar.setProgress(daysBetween );
                     reloadMarker();
                     break;
 
@@ -355,7 +361,8 @@ public class MapActivity extends AppCompatActivity {
               timemachineMaxInterval = cal.getTime();
               daysBetween = daysBetween(timemachineMaxInterval, currentDate);
               timemachineSeekBar.invalidate();
-              timemachineSeekBar.setMax(daysBetween - 1);
+              timemachineSeekBar.setMax(daysBetween + 1);
+              timemachineSeekBar.setProgress(daysBetween + 1);
               reloadMarker();
 
 
@@ -368,11 +375,16 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 
-              timeframeTextView.setText("Progress " + String.valueOf(i));
+
               Calendar tempcal = Calendar.getInstance();
               tempcal.setTime(timemachineMaxInterval);
               tempcal.add(Calendar.DATE, i);
               currentSeekBarDate = tempcal.getTime();
+
+              SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+              timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+              timeframeTextView.setText("All cameras until: " + timestampIso8601.format(currentSeekBarDate));
               reloadMarker();
 
 
@@ -395,6 +407,8 @@ public class MapActivity extends AppCompatActivity {
         } else {
           mapLayout.removeView(timemachineView);
           mapLayout.removeView(timeframeView);
+          isInitialSpinnerSelection = true;
+          reloadMarker();
         }
 
       }
@@ -852,7 +866,7 @@ public class MapActivity extends AppCompatActivity {
 
               Date cameraLastUpdated = timestampIso8601.parse(camerasToDisplay.get(i).getLastUpdated());
 
-              if (cameraLastUpdated.after(currentSeekBarDate)) {
+              if (cameraLastUpdated.before(currentSeekBarDate)) {
                 itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
 
               }
