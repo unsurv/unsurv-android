@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/timemachine_view"
+    android:layout_height="48dp"
+    android:background="#c8333333"
+    android:orientation="horizontal"
+    android:layout_alignParentBottom="true"
+    android:layout_marginEnd="80dp">
+
+
+    <Spinner
+        android:id="@+id/map_timemachine_spinner"
+        android:layout_height="match_parent"
+        android:layout_width="0sp"
+        android:layout_weight="1"
+        >
+
+    </Spinner>
+
+
+    <SeekBar
+        android:id="@+id/map_timemachine_seekbar"
+        android:layout_width="0sp"
+        android:layout_weight="9"
+        android:layout_height="match_parent"
+        />
+
+
+</LinearLayout>

@@ -24,11 +24,17 @@ import android.view.MotionEvent;
 import android.view.View;
 
 
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,10 +69,17 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
 
@@ -101,7 +114,22 @@ public class MapActivity extends AppCompatActivity {
   private boolean mapScrollingEnabled;
 
   private List<SynchronizedCamera> camerasInAreaFromServer = new ArrayList<>();
-  private String lastQuery = "";
+  private List<SynchronizedCamera> camerasFromLastUpdate = new ArrayList<>();
+  private String lastArea = "";
+
+  private ImageButton timemachineButton;
+  private View timemachineView;
+  private View timeframeView;
+
+  private TextView timeframeTextView;
+
+  private Date timemachineMaxInterval;
+  private Date currentSeekBarDate;
+  private int daysBetween;
+
+  private boolean isInitialSpinnerSelection;
+
+
 
   // TODO set max amount visible
 
@@ -114,6 +142,7 @@ public class MapActivity extends AppCompatActivity {
 
     mapView = findViewById(R.id.map);
     mapScrollingEnabled = true;
+    isInitialSpinnerSelection = true;
 
     //TODO find solution to do the same at the beginning of a gesture.
     // Reloads markers in visible area after scrolling. Closes infowindow if open.
@@ -131,7 +160,7 @@ public class MapActivity extends AppCompatActivity {
         closeAllInfoWindowsOn(mapView);
         return false;
       }
-    }, 200)); // delay in ms after zooming/scrolling
+    }, 150)); // delay in ms after zooming/scrolling
 
     mapView.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -204,6 +233,177 @@ public class MapActivity extends AppCompatActivity {
       }
     });
 
+    final RelativeLayout mapLayout = findViewById(R.id.map_rel_layout);
+    ViewGroup.LayoutParams layoutParams = mapLayout.getLayoutParams();
+
+
+
+    timemachineButton = findViewById(R.id.map_timemachine_button);
+
+    timemachineButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        LayoutInflater layoutInflater = (LayoutInflater) MapActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        timemachineView = findViewById(R.id.timemachine_view);
+        timeframeView = findViewById(R.id.map_timeframe);
+
+        if (timemachineView == null) {
+          timemachineView = layoutInflater.inflate(R.layout.scrolling_timemachine, mapLayout);
+          timeframeView = layoutInflater.inflate(R.layout.map_timeframe, mapLayout);
+
+          timeframeTextView = findViewById(R.id.map_timeframe_textview);
+
+          final SeekBar timemachineSeekBar = timemachineView.findViewById(R.id.map_timemachine_seekbar);
+          final Spinner timemachineSpinner = timemachineView.findViewById(R.id.map_timemachine_spinner);
+
+          // Create an ArrayAdapter using the string array and a default spinner layout
+          ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),
+                  R.array.map_timemachine_timeframes, android.R.layout.simple_spinner_item);
+          // Specify the layout to use when the list of choices appears
+          adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+          // Apply the adapter to the spinners
+          timemachineSpinner.setAdapter(adapter);
+
+
+
+          timemachineSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+
+
+              long currentTime = System.currentTimeMillis();
+              Date currentDate = new Date(currentTime);
+
+              Calendar cal = Calendar.getInstance();
+              cal.setTime(currentDate);
+
+              if (isInitialSpinnerSelection) {
+                isInitialSpinnerSelection = false;
+
+                cal.set(2018, 1, 1);
+                timemachineMaxInterval = cal.getTime();
+                daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                timemachineSeekBar.invalidate();
+                timemachineSeekBar.setMax(daysBetween - 1);
+
+              } else {
+
+                switch (i) {
+
+                  case 0: // 7 days
+                    cal.add(Calendar.DATE, -7);
+                    timemachineMaxInterval = cal.getTime();
+                    timemachineSeekBar.invalidate();
+                    timemachineSeekBar.setMax(6);
+                    reloadMarker();
+                    break;
+
+
+                  case 1: // 4 weeks
+                    cal.add(Calendar.DATE, -28);
+                    timemachineMaxInterval = cal.getTime();
+                    timemachineSeekBar.invalidate();
+                    timemachineSeekBar.setMax(27);
+                    reloadMarker();
+                    break;
+
+                  case 2: // 3 months
+                    cal.add(Calendar.MONTH, -3);
+                    timemachineMaxInterval = cal.getTime();
+                    daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                    timemachineSeekBar.invalidate();
+                    timemachineSeekBar.setMax(daysBetween - 1);
+                    reloadMarker();
+                    break;
+
+                  case 3: // 6 months
+                    cal.add(Calendar.MONTH, -6);
+                    timemachineMaxInterval = cal.getTime();
+                    daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                    timemachineSeekBar.invalidate();
+                    timemachineSeekBar.setMax(daysBetween - 1);
+                    reloadMarker();
+                    break;
+
+                  case 4: // 1 year
+                    cal.add(Calendar.MONTH, -12);
+                    timemachineMaxInterval = cal.getTime();
+                    daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                    timemachineSeekBar.invalidate();
+                    timemachineSeekBar.setMax(daysBetween - 1);
+                    reloadMarker();
+                    break;
+
+                }
+              }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+              long currentTime = System.currentTimeMillis();
+              Date currentDate = new Date(currentTime);
+
+              Calendar cal = Calendar.getInstance();
+              cal.setTime(currentDate);
+
+              cal.add(Calendar.MONTH, -6);
+              timemachineMaxInterval = cal.getTime();
+              daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+              timemachineSeekBar.invalidate();
+              timemachineSeekBar.setMax(daysBetween - 1);
+              reloadMarker();
+
+
+
+            }
+          });
+
+
+          timemachineSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+              timeframeTextView.setText("Progress " + String.valueOf(i));
+              Calendar tempcal = Calendar.getInstance();
+              tempcal.setTime(timemachineMaxInterval);
+              tempcal.add(Calendar.DATE, i);
+              currentSeekBarDate = tempcal.getTime();
+              reloadMarker();
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+          });
+
+
+
+
+        } else {
+          mapLayout.removeView(timemachineView);
+          mapLayout.removeView(timeframeView);
+        }
+
+      }
+    });
+
+
+
+
+
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
 
@@ -244,6 +444,9 @@ public class MapActivity extends AppCompatActivity {
     });
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_map).setChecked(true);
+
+
+
 
 
   }
@@ -441,6 +644,22 @@ public class MapActivity extends AppCompatActivity {
         double lonMin = params[paramNo++];
         double lonMax = params[paramNo++];
 
+        String latMinString = String.valueOf(latMin);
+        String latMaxString = String.valueOf(latMax);
+        String lonMinString = String.valueOf(lonMin);
+        String lonMaxString = String.valueOf(lonMax);
+
+        String areaString =
+                latMinString + ","
+                + latMaxString + ","
+                + lonMinString + ","
+                + lonMaxString;
+
+        if (areaString.equals(lastArea)) {
+          return camerasFromLastUpdate;
+        }
+
+
         if (latMin > latMax) {
           double t = latMax;
           latMax = latMin;
@@ -466,6 +685,8 @@ public class MapActivity extends AppCompatActivity {
 
         final SharedPreferences sharedPreferences;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        // TODO maybe move more or less static stuff out of background query? maybe keep to stay updated
 
         String offlineArea = sharedPreferences.getString("area", null); // SNWE
         String[] splitBorders = offlineArea.split(",");
@@ -545,32 +766,22 @@ public class MapActivity extends AppCompatActivity {
 
           if (allowServerQueries || allowOneServerQuery) {
 
-            String latMinString = String.valueOf(latMin);
-            String latMaxString = String.valueOf(latMax);
-            String lonMinString = String.valueOf(lonMin);
-            String lonMaxString = String.valueOf(lonMax);
-
-            String areaQuery = "area="
-                    + latMinString + ","
-                    + latMaxString + ","
-                    + lonMinString + ","
-                    + lonMaxString;
+            String areaQuery = "area=" + areaString;
 
             // TODO add start value to only update not download all everytime. need per area lastUpdated in own db
 
-            String currentQuery = areaQuery; // add startQuery
+            String currentQuery = areaQuery; // add startQuery when needed
 
-            if (!lastQuery.equals(currentQuery)) {
+            if (!lastArea.equals(currentQuery)) {
 
               queryServer(currentQuery);
-              lastQuery = currentQuery;
+              lastArea = currentQuery;
             }
 
 
           }
 
         }
-
 
         allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInArea(latMin, latMax, lonMin, lonMax);
 
@@ -595,6 +806,8 @@ public class MapActivity extends AppCompatActivity {
         }
 
         allCamerasInArea.addAll(allCamerasInAreaFromDb);
+
+        camerasFromLastUpdate = allCamerasInArea;
 
         Log.d(TAG, "doInBackground: " + allCamerasInArea.size());
 
@@ -621,8 +834,36 @@ public class MapActivity extends AppCompatActivity {
         mapView.invalidate();
 
         itemsToDisplay.clear();
-        for (int i = 0; i < camerasToDisplay.size(); i++) {
-          itemsToDisplay.add(new OverlayItem(String.valueOf(i),"test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+
+        timemachineView = findViewById(R.id.map_timemachine_seekbar);
+
+        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        if (timemachineView == null) {
+          for (int i = 0; i < camerasToDisplay.size(); i++) {
+            itemsToDisplay.add(new OverlayItem(String.valueOf(i),"test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+          }
+
+        } else {
+
+          for (int i = 0; i < camerasToDisplay.size(); i++) {
+            try{
+
+              Date cameraLastUpdated = timestampIso8601.parse(camerasToDisplay.get(i).getLastUpdated());
+
+              if (cameraLastUpdated.after(currentSeekBarDate)) {
+                itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+
+              }
+
+            } catch (ParseException parseExc) {
+              Log.i(TAG, "parseException: " + camerasToDisplay.get(i).getLastUpdated());
+            }
+
+          }
+
+
         }
 
         Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
@@ -706,5 +947,10 @@ public class MapActivity extends AppCompatActivity {
       }
     }
   }
+
+  public int daysBetween(Date d1, Date d2){
+    return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
 
 }

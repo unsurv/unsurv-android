@@ -772,7 +772,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         //pitch = mOrientationAngles[1]*(180/Math.PI);
         //roll = mOrientationAngles[2]*(180/Math.PI);
 
-        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         CameraCapture currentCamera = new CameraCapture(
@@ -817,7 +817,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   void processCapturePool(List<CameraCapture> cameraPool){
     // Intersects all capture headings to find true position of a surveillance camera.
-    // Adds a new CameraCapture to database when done processing.
+    // Adds a new SurveillanceCamera to database when done processing.
 
     // repository to get db access
     CameraRepository cameraRepository = new CameraRepository(getApplication());
@@ -826,7 +826,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     List<Location> allIntersectsfromCaptures = new ArrayList<>();
 
-    CameraCapture biggestConfidence = cameraPool.get(0);
+    CameraCapture biggestConfidence = cameraPool.get(0); // is sorted
 
 
     // Get Capture with biggest confidence for thumbnail/picture.
@@ -857,12 +857,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     Location cameraEstimate = LocationUtils.approximateCameraPosition(intersectsInCoordinates, intersectReference);
 
 
-    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
+    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
     Random random = new Random();
 
     long randomDelay = Math.round(sharedPreferences.getLong("syncDelay", 1000*60*60*24) * random.nextDouble());
+
+    currentTime = System.currentTimeMillis();
 
     cameraRepository.insert(new SurveillanceCamera(
             biggestConfidence.getThumbnailPath(),
@@ -870,8 +872,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             cameraEstimate.getLatitude(),
             cameraEstimate.getLongitude(),
             sharedPreferences.getString("comment", "no comment"),
-            timestampIso8601.format(new Date(System.currentTimeMillis())),
-            timestampIso8601.format(new Date(System.currentTimeMillis() + randomDelay))
+            timestampIso8601.format(new Date(currentTime)),
+            timestampIso8601.format(new Date(currentTime + randomDelay))
 
             ));
 

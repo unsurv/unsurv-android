@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="map_timemachine_timeframes">
+
+        <item>7 D</item>
+        <item>4 W</item>
+        <item>3 M</item>
+        <item>6 M</item>
+        <item>1 Y</item>
+
+    </string-array>
+
+</resources>
