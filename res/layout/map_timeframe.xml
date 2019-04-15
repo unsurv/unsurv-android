@@ -7,13 +7,14 @@
     android:background="#c8333333"
     android:orientation="horizontal"
     android:layout_alignParentBottom="true"
+    android:layout_gravity="center"
     android:layout_margin="50dp">
 
 
     <TextView
         android:id="@+id/map_timeframe_textview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"/>
 
 
 </LinearLayout>

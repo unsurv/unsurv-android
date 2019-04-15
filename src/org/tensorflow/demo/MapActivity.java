@@ -96,7 +96,6 @@ public class MapActivity extends AppCompatActivity {
   private CameraViewModel cameraViewModel;
 
   private ArrayList<OverlayItem> itemsToDisplay = new ArrayList<>();
-  private LiveData<List<SurveillanceCamera>> allCameras;
   private ImageButton myLocationButton;
 
 
@@ -129,6 +128,8 @@ public class MapActivity extends AppCompatActivity {
 
   private boolean isInitialSpinnerSelection;
 
+  private SharedPreferences sharedPreferences;
+
 
 
   // TODO set max amount visible
@@ -138,7 +139,7 @@ public class MapActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map);
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
-
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
     mapView = findViewById(R.id.map);
     mapScrollingEnabled = true;
@@ -160,7 +161,7 @@ public class MapActivity extends AppCompatActivity {
         closeAllInfoWindowsOn(mapView);
         return false;
       }
-    }, 150)); // delay in ms after zooming/scrolling
+    }, 150)); // delay for updating in ms after zooming/scrolling
 
     mapView.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -189,6 +190,7 @@ public class MapActivity extends AppCompatActivity {
     mapView.setBuiltInZoomControls(true);
     mapView.setMultiTouchControls(true);
 
+    // TODO add choice + backup strategy here
     mapView.setTileSource(TileSourceFactory.OpenTopo);
 
     final IMapController mapController = mapView.getController();
@@ -198,27 +200,12 @@ public class MapActivity extends AppCompatActivity {
     mapController.setZoom(7.0);
     mapController.setCenter(startPoint);
 
-    //get livedata from local room database
-    cameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
-    allCameras = cameraViewModel.getAllCameras();
-
-    // Refresh markers when database changes
-    Observer<List<SurveillanceCamera>> localCameraObserver = new Observer<List<SurveillanceCamera>>() {
-      @Override
-      public void onChanged(@Nullable List<SurveillanceCamera> surveillanceCameras) {
-        reloadMarker();
-      }
-
-    };
-    // Set observer for LiveData
-    cameraViewModel.getAllCameras().observe(this, localCameraObserver);
-
     // myLocationOverlay
     myLocationOverlay = new MyLocationNewOverlay(mapView);
     myLocationOverlay.enableMyLocation();
     myLocationOverlay.enableFollowLocation();
     myLocationOverlay.setDrawAccuracyEnabled(true);
-    // Set
+    // TODO manage following
     mapController.setCenter(myLocationOverlay.getMyLocation());
     mapController.setZoom(14.00);
     mapView.getOverlays().add(myLocationOverlay);
@@ -237,9 +224,9 @@ public class MapActivity extends AppCompatActivity {
     ViewGroup.LayoutParams layoutParams = mapLayout.getLayoutParams();
 
 
-
     timemachineButton = findViewById(R.id.map_timemachine_button);
 
+    // timemachine is a scrollable timeline to show cameras cumulatively based on their date
     timemachineButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -248,6 +235,7 @@ public class MapActivity extends AppCompatActivity {
         timemachineView = findViewById(R.id.timemachine_view);
         timeframeView = findViewById(R.id.map_timeframe);
 
+        // if timemachine not active
         if (timemachineView == null) {
           timemachineView = layoutInflater.inflate(R.layout.scrolling_timemachine, mapLayout);
           timeframeView = layoutInflater.inflate(R.layout.map_timeframe, mapLayout);
@@ -280,13 +268,25 @@ public class MapActivity extends AppCompatActivity {
               Calendar cal = Calendar.getInstance();
               cal.setTime(currentDate);
 
+              // standard timeframe includes all cameras
               if (isInitialSpinnerSelection) {
                 isInitialSpinnerSelection = false;
 
-                cal.set(2018, 0, 1);
-                timemachineMaxInterval = cal.getTime();
-                daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+
+                int savedValue = sharedPreferences.getInt("timemachineValueInDays", 0);
+                // if user set timeframe before use it
+                if (savedValue != 0) {
+                  cal.add(Calendar.DATE, -savedValue);
+                  timemachineMaxInterval = cal.getTime();
+                  daysBetween = savedValue;
+                } else {
+                  cal.set(2018, 0, 1);
+                  timemachineMaxInterval = cal.getTime();
+                  daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                }
+
                 timemachineSeekBar.invalidate();
+                // steps in timeline = days in timeframe
                 timemachineSeekBar.setMax(daysBetween + 1);
                 timemachineSeekBar.setProgress(daysBetween + 1);
 
@@ -296,7 +296,11 @@ public class MapActivity extends AppCompatActivity {
 
                   case 0: // 7 days
                     cal.add(Calendar.DATE, -7);
+
+                    // used in seekbarchanged listener
                     timemachineMaxInterval = cal.getTime();
+
+                    sharedPreferences.edit().putInt("timemachineValueInDays", 7).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(7);
                     timemachineSeekBar.setProgress(7);
@@ -307,6 +311,7 @@ public class MapActivity extends AppCompatActivity {
                   case 1: // 4 weeks
                     cal.add(Calendar.DATE, -28);
                     timemachineMaxInterval = cal.getTime();
+                    sharedPreferences.edit().putInt("timemachineValueInDays", 28).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(28);
                     timemachineSeekBar.setProgress(28);
@@ -317,8 +322,9 @@ public class MapActivity extends AppCompatActivity {
                     cal.add(Calendar.MONTH, -3);
                     timemachineMaxInterval = cal.getTime();
                     daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                    sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
-                    timemachineSeekBar.setMax(daysBetween );
+                    timemachineSeekBar.setMax(daysBetween);
                     timemachineSeekBar.setProgress(daysBetween);
                     reloadMarker();
                     break;
@@ -327,6 +333,7 @@ public class MapActivity extends AppCompatActivity {
                     cal.add(Calendar.MONTH, -6);
                     timemachineMaxInterval = cal.getTime();
                     daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                    sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
                     timemachineSeekBar.setProgress(daysBetween);
@@ -337,6 +344,18 @@ public class MapActivity extends AppCompatActivity {
                     cal.add(Calendar.MONTH, -12);
                     timemachineMaxInterval = cal.getTime();
                     daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                    sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
+                    timemachineSeekBar.invalidate();
+                    timemachineSeekBar.setMax(daysBetween);
+                    timemachineSeekBar.setProgress(daysBetween );
+                    reloadMarker();
+                    break;
+
+                  case 5: // all
+                    cal.set(2018, 0, 1);
+                    timemachineMaxInterval = cal.getTime();
+                    daysBetween = daysBetween(timemachineMaxInterval, currentDate);
+                    sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
                     timemachineSeekBar.setProgress(daysBetween );
@@ -383,7 +402,7 @@ public class MapActivity extends AppCompatActivity {
 
               SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
               timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-
+              // Show current date in timemachine
               timeframeTextView.setText("All cameras until: " + timestampIso8601.format(currentSeekBarDate));
               reloadMarker();
 
@@ -405,6 +424,7 @@ public class MapActivity extends AppCompatActivity {
 
 
         } else {
+          // disable timemachine on buttonclick if timemachine is active
           mapLayout.removeView(timemachineView);
           mapLayout.removeView(timeframeView);
           isInitialSpinnerSelection = true;
@@ -413,10 +433,6 @@ public class MapActivity extends AppCompatActivity {
 
       }
     });
-
-
-
-
 
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
@@ -459,10 +475,6 @@ public class MapActivity extends AppCompatActivity {
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_map).setChecked(true);
 
-
-
-
-
   }
 
   @Override
@@ -472,19 +484,16 @@ public class MapActivity extends AppCompatActivity {
     return true;
   }
 
-
-
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
 
+      // settings Button
       case R.id.action_settings:
         Intent settingsIntent = new Intent(MapActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
 
         return true;
-
-
 
       default:
         // Fall back on standard behaviour when user choice not recognized.
@@ -516,6 +525,7 @@ public class MapActivity extends AppCompatActivity {
       double zoom = this.mapView.getZoomLevelDouble();
       BoundingBox world = this.mapView.getBoundingBox();
 
+      // WHY IS LONGITUDE EAST < LONGITUDE WEST
       reloadMarker(world, zoom);
 
     } else {
@@ -536,13 +546,16 @@ public class MapActivity extends AppCompatActivity {
 
   }
 
+  /**
+   *
+   * @param queryString url query string i.e. "area=8.2699,50.0201,8.2978,50.0005&start=2018-01-01"
+   */
   void queryServer(String queryString) {
 
     camerasInAreaFromServer.clear();
 
     RequestQueue mRequestQueue;
 
-    final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
     // Set up the network to use HttpURLConnection as the HTTP client.
     Network network = new BasicNetwork(new HurlStack());
@@ -565,7 +578,6 @@ public class MapActivity extends AppCompatActivity {
             new Response.Listener<JSONObject>() {
               @Override
               public void onResponse(JSONObject response) {
-
 
                 JSONObject JSONToSynchronize;
 
@@ -595,10 +607,7 @@ public class MapActivity extends AppCompatActivity {
                           "Error retrieving data from Server. Try again later.", Toast.LENGTH_LONG).show();
 
                 }
-
               }
-
-
 
             }, new Response.ErrorListener() {
       @Override
@@ -629,15 +638,13 @@ public class MapActivity extends AppCompatActivity {
 
   }
 
-
-
   private class BackgroundMarkerLoaderTask extends AsyncTask<Double, Integer, List<SynchronizedCamera>> {
 
     /**
      * Computation of the map itmes in the non-gui background thread. .
      *
      * @param params latMin, latMax, lonMin, longMax, zoom.
-     * @return List of Surveillance Cameras in the current Map window.
+     * @return List of SynchronizedCamera[s] in the current Map window.
      * @see #onPreExecute()
      * @see #onPostExecute
      * @see #publishProgress
@@ -658,22 +665,7 @@ public class MapActivity extends AppCompatActivity {
         double lonMin = params[paramNo++];
         double lonMax = params[paramNo++];
 
-        String latMinString = String.valueOf(latMin);
-        String latMaxString = String.valueOf(latMax);
-        String lonMinString = String.valueOf(lonMin);
-        String lonMaxString = String.valueOf(lonMax);
-
-        String areaString =
-                latMinString + ","
-                + latMaxString + ","
-                + lonMinString + ","
-                + lonMaxString;
-
-        if (areaString.equals(lastArea)) {
-          return camerasFromLastUpdate;
-        }
-
-
+        // change values if in wrong order
         if (latMin > latMax) {
           double t = latMax;
           latMax = latMin;
@@ -688,6 +680,23 @@ public class MapActivity extends AppCompatActivity {
           lonMax = lonMin;
           lonMin = t;
         }
+
+        String latMinString = String.valueOf(latMin);
+        String latMaxString = String.valueOf(latMax);
+        String lonMinString = String.valueOf(lonMin);
+        String lonMaxString = String.valueOf(lonMax);
+
+        String areaString =
+                latMinString + ","
+                        + latMaxString + ","
+                        + lonMinString + ","
+                        + lonMaxString;
+
+        // use "cached" cameras if area the same as last update
+        if (areaString.equals(lastArea)) {
+          return camerasFromLastUpdate;
+        }
+
         double zoom = params[paramNo++];
 
         Log.d(TAG, "doInBackground" +
@@ -697,7 +706,6 @@ public class MapActivity extends AppCompatActivity {
                 " ,lonMax=" + lonMax +
                 ", zoom=" + zoom);
 
-        final SharedPreferences sharedPreferences;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         // TODO maybe move more or less static stuff out of background query? maybe keep to stay updated
@@ -705,6 +713,7 @@ public class MapActivity extends AppCompatActivity {
         String offlineArea = sharedPreferences.getString("area", null); // SNWE
         String[] splitBorders = offlineArea.split(",");
 
+        // offline available borders
         double offlineLatMin = Double.parseDouble(splitBorders[0]);
         double offlineLatMax = Double.parseDouble(splitBorders[1]);
         double offlineLonMin = Double.parseDouble(splitBorders[2]);
@@ -718,12 +727,15 @@ public class MapActivity extends AppCompatActivity {
                 lonMin < offlineLonMin ||
                 lonMax > offlineLonMax;
 
+        // not in offline mode & outside offline area
         if (!offlineMode && outsideOfflineArea) {
 
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
+              // create popupView to ask user if he wants to connect to a server to get data
+              // saves preference if checkbox ticked
               LayoutInflater layoutInflater = (LayoutInflater) MapActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
               View popupView = layoutInflater.inflate(R.layout.leaving_offline_popup, null);
 
@@ -738,8 +750,9 @@ public class MapActivity extends AppCompatActivity {
                       MapView.LayoutParams.WRAP_CONTENT);
 
 
-              if (!popupWindow.isShowing() && !allowServerQueries) {
 
+              if (!popupWindow.isShowing() && !allowServerQueries) {
+                // freeze map while popupWindow is showing
                 mapScrollingEnabled = false;
 
                 popupWindow.showAtLocation(mapView, Gravity.CENTER, 0, 0);
@@ -770,7 +783,6 @@ public class MapActivity extends AppCompatActivity {
                     popupWindow.dismiss();
                     mapScrollingEnabled = true;
 
-
                   }
                 });
               }
@@ -778,25 +790,26 @@ public class MapActivity extends AppCompatActivity {
           });
 
 
+          // permanent permisson or onetime permission for outside area
           if (allowServerQueries || allowOneServerQuery) {
 
             String areaQuery = "area=" + areaString;
 
             // TODO add start value to only update not download all everytime. need per area lastUpdated in own db
 
-            String currentQuery = areaQuery; // add startQuery when needed
+            String currentQuery = areaQuery; // TODO add startQuery when needed
 
+            // area not the same as last update -> query server for data
             if (!lastArea.equals(currentQuery)) {
-
               queryServer(currentQuery);
               lastArea = currentQuery;
             }
-
 
           }
 
         }
 
+        // query local db
         allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInArea(latMin, latMax, lonMin, lonMax);
 
         List<SynchronizedCamera> camerasNotInDb = new ArrayList<>();
@@ -807,12 +820,15 @@ public class MapActivity extends AppCompatActivity {
 
           Set<SynchronizedCamera> setFromDb = new HashSet<>(allCamerasInAreaFromDb);
 
+          // check if data already in db
           for (SynchronizedCamera item : camerasInAreaFromServer) {
             if (!setFromDb.contains(item)) {
               camerasNotInDb.add(item);
             }
           }
 
+          // update local db with new data
+          // TODO see if performance hit from big database exists
           synchronizedCameraRepository.insert(camerasNotInDb);
           allCamerasInArea.addAll(camerasNotInDb);
           camerasNotInDb.clear();
@@ -821,6 +837,7 @@ public class MapActivity extends AppCompatActivity {
 
         allCamerasInArea.addAll(allCamerasInAreaFromDb);
 
+        // cache for current map
         camerasFromLastUpdate = allCamerasInArea;
 
         Log.d(TAG, "doInBackground: " + allCamerasInArea.size());
@@ -854,9 +871,18 @@ public class MapActivity extends AppCompatActivity {
         SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+        int maxMarkers = sharedPreferences.getInt("maxMapMarkers", 500);
+
+        // normal behaviour if timemachine not active
         if (timemachineView == null) {
           for (int i = 0; i < camerasToDisplay.size(); i++) {
             itemsToDisplay.add(new OverlayItem(String.valueOf(i),"test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+            if (i > maxMarkers) {
+              Toast.makeText(getApplicationContext(),
+                      "Too many markers displayed, please zoom in or increase amount",
+                      Toast.LENGTH_SHORT).show();
+              break;
+            }
           }
 
         } else {
@@ -866,9 +892,17 @@ public class MapActivity extends AppCompatActivity {
 
               Date cameraLastUpdated = timestampIso8601.parse(camerasToDisplay.get(i).getLastUpdated());
 
-              if (cameraLastUpdated.before(currentSeekBarDate)) {
+              // display only cameras between seekbar max amount in the past and current seekbardate chosen by user
+              // if seekbar is set to last week, only cameras added less than a week ago will be shown
+              if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
                 itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
 
+                if (i > maxMarkers) {
+                  Toast.makeText(getApplicationContext(),
+                          "Too many markers displayed, please zoom in or increase amount",
+                          Toast.LENGTH_SHORT).show();
+                  break;
+                }
               }
 
             } catch (ParseException parseExc) {
@@ -876,12 +910,14 @@ public class MapActivity extends AppCompatActivity {
             }
 
           }
-
-
         }
+
+
 
         Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
         //TODO scaling marker
+
+        // main overlay for markers
         cameraOverlay = new ItemizedIconOverlay<>(itemsToDisplay, customMarker,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 
@@ -906,6 +942,8 @@ public class MapActivity extends AppCompatActivity {
                         infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
                         infoComment = infoWindow.getView().findViewById(R.id.info_comment);
                         infoEscape = infoWindow.getView().findViewById(R.id.info_escape_button);
+
+                        // TODO add logic for querying the server for individual pictures if not in offline area etc
 
                         File thumbnail = new File(allCamerasInArea.get(cameraIndex).getImagePath());
 
@@ -962,6 +1000,12 @@ public class MapActivity extends AppCompatActivity {
     }
   }
 
+  /**
+   * calculates days inbetween 2 Date[s]
+   * @param d1
+   * @param d2
+   * @return
+   */
   public int daysBetween(Date d1, Date d2){
     return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
   }

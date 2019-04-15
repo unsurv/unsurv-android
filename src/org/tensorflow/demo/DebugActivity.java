@@ -66,6 +66,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -168,6 +169,9 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
     sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
+    sharedPreferences.edit().putInt("maxMapMarkers", 500).apply();
+    // set in timemachineSpinner
+    // sharedPreferences.edit().putInt("timemachineValue", null).apply();
 
 
     wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -284,7 +288,8 @@ public class DebugActivity extends AppCompatActivity {
         sharedPreferences.getLong("synchronizationInterval", 15*60*1000)+ "\n" +
         sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?")+ "\n" +
         sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888")+ "\n" +
-        sharedPreferences.getBoolean("buttonCapture", false) );
+        sharedPreferences.getBoolean("buttonCapture", false) + "\n" +
+        sharedPreferences.getInt("timemachineValueInDays", 0) );
 
 
       }
