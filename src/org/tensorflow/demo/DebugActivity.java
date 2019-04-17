@@ -33,17 +33,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Cache;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Network;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
@@ -66,10 +55,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.TimeZone;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
@@ -80,11 +66,8 @@ public class DebugActivity extends AppCompatActivity {
   private String TAG = "DebugActivity";
 
   private BottomNavigationView bottomNavigationView;
-  private JSONObject JSONToSynchronize;
-  private SynchronizedCamera cameraToAdd;
 
   private SynchronizedCameraRepository synchronizedCameraRepository;
-
 
   private int CHECK_DB_SIZE = 0;
   private int DELETE_DB = 1;

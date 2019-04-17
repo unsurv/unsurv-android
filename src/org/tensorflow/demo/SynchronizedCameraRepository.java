@@ -26,14 +26,17 @@ public class SynchronizedCameraRepository {
     return mSynchronizedCameraDao.getCamerasInArea(latMin, latMax, lonMin, lonMax);
   }
 
+  List<String> getIDsInArea(double latMin, double latMax, double lonMin, double lonMax) {
+    return mSynchronizedCameraDao.getIDsInArea(latMin, latMax, lonMin, lonMax);
+  }
+
   public void insert(List<SynchronizedCamera> synchronizedCamera) {
-    new insertAsyncTask(mSynchronizedCameraDao).execute(synchronizedCamera);
+    new insertAsyncTask(mSynchronizedCameraDao).execute((List)synchronizedCamera);
   }
 
   public void deleteAll() {
     mSynchronizedCameraDao.deleteAll();
   }
-
 
   private static class insertAsyncTask extends AsyncTask<List<SynchronizedCamera>, Void, Void> {
 

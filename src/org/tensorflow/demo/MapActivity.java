@@ -1,8 +1,5 @@
 package org.tensorflow.demo;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -71,7 +67,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -102,6 +97,7 @@ public class MapActivity extends AppCompatActivity {
   private SynchronizedCameraRepository synchronizedCameraRepository;
 
   private List<SynchronizedCamera> allCamerasInArea = new ArrayList<>();
+  private List<String> allIDsInArea = new ArrayList<>();
 
   private InfoWindow infoWindow;
   private ImageView infoImage;
@@ -130,6 +126,22 @@ public class MapActivity extends AppCompatActivity {
 
   private SharedPreferences sharedPreferences;
 
+  private List<SynchronizedCamera> camerasNotInDb = new ArrayList<>();
+  private List<SynchronizedCamera> allCamerasInAreaFromDb = new ArrayList<>();
+
+  private AreaOfflineAvailableRepository areaOfflineAvailableRepository;
+  private List<AreaOfflineAvailable> areasOfflineAvailable = new ArrayList<>();
+  private ImageButton gridButton;
+  private SimpleDateFormat timestampIso8601;
+  private SimpleDateFormat timestampIso8601ForArea;
+  private Date latestUpdateForArea;
+  private boolean timeBasedQuery;
+  private double latMin;
+  private double latMax;
+  private double lonMin;
+  private double lonMax;
+
+  private AreaOfflineAvailable mostRecentArea;
 
 
   // TODO set max amount visible
@@ -139,11 +151,19 @@ public class MapActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map);
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
+    areaOfflineAvailableRepository = new AreaOfflineAvailableRepository(getApplication());
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+    areaOfflineAvailableRepository.deleteAll();
 
     mapView = findViewById(R.id.map);
     mapScrollingEnabled = true;
     isInitialSpinnerSelection = true;
+
+    timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+    timestampIso8601ForArea = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
     //TODO find solution to do the same at the beginning of a gesture.
     // Reloads markers in visible area after scrolling. Closes infowindow if open.
@@ -166,7 +186,7 @@ public class MapActivity extends AppCompatActivity {
     mapView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        reloadMarker();
+        //reloadMarker();
         closeAllInfoWindowsOn(mapView);
       }
     });
@@ -223,6 +243,14 @@ public class MapActivity extends AppCompatActivity {
     final RelativeLayout mapLayout = findViewById(R.id.map_rel_layout);
     ViewGroup.LayoutParams layoutParams = mapLayout.getLayoutParams();
 
+    gridButton = findViewById(R.id.map_grid_button);
+    gridButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        mapController.setCenter(new GeoPoint(50.1120, 8.6776));
+        mapController.setZoom(12.50);
+      }
+    });
 
     timemachineButton = findViewById(R.id.map_timemachine_button);
 
@@ -404,8 +432,7 @@ public class MapActivity extends AppCompatActivity {
               timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
               // Show current date in timemachine
               timeframeTextView.setText("All cameras until: " + timestampIso8601.format(currentSeekBarDate));
-              reloadMarker();
-
+              redrawMarkers(allCamerasInArea);
 
             }
 
@@ -428,7 +455,7 @@ public class MapActivity extends AppCompatActivity {
           mapLayout.removeView(timemachineView);
           mapLayout.removeView(timeframeView);
           isInitialSpinnerSelection = true;
-          reloadMarker();
+          redrawMarkers(allCamerasInArea);
         }
 
       }
@@ -556,7 +583,6 @@ public class MapActivity extends AppCompatActivity {
 
     RequestQueue mRequestQueue;
 
-
     // Set up the network to use HttpURLConnection as the HTTP client.
     Network network = new BasicNetwork(new HurlStack());
 
@@ -612,7 +638,8 @@ public class MapActivity extends AppCompatActivity {
             }, new Response.ErrorListener() {
       @Override
       public void onErrorResponse(VolleyError error) {
-        // TODO: Handle http Errors
+        // TODO: Handle different http Errors
+        Log.i(TAG, "HTTP Error: " + error.toString());
       }
     }
     );
@@ -632,7 +659,34 @@ public class MapActivity extends AppCompatActivity {
 
       @Override
       public void onRequestFinished(Request<Object> request) {
-        reloadMarker();
+
+        camerasNotInDb.clear();
+
+        Set<String> IDsetFromDb = new HashSet<>(allIDsInArea);
+        // check if data already in db
+        for (SynchronizedCamera item : camerasInAreaFromServer) {
+          if (!IDsetFromDb.contains(item.getExternalID())) {
+            camerasNotInDb.add(item);
+          }
+        }
+
+        // update local db with new data
+        synchronizedCameraRepository.insert(camerasNotInDb);
+
+
+
+        if(timeBasedQuery) {
+          areaOfflineAvailableRepository.update(mostRecentArea);
+        } else {
+          long currentTimeInMillis = System.currentTimeMillis();
+          String currentIsoDate = timestampIso8601ForArea.format(new Date(currentTimeInMillis));
+          areaOfflineAvailableRepository.insert(new AreaOfflineAvailable(latMin, latMax, lonMin, lonMax, currentIsoDate));
+        }
+
+        // TODO add area to db
+
+        updateAllCamerasInArea();
+        redrawMarkers(allCamerasInArea);
       }
     });
 
@@ -653,17 +707,23 @@ public class MapActivity extends AppCompatActivity {
     protected List<SynchronizedCamera> doInBackground(Double... params) {
       FolderOverlay result = new FolderOverlay();
 
-      List<SynchronizedCamera> allCamerasInAreaFromDb;
+      // clear vars to work with
+      allCamerasInArea.clear();
+      camerasNotInDb.clear();
+      areasOfflineAvailable.clear();
+
+      // set standard to query for complete timeline of area
+      timeBasedQuery = false;
 
       try {
         if (params.length != 5)
           throw new IllegalArgumentException("expected latMin, latMax, lonMin, longMax, zoom");
 
         int paramNo = 0;
-        double latMin = params[paramNo++];
-        double latMax = params[paramNo++];
-        double lonMin = params[paramNo++];
-        double lonMax = params[paramNo++];
+        latMin = params[paramNo++];
+        latMax = params[paramNo++];
+        lonMin = params[paramNo++];
+        lonMax = params[paramNo++];
 
         // change values if in wrong order
         if (latMin > latMax) {
@@ -692,8 +752,8 @@ public class MapActivity extends AppCompatActivity {
                         + lonMinString + ","
                         + lonMaxString;
 
-        // use "cached" cameras if area the same as last update
-        if (areaString.equals(lastArea)) {
+        // use "cached" cameras if area the same as last update except manual user update
+        if (areaString.equals(lastArea)) { // TODO manual user update
           return camerasFromLastUpdate;
         }
 
@@ -713,7 +773,7 @@ public class MapActivity extends AppCompatActivity {
         String offlineArea = sharedPreferences.getString("area", null); // SNWE
         String[] splitBorders = offlineArea.split(",");
 
-        // offline available borders
+        // "homezone" offline available borders
         double offlineLatMin = Double.parseDouble(splitBorders[0]);
         double offlineLatMax = Double.parseDouble(splitBorders[1]);
         double offlineLonMin = Double.parseDouble(splitBorders[2]);
@@ -722,13 +782,48 @@ public class MapActivity extends AppCompatActivity {
         boolean offlineMode = sharedPreferences.getBoolean("offlineMode", true);
         final boolean allowServerQueries = sharedPreferences.getBoolean("allowServerQueries", false);
 
+        // always query db
+        allCamerasInAreaFromDb.clear();
+        allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInArea(latMin, latMax, lonMin, lonMax);
+        allIDsInArea.clear();
+        allIDsInArea = synchronizedCameraRepository.getIDsInArea(latMin, latMax, lonMin, lonMax);
+
+        updateAllCamerasInArea();
+
         boolean outsideOfflineArea = latMin < offlineLatMin ||
                 latMax > offlineLatMax ||
                 lonMin < offlineLonMin ||
                 lonMax > offlineLonMax;
 
+
+
         // not in offline mode & outside offline area
         if (!offlineMode && outsideOfflineArea) {
+
+          // check if area was visited before
+          areasOfflineAvailable = areaOfflineAvailableRepository.isOfflineavailable(latMin, latMax, lonMin, lonMax);
+
+          // find latest update for current area
+          if (!areasOfflineAvailable.isEmpty()) {
+            timeBasedQuery = true;
+
+            // set to early date temporarily
+            latestUpdateForArea = new Date(0);
+
+            for (AreaOfflineAvailable item : areasOfflineAvailable) {
+              // use precise timings for areas
+
+              Date itemUpdate = timestampIso8601ForArea.parse(item.getLastUpdated());
+
+
+              if (itemUpdate.after(latestUpdateForArea)) {
+                latestUpdateForArea = itemUpdate;
+                mostRecentArea = item;
+              }
+            }
+          }
+
+          // TODO query with start= if timebasedquery == true;
 
           runOnUiThread(new Runnable() {
             @Override
@@ -748,8 +843,6 @@ public class MapActivity extends AppCompatActivity {
                       new PopupWindow(popupView,
                       MapView.LayoutParams.WRAP_CONTENT,
                       MapView.LayoutParams.WRAP_CONTENT);
-
-
 
               if (!popupWindow.isShowing() && !allowServerQueries) {
                 // freeze map while popupWindow is showing
@@ -801,41 +894,34 @@ public class MapActivity extends AppCompatActivity {
 
             // area not the same as last update -> query server for data
             if (!lastArea.equals(currentQuery)) {
-              queryServer(currentQuery);
-              lastArea = currentQuery;
+
+              if(timeBasedQuery) {
+                // area already visited and therefore in db, only query for updates since last "visit"
+
+                // don't query if last visit less than 5 mins ago
+                Date today = new Date(System.currentTimeMillis() - 1000*60*3);
+
+                if (latestUpdateForArea.before(today)) {
+                  String latestUpdate = timestampIso8601.format(latestUpdateForArea);
+                  currentQuery = currentQuery.concat("&start=" + latestUpdate);
+                  queryServer(currentQuery);
+                  lastArea = areaString;
+                }
+
+              } else {
+                queryServer(currentQuery);
+                lastArea = areaString;
+
+              }
             }
 
           }
 
+
+        } else if (offlineMode && outsideOfflineArea) {
+          Toast.makeText(getApplicationContext(), "Not available in Offline-Mode", Toast.LENGTH_SHORT).show();
         }
 
-        // query local db
-        allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInArea(latMin, latMax, lonMin, lonMax);
-
-        List<SynchronizedCamera> camerasNotInDb = new ArrayList<>();
-
-        allCamerasInArea.clear();
-
-        if (outsideOfflineArea) {
-
-          Set<SynchronizedCamera> setFromDb = new HashSet<>(allCamerasInAreaFromDb);
-
-          // check if data already in db
-          for (SynchronizedCamera item : camerasInAreaFromServer) {
-            if (!setFromDb.contains(item)) {
-              camerasNotInDb.add(item);
-            }
-          }
-
-          // update local db with new data
-          // TODO see if performance hit from big database exists
-          synchronizedCameraRepository.insert(camerasNotInDb);
-          allCamerasInArea.addAll(camerasNotInDb);
-          camerasNotInDb.clear();
-
-        }
-
-        allCamerasInArea.addAll(allCamerasInAreaFromDb);
 
         // cache for current map
         camerasFromLastUpdate = allCamerasInArea;
@@ -861,135 +947,10 @@ public class MapActivity extends AppCompatActivity {
     protected void onPostExecute(List<SynchronizedCamera> camerasToDisplay) {
       if (!isCancelled() && (camerasToDisplay != null)) {
 
-        mapView.getOverlays().remove(cameraOverlay);
-        mapView.invalidate();
-
-        itemsToDisplay.clear();
-
-        timemachineView = findViewById(R.id.map_timemachine_seekbar);
-
-        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        int maxMarkers = sharedPreferences.getInt("maxMapMarkers", 500);
-
-        // normal behaviour if timemachine not active
-        if (timemachineView == null) {
-          for (int i = 0; i < camerasToDisplay.size(); i++) {
-            itemsToDisplay.add(new OverlayItem(String.valueOf(i),"test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
-            if (i > maxMarkers) {
-              Toast.makeText(getApplicationContext(),
-                      "Too many markers displayed, please zoom in or increase amount",
-                      Toast.LENGTH_SHORT).show();
-              break;
-            }
-          }
-
-        } else {
-
-          for (int i = 0; i < camerasToDisplay.size(); i++) {
-            try{
-
-              Date cameraLastUpdated = timestampIso8601.parse(camerasToDisplay.get(i).getLastUpdated());
-
-              // display only cameras between seekbar max amount in the past and current seekbardate chosen by user
-              // if seekbar is set to last week, only cameras added less than a week ago will be shown
-              if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
-                itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
-
-                if (i > maxMarkers) {
-                  Toast.makeText(getApplicationContext(),
-                          "Too many markers displayed, please zoom in or increase amount",
-                          Toast.LENGTH_SHORT).show();
-                  break;
-                }
-              }
-
-            } catch (ParseException parseExc) {
-              Log.i(TAG, "parseException: " + camerasToDisplay.get(i).getLastUpdated());
-            }
-
-          }
-        }
-
-
-
-        Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
-        //TODO scaling marker
-
-        // main overlay for markers
-        cameraOverlay = new ItemizedIconOverlay<>(itemsToDisplay, customMarker,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-
-                  @Override
-                  public boolean onItemSingleTapUp(final int index, final OverlayItem cameraItem) {
-                    GeoPoint markerLocation = new GeoPoint(cameraItem.getPoint().getLatitude(), cameraItem.getPoint().getLongitude());
-
-                    //close existing infoWindow
-                    if (infoWindow != null) {
-                      infoWindow.close();
-                    }
-
-                    infoWindow = new InfoWindow(R.layout.camera_info_window, mapView) {
-                      @Override
-                      public void onOpen(Object item) {
-                        int cameraIndex = Integer.parseInt(cameraItem.getUid());
-
-                        infoWindow.setRelatedObject(allCamerasInArea.get(cameraIndex));
-
-                        // Setting content for infoWindow.
-                        infoImage = infoWindow.getView().findViewById(R.id.info_image);
-                        infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
-                        infoComment = infoWindow.getView().findViewById(R.id.info_comment);
-                        infoEscape = infoWindow.getView().findViewById(R.id.info_escape_button);
-
-                        // TODO add logic for querying the server for individual pictures if not in offline area etc
-
-                        File thumbnail = new File(allCamerasInArea.get(cameraIndex).getImagePath());
-
-                        Picasso.get().load(thumbnail)
-                                .into(infoImage);
-                        infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getLastUpdated());
-                        infoComment.setText(allCamerasInArea.get(cameraIndex).getComments());
-
-                        infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
-                        infoEscape.setOnClickListener(new View.OnClickListener() {
-                          @Override
-                          public void onClick(View view) {
-                            infoWindow.close();
-                          }});
-                      }
-
-                      @Override
-                      public void onClose() {
-
-                      }
-                    };
-
-
-                    infoWindow.open(cameraItem, markerLocation, 0, 0);
-
-                    /*
-                    Toast.makeText(
-                            MapActivity.this,
-                            "Item '" + cameraItem.getTitle() + "' (index=" + index
-                                    + ") got single tapped up", Toast.LENGTH_LONG).show();
-                    */
-                    return true; // We 'handled' this event.
-                  }
-
-                  @Override
-                  public boolean onItemLongPress(final int index, final OverlayItem cameraItem) {
-                    Toast.makeText(
-                            MapActivity.this,
-                            "Item '" + cameraItem.getTitle() + "' (index=" + index
-                                    + ") got long pressed", Toast.LENGTH_LONG).show();
-                    return false;
-                  }
-                }, getApplicationContext());
-        mapView.getOverlays().add(cameraOverlay);
+        redrawMarkers(camerasToDisplay);
 
       }
+
       mCurrentBackgroundMarkerLoaderTask = null;
       // there was map move/zoom while {@link BackgroundMarkerLoaderTask} was active. must reload
       if (mMissedMapZoomScrollUpdates > 0) {
@@ -1008,6 +969,137 @@ public class MapActivity extends AppCompatActivity {
    */
   public int daysBetween(Date d1, Date d2){
     return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  private void updateAllCamerasInArea(){
+    allCamerasInArea.clear();
+    allCamerasInArea.addAll(allCamerasInAreaFromDb);
+    allCamerasInArea.addAll(camerasNotInDb);
+  }
+
+  private void redrawMarkers(List<SynchronizedCamera> camerasToDisplay) {
+    mapView.getOverlays().remove(cameraOverlay);
+    mapView.invalidate();
+
+    itemsToDisplay.clear();
+
+    timemachineView = findViewById(R.id.map_timemachine_seekbar);
+
+    int maxMarkers = sharedPreferences.getInt("maxMapMarkers", 500);
+
+    // normal behaviour if timemachine not active
+    if (timemachineView == null) {
+      for (int i = 0; i < camerasToDisplay.size(); i++) {
+        itemsToDisplay.add(new OverlayItem(String.valueOf(i),"test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+        if (i > maxMarkers) {
+          Toast.makeText(getApplicationContext(),
+                  "Too many markers displayed, please zoom in or increase amount",
+                  Toast.LENGTH_SHORT).show();
+          break;
+        }
+      }
+
+    } else {
+
+      for (int i = 0; i < camerasToDisplay.size(); i++) {
+        try{
+
+          Date cameraLastUpdated = timestampIso8601.parse(camerasToDisplay.get(i).getLastUpdated());
+
+          // display only cameras between seekbar max amount in the past and current seekbardate chosen by user
+          // if seekbar is set to last week, only cameras added less than a week ago will be shown
+          if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
+            itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+
+            if (i > maxMarkers) {
+              Toast.makeText(getApplicationContext(),
+                      "Too many markers displayed, please zoom in or increase amount",
+                      Toast.LENGTH_SHORT).show();
+              break;
+            }
+          }
+
+        } catch (ParseException parseExc) {
+          Log.i(TAG, "parseException: " + camerasToDisplay.get(i).getLastUpdated());
+        }
+
+      }
+    }
+
+    Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
+    //TODO scaling marker
+
+    // main overlay for markers
+    cameraOverlay = new ItemizedIconOverlay<>(itemsToDisplay, customMarker,
+            new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+
+              @Override
+              public boolean onItemSingleTapUp(final int index, final OverlayItem cameraItem) {
+                GeoPoint markerLocation = new GeoPoint(cameraItem.getPoint().getLatitude(), cameraItem.getPoint().getLongitude());
+
+                //close existing infoWindow
+                if (infoWindow != null) {
+                  infoWindow.close();
+                }
+
+                infoWindow = new InfoWindow(R.layout.camera_info_window, mapView) {
+                  @Override
+                  public void onOpen(Object item) {
+                    int cameraIndex = Integer.parseInt(cameraItem.getUid());
+
+                    infoWindow.setRelatedObject(allCamerasInArea.get(cameraIndex));
+
+                    // Setting content for infoWindow.
+                    infoImage = infoWindow.getView().findViewById(R.id.info_image);
+                    infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
+                    infoComment = infoWindow.getView().findViewById(R.id.info_comment);
+                    infoEscape = infoWindow.getView().findViewById(R.id.info_escape_button);
+
+                    // TODO add logic for querying the server for individual pictures if not in offline area etc
+
+                    File thumbnail = new File(allCamerasInArea.get(cameraIndex).getImagePath());
+
+                    Picasso.get().load(thumbnail)
+                            .into(infoImage);
+                    infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getLastUpdated());
+                    infoComment.setText(allCamerasInArea.get(cameraIndex).getComments());
+
+                    infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
+                    infoEscape.setOnClickListener(new View.OnClickListener() {
+                      @Override
+                      public void onClick(View view) {
+                        infoWindow.close();
+                      }});
+                  }
+
+                  @Override
+                  public void onClose() {
+
+                  }
+                };
+
+
+                infoWindow.open(cameraItem, markerLocation, 0, 0);
+
+                    /*
+                    Toast.makeText(
+                            MapActivity.this,
+                            "Item '" + cameraItem.getTitle() + "' (index=" + index
+                                    + ") got single tapped up", Toast.LENGTH_LONG).show();
+                    */
+                return true; // We 'handled' this event.
+              }
+
+              @Override
+              public boolean onItemLongPress(final int index, final OverlayItem cameraItem) {
+                Toast.makeText(
+                        MapActivity.this,
+                        "Item '" + cameraItem.getTitle() + "' (index=" + index
+                                + ") got long pressed", Toast.LENGTH_LONG).show();
+                return false;
+              }
+            }, getApplicationContext());
+    mapView.getOverlays().add(cameraOverlay);
   }
 
 

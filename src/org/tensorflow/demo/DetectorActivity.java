@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -772,7 +773,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         //pitch = mOrientationAngles[1]*(180/Math.PI);
         //roll = mOrientationAngles[2]*(180/Math.PI);
 
-        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd");
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         CameraCapture currentCamera = new CameraCapture(
@@ -857,7 +858,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     Location cameraEstimate = LocationUtils.approximateCameraPosition(intersectsInCoordinates, intersectReference);
 
 
-    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
     Random random = new Random();

@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -63,7 +64,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
     protected Void doInBackground(final Void... params) {
       mDao.deleteAll();
 
-      SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+      SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
       timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
       for (int i = 0; i < 200; i++) {
