@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -143,6 +144,8 @@ public class MapActivity extends AppCompatActivity {
 
   private AreaOfflineAvailable mostRecentArea;
 
+  private String picturesPath;
+
 
   // TODO set max amount visible
 
@@ -153,6 +156,9 @@ public class MapActivity extends AppCompatActivity {
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
     areaOfflineAvailableRepository = new AreaOfflineAvailableRepository(getApplication());
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+    picturesPath = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
     areaOfflineAvailableRepository.deleteAll();
 
@@ -183,18 +189,12 @@ public class MapActivity extends AppCompatActivity {
       }
     }, 150)); // delay for updating in ms after zooming/scrolling
 
-    mapView.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        //reloadMarker();
-        closeAllInfoWindowsOn(mapView);
-      }
-    });
 
     mapView.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
         if (mapScrollingEnabled) {
+          closeAllInfoWindowsOn(mapView);
           return false;
         } else {
           return true;
@@ -612,7 +612,8 @@ public class MapActivity extends AppCompatActivity {
                   for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
-                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(JSONToSynchronize.getString("imageURL"),
+                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(
+                            "test_nexus_10.jpg",
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
@@ -899,7 +900,7 @@ public class MapActivity extends AppCompatActivity {
                 // area already visited and therefore in db, only query for updates since last "visit"
 
                 // don't query if last visit less than 5 mins ago
-                Date today = new Date(System.currentTimeMillis() - 1000*60*3);
+                Date today = new Date(System.currentTimeMillis() - 1000*60);
 
                 if (latestUpdateForArea.before(today)) {
                   String latestUpdate = timestampIso8601.format(latestUpdateForArea);
@@ -1057,7 +1058,8 @@ public class MapActivity extends AppCompatActivity {
 
                     // TODO add logic for querying the server for individual pictures if not in offline area etc
 
-                    File thumbnail = new File(allCamerasInArea.get(cameraIndex).getImagePath());
+                    File thumbnail = new File(
+                            picturesPath + allCamerasInArea.get(cameraIndex).getImagePath());
 
                     Picasso.get().load(thumbnail)
                             .into(infoImage);

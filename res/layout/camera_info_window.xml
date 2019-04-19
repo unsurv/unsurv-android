@@ -11,7 +11,7 @@
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:padding="4dp"
         />
 

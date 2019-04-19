@@ -132,7 +132,8 @@ class SynchronizationUtils {
                   for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
-                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(JSONToSynchronize.getString("imageURL"),
+                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(
+                            "test_nexus_10.jpg",
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),

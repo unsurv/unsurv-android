@@ -55,8 +55,6 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
   private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
     private final SynchronizedCameraDao mDao;
-    private static String picturesPath = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
     PopulateDbAsync(SynchronizedCameraRoomDatabase db) {
       mDao = db.synchronizedCameraDao();
@@ -76,7 +74,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
 
         // Populate database with placeholder data.
         SynchronizedCamera synchronizedCamera = new SynchronizedCamera(
-                picturesPath + "190754878_thumbnail.jpg",
+                "190754878_thumbnail.jpg",
                 "asjdnjasdqwdmqwlo",
                 50.0005 + randomLat, 8.2832 + randomLong,
                 "no comments",
