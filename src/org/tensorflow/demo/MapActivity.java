@@ -3,6 +3,8 @@ package org.tensorflow.demo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -49,6 +51,7 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -674,8 +677,6 @@ public class MapActivity extends AppCompatActivity {
         // update local db with new data
         synchronizedCameraRepository.insert(camerasNotInDb);
 
-
-
         if(timeBasedQuery) {
           areaOfflineAvailableRepository.update(mostRecentArea);
         } else {
@@ -1101,6 +1102,7 @@ public class MapActivity extends AppCompatActivity {
                 return false;
               }
             }, getApplicationContext());
+
     mapView.getOverlays().add(cameraOverlay);
   }
 

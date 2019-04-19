@@ -227,6 +227,8 @@ dependencies {
 
     // UnitTests
     implementation 'junit:junit:4.12'
+
+    implementation 'com.github.MKergall:osmbonuspack:6.6.0'
 }
 
 

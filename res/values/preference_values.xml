@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="synchronization_choices">
+        <item>1 day</item>
+        <item>7 days</item>
+        <item>14 days</item>
+        <item>28 days</item>
+    </string-array>
+
+    <integer-array name="synchronization_values">
+        <item>86400</item>
+        <item>604800</item>
+        <item>1209600</item>
+        <item>2419200</item>
+    </integer-array>
+
+    <integer name="default_synchronization_value">
+        604800
+    </integer>
+
+</resources>

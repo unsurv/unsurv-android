@@ -11,20 +11,32 @@
         android:summary= "Test Switch Preference"/>
 
     <Preference
-
         app:title="Send feedback"
         android:summary="Report technical issues or suggest new features"/>
 
     <EditTextPreference
         android:key="synchronizationUrl"
-        android:title="Server to synchronize with"
-        />
+        android:title="Server to synchronize with"/>
 
     <SwitchPreference
         android:key="buttonCapture"
         android:title="Enable hold to capture" />
 
+    <ListPreference
+        android:title="synchronization interval"
+        android:key="synchronizationInterval"
+        android:entries="@array/synchronization_choices"
+        android:entryValues="@array/synchronization_values"/>
 
+    <SwitchPreference
+        android:title="Offline mode"
+        android:key="offlineMode"/>
+
+    <ListPreference
+        android:title="Maximum markers on map"
+        android:key="maxMapMarkers"
+        android:entries="@array/synchronization_choices"
+        android:entryValues="@array/synchronization_values"/>
 
 
 </PreferenceScreen>

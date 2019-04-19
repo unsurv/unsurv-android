@@ -142,20 +142,28 @@ public class DebugActivity extends AppCompatActivity {
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-    notificationPreference = sharedPreferences.getBoolean("notifications", false);
-    debugTextView.setText(String.valueOf(notificationPreference));
+
+    //sharedPreferences.edit().clear().apply();
+
+    sharedPreferences.edit().putBoolean("notifications", false).apply();
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
-    sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
+    // sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
     sharedPreferences.edit().putString("synchronizationURL", "http://192.168.2.159:5000/cameras/?").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
     sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
     sharedPreferences.edit().putInt("maxMapMarkers", 500).apply();
+    // sharedPreferences.edit().putLong("minUploadDelay", 1000*60*60*24*10).apply();
+    // sharedPreferences.edit().putLong("maxUploadDelay", 1000*60*60*24*48L).apply();
+
+
     // set in timemachineSpinner
     // sharedPreferences.edit().putInt("timemachineValue", null).apply();
 
+    notificationPreference = sharedPreferences.getBoolean("notifications", false);
+    debugTextView.setText(String.valueOf(notificationPreference));
 
     wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
