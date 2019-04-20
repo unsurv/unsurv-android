@@ -1,0 +1,56 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="180dp"
+    android:layout_height="wrap_content"
+    android:background="#c8333333"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/bubble_camera_image"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:padding="4dp"
+        />
+
+    <TextView
+        android:id="@+id/bubble_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:padding="4dp"
+        />
+
+    <TextView
+        android:id="@+id/bubble_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:padding="4dp"
+        />
+
+
+
+
+    <TextView
+        android:id="@+id/bubble_subdescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:padding="4dp"
+        android:visibility="gone"
+        />
+    <ImageView
+        android:id="@+id/bubble_image"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:padding="4dp"
+        android:visibility="gone"
+        />
+
+
+
+
+</LinearLayout>

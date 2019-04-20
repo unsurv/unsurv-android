@@ -3,7 +3,9 @@ package org.tensorflow.demo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -63,6 +65,8 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -73,8 +77,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -87,14 +93,15 @@ public class MapActivity extends AppCompatActivity {
   public static final String TAG = "MapActivity";
 
   private MapView mapView;
-  private ItemizedOverlay<OverlayItem> cameraOverlay;
+  private RadiusMarkerClusterer cameraCluster;
+
   private MyLocationNewOverlay myLocationOverlay;
 
   private BottomNavigationView bottomNavigationView;
 
   private CameraViewModel cameraViewModel;
 
-  private ArrayList<OverlayItem> itemsToDisplay = new ArrayList<>();
+  private List<SynchronizedCamera> itemsToDisplay = new ArrayList<>();
   private ImageButton myLocationButton;
 
 
@@ -197,7 +204,7 @@ public class MapActivity extends AppCompatActivity {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
         if (mapScrollingEnabled) {
-          closeAllInfoWindowsOn(mapView);
+          // closeAllInfoWindowsOn(mapView);
           return false;
         } else {
           return true;
@@ -210,7 +217,6 @@ public class MapActivity extends AppCompatActivity {
     mapView.setClickable(true);
 
     //enable pinch to zoom
-    mapView.setBuiltInZoomControls(true);
     mapView.setMultiTouchControls(true);
 
     // TODO add choice + backup strategy here
@@ -231,7 +237,7 @@ public class MapActivity extends AppCompatActivity {
     // TODO manage following
     mapController.setCenter(myLocationOverlay.getMyLocation());
     mapController.setZoom(14.00);
-    mapView.getOverlays().add(myLocationOverlay);
+    // mapView.getOverlays().add(myLocationOverlay);
 
     // Button in to find user location.
     myLocationButton = findViewById(R.id.my_location_button);
@@ -334,7 +340,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", 7).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(7);
-                    timemachineSeekBar.setProgress(7);
+                    timemachineSeekBar.setProgress(0);
                     reloadMarker();
                     break;
 
@@ -345,7 +351,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", 28).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(28);
-                    timemachineSeekBar.setProgress(28);
+                    timemachineSeekBar.setProgress(0);
                     reloadMarker();
                     break;
 
@@ -356,7 +362,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
-                    timemachineSeekBar.setProgress(daysBetween);
+                    timemachineSeekBar.setProgress(0);
                     reloadMarker();
                     break;
 
@@ -367,7 +373,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
-                    timemachineSeekBar.setProgress(daysBetween);
+                    timemachineSeekBar.setProgress(0);
                     reloadMarker();
                     break;
 
@@ -378,18 +384,18 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
-                    timemachineSeekBar.setProgress(daysBetween );
+                    timemachineSeekBar.setProgress(0);
                     reloadMarker();
                     break;
 
                   case 5: // all
-                    cal.set(2018, 0, 1);
+                    cal.set(2016, 0, 1);
                     timemachineMaxInterval = cal.getTime();
                     daysBetween = daysBetween(timemachineMaxInterval, currentDate);
                     sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
-                    timemachineSeekBar.setProgress(daysBetween );
+                    timemachineSeekBar.setProgress(0);
                     reloadMarker();
                     break;
 
@@ -412,7 +418,7 @@ public class MapActivity extends AppCompatActivity {
               daysBetween = daysBetween(timemachineMaxInterval, currentDate);
               timemachineSeekBar.invalidate();
               timemachineSeekBar.setMax(daysBetween + 1);
-              timemachineSeekBar.setProgress(daysBetween + 1);
+              timemachineSeekBar.setProgress(0);
               reloadMarker();
 
 
@@ -805,6 +811,9 @@ public class MapActivity extends AppCompatActivity {
           // check if area was visited before
           areasOfflineAvailable = areaOfflineAvailableRepository.isOfflineavailable(latMin, latMax, lonMin, lonMax);
 
+          // debug ... always query for now
+          areasOfflineAvailable.clear();
+
           // find latest update for current area
           if (!areasOfflineAvailable.isEmpty()) {
             timeBasedQuery = true;
@@ -894,6 +903,7 @@ public class MapActivity extends AppCompatActivity {
 
             String currentQuery = areaQuery; // TODO add startQuery when needed
 
+
             // area not the same as last update -> query server for data
             if (!lastArea.equals(currentQuery)) {
 
@@ -980,28 +990,32 @@ public class MapActivity extends AppCompatActivity {
   }
 
   private void redrawMarkers(List<SynchronizedCamera> camerasToDisplay) {
-    mapView.getOverlays().remove(cameraOverlay);
-    mapView.invalidate();
+
+    mapView.getOverlays().remove(cameraCluster);
+
+    cameraCluster = new RadiusMarkerClusterer(this);
+
+    // TODO cant remove clusterOverlay without breaking it.
 
     itemsToDisplay.clear();
 
     timemachineView = findViewById(R.id.map_timemachine_seekbar);
 
-    int maxMarkers = sharedPreferences.getInt("maxMapMarkers", 500);
-
     // normal behaviour if timemachine not active
     if (timemachineView == null) {
-      for (int i = 0; i < camerasToDisplay.size(); i++) {
-        itemsToDisplay.add(new OverlayItem(String.valueOf(i),"test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
-        if (i > maxMarkers) {
-          Toast.makeText(getApplicationContext(),
-                  "Too many markers displayed, please zoom in or increase amount",
-                  Toast.LENGTH_SHORT).show();
-          break;
-        }
-      }
+
+      cameraCluster.setRadius(150);
+      cameraCluster.setMaxClusteringZoomLevel(14);
+      itemsToDisplay.addAll(camerasToDisplay);
+
+
+
 
     } else {
+
+      // TODO find better performance solution
+
+      cameraCluster.setMaxClusteringZoomLevel(10);
 
       for (int i = 0; i < camerasToDisplay.size(); i++) {
         try{
@@ -1011,14 +1025,7 @@ public class MapActivity extends AppCompatActivity {
           // display only cameras between seekbar max amount in the past and current seekbardate chosen by user
           // if seekbar is set to last week, only cameras added less than a week ago will be shown
           if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
-            itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", camerasToDisplay.get(i).getComments(), new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
-
-            if (i > maxMarkers) {
-              Toast.makeText(getApplicationContext(),
-                      "Too many markers displayed, please zoom in or increase amount",
-                      Toast.LENGTH_SHORT).show();
-              break;
-            }
+            itemsToDisplay.add(camerasToDisplay.get(i));
           }
 
         } catch (ParseException parseExc) {
@@ -1028,82 +1035,39 @@ public class MapActivity extends AppCompatActivity {
       }
     }
 
-    Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
-    //TODO scaling marker
-
-    // main overlay for markers
-    cameraOverlay = new ItemizedIconOverlay<>(itemsToDisplay, customMarker,
-            new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-
-              @Override
-              public boolean onItemSingleTapUp(final int index, final OverlayItem cameraItem) {
-                GeoPoint markerLocation = new GeoPoint(cameraItem.getPoint().getLatitude(), cameraItem.getPoint().getLongitude());
-
-                //close existing infoWindow
-                if (infoWindow != null) {
-                  infoWindow.close();
-                }
-
-                infoWindow = new InfoWindow(R.layout.camera_info_window, mapView) {
-                  @Override
-                  public void onOpen(Object item) {
-                    int cameraIndex = Integer.parseInt(cameraItem.getUid());
-
-                    infoWindow.setRelatedObject(allCamerasInArea.get(cameraIndex));
-
-                    // Setting content for infoWindow.
-                    infoImage = infoWindow.getView().findViewById(R.id.info_image);
-                    infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
-                    infoComment = infoWindow.getView().findViewById(R.id.info_comment);
-                    infoEscape = infoWindow.getView().findViewById(R.id.info_escape_button);
-
-                    // TODO add logic for querying the server for individual pictures if not in offline area etc
-
-                    File thumbnail = new File(
-                            picturesPath + allCamerasInArea.get(cameraIndex).getImagePath());
-
-                    Picasso.get().load(thumbnail)
-                            .into(infoImage);
-                    infoLatestTimestamp.setText(allCamerasInArea.get(cameraIndex).getLastUpdated());
-                    infoComment.setText(allCamerasInArea.get(cameraIndex).getComments());
-
-                    infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
-                    infoEscape.setOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View view) {
-                        infoWindow.close();
-                      }});
-                  }
-
-                  @Override
-                  public void onClose() {
-
-                  }
-                };
 
 
-                infoWindow.open(cameraItem, markerLocation, 0, 0);
+    Drawable clusterIconDrawable = getDrawable(R.drawable.ic_brightness_1_red_24dp);
+    // Bitmap clusterIcon = ((BitmapDrawable)clusterIconDrawable).getBitmap();
+    Bitmap clusterIcon = BitmapFactory.decodeResource(getResources(), R.drawable.marker_cluster);
 
-                    /*
-                    Toast.makeText(
-                            MapActivity.this,
-                            "Item '" + cameraItem.getTitle() + "' (index=" + index
-                                    + ") got single tapped up", Toast.LENGTH_LONG).show();
-                    */
-                return true; // We 'handled' this event.
-              }
+    cameraCluster.setIcon(clusterIcon);
 
-              @Override
-              public boolean onItemLongPress(final int index, final OverlayItem cameraItem) {
-                Toast.makeText(
-                        MapActivity.this,
-                        "Item '" + cameraItem.getTitle() + "' (index=" + index
-                                + ") got long pressed", Toast.LENGTH_LONG).show();
-                return false;
-              }
-            }, getApplicationContext());
+    Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
 
-    mapView.getOverlays().add(cameraOverlay);
+    for (int i = 0; i < itemsToDisplay.size(); i++) {
+      Marker cameraMarker = new Marker(mapView);
+      SynchronizedCamera currentCamera = itemsToDisplay.get(i);
+
+      cameraMarker.setPosition(new GeoPoint(
+              currentCamera.getLatitude(),
+              currentCamera.getLongitude()));
+
+      cameraMarker.setIcon(cameraMarkerIcon);
+
+      cameraMarker.setRelatedObject(currentCamera);
+      cameraMarker.setInfoWindow(new CustomInfoWindow(mapView));
+      cameraMarker.setPanToView(false);
+      //cameraMarker.setTitle(camerasToDisplay.get(i).getComments());
+
+      cameraCluster.add(cameraMarker);
+
+
+    }
+
+    mapView.getOverlays().add(cameraCluster);
+    mapView.invalidate();
+
   }
 
 

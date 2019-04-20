@@ -211,7 +211,7 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        SynchronizationUtils.synchronizeWithServer(sharedPreferences.getString("synchronizationUrl", null),
+        SynchronizationUtils.synchronizeWithServer("http://192.168.2.159:5000/cameras/?",
                 "area=" + sharedPreferences.getString("area", null),
                 true, null, synchronizedCameraRepository);
 
