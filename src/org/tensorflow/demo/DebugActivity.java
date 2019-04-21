@@ -143,7 +143,7 @@ public class DebugActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-    //sharedPreferences.edit().clear().apply();
+    sharedPreferences.edit().clear().apply();
 
     sharedPreferences.edit().putBoolean("notifications", false).apply();
 
@@ -154,7 +154,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
     sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
-    sharedPreferences.edit().putInt("maxMapMarkers", 500).apply();
+    sharedPreferences.edit().putBoolean("clusteringEnabled", true).apply();
     // sharedPreferences.edit().putLong("minUploadDelay", 1000*60*60*24*10).apply();
     // sharedPreferences.edit().putLong("maxUploadDelay", 1000*60*60*24*48L).apply();
 
@@ -589,7 +589,7 @@ public class DebugActivity extends AppCompatActivity {
                         infoImage = infoWindow.getView().findViewById(R.id.info_image);
                         infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
                         infoComment = infoWindow.getView().findViewById(R.id.info_comment);
-                        infoEscape = infoWindow.getView().findViewById(R.id.info_escape_button);
+
 
                         File thumbnail = new File(allCamerasInArea.get(cameraIndex).getThumbnailPath());
                         Picasso.get().load(thumbnail)
@@ -597,12 +597,6 @@ public class DebugActivity extends AppCompatActivity {
                         infoLatestTimestamp.setText("cameraCaptures have no timestamp now");
                         infoComment.setText("no comment");
 
-                        infoEscape.setImageResource(R.drawable.ic_close_red_24dp);
-                        infoEscape.setOnClickListener(new View.OnClickListener() {
-                          @Override
-                          public void onClick(View view) {
-                            infoWindow.close();
-                          }});
                       }
 
                       @Override

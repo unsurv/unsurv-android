@@ -31,13 +31,5 @@
         android:padding="4dp"
         />
 
-    <ImageButton
-        android:id="@+id/info_escape_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="#c8333333"
-        android:layout_gravity="center_horizontal"
-        />
-
 
 </LinearLayout>

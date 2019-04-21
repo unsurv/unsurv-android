@@ -102,6 +102,9 @@ public class MapActivity extends AppCompatActivity {
   private CameraViewModel cameraViewModel;
 
   private List<SynchronizedCamera> itemsToDisplay = new ArrayList<>();
+  private List<OverlayItem> overlayItemsToDisplay = new ArrayList<>();
+  private ItemizedOverlay<OverlayItem> cameraOverlay;
+
   private ImageButton myLocationButton;
 
 
@@ -204,7 +207,7 @@ public class MapActivity extends AppCompatActivity {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
         if (mapScrollingEnabled) {
-          // closeAllInfoWindowsOn(mapView);
+          closeAllInfoWindowsOn(mapView);
           return false;
         } else {
           return true;
@@ -340,7 +343,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", 7).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(7);
-                    timemachineSeekBar.setProgress(0);
+                    timemachineSeekBar.setProgress(7);
                     reloadMarker();
                     break;
 
@@ -351,7 +354,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", 28).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(28);
-                    timemachineSeekBar.setProgress(0);
+                    timemachineSeekBar.setProgress(28);
                     reloadMarker();
                     break;
 
@@ -362,7 +365,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
-                    timemachineSeekBar.setProgress(0);
+                    timemachineSeekBar.setProgress(daysBetween);
                     reloadMarker();
                     break;
 
@@ -373,7 +376,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
-                    timemachineSeekBar.setProgress(0);
+                    timemachineSeekBar.setProgress(daysBetween);
                     reloadMarker();
                     break;
 
@@ -384,7 +387,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
-                    timemachineSeekBar.setProgress(0);
+                    timemachineSeekBar.setProgress(daysBetween);
                     reloadMarker();
                     break;
 
@@ -395,7 +398,7 @@ public class MapActivity extends AppCompatActivity {
                     sharedPreferences.edit().putInt("timemachineValueInDays", daysBetween).apply();
                     timemachineSeekBar.invalidate();
                     timemachineSeekBar.setMax(daysBetween);
-                    timemachineSeekBar.setProgress(0);
+                    timemachineSeekBar.setProgress(daysBetween);
                     reloadMarker();
                     break;
 
@@ -511,6 +514,12 @@ public class MapActivity extends AppCompatActivity {
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_map).setChecked(true);
 
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    reloadMarker();
   }
 
   @Override
@@ -693,7 +702,7 @@ public class MapActivity extends AppCompatActivity {
 
         // TODO add area to db
 
-        updateAllCamerasInArea();
+        updateAllCamerasInArea(false);
         redrawMarkers(allCamerasInArea);
       }
     });
@@ -796,7 +805,7 @@ public class MapActivity extends AppCompatActivity {
         allIDsInArea.clear();
         allIDsInArea = synchronizedCameraRepository.getIDsInArea(latMin, latMax, lonMin, lonMax);
 
-        updateAllCamerasInArea();
+        updateAllCamerasInArea(false);
 
         boolean outsideOfflineArea = latMin < offlineLatMin ||
                 latMax > offlineLatMax ||
@@ -983,90 +992,227 @@ public class MapActivity extends AppCompatActivity {
     return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
   }
 
-  private void updateAllCamerasInArea(){
+  private void updateAllCamerasInArea(boolean queryDB){
     allCamerasInArea.clear();
+
+    if (queryDB) {
+      allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInArea(latMin, latMax, lonMin, lonMax);
+    }
+
     allCamerasInArea.addAll(allCamerasInAreaFromDb);
     allCamerasInArea.addAll(camerasNotInDb);
   }
 
   private void redrawMarkers(List<SynchronizedCamera> camerasToDisplay) {
 
-    mapView.getOverlays().remove(cameraCluster);
 
-    cameraCluster = new RadiusMarkerClusterer(this);
 
     // TODO cant remove clusterOverlay without breaking it.
 
     itemsToDisplay.clear();
+    overlayItemsToDisplay.clear();
 
     timemachineView = findViewById(R.id.map_timemachine_seekbar);
 
-    // normal behaviour if timemachine not active
-    if (timemachineView == null) {
+    Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
+
+    boolean clusteringEnabled = sharedPreferences.getBoolean("clusteringEnabled", true);
+
+    // normal behaviour if timemachine not active. clusters cameras
+    if (timemachineView == null && clusteringEnabled) {
+
+      mapView.getOverlays().remove(cameraCluster);
+      mapView.getOverlays().remove(cameraOverlay);
+
+      cameraCluster = new RadiusMarkerClusterer(this);
 
       cameraCluster.setRadius(150);
       cameraCluster.setMaxClusteringZoomLevel(14);
       itemsToDisplay.addAll(camerasToDisplay);
 
 
+      Drawable clusterIconDrawable = getDrawable(R.drawable.ic_brightness_1_red_24dp);
+      // Bitmap clusterIcon = ((BitmapDrawable)clusterIconDrawable).getBitmap();
+      Bitmap clusterIcon = BitmapFactory.decodeResource(getResources(), R.drawable.marker_cluster);
+
+      cameraCluster.setIcon(clusterIcon);
 
 
-    } else {
+      for (int i = 0; i < itemsToDisplay.size(); i++) {
+        Marker cameraMarker = new Marker(mapView);
+        SynchronizedCamera currentCamera = itemsToDisplay.get(i);
 
-      // TODO find better performance solution
+        cameraMarker.setPosition(new GeoPoint(
+                currentCamera.getLatitude(),
+                currentCamera.getLongitude()));
 
-      cameraCluster.setMaxClusteringZoomLevel(10);
+        cameraMarker.setIcon(cameraMarkerIcon);
 
-      for (int i = 0; i < camerasToDisplay.size(); i++) {
+        cameraMarker.setRelatedObject(currentCamera);
+        cameraMarker.setInfoWindow(new CustomInfoWindow(mapView));
+        cameraMarker.setPanToView(false);
+        //cameraMarker.setTitle(camerasToDisplay.get(i).getComments());
+
+        cameraCluster.add(cameraMarker);
+      }
+
+      mapView.getOverlays().add(cameraCluster);
+      mapView.invalidate();
+
+
+
+    } else { // clustering slows down timemachine immensely, use itemized overlay instead
+
+      final int maxMarkersOnMap = sharedPreferences.getInt("maxMapMarkers", 400);
+
+
+      mapView.getOverlays().remove(cameraCluster);
+      mapView.getOverlays().remove(cameraOverlay);
+
+      if (clusteringEnabled) {
+
         try{
-
-          Date cameraLastUpdated = timestampIso8601.parse(camerasToDisplay.get(i).getLastUpdated());
-
           // display only cameras between seekbar max amount in the past and current seekbardate chosen by user
           // if seekbar is set to last week, only cameras added less than a week ago will be shown
-          if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
-            itemsToDisplay.add(camerasToDisplay.get(i));
+
+          Iterator<SynchronizedCamera> iter = camerasToDisplay.iterator();
+
+          int counter = 0;
+
+          while (iter.hasNext()) {
+            SynchronizedCamera nextCamera = iter.next();
+            Date cameraLastUpdated = timestampIso8601.parse(nextCamera.getLastUpdated());
+            if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
+
+
+              overlayItemsToDisplay.add(new OverlayItem(
+                      nextCamera.getExternalID(),
+                      "test_camera",
+                      nextCamera.getComments(),
+                      new GeoPoint(nextCamera.getLatitude(), nextCamera.getLongitude()
+                      )));
+
+            }
+
+            counter++;
+            if (counter > maxMarkersOnMap) {
+              runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                  Toast.makeText(getApplicationContext(), String.valueOf(maxMarkersOnMap)
+                          + " Markers reached, please zoom in or increase amount in settings",
+                          Toast.LENGTH_SHORT).show();
+                }
+              });
+
+              break;
+
+
+            }
           }
 
         } catch (ParseException parseExc) {
-          Log.i(TAG, "parseException: " + camerasToDisplay.get(i).getLastUpdated());
+          Log.i(TAG, "parseException");
+        }
+
+      } else { // add all if clustering is disabled and no timemachine active
+
+        int counter = 0;
+
+        for (SynchronizedCamera camera : camerasToDisplay) {
+          overlayItemsToDisplay.add(new OverlayItem(
+                  camera.getExternalID(),
+                  "test_camera",
+                  camera.getComments(),
+                  new GeoPoint(camera.getLatitude(), camera.getLongitude()
+                  )));
+          counter++;
+
+
+          if (counter > maxMarkersOnMap) {
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                Toast.makeText(getApplicationContext(), String.valueOf(maxMarkersOnMap)
+                                + " Markers reached, please zoom in or increase amount in settings",
+                        Toast.LENGTH_SHORT).show();
+              }
+            });
+
+            break;
+
+
+          }
         }
 
       }
+
+
+      cameraOverlay = new ItemizedIconOverlay<>(overlayItemsToDisplay, cameraMarkerIcon,
+              new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+
+                @Override
+                public boolean onItemSingleTapUp(final int index, final OverlayItem cameraItem) {
+                  GeoPoint markerLocation = new GeoPoint(cameraItem.getPoint().getLatitude(), cameraItem.getPoint().getLongitude());
+
+                  //close existing infoWindow
+                  if (infoWindow != null) {
+                    infoWindow.close();
+                  }
+
+                  infoWindow = new InfoWindow(R.layout.camera_info_window, mapView) {
+                    @Override
+                    public void onOpen(Object item) {
+                      SynchronizedCamera highlightedCamera = synchronizedCameraRepository.findByID(cameraItem.getUid());
+
+                      infoWindow.setRelatedObject(highlightedCamera);
+
+                      // Setting content for infoWindow.
+                      infoImage = infoWindow.getView().findViewById(R.id.info_image);
+                      infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
+                      infoComment = infoWindow.getView().findViewById(R.id.info_comment);
+
+                      // TODO add logic for querying the server for individual pictures if not in offline area etc
+
+                      File thumbnail = new File(picturesPath + highlightedCamera.getImagePath());
+
+                      Picasso.get().load(thumbnail)
+                              .into(infoImage);
+                      infoLatestTimestamp.setText(highlightedCamera.getLastUpdated());
+                      infoComment.setText(highlightedCamera.getComments());
+
+                    }
+
+                    @Override
+                    public void onClose() {
+
+                    }
+                  };
+
+                  infoWindow.open(cameraItem, markerLocation, 0, 0);
+
+                    /*
+                    Toast.makeText(
+                            MapActivity.this,
+                            "Item '" + cameraItem.getTitle() + "' (index=" + index
+                                    + ") got single tapped up", Toast.LENGTH_LONG).show();
+                    */
+                  return true; // We 'handled' this event.
+                }
+
+                @Override
+                public boolean onItemLongPress(final int index, final OverlayItem cameraItem) {
+                  Toast.makeText(
+                          MapActivity.this,
+                          "Item '" + cameraItem.getTitle() + "' (index=" + index
+                                  + ") got long pressed", Toast.LENGTH_LONG).show();
+                  return false;
+                }
+              }, getApplicationContext());
+
+      mapView.getOverlays().add(cameraOverlay);
+      mapView.invalidate();
     }
-
-
-
-    Drawable clusterIconDrawable = getDrawable(R.drawable.ic_brightness_1_red_24dp);
-    // Bitmap clusterIcon = ((BitmapDrawable)clusterIconDrawable).getBitmap();
-    Bitmap clusterIcon = BitmapFactory.decodeResource(getResources(), R.drawable.marker_cluster);
-
-    cameraCluster.setIcon(clusterIcon);
-
-    Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
-
-    for (int i = 0; i < itemsToDisplay.size(); i++) {
-      Marker cameraMarker = new Marker(mapView);
-      SynchronizedCamera currentCamera = itemsToDisplay.get(i);
-
-      cameraMarker.setPosition(new GeoPoint(
-              currentCamera.getLatitude(),
-              currentCamera.getLongitude()));
-
-      cameraMarker.setIcon(cameraMarkerIcon);
-
-      cameraMarker.setRelatedObject(currentCamera);
-      cameraMarker.setInfoWindow(new CustomInfoWindow(mapView));
-      cameraMarker.setPanToView(false);
-      //cameraMarker.setTitle(camerasToDisplay.get(i).getComments());
-
-      cameraCluster.add(cameraMarker);
-
-
-    }
-
-    mapView.getOverlays().add(cameraCluster);
-    mapView.invalidate();
 
   }
 

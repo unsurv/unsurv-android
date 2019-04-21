@@ -32,11 +32,17 @@
         android:title="Offline mode"
         android:key="offlineMode"/>
 
+    <SwitchPreference
+        android:title="Enable clustering of markers"
+        android:key="clusteringEnabled"/>
+
     <ListPreference
-        android:title="Maximum markers on map"
+        android:title="Maximum simultaneous markers on the map"
         android:key="maxMapMarkers"
-        android:entries="@array/synchronization_choices"
-        android:entryValues="@array/synchronization_values"/>
+        android:entries="@array/max_marker_choices"
+        android:entryValues="@array/max_marker_values"/>
+
+
 
 
 </PreferenceScreen>

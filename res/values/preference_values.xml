@@ -18,4 +18,25 @@
         604800
     </integer>
 
+    <string-array name="max_marker_choices">
+        <item>100 markers</item>
+        <item>200 markers</item>
+        <item>400 markers</item>
+        <item>800 markers</item>
+        <item>1600 markers</item>
+        <item>3200 markers</item>
+        <item>6400 markers</item>
+    </string-array>
+
+    <integer-array name="max_marker_values">
+        <item>100</item>
+        <item>200</item>
+        <item>400</item>
+        <item>800</item>
+        <item>1600</item>
+        <item>3200</item>
+        <item>6400</item>
+    </integer-array>
+
+
 </resources>
