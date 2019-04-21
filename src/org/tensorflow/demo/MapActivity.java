@@ -155,6 +155,8 @@ public class MapActivity extends AppCompatActivity {
   private double lonMin;
   private double lonMax;
 
+  private double lastZoomLevel;
+
   private AreaOfflineAvailable mostRecentArea;
 
   private String picturesPath;
@@ -184,6 +186,8 @@ public class MapActivity extends AppCompatActivity {
 
     timestampIso8601ForArea = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
+    lastZoomLevel = 1000; // start high to always refresh on first redraw
+
     //TODO find solution to do the same at the beginning of a gesture.
     // Reloads markers in visible area after scrolling. Closes infowindow if open.
     mapView.addMapListener(new DelayedMapListener(new MapListener() {
@@ -196,8 +200,16 @@ public class MapActivity extends AppCompatActivity {
 
       @Override
       public boolean onZoom(ZoomEvent event) {
-        reloadMarker();
+
+        boolean isZoomingOut = lastZoomLevel > event.getZoomLevel();
+
+        if (isZoomingOut) {
+          reloadMarker();
+        }
+
         closeAllInfoWindowsOn(mapView);
+
+        lastZoomLevel = event.getZoomLevel();
         return false;
       }
     }, 150)); // delay for updating in ms after zooming/scrolling
