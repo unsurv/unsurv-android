@@ -1075,7 +1075,7 @@ public class MapActivity extends AppCompatActivity {
 
     } else { // clustering slows down timemachine immensely, use itemized overlay instead
 
-      final int maxMarkersOnMap = sharedPreferences.getInt("maxMapMarkers", 400);
+      final int maxMarkersOnMap = Integer.parseInt(sharedPreferences.getString("maxMapMarkers", "400"));
 
 
       mapView.getOverlays().remove(cameraCluster);

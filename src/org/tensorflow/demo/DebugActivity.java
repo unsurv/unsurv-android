@@ -149,7 +149,7 @@ public class DebugActivity extends AppCompatActivity {
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     // sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
-    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.2.159:5000/cameras/?").apply();
+    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.2.137:5000/cameras/?").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
@@ -211,7 +211,9 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        SynchronizationUtils.synchronizeWithServer("http://192.168.2.159:5000/cameras/?",
+        String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/cameras/?");
+
+        SynchronizationUtils.synchronizeWithServer(baseURL,
                 "area=" + sharedPreferences.getString("area", null),
                 true, null, synchronizedCameraRepository);
 
@@ -276,11 +278,11 @@ public class DebugActivity extends AppCompatActivity {
       public void onClick(View view) {
         debugTextView.setText(
         sharedPreferences.getString("lastUpdated", "2018-01-01") + "\n" +
-        sharedPreferences.getLong("synchronizationInterval", 15*60*1000)+ "\n" +
+        sharedPreferences.getString("synchronizationInterval", String.valueOf(15*60*1000))+ "\n" +
         sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?")+ "\n" +
         sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888")+ "\n" +
         sharedPreferences.getBoolean("buttonCapture", false) + "\n" +
-        sharedPreferences.getInt("timemachineValueInDays", 0) );
+        sharedPreferences.getString("timemachineValueInDays", "0"));
 
 
       }
