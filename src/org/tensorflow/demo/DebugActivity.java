@@ -243,11 +243,17 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
+        //SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
 
         // JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
         // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
+
+        StatisticsUtils.getCamerasPerDay(
+                49.99, 50.3638, 7.9648, 8.2888,
+                "2019-01-01", "2019-04-24",
+                false,
+                synchronizedCameraRepository);
 
       }
     });
@@ -284,10 +290,8 @@ public class DebugActivity extends AppCompatActivity {
         sharedPreferences.getBoolean("buttonCapture", false) + "\n" +
         sharedPreferences.getString("timemachineValueInDays", "0"));
 
-
       }
     });
-
 
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

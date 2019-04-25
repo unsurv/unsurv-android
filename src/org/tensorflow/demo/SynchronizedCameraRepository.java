@@ -4,12 +4,17 @@ import android.app.Application;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class SynchronizedCameraRepository {
 
   private SynchronizedCameraDao mSynchronizedCameraDao;
   private List<SynchronizedCamera> mAllCameras;
+
+  private String startDate;
+  private String endDate;
 
   SynchronizedCameraRepository (Application application) {
     SynchronizedCameraRoomDatabase synchronizedDb = SynchronizedCameraRoomDatabase.getDatabase(application);
@@ -18,17 +23,21 @@ public class SynchronizedCameraRepository {
 
   }
 
+
   List<SynchronizedCamera> getAllSynchronizedCameras() {
     return mSynchronizedCameraDao.getAllCameras();
   }
+
 
   List<SynchronizedCamera> getSynchronizedCamerasInArea(double latMin, double latMax, double lonMin, double lonMax) {
     return mSynchronizedCameraDao.getCamerasInArea(latMin, latMax, lonMin, lonMax);
   }
 
+
   List<String> getIDsInArea(double latMin, double latMax, double lonMin, double lonMax) {
     return mSynchronizedCameraDao.getIDsInArea(latMin, latMax, lonMin, lonMax);
   }
+
 
   SynchronizedCamera findByID(String uuid) {
     try {
@@ -43,7 +52,18 @@ public class SynchronizedCameraRepository {
   }
 
 
+  public List<StatisticsMap> getStatistics(double latMin, double latMax, double lonMin, double lonMax, String startDate, String endDate) {
+    try {
+      this.startDate = startDate;
+      this.endDate = endDate;
+      return new getStatisticsAsyncTask(mSynchronizedCameraDao).execute(latMin, latMax, lonMin, lonMax).get();
 
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+    }
+
+    return null;
+  }
 
 
   public void insert(List<SynchronizedCamera> synchronizedCamera) {
@@ -53,6 +73,16 @@ public class SynchronizedCameraRepository {
   public void deleteAll() {
     mSynchronizedCameraDao.deleteAll();
   }
+
+
+
+
+
+
+
+
+
+
 
   private static class insertAsyncTask extends AsyncTask<List<SynchronizedCamera>, Void, Void> {
 
@@ -94,6 +124,26 @@ public class SynchronizedCameraRepository {
       SynchronizedCamera queriedCamera = mAsyncTaskDao.findByID(params[0]);
 
       return queriedCamera;
+    }
+
+  }
+
+
+  private static class getStatisticsAsyncTask extends AsyncTask<Double, Void, List<StatisticsMap>> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+
+    getStatisticsAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected List<StatisticsMap> doInBackground(final Double... params) {
+
+      List<StatisticsMap> statistics = mAsyncTaskDao.getStatistics(params[0], params[1], params[2], params[3]);
+
+      return statistics;
     }
 
   }

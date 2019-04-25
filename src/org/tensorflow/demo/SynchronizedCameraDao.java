@@ -1,10 +1,12 @@
 package org.tensorflow.demo;
 
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Dao
@@ -32,5 +34,12 @@ public interface SynchronizedCameraDao {
 
   @Query("SELECT * FROM synchronized_cameras WHERE :uuid = externalID")
   SynchronizedCamera findByID(String uuid);
+
+  @Query("SELECT uploadedAt, COUNT(uploadedAt) " +
+          "from synchronized_cameras " +
+          "WHERE latitude BETWEEN :latMin AND :latMax AND longitude BETWEEN :lonMin AND :lonMax " +
+          "GROUP BY uploadedAt " +
+          "ORDER BY uploadedAt")
+  List<StatisticsMap> getStatistics(double latMin, double latMax, double lonMin, double lonMax);
 
 }
