@@ -42,6 +42,10 @@ public class SynchronizedCameraRepository {
     return null;
   }
 
+
+
+
+
   public void insert(List<SynchronizedCamera> synchronizedCamera) {
     new insertAsyncTask(mSynchronizedCameraDao).execute((List)synchronizedCamera);
   }

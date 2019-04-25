@@ -21,6 +21,7 @@ public class SynchronizedCamera {
   private String comments;
 
   private String lastUpdated;
+  private String uploadedAt;
 
 
   public SynchronizedCamera (String imagePath,
@@ -28,7 +29,8 @@ public class SynchronizedCamera {
                              double latitude,
                              double longitude,
                              String comments,
-                             String lastUpdated) {
+                             String lastUpdated,
+                             String uploadedAt) {
 
     this.imagePath = imagePath;
     this.externalID = externalID;
@@ -36,6 +38,7 @@ public class SynchronizedCamera {
     this.longitude = longitude;
     this.comments = comments;
     this.lastUpdated = lastUpdated;
+    this.uploadedAt = uploadedAt;
   }
 
   public int getId() {
@@ -66,6 +69,10 @@ public class SynchronizedCamera {
     return lastUpdated;
   }
 
+  public String getUploadedAt() {
+    return uploadedAt;
+  }
+
   public void setId(int id) {
     this.id = id;
   }
@@ -94,4 +101,7 @@ public class SynchronizedCamera {
     this.lastUpdated = lastUpdated;
   }
 
+  public void setUploadedAt(String uploadedAt) {
+    this.uploadedAt = uploadedAt;
+  }
 }

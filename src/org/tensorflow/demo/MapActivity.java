@@ -648,7 +648,8 @@ public class MapActivity extends AppCompatActivity {
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("lastUpdated")
+                            JSONToSynchronize.getString("lastUpdated"),
+                            JSONToSynchronize.getString("uploadedAt")
 
                     );
 
@@ -1076,7 +1077,6 @@ public class MapActivity extends AppCompatActivity {
     } else { // clustering slows down timemachine immensely, use itemized overlay instead
 
       final int maxMarkersOnMap = Integer.parseInt(sharedPreferences.getString("maxMapMarkers", "400"));
-
 
       mapView.getOverlays().remove(cameraCluster);
       mapView.getOverlays().remove(cameraOverlay);
