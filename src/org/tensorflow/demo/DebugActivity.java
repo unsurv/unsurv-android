@@ -1,29 +1,22 @@
 package org.tensorflow.demo;
 
-import android.Manifest;
 import android.app.Application;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
-import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +28,6 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
@@ -149,7 +141,7 @@ public class DebugActivity extends AppCompatActivity {
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     // sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
-    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.2.137:5000/cameras/?").apply();
+    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.2.137:5000/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
@@ -211,9 +203,9 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/cameras/?");
+        String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
 
-        SynchronizationUtils.synchronizeWithServer(baseURL,
+        ConnectionUtils.synchronizeCamerasWithServer(baseURL + "cameras/?",
                 "area=" + sharedPreferences.getString("area", null),
                 true, null, synchronizedCameraRepository);
 
@@ -243,16 +235,15 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        //SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
+        //ConnectionUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
 
         // JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
         // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
 
-        StatisticsUtils.getCamerasPerDay(
+        StatisticsUtils.getCamerasPerDayFromDb(
                 49.99, 50.3638, 7.9648, 8.2888,
-                "2019-01-01", "2019-04-24",
-                false,
+                "2019-04-20", "2019-04-24",
                 synchronizedCameraRepository);
 
       }

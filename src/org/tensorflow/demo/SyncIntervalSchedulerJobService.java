@@ -23,12 +23,12 @@ public class SyncIntervalSchedulerJobService extends JobService {
     PersistableBundle intervalSchedulerExtras = jobParameters.getExtras();
 
 
-    String baseURL = intervalSchedulerExtras.getString("baseURL");
+    String baseURL = intervalSchedulerExtras.getString("baseURL") + "cameras/?";
     String areaQuery = "area=" + intervalSchedulerExtras.getString("area");
     String startQuery = "start=" + intervalSchedulerExtras.getString("start");
 
 
-    SynchronizationUtils.synchronizeWithServer(
+    ConnectionUtils.synchronizeCamerasWithServer(
             baseURL,
             areaQuery,
             true,
@@ -42,9 +42,6 @@ public class SyncIntervalSchedulerJobService extends JobService {
             "lastUpdated",
             timestampIso8601.format(new Date(System.currentTimeMillis())))
             .apply();
-
-
-
 
     return false;
   }

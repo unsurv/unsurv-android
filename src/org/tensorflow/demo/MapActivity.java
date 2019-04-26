@@ -623,7 +623,7 @@ public class MapActivity extends AppCompatActivity {
     mRequestQueue.start();
 
     // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
-    String baseURL = sharedPreferences.getString("synchronizationURL", null);
+    String baseURL = sharedPreferences.getString("synchronizationURL", null) + "cameras/?";
 
     String url = baseURL + queryString;
 
