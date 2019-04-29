@@ -42,4 +42,10 @@ public interface SynchronizedCameraDao {
           "ORDER BY uploadedAt")
   List<StatisticsMap> getStatistics(double latMin, double latMax, double lonMin, double lonMax);
 
+  @Query("SELECT count(*) FROM synchronized_cameras " +
+          "WHERE uploadedAt BETWEEN datetime(:startDate) and  datetime(:endDate)")
+  int getCamerasAddedInTimeframe(String startDate, String endDate);
+
+  @Query("SELECT count(*) from synchronized_cameras")
+  int getNumberOfCameras();
 }

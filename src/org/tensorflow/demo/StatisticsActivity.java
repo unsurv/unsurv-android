@@ -1,8 +1,10 @@
 package org.tensorflow.demo;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Network;
@@ -39,185 +42,101 @@ import com.github.mikephil.charting.data.LineDataSet;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class StatisticsActivity extends AppCompatActivity {
 
   private BottomNavigationView bottomNavigationView;
   private CameraRoomDatabase cameraDb;
-  private List<Pair<String, Integer>> intervalSizes;
-  private List<BarEntry> barEntries;
-  private List<Entry> lineEntries;
-  private AsyncCamerasInTimeframe mAsyncCamerasInTimeframe;
-  private BarChart statisticsBarChart;
-  private LineChart statisticsLineChart;
 
-  // Operating modes for AsyncTask to fetch data. Needs more detail for further graphs.
-  private final int ASYNC_BAR_MODE = 0;
-  private final int ASYNC_LINE_MODE = 1;
+  private TextView totalInArea;
+  private TextView local7Days;
+  private TextView local28Days;
+  private TextView addedByUser;
+  private TextView globalToday;
+  private TextView global28Days;
+  private TextView globalTotal;
+
+  private List<HashMap<Date, Integer>> localCamerasPerDays;
+  private List<HashMap<Date, Integer>> globalCamerasPerDays;
+
+  private SharedPreferences sharedPreferences;
+
+  private double latMin;
+  private double latMax;
+  private double lonMin;
+  private double lonMax;
+
+  private SynchronizedCameraRepository synchronizedCameraRepository;
+
+
 
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_statistics);
-    cameraDb = CameraRoomDatabase.getDatabase(getApplicationContext());
 
-    Spinner timeframeBarSpinner = findViewById(R.id.statistics_bar_spinner);
-    Spinner timeframeLineSpinner = findViewById(R.id.statistics_line_spinner);
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
 
+    totalInArea = findViewById(R.id.total_cameras_statistics);
 
-    statisticsBarChart = findViewById(R.id.statistics_barchart);
+    local7Days = findViewById(R.id.added_past_7_days_statistics);
+    local28Days = findViewById(R.id.added_past_28_days_statistics);
+    addedByUser = findViewById(R.id.added_by_user_statistics);
 
-    statisticsBarChart.setPinchZoom(false);
-    statisticsBarChart.setDoubleTapToZoomEnabled(false);
-    statisticsBarChart.setScaleXEnabled(false);
-    statisticsBarChart.setScaleYEnabled(false);
+    globalToday = findViewById(R.id.global_today_statistics);
+    global28Days = findViewById(R.id.global_28days_statistics);
+    globalTotal = findViewById(R.id.global_total_statistics);
 
-    XAxis barXAxis = statisticsBarChart.getXAxis();
-    YAxis barYAxis = statisticsBarChart.getAxisLeft();
-
-    // Disable right-side axis.
-    statisticsBarChart.getAxisRight().setEnabled(false);
-
-    barXAxis.setTextColor(Color.WHITE);
-    barYAxis.setTextColor(Color.WHITE);
-
-    barXAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 
-    statisticsLineChart = findViewById(R.id.statistics_linechart);
+    String homeZone = sharedPreferences.getString("area", null);
 
-    XAxis lineXAxis = statisticsLineChart.getXAxis();
-    YAxis lineYAxis = statisticsLineChart.getAxisLeft();
+    String[] splitBorders = homeZone.split(",");
 
-    lineXAxis.setTextColor(Color.WHITE);
-    lineYAxis.setTextColor(Color.WHITE);
-    lineXAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+    latMin = Double.valueOf(splitBorders[0]);
+    latMax = Double.valueOf(splitBorders[1]);
+    lonMin = Double.valueOf(splitBorders[2]);
+    lonMax = Double.valueOf(splitBorders[3]);
 
+    long currentTime = System.currentTimeMillis();
+    Date currentDate = new Date(currentTime);
 
-    barEntries = new ArrayList<BarEntry>();
-    lineEntries = new ArrayList<Entry>();
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(currentDate);
 
-    // Create an ArrayAdapter using the string array and a default spinner layout
-    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-            R.array.statistics_timeframes, android.R.layout.simple_spinner_item);
-    // Specify the layout to use when the list of choices appears
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    // cal.add(Calendar.MONTH, -12);
 
-    // Apply the adapter to the spinners
-    timeframeBarSpinner.setAdapter(adapter);
-    timeframeLineSpinner.setAdapter(adapter);
+    cal.add(Calendar.DATE, -7);
+    Date sevenDaysBeforeToday = cal.getTime();
 
-    timeframeBarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+    // data from -7 days until today
+    int totalSevenDays = StatisticsUtils.getTotalCamerasInTimeframeFromDb(sevenDaysBeforeToday, currentDate, synchronizedCameraRepository);
 
-        // Listen for item selected in spinner. AsyncTask input is (operating mode, time, ... , time).
-        switch (i) {
-          case 0:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute("BAR", "-3 days", "-2 days", "-1 day");
-            break;
+    // only subtract 21 here because we've subtracted 7 earlier
+    cal.add(Calendar.DATE, -21);
+    Date twentyEightDaysBeforeToday = cal.getTime();
 
-          case 1:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "BAR", "-7 days", "-6 days", "-5 days", "-4 day", "-3 days", "-2 days", "-1 day");
-            break;
+    int totalTwentyeightDays = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
 
-            case 2:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "BAR", "-14 days", "-13 days", "-12 days", "-11 days", "-10 days", "-9 days",
-                    "-8 days", "-7 days", "-6 days", "-5 days", "-4 days", "-3 days", "-2 days", "-1 day");
-            break;
+    int totalInDb = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
 
-          case 3:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "BAR", "-28 days", "-21 days", "-14 days", "-7 days");
-            break;
+    totalInArea.setText(String.valueOf(totalInDb));
+    local7Days.setText(String.valueOf(totalSevenDays));
+    local28Days.setText(String.valueOf(totalTwentyeightDays));
 
-          case 4:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "BAR", "-6 months", "-5 months", "-4 months", "-3 months", "-2 months", "-1 month");
-            break;
-
-          case 5:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "BAR", "-12 months", "-11 months", "-10 months", "-9 months", "-8 months",
-                    "-8 months", "-7 months", "-6 months", "-5 months", "-4 months", "-3 months",
-                    "-2 months", "-1 month");
-            break;
-        }
-
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> adapterView) {
-
-      }
-    });
-
-
-
-    timeframeLineSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-        switch (i) {
-          case 0:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute("LINE", "-3 days", "-2 days", "-1 day");
-            break;
-
-          case 1:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "LINE", "-7 days", "-6 days", "-5 days", "-4 day", "-3 days", "-2 days", "-1 day");
-            break;
-
-          case 2:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "LINE", "-14 days", "-13 days", "-12 days", "-11 days", "-10 days", "-9 days",
-                    "-8 days", "-7 days", "-6 days", "-5 days", "-4 days", "-3 days", "-2 days", "-1 day");
-            break;
-
-          case 3:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "LINE", "-28 days", "-21 days", "-14 days", "-7 days");
-            break;
-
-          case 4:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "LINE", "-6 months", "-5 months", "-4 months", "-3 months", "-2 months", "-1 month");
-            break;
-
-          case 5:
-            mAsyncCamerasInTimeframe = new AsyncCamerasInTimeframe();
-            mAsyncCamerasInTimeframe.execute(
-                    "LINE", "-12 months", "-11 months", "-10 months", "-9 months", "-8 months",
-                    "-8 months", "-7 months", "-6 months", "-5 months", "-4 months", "-3 months",
-                    "-2 months", "-1 month");
-            break;
-
-        }
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> adapterView) {
-      }
-    });
 
 
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
@@ -278,13 +197,13 @@ public class StatisticsActivity extends AppCompatActivity {
 
         return true;
 
-
-
       default:
         // Fall back on standard behaviour when user choice not recognized.
         return super.onOptionsItemSelected(item);
     }
   }
+
+
 
   // Helper methods for querying database.
   private List<SurveillanceCamera> getCamerasInTimeframe(String sqlliteTimeStartpoint, String sqlliteTimeEndpoint) {
@@ -295,99 +214,5 @@ public class StatisticsActivity extends AppCompatActivity {
     return cameraDb.surveillanceCameraDao().getTotalCamerasUpTo(sqliteTime);
   }
 
-
-  private class AsyncCamerasInTimeframe extends AsyncTask<String, Integer, List<Pair<Integer, Integer>>> {
-    /**
-     * Fetches data for graphs from database in background task.
-     *
-     * @param strings ("MODE", "sqltime",..., "sqltime").
-     *                modes = "BAR", "LINE"
-     *                sqltime see https://www.sqlite.org/lang_datefunc.html
-     * @return list of xy value pairs where first Pair describes mode again:
-     * (Pair(MODE, MODE), Pair(xValue0, yValue0), Pair(xValue1, yValue1), ...).
-     * @see #onPreExecute()
-     * @see #onPostExecute iterates through Pairs and populates graphs depending on mode.
-     * @see #publishProgress
-     */
-
-    @Override
-    protected List<Pair<Integer, Integer>> doInBackground(String... strings) {
-      List<Pair<Integer, Integer>> outputPairs = new ArrayList<>();
-      List<String> parameters = Arrays.asList(strings);
-
-      // Fetching data depending on mode. Different modes are for different graphs.
-      if (parameters.get(0).equals("BAR")) {
-        outputPairs.add(Pair.create(ASYNC_BAR_MODE, ASYNC_BAR_MODE));
-        // TODO Add query in CameraDao with sql COUNT operator.
-        for (int j = 1; j < parameters.size(); j++) {
-          if (j < parameters.size() - 1) {
-            outputPairs.add(Pair.create(j, getCamerasInTimeframe(parameters.get(j), parameters.get(j + 1)).size()));
-          } else {
-            outputPairs.add(Pair.create(j, getCamerasInTimeframe(parameters.get(j), "-1 second").size()));
-
-          }
-
-        }
-      } else if (parameters.get(0).equals("LINE")) {
-        outputPairs.add(Pair.create(ASYNC_LINE_MODE, ASYNC_LINE_MODE));
-
-        int currentTotalCameras = getTotalCamerasUpTo(parameters.get(1));
-
-        for (int k = 1; k < parameters.size(); k++) {
-
-          if (k < parameters.size() - 1) {
-            outputPairs.add(Pair.create(k, currentTotalCameras + getCamerasInTimeframe(parameters.get(k), parameters.get(k + 1)).size()));
-            currentTotalCameras += getCamerasInTimeframe(parameters.get(k), parameters.get(k + 1)).size();
-          } else {
-            outputPairs.add(Pair.create(k, currentTotalCameras + getCamerasInTimeframe(parameters.get(k), "-1 second").size()));
-            currentTotalCameras += currentTotalCameras + getCamerasInTimeframe(parameters.get(k), "-1 second").size();
-
-          }
-        }
-        }
-
-      return outputPairs;
-    }
-
-    @Override
-    protected void onPostExecute(List<Pair<Integer, Integer>> pairs) {
-      super.onPostExecute(pairs);
-
-      // Adds output from querying to corresponding graphs and refreshes them.
-      if (pairs.get(0).first == ASYNC_BAR_MODE && pairs.get(0).second == ASYNC_BAR_MODE){
-        barEntries.clear();
-
-        for (int i = 1; i < pairs.size(); i++) {
-
-          barEntries.add(new BarEntry(pairs.get(i).first, pairs.get(i).second));
-
-        }
-
-        BarDataSet barDataSet = new BarDataSet(barEntries, "");
-        BarData barData = new BarData(barDataSet);
-        barData.setValueTextColor(Color.WHITE);
-        statisticsBarChart.setData(barData);
-        // refresh
-        statisticsBarChart.invalidate();
-
-      } else if (pairs.get(0).first == ASYNC_LINE_MODE && pairs.get(0).second == ASYNC_LINE_MODE) {
-        lineEntries.clear();
-
-        for (int i = 1; i < pairs.size(); i++) {
-
-          lineEntries.add(new Entry(pairs.get(i).first, pairs.get(i).second));
-
-        }
-
-        LineDataSet lineDataSet = new LineDataSet(lineEntries, "");
-        LineData lineData = new LineData(lineDataSet);
-        lineData.setValueTextColor(Color.WHITE);
-        statisticsLineChart.setData(lineData);
-        // refresh
-        statisticsLineChart.invalidate();
-
-      }
-    }
-  }
 
 }

@@ -328,7 +328,7 @@ public class MapActivity extends AppCompatActivity {
                 int savedValue = sharedPreferences.getInt("timemachineValueInDays", 0);
                 // if user set timeframe before use it
                 if (savedValue != 0) {
-                  cal.add(Calendar.DATE, -savedValue);
+                  cal.add(Calendar.DATE, - savedValue);
                   timemachineMaxInterval = cal.getTime();
                   daysBetween = savedValue;
                 } else {
@@ -603,124 +603,6 @@ public class MapActivity extends AppCompatActivity {
 
   }
 
-  /**
-   *
-   * @param queryString url query string i.e. "area=8.2699,50.0201,8.2978,50.0005&start=2018-01-01"
-   */
-  void queryServer(String queryString) {
-
-    camerasInAreaFromServer.clear();
-
-    RequestQueue mRequestQueue;
-
-    // Set up the network to use HttpURLConnection as the HTTP client.
-    Network network = new BasicNetwork(new HurlStack());
-
-    // Instantiate the RequestQueue with the cache and network.
-    mRequestQueue = new RequestQueue(new NoCache(), network);
-
-    // Start the queue
-    mRequestQueue.start();
-
-    // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
-    String baseURL = sharedPreferences.getString("synchronizationURL", null) + "cameras/?";
-
-    String url = baseURL + queryString;
-
-    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-            Request.Method.GET,
-            url,
-            null,
-            new Response.Listener<JSONObject>() {
-              @Override
-              public void onResponse(JSONObject response) {
-
-                JSONObject JSONToSynchronize;
-
-                try {
-
-                  for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
-                    JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
-
-                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(
-                            "test_nexus_10.jpg",
-                            JSONToSynchronize.getString("id"),
-                            JSONToSynchronize.getDouble("lat"),
-                            JSONToSynchronize.getDouble("lon"),
-                            JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("lastUpdated"),
-                            JSONToSynchronize.getString("uploadedAt")
-
-                    );
-
-                    camerasInAreaFromServer.add(cameraToAdd);
-
-                  }
-
-                } catch (Exception e) {
-                  Log.i(TAG, "onResponse: " + e.toString());
-
-                  Toast.makeText(
-                          MapActivity.this,
-                          "Error retrieving data from Server. Try again later.", Toast.LENGTH_LONG).show();
-
-                }
-              }
-
-            }, new Response.ErrorListener() {
-      @Override
-      public void onErrorResponse(VolleyError error) {
-        // TODO: Handle different http Errors
-        Log.i(TAG, "HTTP Error: " + error.toString());
-      }
-    }
-    );
-
-    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-            30000,
-            0,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-    ));
-
-    mRequestQueue.add(jsonObjectRequest);
-
-    if (allowOneServerQuery) {
-      allowOneServerQuery = false; // used up single permission for querying
-    }
-    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-
-      @Override
-      public void onRequestFinished(Request<Object> request) {
-
-        camerasNotInDb.clear();
-
-        Set<String> IDsetFromDb = new HashSet<>(allIDsInArea);
-        // check if data already in db
-        for (SynchronizedCamera item : camerasInAreaFromServer) {
-          if (!IDsetFromDb.contains(item.getExternalID())) {
-            camerasNotInDb.add(item);
-          }
-        }
-
-        // update local db with new data
-        synchronizedCameraRepository.insert(camerasNotInDb);
-
-        if(timeBasedQuery) {
-          areaOfflineAvailableRepository.update(mostRecentArea);
-        } else {
-          long currentTimeInMillis = System.currentTimeMillis();
-          String currentIsoDate = timestampIso8601ForArea.format(new Date(currentTimeInMillis));
-          areaOfflineAvailableRepository.insert(new AreaOfflineAvailable(latMin, latMax, lonMin, lonMax, currentIsoDate));
-        }
-
-        // TODO add area to db
-
-        updateAllCamerasInArea(false);
-        redrawMarkers(allCamerasInArea);
-      }
-    });
-
-  }
 
   private class BackgroundMarkerLoaderTask extends AsyncTask<Double, Integer, List<SynchronizedCamera>> {
 
@@ -938,12 +820,12 @@ public class MapActivity extends AppCompatActivity {
                 if (latestUpdateForArea.before(today)) {
                   String latestUpdate = timestampIso8601.format(latestUpdateForArea);
                   currentQuery = currentQuery.concat("&start=" + latestUpdate);
-                  queryServer(currentQuery);
+                  queryServerForCameras(currentQuery);
                   lastArea = areaString;
                 }
 
               } else {
-                queryServer(currentQuery);
+                queryServerForCameras(currentQuery);
                 lastArea = areaString;
 
               }
@@ -1228,5 +1110,205 @@ public class MapActivity extends AppCompatActivity {
 
   }
 
+  void queryServerForStatistics(String baseURL, String area, String startDate, String endDate){
 
+    final String TAG = "StatisticsUtils";
+    //TODO check api for negative values in left right top bottom see if still correct
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    String url = baseURL + "statistics/?area=" + area + "&start=" + startDate + "&end=" + endDate;
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                List<SynchronizedCamera> camerasToSync = new ArrayList<>();
+                JSONObject JSONToSynchronize;
+
+                try {
+
+                  for (int i = 0; i < response.getJSONArray("added_per_day").length(); i++) {
+                    JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("added_per_day").get(i)));
+
+                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(
+                            "test_nexus_10.jpg",
+                            JSONToSynchronize.getString("id"),
+                            JSONToSynchronize.getDouble("lat"),
+                            JSONToSynchronize.getDouble("lon"),
+                            JSONToSynchronize.getString("comments"),
+                            JSONToSynchronize.getString("lastUpdated"),
+                            JSONToSynchronize.getString("uploadedAt")
+
+                    );
+
+                    camerasToSync.add(cameraToAdd);
+
+                  }
+
+
+
+                } catch (Exception e) {
+                  Log.i(TAG, "onResponse: " + e.toString());
+
+                }
+
+              }
+            }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        // TODO: Handle Errors
+      }
+    }
+    );
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.add(jsonObjectRequest);
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+
+      }
+    });
+
+  }
+
+  /**
+   *
+   * @param queryString url query string i.e. "area=8.2699,50.0201,8.2978,50.0005&start=2018-01-01"
+   */
+  void queryServerForCameras(String queryString) {
+
+    camerasInAreaFromServer.clear();
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
+    String baseURL = sharedPreferences.getString("synchronizationURL", null) + "cameras/?";
+
+    String url = baseURL + queryString;
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                JSONObject JSONToSynchronize;
+
+                try {
+
+                  for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
+                    JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
+
+                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(
+                            "test_nexus_10.jpg",
+                            JSONToSynchronize.getString("id"),
+                            JSONToSynchronize.getDouble("lat"),
+                            JSONToSynchronize.getDouble("lon"),
+                            JSONToSynchronize.getString("comments"),
+                            JSONToSynchronize.getString("lastUpdated"),
+                            JSONToSynchronize.getString("uploadedAt")
+
+                    );
+
+                    camerasInAreaFromServer.add(cameraToAdd);
+
+                  }
+
+                } catch (Exception e) {
+                  Log.i(TAG, "onResponse: " + e.toString());
+
+                  Toast.makeText(
+                          MapActivity.this,
+                          "Error retrieving data from Server. Try again later.", Toast.LENGTH_LONG).show();
+
+                }
+              }
+
+            }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        // TODO: Handle different http Errors
+        Log.i(TAG, "HTTP Error: " + error.toString());
+      }
+    }
+    );
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.add(jsonObjectRequest);
+
+    if (allowOneServerQuery) {
+      allowOneServerQuery = false; // used up single permission for querying
+    }
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+
+        camerasNotInDb.clear();
+
+        Set<String> IDsetFromDb = new HashSet<>(allIDsInArea);
+        // check if data already in db
+        for (SynchronizedCamera item : camerasInAreaFromServer) {
+          if (!IDsetFromDb.contains(item.getExternalID())) {
+            camerasNotInDb.add(item);
+          }
+        }
+
+        // update local db with new data
+        synchronizedCameraRepository.insert(camerasNotInDb);
+
+        if(timeBasedQuery) {
+          areaOfflineAvailableRepository.update(mostRecentArea);
+        } else {
+          long currentTimeInMillis = System.currentTimeMillis();
+          String currentIsoDate = timestampIso8601ForArea.format(new Date(currentTimeInMillis));
+          areaOfflineAvailableRepository.insert(new AreaOfflineAvailable(latMin, latMax, lonMin, lonMax, currentIsoDate));
+        }
+
+        // TODO add area to db
+
+        updateAllCamerasInArea(false);
+        redrawMarkers(allCamerasInArea);
+      }
+    });
+
+  }
 }

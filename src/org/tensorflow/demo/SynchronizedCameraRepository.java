@@ -39,6 +39,8 @@ public class SynchronizedCameraRepository {
   }
 
 
+
+
   SynchronizedCamera findByID(String uuid) {
     try {
       SynchronizedCamera camera = new findByIDAsyncTask(mSynchronizedCameraDao).execute(uuid).get();
@@ -52,7 +54,7 @@ public class SynchronizedCameraRepository {
   }
 
 
-  public List<StatisticsMap> getStatistics(double latMin, double latMax, double lonMin, double lonMax, String startDate, String endDate) {
+  public List<StatisticsMap> getPerDayStatistics(double latMin, double latMax, double lonMin, double lonMax, String startDate, String endDate) {
     try {
       this.startDate = startDate;
       this.endDate = endDate;
@@ -65,6 +67,28 @@ public class SynchronizedCameraRepository {
     return null;
   }
 
+  int getAmountInTimeframe(String startDate, String endDate){
+    try {
+      return new camerasInTimeframeAsyncTask(mSynchronizedCameraDao).execute(startDate, endDate).get();
+
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+      return 0;
+    }
+
+  }
+
+  int getTotalAmountInDb(){
+    try {
+      return new camerasTotalAsyncTask(mSynchronizedCameraDao).execute().get();
+
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+      return 0;
+    }
+  }
+
+
 
   public void insert(List<SynchronizedCamera> synchronizedCamera) {
     new insertAsyncTask(mSynchronizedCameraDao).execute((List)synchronizedCamera);
@@ -73,14 +97,6 @@ public class SynchronizedCameraRepository {
   public void deleteAll() {
     mSynchronizedCameraDao.deleteAll();
   }
-
-
-
-
-
-
-
-
 
 
 
@@ -144,6 +160,46 @@ public class SynchronizedCameraRepository {
       List<StatisticsMap> statistics = mAsyncTaskDao.getStatistics(params[0], params[1], params[2], params[3]);
 
       return statistics;
+    }
+
+  }
+
+
+  private static class camerasInTimeframeAsyncTask extends AsyncTask<String, Void, Integer> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+
+    camerasInTimeframeAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected Integer doInBackground(final String... params) {
+
+      int camerasInTimeframe = mAsyncTaskDao.getCamerasAddedInTimeframe(params[0], params[1]);
+
+      return camerasInTimeframe;
+    }
+
+  }
+
+
+  private static class camerasTotalAsyncTask extends AsyncTask<Void, Void, Integer> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+
+    camerasTotalAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected Integer doInBackground(final Void... params) {
+
+      int camerasInTimeframe = mAsyncTaskDao.getNumberOfCameras();
+
+      return camerasInTimeframe;
     }
 
   }

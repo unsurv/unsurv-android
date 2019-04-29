@@ -44,10 +44,13 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
@@ -235,16 +238,28 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        //ConnectionUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
+        // ConnectionUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
 
         // JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
         // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
 
-        StatisticsUtils.getCamerasPerDayFromDb(
-                49.99, 50.3638, 7.9648, 8.2888,
-                "2019-04-20", "2019-04-24",
-                synchronizedCameraRepository);
+        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        try {
+          Date startDate = timestampIso8601.parse("2019-04-20");
+          Date endDate = timestampIso8601.parse("2019-04-24");
+
+          StatisticsUtils.getCamerasPerDayFromDb(
+                  49.99, 50.3638, 7.9648, 8.2888,
+                  startDate, endDate,
+                  synchronizedCameraRepository);
+
+        } catch (ParseException e) {
+          Log.i(TAG, e.toString());
+        }
+
 
       }
     });
