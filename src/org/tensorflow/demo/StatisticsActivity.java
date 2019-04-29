@@ -2,21 +2,14 @@ package org.tensorflow.demo;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -29,22 +22,12 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NoCache;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -76,6 +59,14 @@ public class StatisticsActivity extends AppCompatActivity {
   private double lonMax;
 
   private SynchronizedCameraRepository synchronizedCameraRepository;
+
+  private int globalTodayAmount;
+  private int global28DaysAmount;
+  private int globalTotalAmount;
+
+  private int local7DaysAmount;
+  private int totalLocal28Days;
+  private int totalLocal;
 
 
 
@@ -123,21 +114,24 @@ public class StatisticsActivity extends AppCompatActivity {
     Date sevenDaysBeforeToday = cal.getTime();
 
     // data from -7 days until today
-    int totalSevenDays = StatisticsUtils.getTotalCamerasInTimeframeFromDb(sevenDaysBeforeToday, currentDate, synchronizedCameraRepository);
+    local7DaysAmount = StatisticsUtils.getTotalCamerasInTimeframeFromDb(sevenDaysBeforeToday, currentDate, synchronizedCameraRepository);
 
     // only subtract 21 here because we've subtracted 7 earlier
     cal.add(Calendar.DATE, -21);
     Date twentyEightDaysBeforeToday = cal.getTime();
 
-    int totalTwentyeightDays = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
+    totalLocal28Days = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
 
-    int totalInDb = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
+    totalLocal = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
 
-    totalInArea.setText(String.valueOf(totalInDb));
-    local7Days.setText(String.valueOf(totalSevenDays));
-    local28Days.setText(String.valueOf(totalTwentyeightDays));
+    totalInArea.setText(String.valueOf(totalLocal));
+    local7Days.setText(String.valueOf(local7DaysAmount));
+    local28Days.setText(String.valueOf(totalLocal28Days));
 
 
+    String baseURL = sharedPreferences.getString("synchronizationURL", null);
+
+    queryServerForStatistics(baseURL, "global", "2018-01-01", "2019-01-01");
 
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
@@ -215,4 +209,95 @@ public class StatisticsActivity extends AppCompatActivity {
   }
 
 
+  void queryServerForStatistics(String baseURL, String area, String startDate, String endDate){
+
+    final String TAG = "StatisticsUtils";
+    //TODO check api for negative values in left right top bottom see if still correct
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    String url = baseURL + "statistics/?area=" + area;
+
+    if (startDate != null){
+     url += "&start=" + startDate;
+    }
+
+    if (endDate != null){
+      url += "&end=" + endDate;
+    }
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                JSONObject JSONFromServer;
+
+                try {
+
+                  JSONFromServer = response.getJSONObject("global");
+
+                  globalTodayAmount = JSONFromServer.getInt("global_today");
+                  global28DaysAmount = JSONFromServer.getInt("global_28days");
+                  globalTotalAmount = JSONFromServer.getInt("global_total");
+
+
+
+                } catch (Exception e) {
+                  Log.i(TAG, "onResponse: " + e.toString());
+
+                }
+
+              }
+            }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        // TODO: Handle Errors
+      }
+    }
+    );
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.add(jsonObjectRequest);
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+
+        redrawGlobalTextViews();
+
+      }
+    });
+
+  }
+
+  /**
+   * updates all Textviews which rely on outside data
+   */
+
+  void redrawGlobalTextViews(){
+
+    globalToday.setText(String.valueOf(globalTodayAmount));
+    global28Days.setText(String.valueOf(global28DaysAmount));
+    globalTotal.setText(String.valueOf(globalTotalAmount));
+
+  }
 }
