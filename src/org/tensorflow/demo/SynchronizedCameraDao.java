@@ -28,6 +28,10 @@ public interface SynchronizedCameraDao {
           "WHERE latitude BETWEEN :latMin AND :latMax AND longitude BETWEEN :lonMin AND :lonMax")
   List<SynchronizedCamera> getCamerasInArea(double latMin, double latMax, double lonMin, double lonMax);
 
+  @Query("SELECT latitude, longitude, externalID FROM synchronized_cameras " +
+          "WHERE latitude BETWEEN :latMin AND :latMax AND longitude BETWEEN :lonMin AND :lonMax")
+  List<SlimSynchronizedCamera> getSlimCamerasInArea(double latMin, double latMax, double lonMin, double lonMax);
+
   @Query("SELECT externalID FROM synchronized_cameras " +
           "WHERE latitude BETWEEN :latMin AND :latMax AND longitude BETWEEN :lonMin AND :lonMax")
   List<String> getIDsInArea(double latMin, double latMax, double lonMin, double lonMax);

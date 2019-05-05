@@ -40,6 +40,18 @@ public class SynchronizedCameraRepository {
 
 
 
+  List<SlimSynchronizedCamera> getSlimCamerasInArea(double latMin, double latMax, double lonMin, double lonMax) {
+    try {
+      List<SlimSynchronizedCamera> cameras = new findSlimCamerasInArea(mSynchronizedCameraDao).execute(latMin, latMax, lonMin, lonMax).get();
+      return cameras;
+
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+    }
+
+    return null;
+  }
+
 
   SynchronizedCamera findByID(String uuid) {
     try {
@@ -200,6 +212,26 @@ public class SynchronizedCameraRepository {
       int camerasInTimeframe = mAsyncTaskDao.getNumberOfCameras();
 
       return camerasInTimeframe;
+    }
+
+  }
+
+
+  private static class findSlimCamerasInArea extends AsyncTask<Double, Void, List<SlimSynchronizedCamera>> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+
+    findSlimCamerasInArea(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected List<SlimSynchronizedCamera> doInBackground(final Double... params) {
+
+      List<SlimSynchronizedCamera> slimCamerasInArea = mAsyncTaskDao.getSlimCamerasInArea(params[0], params[1], params[2], params[3]);
+
+      return slimCamerasInArea;
     }
 
   }

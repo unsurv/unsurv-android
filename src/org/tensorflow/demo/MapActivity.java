@@ -1311,4 +1311,12 @@ public class MapActivity extends AppCompatActivity {
     });
 
   }
+
+  SynchronizedCamera getCameraFromId(String uid, SynchronizedCameraRepository synchronizedCameraRepository){
+
+
+
+    return null;
+  }
+
 }
