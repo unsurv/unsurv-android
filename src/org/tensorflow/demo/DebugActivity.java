@@ -44,11 +44,9 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -143,8 +141,8 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("notifications", false).apply();
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
-    // sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
-    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.2.137:5000/").apply();
+    sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
+    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.1.77:5000/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
@@ -184,6 +182,10 @@ public class DebugActivity extends AppCompatActivity {
     mapController.setZoom(14.0);
     mapController.setCenter(startPoint);
 
+    SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
+
+    JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
+
 
     mapView.addMapListener(new DelayedMapListener(new MapListener() {
       @Override
@@ -208,7 +210,7 @@ public class DebugActivity extends AppCompatActivity {
 
         String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
 
-        ConnectionUtils.synchronizeCamerasWithServer(baseURL + "cameras/?",
+        SynchronizationUtils.synchronizeCamerasWithServer(baseURL + "cameras/?",
                 "area=" + sharedPreferences.getString("area", null),
                 true, null, synchronizedCameraRepository);
 
@@ -238,27 +240,14 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        // ConnectionUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
+        SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
 
-        // JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
+        JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
-        // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
+        List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
 
         SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        try {
-          Date startDate = timestampIso8601.parse("2019-04-20");
-          Date endDate = timestampIso8601.parse("2019-04-24");
-
-          StatisticsUtils.getCamerasPerDayFromDb(
-                  49.99, 50.3638, 7.9648, 8.2888,
-                  startDate, endDate,
-                  synchronizedCameraRepository);
-
-        } catch (ParseException e) {
-          Log.i(TAG, e.toString());
-        }
 
 
       }
@@ -333,7 +322,16 @@ public class DebugActivity extends AppCompatActivity {
 
     List<CameraCapture> captureListTest = Arrays.asList(cameraCapture1, cameraCapture2, cameraCapture3, cameraCapture4);
 
-
+    SurveillanceCamera testCamera = new SurveillanceCamera(
+            "asd",
+            "asd",
+            50.000,
+            8.0000,
+            "asd",
+            "2019-01-03",
+            "2019-05-30");
+    CameraRepository cameraRepository = new CameraRepository(getApplication());
+    cameraRepository.insert(testCamera);
 
     allCamerasInArea = captureListTest;
 

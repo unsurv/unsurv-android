@@ -1,5 +1,12 @@
 package org.tensorflow.demo;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import com.android.volley.DefaultRetryPolicy;
@@ -13,13 +20,67 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NoCache;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 
-class ConnectionUtils {
+class SynchronizationUtils {
 
-  private static String TAG = "ConnectionUtils";
+  private static String TAG = "SynchronizationUtils";
+
+  static Boolean scheduleSyncIntervalJob (Context context, @Nullable PersistableBundle jobExtras) {
+
+    //TODO Do I need jobExtras here? yes for location boundingbox
+
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+    long syncIntervalInMillis = sharedPreferences.getLong("synchronizationInterval", 0);
+
+    if (syncIntervalInMillis == 0) {
+      return false; // TODO don't relist job after completion? check documentation again
+    }
+
+    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+    PersistableBundle syncJobExtras = new PersistableBundle();
+
+    syncJobExtras.putString("baseURL", sharedPreferences.getString("synchronizationURL", null));
+    syncJobExtras.putString("area", sharedPreferences.getString("area", null));
+    syncJobExtras.putString("start", sharedPreferences.getString("lastUpdated", null));
+
+
+    ComponentName componentName = new ComponentName(context, SyncIntervalSchedulerJobService.class);
+
+    JobInfo.Builder jobBuilder  = new JobInfo.Builder(0, componentName); // Job ID
+
+    jobBuilder.setExtras(syncJobExtras);
+
+    jobBuilder.setPeriodic(30*1000, 5*1000);
+    //jobBuilder.setPeriodic(syncIntervalInMillis);
+
+    //jobBuilder.setOverrideDeadline(15*1000); // force after 15 s for debug
+
+    //jobBuilder.setPersisted(true);
+
+    JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+
+
+    // .schedule overrides previous Jobs with same ID.
+    int scheduleResult = jobScheduler.schedule(jobBuilder.build());
+
+    if (scheduleResult == JobScheduler.RESULT_SUCCESS) {
+      return true;
+    } else {
+      return false;  // TODO CHECK FOR RETURN VALUE WHEN SYNC STARTED AND LET USER KNOW IF IT FAILED
+    }
+
+
+  }
 
 
   static void synchronizeCamerasWithServer(String baseURL, String areaQuery, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
@@ -42,7 +103,7 @@ class ConnectionUtils {
    String url = baseURL + areaQuery;
 
     if (startQuery != null) {
-      url.concat("&" + startQuery);
+      url += "&" + startQuery;
     }
 
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(

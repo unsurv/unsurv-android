@@ -23,11 +23,9 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NoCache;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,13 +38,13 @@ public class StatisticsActivity extends AppCompatActivity {
   private BottomNavigationView bottomNavigationView;
   private CameraRoomDatabase cameraDb;
 
-  private TextView totalInArea;
-  private TextView local7Days;
-  private TextView local28Days;
-  private TextView addedByUser;
-  private TextView globalToday;
-  private TextView global28Days;
-  private TextView globalTotal;
+  private TextView totalInAreaTextView;
+  private TextView local7DaysTextView;
+  private TextView local28DaysTextView;
+  private TextView totalByUserTextView;
+  private TextView globalTodayTextView;
+  private TextView global28DaysTextView;
+  private TextView globalTotalTextView;
 
   private List<HashMap<Date, Integer>> localCamerasPerDays;
   private List<HashMap<Date, Integer>> globalCamerasPerDays;
@@ -59,6 +57,7 @@ public class StatisticsActivity extends AppCompatActivity {
   private double lonMax;
 
   private SynchronizedCameraRepository synchronizedCameraRepository;
+  private CameraRepository cameraRepository;
 
   private int globalTodayAmount;
   private int global28DaysAmount;
@@ -67,6 +66,7 @@ public class StatisticsActivity extends AppCompatActivity {
   private int local7DaysAmount;
   private int totalLocal28Days;
   private int totalLocal;
+  private int totalByUser;
 
 
 
@@ -78,16 +78,17 @@ public class StatisticsActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
+    cameraRepository = new CameraRepository(getApplication());
 
-    totalInArea = findViewById(R.id.total_cameras_statistics);
+    totalInAreaTextView = findViewById(R.id.total_cameras_statistics);
 
-    local7Days = findViewById(R.id.added_past_7_days_statistics);
-    local28Days = findViewById(R.id.added_past_28_days_statistics);
-    addedByUser = findViewById(R.id.added_by_user_statistics);
+    local7DaysTextView = findViewById(R.id.added_past_7_days_statistics);
+    local28DaysTextView = findViewById(R.id.added_past_28_days_statistics);
+    totalByUserTextView = findViewById(R.id.added_by_user_statistics);
 
-    globalToday = findViewById(R.id.global_today_statistics);
-    global28Days = findViewById(R.id.global_28days_statistics);
-    globalTotal = findViewById(R.id.global_total_statistics);
+    globalTodayTextView = findViewById(R.id.global_today_statistics);
+    global28DaysTextView = findViewById(R.id.global_28days_statistics);
+    globalTotalTextView = findViewById(R.id.global_total_statistics);
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -123,11 +124,12 @@ public class StatisticsActivity extends AppCompatActivity {
     totalLocal28Days = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
 
     totalLocal = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
+    totalByUser = StatisticsUtils.totalCamerasByUser(cameraRepository);
 
-    totalInArea.setText(String.valueOf(totalLocal));
-    local7Days.setText(String.valueOf(local7DaysAmount));
-    local28Days.setText(String.valueOf(totalLocal28Days));
-
+    totalInAreaTextView.setText(String.valueOf(totalLocal));
+    local7DaysTextView.setText(String.valueOf(local7DaysAmount));
+    local28DaysTextView.setText(String.valueOf(totalLocal28Days));
+    totalByUserTextView.setText(String.valueOf(totalByUser));
 
     String baseURL = sharedPreferences.getString("synchronizationURL", null);
 
@@ -295,9 +297,9 @@ public class StatisticsActivity extends AppCompatActivity {
 
   void redrawGlobalTextViews(){
 
-    globalToday.setText(String.valueOf(globalTodayAmount));
-    global28Days.setText(String.valueOf(global28DaysAmount));
-    globalTotal.setText(String.valueOf(globalTotalAmount));
+    globalTodayTextView.setText(String.valueOf(globalTodayAmount));
+    global28DaysTextView.setText(String.valueOf(global28DaysAmount));
+    globalTotalTextView.setText(String.valueOf(globalTotalAmount));
 
   }
 }

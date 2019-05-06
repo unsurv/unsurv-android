@@ -25,10 +25,10 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
     String baseURL = intervalSchedulerExtras.getString("baseURL") + "cameras/?";
     String areaQuery = "area=" + intervalSchedulerExtras.getString("area");
-    String startQuery = "start=" + intervalSchedulerExtras.getString("start");
+    String startQuery = "start=" + sharedPreferences.getString("lastUpdated", "01-01-2000");
 
 
-    ConnectionUtils.synchronizeCamerasWithServer(
+    SynchronizationUtils.synchronizeCamerasWithServer(
             baseURL,
             areaQuery,
             true,

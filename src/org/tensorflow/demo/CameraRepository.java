@@ -3,6 +3,7 @@ package org.tensorflow.demo;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.List;
 
@@ -26,6 +27,17 @@ public class CameraRepository {
     new insertAsyncTask(mCameraDao).execute(surveillanceCamera);
   }
 
+  int getCamerasFromUserCount(){
+    try {
+      return new CameraRepository.getCountAsyncTask(mCameraDao).execute().get();
+
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+      return 0;
+    }
+  }
+
+
 
   private static class insertAsyncTask extends AsyncTask<SurveillanceCamera, Void, Void> {
 
@@ -39,6 +51,20 @@ public class CameraRepository {
     protected Void doInBackground(final SurveillanceCamera... params) {
       mAsyncTaskDao.insert(params[0]);
       return null;
+    }
+  }
+
+  private static class getCountAsyncTask extends AsyncTask<Void, Void, Integer> {
+
+    private CameraDao mAsyncTaskDao;
+
+    getCountAsyncTask(CameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected Integer doInBackground(final Void... params) {
+      return mAsyncTaskDao.getTotalCamerasByUser();
     }
   }
 
