@@ -124,7 +124,7 @@ public class StatisticsActivity extends AppCompatActivity {
     totalLocal28Days = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
 
     totalLocal = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
-    totalByUser = StatisticsUtils.totalCamerasByUser(cameraRepository);
+    totalByUser = StatisticsUtils.totalCamerasAddedByUser(cameraRepository);
 
     totalInAreaTextView.setText(String.valueOf(totalLocal));
     local7DaysTextView.setText(String.valueOf(local7DaysAmount));
@@ -292,7 +292,7 @@ public class StatisticsActivity extends AppCompatActivity {
   }
 
   /**
-   * updates all Textviews which rely on outside data
+   * updates all TextViews which rely on outside data
    */
 
   void redrawGlobalTextViews(){

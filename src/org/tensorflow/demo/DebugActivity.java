@@ -142,7 +142,7 @@ public class DebugActivity extends AppCompatActivity {
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     sharedPreferences.edit().putLong("synchronizationInterval", 15*60*1000).apply();
-    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.1.77:5000/").apply();
+    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.1.137:5000/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
@@ -182,9 +182,6 @@ public class DebugActivity extends AppCompatActivity {
     mapController.setZoom(14.0);
     mapController.setCenter(startPoint);
 
-    SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
-
-    JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
 
     mapView.addMapListener(new DelayedMapListener(new MapListener() {
@@ -201,7 +198,7 @@ public class DebugActivity extends AppCompatActivity {
         closeAllInfoWindowsOn(mapView);
         return false;
       }
-    }, 50)); // delay in ms after zooming/scrolling
+    }, 50)); // delay for refresh in ms after zooming/scrolling
 
 
     debugDbSync.setOnClickListener(new View.OnClickListener() {

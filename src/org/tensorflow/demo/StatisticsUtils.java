@@ -1,6 +1,5 @@
 package org.tensorflow.demo;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -82,8 +81,8 @@ public class StatisticsUtils {
     return synchronizedCameraRepository.getTotalAmountInDb();
   }
 
-  static int totalCamerasByUser(CameraRepository cameraRepository){
-    return cameraRepository.getCamerasFromUserCount();
+  static int totalCamerasAddedByUser(CameraRepository cameraRepository){
+    return cameraRepository.getCamerasAddedByUserCount();
   }
 
 }

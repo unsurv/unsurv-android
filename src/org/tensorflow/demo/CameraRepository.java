@@ -27,7 +27,7 @@ public class CameraRepository {
     new insertAsyncTask(mCameraDao).execute(surveillanceCamera);
   }
 
-  int getCamerasFromUserCount(){
+  int getCamerasAddedByUserCount(){
     try {
       return new CameraRepository.getCountAsyncTask(mCameraDao).execute().get();
 
@@ -64,7 +64,7 @@ public class CameraRepository {
 
     @Override
     protected Integer doInBackground(final Void... params) {
-      return mAsyncTaskDao.getTotalCamerasByUser();
+      return mAsyncTaskDao.getTotalCamerasAddedByUser();
     }
   }
 

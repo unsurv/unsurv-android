@@ -161,6 +161,8 @@ public class MapActivity extends AppCompatActivity {
 
   private String picturesPath;
 
+  private TextView amountOnMap;
+
 
   // TODO set max amount visible
 
@@ -243,6 +245,8 @@ public class MapActivity extends AppCompatActivity {
     GeoPoint startPoint = new GeoPoint(50.0027, 8.2771);
     mapController.setZoom(7.0);
     mapController.setCenter(startPoint);
+
+    amountOnMap = findViewById(R.id.map_count_textview);
 
     // myLocationOverlay
     myLocationOverlay = new MyLocationNewOverlay(mapView);
@@ -932,7 +936,7 @@ public class MapActivity extends AppCompatActivity {
 
       cameraCluster.setIcon(clusterIcon);
 
-
+      amountOnMap.setText("Total cameras: " + itemsToDisplay.size());
       for (int i = 0; i < itemsToDisplay.size(); i++) {
         Marker cameraMarker = new Marker(mapView);
         SynchronizedCamera currentCamera = itemsToDisplay.get(i);
@@ -1041,7 +1045,7 @@ public class MapActivity extends AppCompatActivity {
 
       }
 
-
+      amountOnMap.setText("Total cameras: " + overlayItemsToDisplay.size());
       cameraOverlay = new ItemizedIconOverlay<>(overlayItemsToDisplay, cameraMarkerIcon,
               new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 

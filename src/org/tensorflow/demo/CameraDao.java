@@ -32,7 +32,7 @@ public interface CameraDao {
   int getTotalCamerasUpTo(String endpoint);
 
   @Query("SELECT count(*) FROM local_surveillance_cameras")
-  int getTotalCamerasByUser();
+  int getTotalCamerasAddedByUser();
 
 
 }
