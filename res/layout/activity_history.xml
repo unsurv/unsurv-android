@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout
+    android:id="@+id/history_linear"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000"
+
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -20,13 +21,75 @@
 
         />
 
+    <LinearLayout
+        android:id="@+id/history_detail_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:padding="2dp"
+                android:id="@+id/history_detail_image"
+                android:layout_width="0sp"
+                android:layout_weight="5"
+                android:layout_height="200dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                />
+
+            <org.osmdroid.views.MapView
+                android:padding="2dp"
+                android:id="@+id/history_detail_map"
+                android:layout_width="0sp"
+                android:layout_weight="5"
+                android:layout_height="200dp">
+
+            </org.osmdroid.views.MapView>
+
+
+
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/history_detail_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:padding="4dp"
+            android:text="Please select a camera"
+            android:textColor="#FFF"
+            android:layout_gravity="center"
+            />
+
+        <TextView
+            android:id="@+id/history_detail_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:padding="4dp"
+            android:layout_gravity="center"
+            android:textColor="#FFF"
+            />
+
+
+    </LinearLayout>
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/camera_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0sp"
-        android:layout_weight="9"
-        android:background="@android:color/darker_gray"
+        android:layout_weight="5"
+
         tools:listitem="@layout/camera_recyclerview_item" />
 
     <android.support.design.widget.BottomNavigationView

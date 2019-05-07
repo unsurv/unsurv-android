@@ -2,6 +2,7 @@ package org.tensorflow.demo;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,8 +11,18 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapView;
 
 import java.util.List;
 
@@ -24,9 +35,30 @@ public class HistoryActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_history);
 
+    MapView detailMap = findViewById(R.id.history_detail_map);
+    detailMap.setTilesScaledToDpi(true);
+    detailMap.setClickable(false);
+    detailMap.setMultiTouchControls(false);
+    detailMap.setTileSource(TileSourceFactory.OpenTopo);
+
+    final CustomZoomButtonsController zoomController = detailMap.getZoomController();
+    zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+
+    final IMapController mapController = detailMap.getController();
+
+    // Setting starting position and zoom level.
+    GeoPoint startPoint = new GeoPoint(50.0027, 8.2771);
+    mapController.setZoom(15.0);
+    mapController.setCenter(startPoint);
+
 
     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.camera_recyclerview);
-    final CameraListAdapter adapter = new CameraListAdapter(this);
+
+    LayoutInflater layoutInflater = (LayoutInflater) HistoryActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    final LinearLayout rootView = findViewById(R.id.history_detail_linear);
+    final CameraListAdapter adapter = new CameraListAdapter(this, rootView);
+
     recyclerView.setAdapter(adapter);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
 

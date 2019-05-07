@@ -74,7 +74,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
 
         // Populate database with placeholder data.
         SurveillanceCamera surveillanceCamera = new SurveillanceCamera(
-                picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                picturesPath + "test_nexus_10.jpg", picturesPath + "190754878.jpg",
                 50.0005 + randomLat, 8.2832 + randomLong,
                 "",
                 timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),
