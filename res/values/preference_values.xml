@@ -14,9 +14,9 @@
         <item>2419200000</item>
     </string-array>
 
-    <integer name="default_synchronization_value">
+    <string name="default_synchronization_value">
         604800
-    </integer>
+    </string>
 
     <string-array name="max_marker_choices">
         <item>100</item>

@@ -38,7 +38,7 @@ class SynchronizationUtils {
 
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-    long syncIntervalInMillis = sharedPreferences.getLong("synchronizationInterval", 0);
+    long syncIntervalInMillis = Long.parseLong(sharedPreferences.getString("synchronizationInterval", "0"));
 
     if (syncIntervalInMillis == 0) {
       return false; // TODO don't relist job after completion? check documentation again

@@ -3,10 +3,8 @@ package org.tensorflow.demo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -66,7 +64,6 @@ import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -77,7 +74,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -145,7 +141,7 @@ public class MapActivity extends AppCompatActivity {
 
   private AreaOfflineAvailableRepository areaOfflineAvailableRepository;
   private List<AreaOfflineAvailable> areasOfflineAvailable = new ArrayList<>();
-  private ImageButton gridButton;
+  private ImageButton refreshButton;
   private SimpleDateFormat timestampIso8601;
   private SimpleDateFormat timestampIso8601ForArea;
   private Date latestUpdateForArea;
@@ -154,6 +150,15 @@ public class MapActivity extends AppCompatActivity {
   private double latMax;
   private double lonMin;
   private double lonMax;
+
+  private String latMinString;
+  private String latMaxString;
+  private String lonMinString;
+  private String lonMaxString;
+
+  private String areaString;
+
+  boolean offlineMode;
 
   private double lastZoomLevel;
 
@@ -271,12 +276,19 @@ public class MapActivity extends AppCompatActivity {
     final RelativeLayout mapLayout = findViewById(R.id.map_rel_layout);
     ViewGroup.LayoutParams layoutParams = mapLayout.getLayoutParams();
 
-    gridButton = findViewById(R.id.map_grid_button);
-    gridButton.setOnClickListener(new View.OnClickListener() {
+    offlineMode = sharedPreferences.getBoolean("offlineMode", true);
+
+    refreshButton = findViewById(R.id.map_refresh_button);
+    refreshButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        mapController.setCenter(new GeoPoint(50.1120, 8.6776));
-        mapController.setZoom(12.50);
+        if (!offlineMode) {
+          queryServerForCameras("area=" + areaString);
+        } else {
+          updateAllCamerasInArea(true);
+          redrawMarkers(allCamerasInArea);
+        }
+
       }
     });
 
@@ -657,12 +669,12 @@ public class MapActivity extends AppCompatActivity {
           lonMin = t;
         }
 
-        String latMinString = String.valueOf(latMin);
-        String latMaxString = String.valueOf(latMax);
-        String lonMinString = String.valueOf(lonMin);
-        String lonMaxString = String.valueOf(lonMax);
+        latMinString = String.valueOf(latMin);
+        latMaxString = String.valueOf(latMax);
+        lonMinString = String.valueOf(lonMin);
+        lonMaxString = String.valueOf(lonMax);
 
-        String areaString =
+        areaString =
                 latMinString + ","
                         + latMaxString + ","
                         + lonMinString + ","
@@ -695,7 +707,6 @@ public class MapActivity extends AppCompatActivity {
         double offlineLonMin = Double.parseDouble(splitBorders[2]);
         double offlineLonMax = Double.parseDouble(splitBorders[3]);
 
-        boolean offlineMode = sharedPreferences.getBoolean("offlineMode", true);
         final boolean allowServerQueries = sharedPreferences.getBoolean("allowServerQueries", false);
 
         // always query db
