@@ -23,9 +23,10 @@ package org.tensorflow.demo;
 
 public class MapTutorialFragment extends android.support.v4.app.Fragment {
 
-  SharedPreferences sharedPreferences;
-  Boolean mapScrollingEnabled = true;
-
+  private SharedPreferences sharedPreferences;
+  private Boolean mapScrollingEnabled = true;
+  private TutorialViewPager tutorialViewPager;
+  private boolean homezoneIsSet;
 
   public MapTutorialFragment() {
 
@@ -37,12 +38,15 @@ public class MapTutorialFragment extends android.support.v4.app.Fragment {
 
     View rootView = inflater.inflate(R.layout.map_tutorial, container,false);
 
-    final TutorialViewPager tutorialViewPager = getActivity().findViewById(R.id.tutorial_viewpager);
-    tutorialViewPager.setFragmentScrollingEnabled(false);
-
-
-
+    tutorialViewPager = getActivity().findViewById(R.id.tutorial_viewpager);
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+
+    homezoneIsSet = sharedPreferences.getString("area", null) != null;
+
+    if (!homezoneIsSet){
+      tutorialViewPager.setFragmentScrollingEnabled(false);
+    }
+
 
     final TextView mapTutorialTextView = rootView.findViewById(R.id.map_tutorial_textview);
     mapTutorialTextView.setText("Please select an area for offline availability");
@@ -94,18 +98,21 @@ public class MapTutorialFragment extends android.support.v4.app.Fragment {
 
         // I DON'T KNOW WTF IS GOING ON, VOLLEY REQUEST LIB DOESN'T LIKE PRECISE BORDERS
         String areaString =
-                westBorder.substring(0, westBorder.length() - 11) + "," +
-                northBorder.substring(0, northBorder.length() - 11) + "," +
-                eastBorder.substring(0, eastBorder.length() - 11) + "," +
-                southBorder.substring(0, southBorder.length() - 11);
+                southBorder.substring(0, southBorder.length() - 11)
+                + "," + northBorder.substring(0, northBorder.length() - 11)
+                + "," + westBorder.substring(0, westBorder.length() - 11)
+                + "," + eastBorder.substring(0, eastBorder.length() - 11);
+
+        // areaString = southBorder + "," + northBorder + "," + westBorder + "," + eastBorder;
 
 
         mapTutorialTextView.setText(areaString);
-        sharedPreferences.edit().putString("area", "area=" + areaString).apply(); // W N E S
+        sharedPreferences.edit().putString("area", areaString).apply(); // W N E S
 
         mapScrollingEnabled = false;
         tutorialViewPager.setFragmentScrollingEnabled(true);
-        tutorialViewPager.setCurrentItem(1);
+
+        homezoneIsSet = true;
 
       }
     });

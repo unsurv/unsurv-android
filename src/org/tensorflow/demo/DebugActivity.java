@@ -149,7 +149,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
     sharedPreferences.edit().putBoolean("clusteringEnabled", true).apply();
     // sharedPreferences.edit().putLong("minUploadDelay", 1000*60*60*24*10).apply();
-    // sharedPreferences.edit().putLong("maxUploadDelay", 1000*60*60*24*48L).apply();
+    // sharedPreferences.edit().putLong("maxUploadDelay", 1000*60*60*24*48).apply();
 
 
     // set in timemachineSpinner
@@ -276,9 +276,9 @@ public class DebugActivity extends AppCompatActivity {
       public void onClick(View view) {
         debugTextView.setText(
         sharedPreferences.getString("lastUpdated", "2018-01-01") + "\n" +
-        sharedPreferences.getString("synchronizationInterval", String.valueOf(15*60*1000))+ "\n" +
-        sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?")+ "\n" +
-        sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888")+ "\n" +
+        sharedPreferences.getString("synchronizationInterval", String.valueOf(15*60*1000)) + "\n" +
+        sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?") + "\n" +
+        sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888") + "\n" +
         sharedPreferences.getBoolean("buttonCapture", false) + "\n" +
         sharedPreferences.getString("timemachineValueInDays", "0"));
 

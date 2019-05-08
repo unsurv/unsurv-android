@@ -256,12 +256,12 @@ public class MapActivity extends AppCompatActivity {
     // myLocationOverlay
     myLocationOverlay = new MyLocationNewOverlay(mapView);
     myLocationOverlay.enableMyLocation();
-    myLocationOverlay.enableFollowLocation();
-    myLocationOverlay.setDrawAccuracyEnabled(true);
     // TODO manage following
+    // myLocationOverlay.enableFollowLocation();
+    myLocationOverlay.setDrawAccuracyEnabled(true);
     mapController.setCenter(myLocationOverlay.getMyLocation());
     mapController.setZoom(14.00);
-    // mapView.getOverlays().add(myLocationOverlay);
+    mapView.getOverlays().add(myLocationOverlay);
 
     // Button in to find user location.
     myLocationButton = findViewById(R.id.my_location_button);

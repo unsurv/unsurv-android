@@ -1,13 +1,24 @@
 package org.tensorflow.demo;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 public class RecordingTutorialFragment extends android.support.v4.app.Fragment {
+
+  private SharedPreferences sharedPreferences;
+
+  private TutorialViewPager tutorialViewPager;
+
+  private CheckBox automaticCaptureCheckbox;
+  private CheckBox buttonCaptureCheckbox;
 
   public RecordingTutorialFragment() {
 
@@ -17,10 +28,38 @@ public class RecordingTutorialFragment extends android.support.v4.app.Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
+
     View rootView = inflater.inflate(R.layout.recording_tutorial, container,false);
 
-    TextView recordingTextView = rootView.findViewById(R.id.recording_tutorial_textview);
-    recordingTextView.setText("Fragment Works");
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+
+    // standard choice is automatic capture
+    sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
+
+    automaticCaptureCheckbox = rootView.findViewById(R.id.recording_tutorial_automatic_check);
+    buttonCaptureCheckbox = rootView.findViewById(R.id.recording_tutorial_button_check);
+
+    automaticCaptureCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+        if (b) {
+          sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
+          buttonCaptureCheckbox.setChecked(false);
+        }
+      }
+    });
+
+    buttonCaptureCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+        if (b) {
+          sharedPreferences.edit().putBoolean("buttonCapture", true).apply();
+          automaticCaptureCheckbox.setChecked(false);
+        }
+      }
+    });
 
 
     return rootView;

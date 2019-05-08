@@ -15,7 +15,7 @@
     </string-array>
 
     <string name="default_synchronization_value">
-        604800
+        604800000
     </string>
 
     <string-array name="max_marker_choices">

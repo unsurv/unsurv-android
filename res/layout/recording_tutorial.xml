@@ -7,15 +7,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
 
 
-    <TextView
-        android:id="@+id/recording_tutorial_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="asd"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/automatic_capture_layout"
+        android:layout_width="0sp"
+        android:layout_weight="5"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:src="@drawable/ic_adb_grey_36dp"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="8"
+            />
+
+        <CheckBox
+            android:id="@+id/recording_tutorial_automatic_check"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="2"
+            android:text="automatic capture"
+            android:textSize="20sp"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:checked="true"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/button_capture_layout"
+        android:layout_width="0sp"
+        android:layout_weight="5"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:src="@drawable/ic_radio_button_checked_grey_36dp"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="8"
+            />
+
+        <CheckBox
+            android:id="@+id/recording_tutorial_button_check"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="2"
+            android:text="button capture"
+            android:textSize="20sp"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"/>
+
+
+
+    </LinearLayout>
 
 </LinearLayout>
 
