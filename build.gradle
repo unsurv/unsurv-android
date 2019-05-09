@@ -35,7 +35,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
-        classpath 'org.apache.httpcomponents:httpclient:4.5.4'
+
     }
 }
 
@@ -219,16 +219,17 @@ dependencies {
     //osmdroid openstreetmap
     implementation 'org.osmdroid:osmdroid-android:6.1.0'
 
-    //MPAndroidChart
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    // bonus functionality (clustering / routing)
+    implementation 'com.github.MKergall:osmbonuspack:6.6.0'
 
     //Volley google request library
     implementation 'com.android.volley:volley:1.1.1'
 
+    // google crypto lib
+    implementation 'com.google.crypto.tink:tink-android:1.2.2'
+
     // UnitTests
     implementation 'junit:junit:4.12'
-
-    implementation 'com.github.MKergall:osmbonuspack:6.6.0'
 }
 
 

@@ -618,6 +618,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                   pooledCameraCaptures.clear();
 
+                  // TODO add "unsurv" to every picturesPath
                   CameraCapture cameraCapture1 = new CameraCapture(99.9f,
                           picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
                           10, 120, 50, 140,
