@@ -1,11 +1,8 @@
 package org.tensorflow.demo;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
+
 
 import com.google.crypto.tink.HybridDecrypt;
 import com.google.crypto.tink.HybridEncrypt;
@@ -28,7 +25,7 @@ public class EncryptionUtils {
 
   private static String MASTER_KEY_URI = "android-keystore://unsurv_masterKey";
   private static String MAIN_KEY_FILENAME = "mainKeyset.json";
-  private static String ONE_TIME_KEY_FILENAME = "android-keystore://unsurv_masterKey";
+  private static String ONE_TIME_KEY_FILENAME = "oneTimeKey.json";
 
 
   static void generateMasterKey() throws GeneralSecurityException, IOException {
@@ -148,25 +145,6 @@ public class EncryptionUtils {
     }
 
     return bytes;
-  }
-
-  void bytesToImage (byte[] bytes, String path, String filename, boolean byteIsEncrypted) throws IOException{
-
-    String fileExtension;
-
-    if (byteIsEncrypted) {
-      fileExtension = ".aes";
-    } else {
-      fileExtension = ".jpg";
-    }
-
-    File image = new File(path + filename + fileExtension);
-
-    FileOutputStream fileOutputStream = new FileOutputStream(image.getPath());
-
-    fileOutputStream.write(bytes);
-    fileOutputStream.close();
-
   }
 
 }

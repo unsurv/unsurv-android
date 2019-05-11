@@ -102,6 +102,14 @@ android {
                     arguments '-DANDROID_TOOLCHAIN=gcc', '-DANDROID_STL=gnustl_static'
                 }
             }
+
+            javaCompileOptions {
+                annotationProcessorOptions {
+                    arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+                }
+            }
+
+
         }
         externalNativeBuild {
             cmake {
