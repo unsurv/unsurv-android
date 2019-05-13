@@ -5,10 +5,14 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Network;
 import com.android.volley.Request;
@@ -23,9 +27,13 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
+
+import okhttp3.internal.http2.ConnectionShutdownException;
 
 
 class SynchronizationUtils {
@@ -100,15 +108,15 @@ class SynchronizationUtils {
     // Start the queue
     mRequestQueue.start();
 
-   String url = baseURL + areaQuery;
+   String URL = baseURL + areaQuery;
 
     if (startQuery != null) {
-      url += "&" + startQuery;
+      URL += "&" + startQuery;
     }
 
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.GET,
-            url,
+            URL,
             null,
             new Response.Listener<JSONObject>() {
               @Override
@@ -165,5 +173,82 @@ class SynchronizationUtils {
     mRequestQueue.add(jsonObjectRequest);
 
   }
+
+
+  static void getAPIkey(final SharedPreferences sharedPreferences) {
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    String baseURL = sharedPreferences.getString("synchronizationURL", null);
+
+    String completeURL = baseURL + "getKey";
+
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            completeURL,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                List<SynchronizedCamera> camerasToSync = new ArrayList<>();
+
+
+                try {
+
+                  String key = response.getString("key");
+                  String expiration = response.getString("utcExpiration");
+
+                  sharedPreferences.edit().putString("apiKey", key).apply();
+                  sharedPreferences.edit().putString("apiKeyExpiration", expiration).apply();
+
+
+                } catch (Exception e) {
+                  Log.i(TAG, "onResponse: " + e.toString());
+
+                }
+
+              }
+            }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        // TODO: Handle Errors
+
+      }
+    })    {
+      @Override
+
+      public Map<String, String> getHeaders() throws AuthFailureError {
+
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.add(jsonObjectRequest);
+
+  }
+
 
 }

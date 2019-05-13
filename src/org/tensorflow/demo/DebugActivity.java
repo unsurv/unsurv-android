@@ -147,7 +147,12 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
     sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
+    sharedPreferences.edit().putBoolean("askForConnections", true).apply();
     sharedPreferences.edit().putBoolean("clusteringEnabled", true).apply();
+    sharedPreferences.edit().putString("apiKey", "abc").apply();
+    sharedPreferences.edit().putString("apiKeyExpiration", "2018-01-01 00:00:00").apply();
+
+
     // sharedPreferences.edit().putLong("minUploadDelay", 1000*60*60*24*10).apply();
     // sharedPreferences.edit().putLong("maxUploadDelay", 1000*60*60*24*48).apply();
 
@@ -210,6 +215,8 @@ public class DebugActivity extends AppCompatActivity {
         SynchronizationUtils.synchronizeCamerasWithServer(baseURL + "cameras/?",
                 "area=" + sharedPreferences.getString("area", null),
                 true, null, synchronizedCameraRepository);
+
+        SynchronizationUtils.getAPIkey(sharedPreferences);
 
 
       }
@@ -275,12 +282,14 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         debugTextView.setText(
-        sharedPreferences.getString("lastUpdated", "2018-01-01") + "\n" +
-        sharedPreferences.getString("synchronizationInterval", String.valueOf(15*60*1000)) + "\n" +
-        sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?") + "\n" +
-        sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888") + "\n" +
-        sharedPreferences.getBoolean("buttonCapture", false) + "\n" +
-        sharedPreferences.getString("timemachineValueInDays", "0"));
+                sharedPreferences.getString("lastUpdated", "2018-01-01") + "\n" +
+                sharedPreferences.getString("synchronizationInterval", String.valueOf(15*60*1000)) + "\n" +
+                sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?") + "\n" +
+                sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888") + "\n" +
+                sharedPreferences.getBoolean("buttonCapture", false) + "\n" +
+                sharedPreferences.getString("timemachineValueInDays", "0") + "\n" +
+                sharedPreferences.getString("apiKey", "ApiKeyFailed") + "\n" +
+                sharedPreferences.getString("apiKeyExpiration", "ApiKeyFailed"));
 
       }
     });

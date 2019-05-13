@@ -66,7 +66,7 @@ public class SynchronizedCameraRepository {
   }
 
 
-  public List<StatisticsMap> getPerDayStatistics(double latMin, double latMax, double lonMin, double lonMax, String startDate, String endDate) {
+  List<StatisticsMap> getPerDayStatistics(double latMin, double latMax, double lonMin, double lonMax, String startDate, String endDate) {
     try {
       this.startDate = startDate;
       this.endDate = endDate;

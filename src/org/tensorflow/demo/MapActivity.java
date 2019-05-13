@@ -37,6 +37,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Network;
 import com.android.volley.Request;
@@ -75,10 +76,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -142,8 +145,8 @@ public class MapActivity extends AppCompatActivity {
   private AreaOfflineAvailableRepository areaOfflineAvailableRepository;
   private List<AreaOfflineAvailable> areasOfflineAvailable = new ArrayList<>();
   private ImageButton refreshButton;
-  private SimpleDateFormat timestampIso8601;
-  private SimpleDateFormat timestampIso8601ForArea;
+  private SimpleDateFormat timestampIso8601DaysAccuracy;
+  private SimpleDateFormat timestampIso8601SecondsAccuracy;
   private Date latestUpdateForArea;
   private boolean timeBasedQuery;
   private double latMin;
@@ -188,10 +191,10 @@ public class MapActivity extends AppCompatActivity {
     mapScrollingEnabled = true;
     isInitialSpinnerSelection = true;
 
-    timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+    timestampIso8601DaysAccuracy = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    timestampIso8601DaysAccuracy.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-    timestampIso8601ForArea = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
     lastZoomLevel = 1000; // start high to always refresh on first redraw
 
@@ -743,7 +746,7 @@ public class MapActivity extends AppCompatActivity {
             for (AreaOfflineAvailable item : areasOfflineAvailable) {
               // use precise timings for areas
 
-              Date itemUpdate = timestampIso8601ForArea.parse(item.getLastUpdated());
+              Date itemUpdate = timestampIso8601SecondsAccuracy.parse(item.getLastUpdated());
 
 
               if (itemUpdate.after(latestUpdateForArea)) {
@@ -774,7 +777,9 @@ public class MapActivity extends AppCompatActivity {
                       MapView.LayoutParams.WRAP_CONTENT,
                       MapView.LayoutParams.WRAP_CONTENT);
 
-              if (!popupWindow.isShowing() && !allowServerQueries) {
+              boolean askForConnection = sharedPreferences.getBoolean("askForConnections", true);
+
+              if (!popupWindow.isShowing() && !allowServerQueries && askForConnection) {
                 // freeze map while popupWindow is showing
                 mapScrollingEnabled = false;
 
@@ -786,6 +791,8 @@ public class MapActivity extends AppCompatActivity {
 
                     if (dontAskAgainACheckBox.isChecked()) {
                       sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
+                      sharedPreferences.edit().putBoolean("askForConnections", false).apply();
+
                     }
 
                     allowOneServerQuery = true;
@@ -802,6 +809,8 @@ public class MapActivity extends AppCompatActivity {
 
                     if (dontAskAgainACheckBox.isChecked()) {
                       sharedPreferences.edit().putBoolean("allowServerQueries", false).apply();
+                      sharedPreferences.edit().putBoolean("askForConnections", false).apply();
+
                     }
                     popupWindow.dismiss();
                     mapScrollingEnabled = true;
@@ -833,7 +842,7 @@ public class MapActivity extends AppCompatActivity {
                 Date today = new Date(System.currentTimeMillis() - 1000*60);
 
                 if (latestUpdateForArea.before(today)) {
-                  String latestUpdate = timestampIso8601.format(latestUpdateForArea);
+                  String latestUpdate = timestampIso8601DaysAccuracy.format(latestUpdateForArea);
                   currentQuery = currentQuery.concat("&start=" + latestUpdate);
                   queryServerForCameras(currentQuery);
                   lastArea = areaString;
@@ -990,7 +999,7 @@ public class MapActivity extends AppCompatActivity {
 
           while (iter.hasNext()) {
             SynchronizedCamera nextCamera = iter.next();
-            Date cameraLastUpdated = timestampIso8601.parse(nextCamera.getLastUpdated());
+            Date cameraLastUpdated = timestampIso8601DaysAccuracy.parse(nextCamera.getLastUpdated());
             if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
 
 
@@ -1214,6 +1223,26 @@ public class MapActivity extends AppCompatActivity {
    */
   void queryServerForCameras(String queryString) {
 
+    // aborts current query if API key expired. starts same query after a new API key is aquired in refreshApiKeyAsyncTask
+    try {
+
+      Date apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(sharedPreferences.getString("apiKeyExpiration", null));
+
+      Date currentDate = new Date(System.currentTimeMillis());
+
+      if (apiKeyExpiration.before(currentDate)){
+
+        // abort current query
+        new refreshApiKeyAsyncTask().execute(queryString);
+        return;
+      }
+
+
+    } catch (ParseException pse) {
+      Log.i(TAG, "queryServerForCamera: " + pse.toString());
+    }
+
+
     camerasInAreaFromServer.clear();
 
     RequestQueue mRequestQueue;
@@ -1278,8 +1307,20 @@ public class MapActivity extends AppCompatActivity {
         // TODO: Handle different http Errors
         Log.i(TAG, "HTTP Error: " + error.toString());
       }
-    }
-    );
+
+    }) {
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+
+        return headers;
+      }
+    };
 
     jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
             30000,
@@ -1292,6 +1333,7 @@ public class MapActivity extends AppCompatActivity {
     if (allowOneServerQuery) {
       allowOneServerQuery = false; // used up single permission for querying
     }
+
     mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
 
       @Override
@@ -1314,7 +1356,7 @@ public class MapActivity extends AppCompatActivity {
           areaOfflineAvailableRepository.update(mostRecentArea);
         } else {
           long currentTimeInMillis = System.currentTimeMillis();
-          String currentIsoDate = timestampIso8601ForArea.format(new Date(currentTimeInMillis));
+          String currentIsoDate = timestampIso8601SecondsAccuracy.format(new Date(currentTimeInMillis));
           areaOfflineAvailableRepository.insert(new AreaOfflineAvailable(latMin, latMax, lonMin, lonMax, currentIsoDate));
         }
 
@@ -1326,6 +1368,31 @@ public class MapActivity extends AppCompatActivity {
     });
 
   }
+
+
+  // gets a new API key if it's expired. requeues original server query afterwards which checks for new API key.
+  private class refreshApiKeyAsyncTask extends AsyncTask<String, Void, String> {
+
+    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+
+
+    refreshApiKeyAsyncTask(){}
+
+    @Override
+    protected String doInBackground(String... params) {
+      SynchronizationUtils.getAPIkey(sharedPreferences);
+
+      return params[0];
+    }
+
+    @Override
+    protected void onPostExecute(String originalQuery) {
+
+      queryServerForCameras(originalQuery);
+    }
+  }
+
+
 
   SynchronizedCamera getCameraFromId(String uid, SynchronizedCameraRepository synchronizedCameraRepository){
 
