@@ -64,6 +64,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
     SynchronizationUtils.synchronizeCamerasWithServer(
             baseURL,
             areaQuery,
+            sharedPreferences,
             true,
             startQuery,
             synchronizedCameraRepository
@@ -107,6 +108,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
       SynchronizationUtils.synchronizeCamerasWithServer(
               baseURL,
               areaQuery,
+              sharedPreferences,
               true,
               startQuery,
               synchronizedCameraRepository

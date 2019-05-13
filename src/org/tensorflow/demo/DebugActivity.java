@@ -212,9 +212,13 @@ public class DebugActivity extends AppCompatActivity {
 
         String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
 
-        SynchronizationUtils.synchronizeCamerasWithServer(baseURL + "cameras/?",
+        SynchronizationUtils.synchronizeCamerasWithServer(
+                baseURL + "cameras/?",
                 "area=" + sharedPreferences.getString("area", null),
-                true, null, synchronizedCameraRepository);
+                sharedPreferences,
+                true,
+                null,
+                synchronizedCameraRepository);
 
         SynchronizationUtils.getAPIkey(sharedPreferences);
 

@@ -91,7 +91,7 @@ class SynchronizationUtils {
   }
 
 
-  static void synchronizeCamerasWithServer(String baseURL, String areaQuery, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
+  static void synchronizeCamerasWithServer(String baseURL, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
 
     //TODO check api for negative values in left right top bottom see if still correct
 
@@ -161,8 +161,20 @@ class SynchronizationUtils {
       public void onErrorResponse(VolleyError error) {
         // TODO: Handle Errors
       }
-    }
-    );
+    }) {
+      @Override
+
+      public Map<String, String> getHeaders() throws AuthFailureError {
+
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+
+        return headers;
+      }
+    };
 
     jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
             30000,
@@ -225,20 +237,7 @@ class SynchronizationUtils {
         // TODO: Handle Errors
 
       }
-    })    {
-      @Override
-
-      public Map<String, String> getHeaders() throws AuthFailureError {
-
-        Map<String, String> headers = new HashMap<>();
-        String apiKey = sharedPreferences.getString("apiKey", null);
-        headers.put("Authorization", apiKey);
-        headers.put("Content-Type", "application/json");
-
-
-        return headers;
-      }
-    };
+    });
 
     jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
             30000,
