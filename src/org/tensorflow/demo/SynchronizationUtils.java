@@ -4,12 +4,14 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -187,7 +189,7 @@ class SynchronizationUtils {
   }
 
 
-  static void getAPIkey(final SharedPreferences sharedPreferences) {
+  static void getAPIkey(final Context context, final SharedPreferences sharedPreferences) {
 
     RequestQueue mRequestQueue;
 
@@ -244,6 +246,18 @@ class SynchronizationUtils {
             0,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
     ));
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+
+        Intent intent = new Intent();
+        intent.setAction("org.unsurv.API_KEY_CHANGED");
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
+        localBroadcastManager.sendBroadcast(intent);
+      }
+    });
 
     mRequestQueue.add(jsonObjectRequest);
 

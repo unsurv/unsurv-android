@@ -220,9 +220,6 @@ public class DebugActivity extends AppCompatActivity {
                 null,
                 synchronizedCameraRepository);
 
-        SynchronizationUtils.getAPIkey(sharedPreferences);
-
-
       }
     });
 

@@ -1,7 +1,9 @@
 package org.tensorflow.demo;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +13,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -171,6 +174,12 @@ public class MapActivity extends AppCompatActivity {
 
   private TextView amountOnMap;
 
+  private LocalBroadcastManager localBroadcastManager;
+  private IntentFilter intentFilter;
+  private BroadcastReceiver br;
+
+  private boolean abortedServerQuery;
+
 
   // TODO set max amount visible
 
@@ -181,6 +190,8 @@ public class MapActivity extends AppCompatActivity {
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
     areaOfflineAvailableRepository = new AreaOfflineAvailableRepository(getApplication());
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+    localBroadcastManager = LocalBroadcastManager.getInstance(MapActivity.this);
 
     picturesPath = Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
@@ -286,6 +297,7 @@ public class MapActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         if (!offlineMode) {
+          sharedPreferences.edit().putString("apiKeyExpiration", "2018-12-12 00:00:00").apply();
           queryServerForCameras("area=" + areaString);
         } else {
           updateAllCamerasInArea(true);
@@ -550,7 +562,28 @@ public class MapActivity extends AppCompatActivity {
   @Override
   protected void onResume() {
     super.onResume();
+
+    br = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        reloadMarker();
+      }
+    };
+
+    intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
+
+    localBroadcastManager.registerReceiver(br, intentFilter);
+
     reloadMarker();
+  }
+
+  @Override
+  protected void onPause() {
+
+  localBroadcastManager.unregisterReceiver(br);
+
+  super.onPause();
+
   }
 
   @Override
@@ -595,6 +628,11 @@ public class MapActivity extends AppCompatActivity {
 
 
   private void reloadMarker() {
+
+    if (abortedServerQuery) {
+      queryServerForCameras(lastArea);
+      abortedServerQuery = false;
+    }
 
     if (mCurrentBackgroundMarkerLoaderTask == null) {
       // start background load
@@ -924,10 +962,6 @@ public class MapActivity extends AppCompatActivity {
 
   private void redrawMarkers(List<SynchronizedCamera> camerasToDisplay) {
 
-
-
-    // TODO cant remove clusterOverlay without breaking it.
-
     itemsToDisplay.clear();
     overlayItemsToDisplay.clear();
 
@@ -1231,9 +1265,11 @@ public class MapActivity extends AppCompatActivity {
       Date currentDate = new Date(System.currentTimeMillis());
 
       if (apiKeyExpiration.before(currentDate)){
-
+        SynchronizationUtils.getAPIkey(getApplicationContext(), sharedPreferences);
+        //new refreshApiKeyAsyncTask().execute(queryString);
+        abortedServerQuery = true;
+        lastArea = queryString;
         // abort current query
-        new refreshApiKeyAsyncTask().execute(queryString);
         return;
       }
 
@@ -1367,38 +1403,6 @@ public class MapActivity extends AppCompatActivity {
       }
     });
 
-  }
-
-
-  // gets a new API key if it's expired. requeues original server query afterwards which checks for new API key.
-  private class refreshApiKeyAsyncTask extends AsyncTask<String, Void, String> {
-
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
-
-
-    refreshApiKeyAsyncTask(){}
-
-    @Override
-    protected String doInBackground(String... params) {
-      SynchronizationUtils.getAPIkey(sharedPreferences);
-
-      return params[0];
-    }
-
-    @Override
-    protected void onPostExecute(String originalQuery) {
-
-      queryServerForCameras(originalQuery);
-    }
-  }
-
-
-
-  SynchronizedCamera getCameraFromId(String uid, SynchronizedCameraRepository synchronizedCameraRepository){
-
-
-
-    return null;
   }
 
 }

@@ -97,7 +97,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
     @Override
     protected Void doInBackground(Void... params) {
-      SynchronizationUtils.getAPIkey(sharedPreferences);
+      SynchronizationUtils.getAPIkey(getApplicationContext(), sharedPreferences);
 
       return null;
     }

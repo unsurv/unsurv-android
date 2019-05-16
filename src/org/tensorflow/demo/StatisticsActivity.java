@@ -1,10 +1,14 @@
 package org.tensorflow.demo;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +29,7 @@ import com.android.volley.toolbox.NoCache;
 
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -67,6 +72,13 @@ public class StatisticsActivity extends AppCompatActivity {
   private int totalLocal28Days;
   private int totalLocal;
   private int totalByUser;
+
+  private SimpleDateFormat timestampIso8601SecondsAccuracy;
+
+
+  private LocalBroadcastManager localBroadcastManager;
+  private IntentFilter intentFilter;
+  private BroadcastReceiver br;
 
 
 
@@ -131,8 +143,10 @@ public class StatisticsActivity extends AppCompatActivity {
     local28DaysTextView.setText(String.valueOf(totalLocal28Days));
     totalByUserTextView.setText(String.valueOf(totalByUser));
 
-    String baseURL = sharedPreferences.getString("synchronizationURL", null);
+    localBroadcastManager = LocalBroadcastManager.getInstance(StatisticsActivity.this);
 
+
+    String baseURL = sharedPreferences.getString("synchronizationURL", null);
     queryServerForStatistics(baseURL, "global", "2018-01-01", "2019-01-01");
 
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
@@ -172,6 +186,30 @@ public class StatisticsActivity extends AppCompatActivity {
     });
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_stats).setChecked(true);
+  }
+
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    br = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        String baseURL = sharedPreferences.getString("synchronizationURL", null);
+        queryServerForStatistics(baseURL, "global", "2018-01-01", "2019-01-01");
+      }
+    };
+
+    intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
+
+    localBroadcastManager.registerReceiver(br, intentFilter);
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    localBroadcastManager.unregisterReceiver(br);
   }
 
   @Override
@@ -215,6 +253,26 @@ public class StatisticsActivity extends AppCompatActivity {
 
     final String TAG = "StatisticsUtils";
     //TODO check api for negative values in left right top bottom see if still correct
+
+    try {
+      String apiKeyExpirationString = sharedPreferences.getString("apiKeyExpiration", null);
+      timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+      Date apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(apiKeyExpirationString);
+
+      Date currentDate = new Date(System.currentTimeMillis());
+
+      if (apiKeyExpiration.before(currentDate)){
+        SynchronizationUtils.getAPIkey(getApplicationContext(), sharedPreferences);
+
+        // abort current query
+        return;
+      }
+
+
+    } catch (ParseException pse) {
+      Log.i(TAG, "queryServerForCamera: " + pse.toString());
+    }
+
 
     RequestQueue mRequestQueue;
 
