@@ -130,7 +130,15 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
           mapController.setZoom(15.0);
           mapController.setCenter(cameraLocation);
 
-          detailTimestamp.setText(mSurveillanceCameras.get(currentPosition).getTimestamp());
+          String timestamp = mSurveillanceCameras.get(currentPosition).getTimestamp();
+
+          if (timestamp != null) {
+            detailTimestamp.setText(timestamp);
+
+          } else {
+            detailTimestamp.setText("Enable \"Show actual Timestamps\" in Settings");
+          }
+
           detailUpload.setText(mSurveillanceCameras.get(currentPosition).getTimeToSync());
 
           Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(view.getContext().getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);

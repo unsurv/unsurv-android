@@ -36,13 +36,14 @@
         android:title="Enable clustering of markers"
         android:key="clusteringEnabled"/>
 
+    <SwitchPreference
+        android:title="Enable clustering of markers"
+        android:key="showCaptureTimestamps"/>
+
     <ListPreference
         android:title="Maximum simultaneous markers on the map"
         android:key="maxMapMarkers"
         android:entries="@array/max_marker_choices"
         android:entryValues="@array/max_marker_values"/>
-
-
-
 
 </PreferenceScreen>

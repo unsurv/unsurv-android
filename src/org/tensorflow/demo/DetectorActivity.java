@@ -864,20 +864,47 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     Random random = new Random();
 
-    long randomDelay = Math.round(sharedPreferences.getLong("syncDelay", 1000*60*60*24) * random.nextDouble());
+    long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*3) * 1000;
+    long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
 
+    long timeframe = maxDelay - minDelay;
+
+    long randomDelay = Math.round(timeframe * random.nextDouble()); // minDelay < x < maxDelay
+
+    random.nextLong();
     currentTime = System.currentTimeMillis();
 
-    cameraRepository.insert(new SurveillanceCamera(
-            biggestConfidence.getThumbnailPath(),
-            biggestConfidence.getImagePath(),
-            cameraEstimate.getLatitude(),
-            cameraEstimate.getLongitude(),
-            sharedPreferences.getString("comment", "no comment"),
-            timestampIso8601.format(new Date(currentTime)),
-            timestampIso8601.format(new Date(currentTime + randomDelay))
+    boolean useTimestamp = sharedPreferences.getBoolean("showCaptureTimestamps", false);
 
-            ));
+    if (useTimestamp) {
+
+      cameraRepository.insert(new SurveillanceCamera(
+              biggestConfidence.getThumbnailPath(),
+              biggestConfidence.getImagePath(),
+              cameraEstimate.getLatitude(),
+              cameraEstimate.getLongitude(),
+              sharedPreferences.getString("comment", "no comment"),
+              timestampIso8601.format(new Date(currentTime)),
+              timestampIso8601.format(new Date(currentTime + randomDelay))
+
+      ));
+
+    } else {
+
+      cameraRepository.insert(new SurveillanceCamera(
+              biggestConfidence.getThumbnailPath(),
+              biggestConfidence.getImagePath(),
+              cameraEstimate.getLatitude(),
+              cameraEstimate.getLongitude(),
+              sharedPreferences.getString("comment", "no comment"),
+              null,
+              timestampIso8601.format(new Date(currentTime + randomDelay))
+
+      ));
+
+    }
+
+
 
 
   }
