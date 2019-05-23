@@ -574,6 +574,8 @@ public class MapActivity extends AppCompatActivity {
 
     localBroadcastManager.registerReceiver(br, intentFilter);
 
+    Toast.makeText(MapActivity.this, "Server authorization refreshed, please repeat your last action", Toast.LENGTH_LONG).show();
+
     reloadMarker();
   }
 

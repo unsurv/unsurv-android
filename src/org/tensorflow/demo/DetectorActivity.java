@@ -874,18 +874,20 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     random.nextLong();
     currentTime = System.currentTimeMillis();
 
-    boolean useTimestamp = sharedPreferences.getBoolean("showCaptureTimestamps", false);
+    boolean useTimestamp = sharedPreferences.getBoolean("enableCaptureTimestamps", false);
 
     if (useTimestamp) {
 
       cameraRepository.insert(new SurveillanceCamera(
               biggestConfidence.getThumbnailPath(),
               biggestConfidence.getImagePath(),
+              null,
               cameraEstimate.getLatitude(),
               cameraEstimate.getLongitude(),
               sharedPreferences.getString("comment", "no comment"),
               timestampIso8601.format(new Date(currentTime)),
-              timestampIso8601.format(new Date(currentTime + randomDelay))
+              timestampIso8601.format(new Date(currentTime + randomDelay)),
+              false
 
       ));
 
@@ -894,11 +896,13 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       cameraRepository.insert(new SurveillanceCamera(
               biggestConfidence.getThumbnailPath(),
               biggestConfidence.getImagePath(),
+              null,
               cameraEstimate.getLatitude(),
               cameraEstimate.getLongitude(),
               sharedPreferences.getString("comment", "no comment"),
               null,
-              timestampIso8601.format(new Date(currentTime + randomDelay))
+              timestampIso8601.format(new Date(currentTime + randomDelay)),
+              false
 
       ));
 

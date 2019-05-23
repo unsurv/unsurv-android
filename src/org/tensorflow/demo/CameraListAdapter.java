@@ -1,10 +1,12 @@
 package org.tensorflow.demo;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -103,8 +105,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
           Log.i("holder onClick:", "clicked position: " + holder.getAdapterPosition());
 
 
-
-
           int currentPosition = holder.getAdapterPosition();
           SurveillanceCamera currentCamera = mSurveillanceCameras.get(currentPosition);
 
@@ -136,7 +136,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
             detailTimestamp.setText(timestamp);
 
           } else {
-            detailTimestamp.setText("Enable \"Show actual Timestamps\" in Settings");
+            detailTimestamp.setText(" \"Enable Capture Timestamps\" in Settings");
           }
 
           detailUpload.setText(mSurveillanceCameras.get(currentPosition).getTimeToSync());

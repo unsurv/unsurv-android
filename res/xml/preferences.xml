@@ -37,8 +37,8 @@
         android:key="clusteringEnabled"/>
 
     <SwitchPreference
-        android:title="Enable clustering of markers"
-        android:key="showCaptureTimestamps"/>
+        android:title="Enable timestamps for captures"
+        android:key="enableCaptureTimestamps"/>
 
     <ListPreference
         android:title="Maximum simultaneous markers on the map"

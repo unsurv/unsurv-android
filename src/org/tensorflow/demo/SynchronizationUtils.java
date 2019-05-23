@@ -12,6 +12,7 @@ import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.JsonWriter;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -25,8 +26,13 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NoCache;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,7 +99,7 @@ class SynchronizationUtils {
   }
 
 
-  static void synchronizeCamerasWithServer(String baseURL, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
+  static void synchronizeCamerasWithServer(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
 
     //TODO check api for negative values in left right top bottom see if still correct
 
@@ -110,7 +116,7 @@ class SynchronizationUtils {
     // Start the queue
     mRequestQueue.start();
 
-   String URL = baseURL + areaQuery;
+   String URL = baseUrl + areaQuery;
 
     if (startQuery != null) {
       URL += "&" + startQuery;
@@ -165,14 +171,12 @@ class SynchronizationUtils {
       }
     }) {
       @Override
-
       public Map<String, String> getHeaders() throws AuthFailureError {
 
         Map<String, String> headers = new HashMap<>();
         String apiKey = sharedPreferences.getString("apiKey", null);
         headers.put("Authorization", apiKey);
         headers.put("Content-Type", "application/json");
-
 
         return headers;
       }
@@ -256,6 +260,107 @@ class SynchronizationUtils {
         intent.setAction("org.unsurv.API_KEY_CHANGED");
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
         localBroadcastManager.sendBroadcast(intent);
+      }
+    });
+
+    mRequestQueue.add(jsonObjectRequest);
+
+  }
+
+
+  static void uploadSurveillanceCamera(List<SurveillanceCamera> camerasToUpload, String url, final SharedPreferences sharedPreferences) {
+
+    JSONArray jsonArray = new JSONArray();
+
+    for (SurveillanceCamera element : camerasToUpload) {
+      JSONObject tmpJsonObject = new JSONObject();
+
+      try {
+
+        tmpJsonObject.put("lat", element.getLatitude());
+        tmpJsonObject.put("lon", element.getLongitude());
+
+
+      } catch (JSONException jse) {
+        Log.i(TAG, "JsonException: " + jse.toString());
+      }
+
+      jsonArray.put(tmpJsonObject);
+    }
+
+
+    JSONObject postObject = new JSONObject();
+
+
+    try {
+
+      postObject.put("cameras", jsonArray);
+
+    } catch (JSONException jse) {
+      Log.i(TAG, "JsonException: " + jse.toString());
+    }
+
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            postObject,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                try {
+
+                  response.getString("updated_info");
+
+                } catch (JSONException jse) {
+                  Log.i(TAG, "JsonException in response: " + jse.toString());
+                }
+
+              }
+            },
+
+            new Response.ErrorListener() {
+              @Override
+              public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "error in ");
+
+              }
+            }
+    ){
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+        Log.i(TAG, "post request finished");
       }
     });
 

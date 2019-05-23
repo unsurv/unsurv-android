@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.TimeZone;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
@@ -82,6 +83,12 @@ public class DebugActivity extends AppCompatActivity {
   private List<SynchronizedCamera> camerasToSync;
 
   private WifiManager wifiManager;
+
+  private static String picturesPath = Environment.getExternalStoragePublicDirectory(
+          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
+
+  private int randomCamerasAdded;
+  private List<SurveillanceCamera> randomCameras = new ArrayList<>();
 
 
 
@@ -131,8 +138,13 @@ public class DebugActivity extends AppCompatActivity {
     final Button debugTutorial = findViewById(R.id.start_tutorial);
     final Button debugCheckJobs = findViewById(R.id.check_jobs);
     final Button debugShowPrefs = findViewById(R.id.show_preferences);
+    final Button addCam = findViewById(R.id.add_surveilllance_camera);
+    final Button uploadCameras = findViewById(R.id.upload_cameras);
+    final Button getKeyButton = findViewById(R.id.get_key);
 
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
+
+    randomCamerasAdded = 0;
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -296,6 +308,59 @@ public class DebugActivity extends AppCompatActivity {
       }
     });
 
+    addCam.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        Random random = new Random();
+        String nullOrDate;
+
+        if (random.nextFloat() < 0.5) {
+          nullOrDate = null;
+        } else {
+          nullOrDate = "2018-01-02";
+        }
+
+
+        SurveillanceCamera randomCamera = new SurveillanceCamera(
+                picturesPath + "test_nexus_10.jpg",
+                picturesPath + "test_nexus_10.jpg",
+                null,
+                50.000,
+                8.0000,
+                "asd",
+                nullOrDate,
+                "2019-05-30",
+                false);
+        CameraRepository cameraRepository = new CameraRepository(getApplication());
+        cameraRepository.insert(randomCamera);
+
+        randomCameras.add(randomCamera);
+
+        randomCamerasAdded += 1;
+
+        debugTextView.setText(randomCamerasAdded + " random cameras added");
+
+      }
+    });
+
+    uploadCameras.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        String url = sharedPreferences.getString("synchronizationURL", null) + "cameras/upload";
+        SynchronizationUtils.uploadSurveillanceCamera(randomCameras, url, sharedPreferences);
+      }
+    });
+
+    getKeyButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        SynchronizationUtils.getAPIkey(DebugActivity.this, sharedPreferences);
+      }
+    });
+
+
+
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -333,11 +398,14 @@ public class DebugActivity extends AppCompatActivity {
     SurveillanceCamera testCamera = new SurveillanceCamera(
             "asd",
             "asd",
+            null,
             50.000,
             8.0000,
             "asd",
             null,
-            "2019-05-30");
+            "2019-05-30",
+            false);
+
     CameraRepository cameraRepository = new CameraRepository(getApplication());
     cameraRepository.insert(testCamera);
 

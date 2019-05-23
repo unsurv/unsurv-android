@@ -3,6 +3,7 @@ package org.tensorflow.demo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 
 @Entity(tableName = "local_surveillance_cameras")
@@ -15,6 +16,9 @@ public class SurveillanceCamera {
 
   private String imagePath;
 
+  @Nullable
+  private String externalId;
+
   private double latitude;
   private double longitude;
 
@@ -23,18 +27,23 @@ public class SurveillanceCamera {
   private String timestamp;
   private String timeToSync; // time where photo was taken + random delay for privacy reasons
 
+  private boolean uploadCompleted;
+
 
   public SurveillanceCamera(String thumbnailPath,
                        String imagePath,
+                       @Nullable String externalId,
                        double latitude,
                        double longitude,
-
                        String comment,
                        String timestamp,
-                       String timeToSync){
+                       String timeToSync,
+                       boolean uploadCompleted){
 
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;
+
+    this.externalId = externalId;
 
     this.latitude = latitude;
     this.longitude = longitude;
@@ -43,6 +52,8 @@ public class SurveillanceCamera {
 
     this.timestamp = timestamp;
     this.timeToSync = timeToSync;
+
+    this.uploadCompleted = uploadCompleted;
 
 
   }
@@ -61,6 +72,10 @@ public class SurveillanceCamera {
     return imagePath;
   }
 
+  @Nullable
+  public String getExternalId() {
+    return externalId;
+  }
 
   public double getLatitude() {
     return latitude;
@@ -78,6 +93,9 @@ public class SurveillanceCamera {
   public String getTimestamp() { return timestamp; }
 
   public String getTimeToSync() { return timeToSync; }
+  public boolean getUploadCompleted(){
+    return uploadCompleted;
+  }
 
   public void setId(int id) {
     this.id = id;
@@ -89,6 +107,10 @@ public class SurveillanceCamera {
 
   public void setImagePath(String ImagePath) {
     this.imagePath = ImagePath;
+  }
+
+  public void setExternalId(@Nullable String externalId) {
+    this.externalId = externalId;
   }
 
   public void setLatitude(double Latitude) {
@@ -106,4 +128,6 @@ public class SurveillanceCamera {
   public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
 
   public void setTimeToSync(String timeToSync) { this.timeToSync = timeToSync; }
+
+  public void setUploadCompleted(boolean uploadCompleted){this.uploadCompleted = uploadCompleted; }
 }

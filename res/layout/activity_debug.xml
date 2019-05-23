@@ -83,6 +83,24 @@
             android:layout_height="wrap_content"
             android:text="SHOW PREFS"/>
 
+        <Button
+            android:id="@+id/add_surveilllance_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ADD CAM"/>
+
+        <Button
+            android:id="@+id/upload_cameras"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UPLOAD"/>
+
+        <Button
+            android:id="@+id/get_key"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="KEY"/>
+
     </LinearLayout>
 
 
@@ -90,8 +108,7 @@
     <TextView
         android:id="@+id/debug_textview"
         android:layout_width="match_parent"
-        android:layout_height="0sp"
-        android:layout_weight="6"
+        android:layout_height="wrap_content"
         android:text="This is a debug-activity"/>
 
 
