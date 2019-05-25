@@ -268,18 +268,22 @@ class SynchronizationUtils {
   }
 
 
-  static void uploadSurveillanceCamera(List<SurveillanceCamera> camerasToUpload, String url, final SharedPreferences sharedPreferences) {
+  static void uploadSurveillanceCamera(List<SurveillanceCamera> camerasToUpload, String url, final SharedPreferences sharedPreferences, final CameraRepository cameraRepository) {
 
     JSONArray jsonArray = new JSONArray();
 
-    for (SurveillanceCamera element : camerasToUpload) {
+    final HashMap<Integer, SurveillanceCamera> cameraMap = new HashMap<>();
+
+    for (int i=0; i < camerasToUpload.size(); i++) {
       JSONObject tmpJsonObject = new JSONObject();
 
       try {
 
-        tmpJsonObject.put("lat", element.getLatitude());
-        tmpJsonObject.put("lon", element.getLongitude());
+        tmpJsonObject.put("lat", camerasToUpload.get(i).getLatitude());
+        tmpJsonObject.put("lon", camerasToUpload.get(i).getLongitude());
+        tmpJsonObject.put("tmp_id", i);
 
+        cameraMap.put(i, camerasToUpload.get(i));
 
       } catch (JSONException jse) {
         Log.i(TAG, "JsonException: " + jse.toString());
@@ -322,7 +326,24 @@ class SynchronizationUtils {
 
                 try {
 
-                  response.getString("updated_info");
+                  JSONArray updatedInfo = response.getJSONArray("updated_info");
+
+                  for (int j = 0; j < updatedInfo.length(); j++){
+
+                    SurveillanceCamera currentCamera = cameraMap.get(j);
+
+                    JSONObject updatedInfoForCamera = updatedInfo.getJSONObject(j);
+
+                    String idSetByServer = updatedInfoForCamera.getString(String.valueOf(j));
+
+                    currentCamera.setExternalId(idSetByServer);
+                    currentCamera.setLocationUploaded(true);
+
+                    cameraRepository.updateCameras(currentCamera);
+
+                  }
+
+
 
                 } catch (JSONException jse) {
                   Log.i(TAG, "JsonException in response: " + jse.toString());

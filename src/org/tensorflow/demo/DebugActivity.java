@@ -171,6 +171,8 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putInt("minUploadDelay", 86400).apply(); // multiply by 1000 when called to get real value in ms
     sharedPreferences.edit().putInt("maxUploadDelay", 604800).apply();
 
+    SynchronizationUtils.getAPIkey(DebugActivity.this, sharedPreferences);
+
 
     // set in timemachineSpinner
     // sharedPreferences.edit().putInt("timemachineValue", null).apply();
@@ -328,8 +330,8 @@ public class DebugActivity extends AppCompatActivity {
                 picturesPath + "test_nexus_10.jpg",
                 picturesPath + "test_nexus_10.jpg",
                 null,
-                50.000,
-                8.0000,
+                50.000 * random.nextFloat(),
+                8.0000 * random.nextFloat(),
                 "asd",
                 nullOrDate,
                 "2019-05-30",
@@ -352,7 +354,7 @@ public class DebugActivity extends AppCompatActivity {
       public void onClick(View view) {
         allCameras = cameraRepository.getAllCameras();
         String url = sharedPreferences.getString("synchronizationURL", null) + "cameras/upload";
-        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences);
+        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences, cameraRepository);
       }
     });
 
