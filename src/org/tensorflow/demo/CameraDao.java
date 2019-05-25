@@ -41,6 +41,9 @@ public interface CameraDao {
   @Query("SELECT * from local_surveillance_cameras")
   List<SurveillanceCamera> getAllCameras();
 
+  @Query("SELECT * from local_surveillance_cameras WHERE locationUploaded")
+  List<SurveillanceCamera> getCamerasForImageUpload();
+
 
 }
 // example db timestamp 2018-09-17T15:26:33+0000

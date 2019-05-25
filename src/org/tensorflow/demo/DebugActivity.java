@@ -327,7 +327,7 @@ public class DebugActivity extends AppCompatActivity {
 
 
         SurveillanceCamera randomCamera = new SurveillanceCamera(
-                picturesPath + "test_nexus_10.jpg",
+                picturesPath + "test_pixel_2.jpg",
                 picturesPath + "test_nexus_10.jpg",
                 null,
                 50.000 * random.nextFloat(),
@@ -340,8 +340,6 @@ public class DebugActivity extends AppCompatActivity {
         CameraRepository cameraRepository = new CameraRepository(getApplication());
         cameraRepository.insert(randomCamera);
 
-
-
         randomCamerasAdded += 1;
 
         debugTextView.setText(randomCamerasAdded + " random cameras added");
@@ -353,7 +351,7 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         allCameras = cameraRepository.getAllCameras();
-        String url = sharedPreferences.getString("synchronizationURL", null) + "cameras/upload";
+        String url = sharedPreferences.getString("synchronizationURL", null) + "cameras/upload/location";
         SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences, cameraRepository);
       }
     });
@@ -366,12 +364,9 @@ public class DebugActivity extends AppCompatActivity {
     });
 
 
-
-
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-    String picturesPath = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
+
 
 
 
@@ -402,7 +397,7 @@ public class DebugActivity extends AppCompatActivity {
     List<CameraCapture> captureListTest = Arrays.asList(cameraCapture1, cameraCapture2, cameraCapture3, cameraCapture4);
 
     SurveillanceCamera testCamera = new SurveillanceCamera(
-            "asd",
+            picturesPath + "test_pixel_2.jpg",
             "asd",
             null,
             50.000,

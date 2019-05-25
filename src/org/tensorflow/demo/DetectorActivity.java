@@ -751,11 +751,11 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         int widthThumbnail = Math.round(location.width());
         int heightThumbnail = Math.round(location.height());
 
-        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
 
         thumbnailOut = new FileOutputStream(thumbnailFile);
         Bitmap thumbnail = Bitmap.createBitmap(croppedBitmap, xThumbnail, yThumbnail, widthThumbnail, heightThumbnail);
-        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, thumbnailOut);
+        thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, thumbnailOut);
 
         int cameraLeft = Math.round(location.left);
         int cameraRight = Math.round(location.right);

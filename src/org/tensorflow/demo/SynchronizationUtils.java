@@ -7,11 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Base64;
 import android.util.JsonWriter;
 import android.util.Log;
 
@@ -32,6 +35,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +52,9 @@ import okhttp3.internal.http2.ConnectionShutdownException;
 
 
 class SynchronizationUtils {
+
+  private static String picturesPath = Environment.getExternalStoragePublicDirectory(
+          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
   private static String TAG = "SynchronizationUtils";
 
@@ -268,9 +278,9 @@ class SynchronizationUtils {
   }
 
 
-  static void uploadSurveillanceCamera(List<SurveillanceCamera> camerasToUpload, String url, final SharedPreferences sharedPreferences, final CameraRepository cameraRepository) {
+  static void uploadSurveillanceCamera(List<SurveillanceCamera> camerasToUpload, final String url, final SharedPreferences sharedPreferences, final CameraRepository cameraRepository) {
 
-    JSONArray jsonArray = new JSONArray();
+    JSONArray postArray = new JSONArray();
 
     final HashMap<Integer, SurveillanceCamera> cameraMap = new HashMap<>();
 
@@ -289,21 +299,18 @@ class SynchronizationUtils {
         Log.i(TAG, "JsonException: " + jse.toString());
       }
 
-      jsonArray.put(tmpJsonObject);
+      postArray.put(tmpJsonObject);
     }
-
 
     JSONObject postObject = new JSONObject();
 
-
     try {
 
-      postObject.put("cameras", jsonArray);
+      postObject.put("cameras", postArray);
 
     } catch (JSONException jse) {
       Log.i(TAG, "JsonException: " + jse.toString());
     }
-
 
     RequestQueue mRequestQueue;
 
@@ -343,7 +350,10 @@ class SynchronizationUtils {
 
                   }
 
+                  String imageUploadUrl = sharedPreferences.getString("synchronizationURL", null) + "cameras/upload/image";
 
+
+                  uploadImages(cameraRepository, imageUploadUrl, sharedPreferences);
 
                 } catch (JSONException jse) {
                   Log.i(TAG, "JsonException in response: " + jse.toString());
@@ -389,5 +399,147 @@ class SynchronizationUtils {
 
   }
 
+
+  static void uploadImages(CameraRepository cameraRepository, String url, final SharedPreferences sharedPreferences) {
+
+    List<SurveillanceCamera> cameras = cameraRepository.getCamerasForImageUpload();
+
+    HashMap<String, String> idToEncodedImageMap = new HashMap<>();
+
+    JSONArray postArray = new JSONArray();
+
+    byte[] imageAsBytes;
+    String imageAsBase64;
+
+    for (SurveillanceCamera camera : cameras){
+
+      File imageFile = new File(camera.getThumbnailPath());
+      JSONObject singleCamera = new JSONObject();
+
+      try {
+
+        imageAsBytes = readFileToBytes(imageFile);
+
+        imageAsBase64 =  Base64.encodeToString(imageAsBytes, Base64.DEFAULT);
+
+        idToEncodedImageMap.put(camera.getExternalId(), imageAsBase64);
+
+        singleCamera.put(camera.getExternalId(), imageAsBase64);
+
+        postArray.put(singleCamera);
+
+      } catch (Exception e){
+        Log.i(TAG, "convertFileToBase64: " + e.toString());
+      }
+
+    }
+
+    JSONObject postObject = new JSONObject();
+
+    try {
+
+      postObject.put("images", postArray);
+
+    } catch (JSONException jse) {
+      Log.i(TAG, "postJSON: " + jse.toString());
+    }
+
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            postObject,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                try {
+
+                  JSONObject updatedInfo = response.getJSONObject("message");
+                  //JSONArray serverInfo = response.getJSONArray("status");
+
+                } catch (JSONException jse) {
+                  Log.i(TAG, "JsonException in response: " + jse.toString());
+                }
+
+              }
+            },
+
+            new Response.ErrorListener() {
+              @Override
+              public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "error in ");
+
+              }
+            }
+    ){
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+        Log.i(TAG, "post request finished");
+      }
+    });
+
+    mRequestQueue.add(jsonObjectRequest);
+
+
+  }
+
+
+
+  static byte[] readFileToBytes(File f) throws IOException {
+    int size = (int) f.length();
+    byte[] bytes = new byte[size];
+    byte[] tmpBuff = new byte[size];
+    FileInputStream fis = new FileInputStream(f);
+
+    try {
+
+      int read = fis.read(bytes, 0, size);
+      if (read < size) {
+        int remain = size - read;
+        while (remain > 0) {
+          read = fis.read(tmpBuff, 0, remain);
+          System.arraycopy(tmpBuff, 0, bytes, size - remain, read);
+          remain -= read;
+        }
+      }
+    }  catch (IOException e){
+      throw e;
+    } finally {
+      fis.close();
+    }
+
+    return bytes;
+  }
 
 }
