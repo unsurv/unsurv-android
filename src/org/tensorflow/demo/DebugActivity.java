@@ -88,7 +88,8 @@ public class DebugActivity extends AppCompatActivity {
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
   private int randomCamerasAdded;
-  private List<SurveillanceCamera> randomCameras = new ArrayList<>();
+  private List<SurveillanceCamera> allCameras = new ArrayList<>();
+  private CameraRepository cameraRepository;
 
 
 
@@ -142,6 +143,7 @@ public class DebugActivity extends AppCompatActivity {
     final Button uploadCameras = findViewById(R.id.upload_cameras);
     final Button getKeyButton = findViewById(R.id.get_key);
 
+    cameraRepository = new CameraRepository(getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
 
     randomCamerasAdded = 0;
@@ -331,11 +333,12 @@ public class DebugActivity extends AppCompatActivity {
                 "asd",
                 nullOrDate,
                 "2019-05-30",
+                false,
                 false);
         CameraRepository cameraRepository = new CameraRepository(getApplication());
         cameraRepository.insert(randomCamera);
 
-        randomCameras.add(randomCamera);
+
 
         randomCamerasAdded += 1;
 
@@ -347,8 +350,9 @@ public class DebugActivity extends AppCompatActivity {
     uploadCameras.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
+        allCameras = cameraRepository.getAllCameras();
         String url = sharedPreferences.getString("synchronizationURL", null) + "cameras/upload";
-        SynchronizationUtils.uploadSurveillanceCamera(randomCameras, url, sharedPreferences);
+        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences);
       }
     });
 
@@ -404,6 +408,7 @@ public class DebugActivity extends AppCompatActivity {
             "asd",
             null,
             "2019-05-30",
+            false,
             false);
 
     CameraRepository cameraRepository = new CameraRepository(getApplication());

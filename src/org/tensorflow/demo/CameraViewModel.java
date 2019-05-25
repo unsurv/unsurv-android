@@ -14,7 +14,7 @@ public class CameraViewModel extends AndroidViewModel {
   public CameraViewModel(Application application) {
     super(application);
     mRepository = new CameraRepository(application);
-    mAllCameras = mRepository.getAllCameras();
+    mAllCameras = mRepository.getAllCamerasAsLiveData();
   }
 
   LiveData<List<SurveillanceCamera>> getAllCameras() {

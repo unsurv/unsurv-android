@@ -887,6 +887,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               sharedPreferences.getString("comment", "no comment"),
               timestampIso8601.format(new Date(currentTime)),
               timestampIso8601.format(new Date(currentTime + randomDelay)),
+              false,
               false
 
       ));
@@ -902,6 +903,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               sharedPreferences.getString("comment", "no comment"),
               null,
               timestampIso8601.format(new Date(currentTime + randomDelay)),
+              false,
               false
 
       ));

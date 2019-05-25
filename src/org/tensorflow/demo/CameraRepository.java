@@ -16,10 +16,10 @@ public class CameraRepository {
   CameraRepository(Application application) {
     CameraRoomDatabase db = CameraRoomDatabase.getDatabase(application);
     mCameraDao = db.surveillanceCameraDao();
-    mAllSurveillanceCameras = mCameraDao.getAllCameras();
+    mAllSurveillanceCameras = mCameraDao.getAllCamerasAsLiveData();
   }
 
-  LiveData<List<SurveillanceCamera>> getAllCameras() {
+  LiveData<List<SurveillanceCamera>> getAllCamerasAsLiveData() {
       return mAllSurveillanceCameras;
   }
 
@@ -35,6 +35,23 @@ public class CameraRepository {
       Log.i("Background findByID Error: " , e.toString());
       return 0;
     }
+  }
+
+  public void updateCameras (SurveillanceCamera... surveillanceCameras) {
+    new updateAsyncTask(mCameraDao).execute(surveillanceCameras);
+  }
+
+
+  public List<SurveillanceCamera> getAllCameras(){
+
+    try {
+      return new getAllCamerasAsyncTask(mCameraDao).execute().get();
+
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+      return null;
+    }
+
   }
 
 
@@ -65,6 +82,35 @@ public class CameraRepository {
     @Override
     protected Integer doInBackground(final Void... params) {
       return mAsyncTaskDao.getTotalCamerasAddedByUser();
+    }
+  }
+
+  private static class updateAsyncTask extends AsyncTask<SurveillanceCamera, Void, Void> {
+
+    private CameraDao mAsyncTaskDao;
+
+    updateAsyncTask(CameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected Void doInBackground(final SurveillanceCamera... params) {
+      mAsyncTaskDao.updateCameras(params);
+      return null;
+    }
+  }
+
+  private static class getAllCamerasAsyncTask extends AsyncTask<Void, Void, List<SurveillanceCamera>> {
+
+    private CameraDao mAsyncTaskDao;
+
+    getAllCamerasAsyncTask(CameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected List<SurveillanceCamera> doInBackground(Void... params) {
+      return mAsyncTaskDao.getAllCameras();
     }
   }
 

@@ -27,6 +27,8 @@ public class SurveillanceCamera {
   private String timestamp;
   private String timeToSync; // time where photo was taken + random delay for privacy reasons
 
+  private boolean locationUploaded;
+
   private boolean uploadCompleted;
 
 
@@ -38,6 +40,7 @@ public class SurveillanceCamera {
                        String comment,
                        String timestamp,
                        String timeToSync,
+                       boolean locationUploaded,
                        boolean uploadCompleted){
 
     this.thumbnailPath = thumbnailPath;
@@ -52,6 +55,8 @@ public class SurveillanceCamera {
 
     this.timestamp = timestamp;
     this.timeToSync = timeToSync;
+
+    this.locationUploaded = locationUploaded;
 
     this.uploadCompleted = uploadCompleted;
 
@@ -93,8 +98,12 @@ public class SurveillanceCamera {
   public String getTimestamp() { return timestamp; }
 
   public String getTimeToSync() { return timeToSync; }
+
   public boolean getUploadCompleted(){
     return uploadCompleted;
+  }
+  public boolean getLocationUploaded(){
+    return locationUploaded;
   }
 
   public void setId(int id) {
@@ -129,5 +138,6 @@ public class SurveillanceCamera {
 
   public void setTimeToSync(String timeToSync) { this.timeToSync = timeToSync; }
 
+  public void setLocationUploaded(boolean locationUploaded){this.locationUploaded = locationUploaded; }
   public void setUploadCompleted(boolean uploadCompleted){this.uploadCompleted = uploadCompleted; }
 }

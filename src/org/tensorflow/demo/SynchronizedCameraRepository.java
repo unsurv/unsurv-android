@@ -19,7 +19,7 @@ public class SynchronizedCameraRepository {
   SynchronizedCameraRepository (Application application) {
     SynchronizedCameraRoomDatabase synchronizedDb = SynchronizedCameraRoomDatabase.getDatabase(application);
     mSynchronizedCameraDao = synchronizedDb.synchronizedCameraDao();
-    //mAllCameras = mSynchronizedCameraDao.getAllCameras();
+    //mAllCameras = mSynchronizedCameraDao.getAllCamerasAsLiveData();
 
   }
 

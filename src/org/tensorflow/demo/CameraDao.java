@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface CameraDao {
   void deleteAll();
 
   @Query("SELECT * FROM local_surveillance_cameras")
-  LiveData<List<SurveillanceCamera>> getAllCameras();
+  LiveData<List<SurveillanceCamera>> getAllCamerasAsLiveData();
 
   @Query("SELECT * FROM local_surveillance_cameras " +
           "WHERE latitude BETWEEN :latMin AND :latMax AND longitude BETWEEN :lonMin AND :lonMax")
@@ -33,6 +34,12 @@ public interface CameraDao {
 
   @Query("SELECT count(*) FROM local_surveillance_cameras")
   int getTotalCamerasAddedByUser();
+
+  @Update
+  void updateCameras(SurveillanceCamera... surveillanceCameras);
+
+  @Query("SELECT * from local_surveillance_cameras")
+  List<SurveillanceCamera> getAllCameras();
 
 
 }
