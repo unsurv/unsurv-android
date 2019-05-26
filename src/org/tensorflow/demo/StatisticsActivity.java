@@ -238,41 +238,13 @@ public class StatisticsActivity extends AppCompatActivity {
   }
 
 
-
-  // Helper methods for querying database.
-  private List<SurveillanceCamera> getCamerasInTimeframe(String sqlliteTimeStartpoint, String sqlliteTimeEndpoint) {
-    return cameraDb.surveillanceCameraDao().getCamerasAddedInTimeframe(sqlliteTimeStartpoint, sqlliteTimeEndpoint);
-  }
-
-  private int getTotalCamerasUpTo(String sqliteTime) {
-    return cameraDb.surveillanceCameraDao().getTotalCamerasUpTo(sqliteTime);
-  }
-
-
   void queryServerForStatistics(String baseURL, String area, String startDate, String endDate){
 
     final String TAG = "StatisticsUtils";
     //TODO check api for negative values in left right top bottom see if still correct
 
-    try {
-      String apiKeyExpirationString = sharedPreferences.getString("apiKeyExpiration", null);
-      timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-      Date apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(apiKeyExpirationString);
 
-      Date currentDate = new Date(System.currentTimeMillis());
-
-      if (apiKeyExpiration.before(currentDate)){
-        SynchronizationUtils.getAPIkey(getApplicationContext(), sharedPreferences);
-
-        // abort current query
-        return;
-      }
-
-
-    } catch (ParseException pse) {
-      Log.i(TAG, "queryServerForCamera: " + pse.toString());
-    }
-
+    SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, getApplicationContext());
 
     RequestQueue mRequestQueue;
 

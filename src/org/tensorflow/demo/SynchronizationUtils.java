@@ -38,6 +38,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.ParseException;
@@ -470,10 +471,84 @@ class SynchronizationUtils {
                 try {
 
                   JSONObject updatedInfo = response.getJSONObject("message");
-                  //JSONArray serverInfo = response.getJSONArray("status");
 
                 } catch (JSONException jse) {
                   Log.i(TAG, "JsonException in response: " + jse.toString());
+                }
+
+              }
+            },
+
+            new Response.ErrorListener() {
+              @Override
+              public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "error in ");
+
+              }
+            }
+    ){
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+        Log.i(TAG, "post request finished");
+      }
+    });
+
+    mRequestQueue.add(jsonObjectRequest);
+
+  }
+
+
+  static void downloadImage(String url, final String externalId, final SharedPreferences sharedPreferences) {
+
+        RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                try {
+
+                  String base64Image = response.getString("base_64_image");
+
+                  byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
+
+                  saveBytesToFile(imageAsBytes, "THISSHITWASDOWNLOADED.jpg", picturesPath);
+
+
+                } catch (Exception e) {
+                  Log.i(TAG, "JsonException in response: " + e.toString());
                 }
 
               }
@@ -572,6 +647,16 @@ class SynchronizationUtils {
     }
 
     return bytes;
+  }
+
+  static void saveBytesToFile(byte[] bytes, String filename, String path) throws IOException {
+
+    File file = new File(path + filename);
+
+    FileOutputStream fileOutputStream = new FileOutputStream(file.getPath());
+
+    fileOutputStream.write(bytes);
+    fileOutputStream.close();
   }
 
 }

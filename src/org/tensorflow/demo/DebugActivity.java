@@ -351,8 +351,12 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         allCameras = cameraRepository.getAllCameras();
-        String url = sharedPreferences.getString("synchronizationURL", null) + "cameras/upload/location";
-        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences, cameraRepository);
+        String url = sharedPreferences.getString("synchronizationURL", null);
+        //SynchronizationUtils.uploadSurveillanceCamera(allCameras, url + "cameras/upload/location", sharedPreferences, cameraRepository);
+
+        String externalId = "145432e0e9c54d0d";
+        SynchronizationUtils.downloadImage(url + "cameras/145432e0e9c54d0d/image", externalId, sharedPreferences);
+
       }
     });
 
