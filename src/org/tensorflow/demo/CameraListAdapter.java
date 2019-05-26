@@ -88,7 +88,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       String mLatitude = String.valueOf(current.getLatitude());
       String mLongitude = String.valueOf(current.getLongitude());
-      File mThumbnailPicture = new File(current.getThumbnailPath());
+      File mThumbnailPicture = new File(picturesPath + current.getThumbnailPath());
 
       String mComment = current.getComment();
 
@@ -113,7 +113,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
           TextView detailUpload = mHistoryDetails.findViewById(R.id.history_detail_upload);
           ImageView detailImage = mHistoryDetails.findViewById(R.id.history_detail_image);
 
-          File cameraImage = new File(currentCamera.getThumbnailPath());
+          File cameraImage = new File(picturesPath + currentCamera.getThumbnailPath());
 
           Picasso.get().load(cameraImage)
                   .placeholder(R.drawable.ic_launcher)

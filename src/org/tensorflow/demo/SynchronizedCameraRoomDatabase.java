@@ -74,7 +74,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
 
         // Populate database with placeholder data.
         SynchronizedCamera synchronizedCamera = new SynchronizedCamera(
-                "190754878_thumbnail.jpg",
+                "test_pixel_2.jpg",
                 "asjdnjasdqwdmqwlo",
                 50.0005 + randomLat, 8.2832 + randomLong,
                 "no comments",

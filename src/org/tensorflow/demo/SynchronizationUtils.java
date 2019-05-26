@@ -149,7 +149,7 @@ class SynchronizationUtils {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
-                            "test_nexus_10.jpg",
+                            "test_pixel_2.jpg",
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
@@ -413,7 +413,7 @@ class SynchronizationUtils {
 
     for (SurveillanceCamera camera : cameras){
 
-      File imageFile = new File(camera.getThumbnailPath());
+      File imageFile = new File(picturesPath + camera.getThumbnailPath());
       JSONObject singleCamera = new JSONObject();
 
       try {

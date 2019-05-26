@@ -74,7 +74,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
 
         // Populate database with placeholder data.
         SurveillanceCamera surveillanceCamera = new SurveillanceCamera(
-                picturesPath + "test_pixel_2.jpg", picturesPath + "190754878.jpg",
+                "test_pixel_2.jpg", "190754878.jpg",
                 null,
                 50.0005 + randomLat, 8.2832 + randomLong,
                 "",

@@ -567,14 +567,13 @@ public class MapActivity extends AppCompatActivity {
       @Override
       public void onReceive(Context context, Intent intent) {
         reloadMarker();
+        Toast.makeText(MapActivity.this, "Server authorization refreshed, please repeat your last action", Toast.LENGTH_LONG).show();
       }
     };
 
     intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
 
     localBroadcastManager.registerReceiver(br, intentFilter);
-
-    Toast.makeText(MapActivity.this, "Server authorization refreshed, please repeat your last action", Toast.LENGTH_LONG).show();
 
     reloadMarker();
   }
@@ -1233,7 +1232,7 @@ public class MapActivity extends AppCompatActivity {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
-                            "test_nexus_10.jpg",
+                            "test_pixel_2.jpg",
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),

@@ -327,8 +327,8 @@ public class DebugActivity extends AppCompatActivity {
 
 
         SurveillanceCamera randomCamera = new SurveillanceCamera(
-                picturesPath + "test_pixel_2.jpg",
-                picturesPath + "test_nexus_10.jpg",
+                "test_pixel_2.jpg",
+                "test_nexus_10.jpg",
                 null,
                 50.000 * random.nextFloat(),
                 8.0000 * random.nextFloat(),
@@ -397,7 +397,7 @@ public class DebugActivity extends AppCompatActivity {
     List<CameraCapture> captureListTest = Arrays.asList(cameraCapture1, cameraCapture2, cameraCapture3, cameraCapture4);
 
     SurveillanceCamera testCamera = new SurveillanceCamera(
-            picturesPath + "test_pixel_2.jpg",
+            "test_pixel_2.jpg",
             "asd",
             null,
             50.000,

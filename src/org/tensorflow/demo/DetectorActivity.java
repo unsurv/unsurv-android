@@ -620,25 +620,25 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                   // TODO add "unsurv" to every picturesPath
                   CameraCapture cameraCapture1 = new CameraCapture(99.9f,
-                          picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                          "190754878_thumbnail.jpg", "190754878.jpg",
                           10, 120, 50, 140,
                           49.99452, 8.24688,
                           10.3345, 0 + 3.14/18, 12.3313, 170.3332);
 
                   CameraCapture cameraCapture2 = new CameraCapture(99.9f,
-                          picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                          "190754878_thumbnail.jpg", "190754878.jpg",
                           10, 120, 50, 140,
                           49.99455, 8.24715,
                           10.3345, 0 + 3.14/36, 12.3313, 170.3332);
 
                   CameraCapture cameraCapture3 = new CameraCapture(99.9f,
-                          picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                          "190754878_thumbnail.jpg", "190754878.jpg",
                           10, 120, 50, 140,
                           49.99458, 8.24735,
                           10.3345, 0 - 3.14/36, 12.3313, 170.3332);
 
                   CameraCapture cameraCapture4 = new CameraCapture(99.9f,
-                          picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
+                          "190754878_thumbnail.jpg", "190754878.jpg",
                           10, 120, 50, 140,
                           49.99455, 8.24750,
                           10.3345, 0 - 3.14/18, 12.3313, 170.3332);
