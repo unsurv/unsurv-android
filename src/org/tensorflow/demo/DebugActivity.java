@@ -171,7 +171,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putInt("minUploadDelay", 86400).apply(); // multiply by 1000 when called to get real value in ms
     sharedPreferences.edit().putInt("maxUploadDelay", 604800).apply();
 
-    SynchronizationUtils.getAPIkey(DebugActivity.this, sharedPreferences);
+    // SynchronizationUtils.getAPIkey(DebugActivity.this, sharedPreferences);
 
 
     // set in timemachineSpinner

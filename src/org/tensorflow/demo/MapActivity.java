@@ -1176,27 +1176,14 @@ public class MapActivity extends AppCompatActivity {
    */
   void queryServerForCameras(String queryString) {
 
-    // aborts current query if API key expired. starts same query after a new API key is aquired in refreshApiKeyAsyncTask
-    try {
+    // aborts current query if API key expired. starts same query after a new API key is aquired
 
-      Date apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(sharedPreferences.getString("apiKeyExpiration", null));
-
-      Date currentDate = new Date(System.currentTimeMillis());
-
-      if (apiKeyExpiration.before(currentDate)){
-        SynchronizationUtils.getAPIkey(getApplicationContext(), sharedPreferences);
-        //new refreshApiKeyAsyncTask().execute(queryString);
-        abortedServerQuery = true;
-        lastArea = queryString;
-        // abort current query
-        return;
-      }
-
-
-    } catch (ParseException pse) {
-      Log.i(TAG, "queryServerForCamera: " + pse.toString());
+    if (SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, getApplicationContext())){
+      abortedServerQuery = true;
+      lastArea = queryString;
+      // abort current query
+      return;
     }
-
 
     camerasInAreaFromServer.clear();
 

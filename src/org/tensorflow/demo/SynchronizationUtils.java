@@ -40,8 +40,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -239,6 +241,7 @@ class SynchronizationUtils {
 
                   sharedPreferences.edit().putString("apiKey", key).apply();
                   sharedPreferences.edit().putString("apiKeyExpiration", expiration).apply();
+
 
 
                 } catch (Exception e) {
@@ -510,6 +513,35 @@ class SynchronizationUtils {
     });
 
     mRequestQueue.add(jsonObjectRequest);
+
+
+  }
+
+
+  static boolean refreshApiKeyIfExpired(SharedPreferences sharedPreferences, Context context){
+
+    SimpleDateFormat timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+
+    Date apiKeyExpiration;
+    Date currentDate = new Date(System.currentTimeMillis());
+
+    try {
+      apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(sharedPreferences.getString("apiKeyExpiration", null));
+
+      if (apiKeyExpiration.before(currentDate)){
+
+        getAPIkey(context, sharedPreferences);
+        return true;
+
+      } else {
+        return false;
+      }
+
+    } catch (ParseException pse) {
+      Log.i(TAG, "apiKeyParse: " + pse.toString());
+    }
+
+    return false;
 
 
   }
