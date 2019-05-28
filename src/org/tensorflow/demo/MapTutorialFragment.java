@@ -5,8 +5,6 @@ package org.tensorflow.demo;
         import android.os.Bundle;
         import android.preference.PreferenceManager;
         import android.support.annotation.Nullable;
-        import android.support.v4.app.Fragment;
-        import android.support.v4.view.ViewPager;
         import android.view.LayoutInflater;
         import android.view.MotionEvent;
         import android.view.View;
@@ -26,7 +24,8 @@ public class MapTutorialFragment extends android.support.v4.app.Fragment {
   private SharedPreferences sharedPreferences;
   private Boolean mapScrollingEnabled = true;
   private TutorialViewPager tutorialViewPager;
-  private boolean homezoneIsSet;
+  private boolean homeZoneIsSet;
+  private boolean setHomeButtonUsed;
 
   public MapTutorialFragment() {
 
@@ -41,12 +40,11 @@ public class MapTutorialFragment extends android.support.v4.app.Fragment {
     tutorialViewPager = getActivity().findViewById(R.id.tutorial_viewpager);
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
-    homezoneIsSet = sharedPreferences.getString("area", null) != null;
+    homeZoneIsSet = sharedPreferences.getString("area", null) != null;
 
-    if (!homezoneIsSet){
+    if (!homeZoneIsSet  || !setHomeButtonUsed){
       tutorialViewPager.setFragmentScrollingEnabled(false);
     }
-
 
     final TextView mapTutorialTextView = rootView.findViewById(R.id.map_tutorial_textview);
     mapTutorialTextView.setText("Please select an area for offline availability");
@@ -112,7 +110,11 @@ public class MapTutorialFragment extends android.support.v4.app.Fragment {
         mapScrollingEnabled = false;
         tutorialViewPager.setFragmentScrollingEnabled(true);
 
-        homezoneIsSet = true;
+        setHomeButtonUsed = true;
+        homeZoneIsSet = true;
+        tutorialViewPager.setCurrentItem(1);
+
+
 
       }
     });
@@ -122,6 +124,7 @@ public class MapTutorialFragment extends android.support.v4.app.Fragment {
       public void onClick(View view) {
 
         mapScrollingEnabled = true;
+        setHomeButtonUsed = false;
         tutorialViewPager.setFragmentScrollingEnabled(false);
 
 
