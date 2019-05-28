@@ -64,7 +64,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   private List<SurveillanceCamera> mSurveillanceCameras;
 
-  private String picturesPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
+  private String picturesPath = SynchronizationUtils.picturesPath;
 
   CameraListAdapter(Context context, LinearLayout detailLinearLayout) {
     mInflater = LayoutInflater.from(context);

@@ -56,7 +56,7 @@ import okhttp3.internal.http2.ConnectionShutdownException;
 
 class SynchronizationUtils {
 
-  private static String picturesPath = Environment.getExternalStoragePublicDirectory(
+  public static String picturesPath = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
   private static String TAG = "SynchronizationUtils";

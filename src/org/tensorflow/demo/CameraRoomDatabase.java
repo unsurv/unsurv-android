@@ -53,8 +53,6 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
   private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
     private final CameraDao mDao;
-    private static String picturesPath = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
             PopulateDbAsync(CameraRoomDatabase db) {
       mDao = db.surveillanceCameraDao();

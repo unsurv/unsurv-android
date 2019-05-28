@@ -170,7 +170,7 @@ public class MapActivity extends AppCompatActivity {
 
   private AreaOfflineAvailable mostRecentArea;
 
-  private String picturesPath;
+  private String picturesPath = SynchronizationUtils.picturesPath;
 
   private TextView amountOnMap;
 
@@ -192,9 +192,6 @@ public class MapActivity extends AppCompatActivity {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
     localBroadcastManager = LocalBroadcastManager.getInstance(MapActivity.this);
-
-    picturesPath = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
     areaOfflineAvailableRepository.deleteAll();
 
@@ -968,7 +965,9 @@ public class MapActivity extends AppCompatActivity {
 
     timemachineView = findViewById(R.id.map_timemachine_seekbar);
 
-    Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
+    Drawable cameraMarkerIcon = getDrawable(R.drawable.standard_camera_marker_5_dpi);
+    //Drawable clusterCameraMarkerIcon = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 400, null);
+    Drawable clusterCameraMarkerIcon = getDrawable(R.drawable.standard_camera_marker_15dpi);
 
     boolean clusteringEnabled = sharedPreferences.getBoolean("clusteringEnabled", true);
 
@@ -1000,7 +999,7 @@ public class MapActivity extends AppCompatActivity {
                 currentCamera.getLatitude(),
                 currentCamera.getLongitude()));
 
-        cameraMarker.setIcon(cameraMarkerIcon);
+        cameraMarker.setIcon(clusterCameraMarkerIcon);
 
         cameraMarker.setRelatedObject(currentCamera);
         cameraMarker.setInfoWindow(new CustomInfoWindow(mapView));

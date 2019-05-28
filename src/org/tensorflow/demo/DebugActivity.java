@@ -84,8 +84,7 @@ public class DebugActivity extends AppCompatActivity {
 
   private WifiManager wifiManager;
 
-  private static String picturesPath = Environment.getExternalStoragePublicDirectory(
-          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
+  private String picturesPath = SynchronizationUtils.picturesPath;
 
   private int randomCamerasAdded;
   private List<SurveillanceCamera> allCameras = new ArrayList<>();
