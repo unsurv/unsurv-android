@@ -11,15 +11,18 @@ import android.util.Log;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class SyncIntervalSchedulerJobService extends JobService {
 
-  private String baseURL;
+  private String downloadUrl;
+  private String uploadUrl;
   private String areaQuery;
   private String startQuery;
   private SynchronizedCameraRepository synchronizedCameraRepository;
+  private CameraRepository cameraRepository;
   private SharedPreferences sharedPreferences;
   private static String TAG = "SyncIntervalSchedulerJobService";
   private SimpleDateFormat timestampIso8601SecondsAccuracy;
@@ -31,11 +34,13 @@ public class SyncIntervalSchedulerJobService extends JobService {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
+    cameraRepository = new CameraRepository(getApplication());
 
     PersistableBundle intervalSchedulerExtras = jobParameters.getExtras();
 
 
-    baseURL = intervalSchedulerExtras.getString("baseURL") + "cameras/?";
+    downloadUrl = intervalSchedulerExtras.getString("downloadUrl");
+    uploadUrl = intervalSchedulerExtras.getString("uploadUrl");
     areaQuery = "area=" + intervalSchedulerExtras.getString("area");
     startQuery = "start=" + sharedPreferences.getString("lastUpdated", "01-01-2000");
 
@@ -61,14 +66,19 @@ public class SyncIntervalSchedulerJobService extends JobService {
     }
 
 
-    SynchronizationUtils.synchronizeCamerasWithServer(
-            baseURL,
+    SynchronizationUtils.downloadCamerasFromServer(
+            downloadUrl,
             areaQuery,
             sharedPreferences,
             true,
             startQuery,
             synchronizedCameraRepository
             );
+
+    List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
+
+    SynchronizationUtils.uploadSurveillanceCamera(camerasToUpload, uploadUrl, sharedPreferences, cameraRepository);
+
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -105,8 +115,8 @@ public class SyncIntervalSchedulerJobService extends JobService {
     @Override
     protected void onPostExecute(Void nothingness) {
 
-      SynchronizationUtils.synchronizeCamerasWithServer(
-              baseURL,
+      SynchronizationUtils.downloadCamerasFromServer(
+              downloadUrl,
               areaQuery,
               sharedPreferences,
               true,
@@ -123,11 +133,5 @@ public class SyncIntervalSchedulerJobService extends JobService {
               .apply();
     }
   }
-
-
-
-
-
-
 
 }

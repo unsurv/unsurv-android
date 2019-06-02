@@ -2,6 +2,7 @@ package org.tensorflow.demo;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
@@ -13,6 +14,12 @@ public interface CameraDao {
 
   @Insert(onConflict = 1)
   void insert(SurveillanceCamera surveillanceCamera);
+
+  @Update
+  void updateCameras(SurveillanceCamera... surveillanceCameras);
+
+  @Delete
+  void deleteCameras(SurveillanceCamera... surveillanceCameras);
 
   @Query("DELETE FROM local_surveillance_cameras")
   void deleteAll();
@@ -35,14 +42,21 @@ public interface CameraDao {
   @Query("SELECT count(*) FROM local_surveillance_cameras")
   int getTotalCamerasAddedByUser();
 
-  @Update
-  void updateCameras(SurveillanceCamera... surveillanceCameras);
+  @Query("SELECT * FROM local_surveillance_cameras WHERE timeToSync " +
+          "BETWEEN datetime('2000-01-01') AND datetime('now')")
+  List<SurveillanceCamera> getCamerasToUpload();
+
 
   @Query("SELECT * from local_surveillance_cameras")
   List<SurveillanceCamera> getAllCameras();
 
   @Query("SELECT * from local_surveillance_cameras WHERE locationUploaded")
   List<SurveillanceCamera> getCamerasForImageUpload();
+
+  @Query("SELECT * from local_surveillance_cameras WHERE uploadCompleted")
+  List<SurveillanceCamera> getUploadedCameras();
+
+
 
 
 }

@@ -41,6 +41,10 @@ public class CameraRepository {
     new updateAsyncTask(mCameraDao).execute(surveillanceCameras);
   }
 
+  void deleteCameras (SurveillanceCamera... surveillanceCameras) {
+    new deleteAsyncTask(mCameraDao).execute(surveillanceCameras);
+  }
+
 
   List<SurveillanceCamera> getAllCameras(){
 
@@ -49,6 +53,19 @@ public class CameraRepository {
 
     } catch (Exception e) {
       Log.i("Background getAllCameras Error: " , e.toString());
+      return null;
+    }
+
+  }
+
+  List<SurveillanceCamera> getCamerasForUpload(){
+
+    try {
+      List<SurveillanceCamera> camerasToUpload = new getCamerasForUploadAsyncTask(mCameraDao).execute().get();
+      return camerasToUpload;
+
+    } catch (Exception e) {
+      Log.i("Background getIdsForImageUpload Error: " , e.toString());
       return null;
     }
 
@@ -113,6 +130,21 @@ public class CameraRepository {
     }
   }
 
+  private static class deleteAsyncTask extends AsyncTask<SurveillanceCamera, Void, Void> {
+
+    private CameraDao mAsyncTaskDao;
+
+    deleteAsyncTask(CameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected Void doInBackground(final SurveillanceCamera... params) {
+      mAsyncTaskDao.deleteCameras(params);
+      return null;
+    }
+  }
+
   private static class getAllCamerasAsyncTask extends AsyncTask<Void, Void, List<SurveillanceCamera>> {
 
     private CameraDao mAsyncTaskDao;
@@ -126,6 +158,21 @@ public class CameraRepository {
       return mAsyncTaskDao.getAllCameras();
     }
   }
+
+  private static class getCamerasForUploadAsyncTask extends AsyncTask<Void, Void, List<SurveillanceCamera>> {
+
+    private CameraDao mAsyncTaskDao;
+
+    getCamerasForUploadAsyncTask(CameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected List<SurveillanceCamera> doInBackground(Void... params) {
+      return mAsyncTaskDao.getCamerasToUpload();
+    }
+  }
+
 
   private static class getCamerasForImageUploadAsyncTask extends AsyncTask<Void, Void, List<SurveillanceCamera>> {
 

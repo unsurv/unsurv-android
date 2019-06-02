@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -228,7 +227,7 @@ public class DebugActivity extends AppCompatActivity {
 
         String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
 
-        SynchronizationUtils.synchronizeCamerasWithServer(
+        SynchronizationUtils.downloadCamerasFromServer(
                 baseURL + "cameras/?",
                 "area=" + sharedPreferences.getString("area", null),
                 sharedPreferences,
@@ -351,10 +350,12 @@ public class DebugActivity extends AppCompatActivity {
       public void onClick(View view) {
         allCameras = cameraRepository.getAllCameras();
         String url = sharedPreferences.getString("synchronizationURL", null);
-        //SynchronizationUtils.uploadSurveillanceCamera(allCameras, url + "cameras/upload/location", sharedPreferences, cameraRepository);
+        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url + "cameras/upload/location", sharedPreferences, cameraRepository);
 
+        List<String> externalIds = new ArrayList<>();
         String externalId = "145432e0e9c54d0d";
-        SynchronizationUtils.downloadImage(url + "cameras/145432e0e9c54d0d/image", externalId, sharedPreferences);
+        //externalIds.add(externalId);
+        //SynchronizationUtils.downloadImages(url + "images/", externalIds, sharedPreferences);
 
       }
     });

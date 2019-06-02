@@ -863,7 +863,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     Random random = new Random();
 
-    long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*3) * 1000;
+    long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*2) * 1000; // 2 d
     long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
 
     long timeframe = maxDelay - minDelay;

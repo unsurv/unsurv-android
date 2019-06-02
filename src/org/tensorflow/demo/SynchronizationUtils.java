@@ -6,16 +6,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
+import android.graphics.Camera;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Base64;
-import android.util.JsonWriter;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -29,18 +26,15 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NoCache;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,7 +45,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import okhttp3.internal.http2.ConnectionShutdownException;
 
 
 class SynchronizationUtils {
@@ -78,7 +71,8 @@ class SynchronizationUtils {
 
     PersistableBundle syncJobExtras = new PersistableBundle();
 
-    syncJobExtras.putString("baseURL", sharedPreferences.getString("synchronizationURL", null));
+    syncJobExtras.putString("downloadUrl", sharedPreferences.getString("synchronizationURL", null) + "cameras/?");
+    syncJobExtras.putString("uploadUrl", sharedPreferences.getString("synchronizationURL", null) + "cameras/upload/location");
     syncJobExtras.putString("area", sharedPreferences.getString("area", null));
     syncJobExtras.putString("start", sharedPreferences.getString("lastUpdated", null));
 
@@ -112,7 +106,7 @@ class SynchronizationUtils {
   }
 
 
-  static void synchronizeCamerasWithServer(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
+  static void downloadCamerasFromServer(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
 
     //TODO check api for negative values in left right top bottom see if still correct
 
@@ -181,6 +175,7 @@ class SynchronizationUtils {
       @Override
       public void onErrorResponse(VolleyError error) {
         // TODO: Handle Errors
+        Log.i(TAG, "Error in connection " + error.toString());
       }
     }) {
       @Override
@@ -404,9 +399,9 @@ class SynchronizationUtils {
   }
 
 
-  static void uploadImages(CameraRepository cameraRepository, String url, final SharedPreferences sharedPreferences) {
+  static void uploadImages(final CameraRepository cameraRepository, String url, final SharedPreferences sharedPreferences) {
 
-    List<SurveillanceCamera> cameras = cameraRepository.getCamerasForImageUpload();
+    final List<SurveillanceCamera> cameras = cameraRepository.getCamerasForImageUpload();
 
     HashMap<String, String> idToEncodedImageMap = new HashMap<>();
 
@@ -471,6 +466,7 @@ class SynchronizationUtils {
                 try {
 
                   JSONObject updatedInfo = response.getJSONObject("message");
+                  cleanupUploadedCameras(cameras, cameraRepository);
 
                 } catch (JSONException jse) {
                   Log.i(TAG, "JsonException in response: " + jse.toString());
@@ -517,9 +513,26 @@ class SynchronizationUtils {
   }
 
 
-  static void downloadImage(String url, final String externalId, final SharedPreferences sharedPreferences) {
+  static void downloadImages(String url, final List<String> externalIds, final SharedPreferences sharedPreferences) {
 
-        RequestQueue mRequestQueue;
+    JSONObject postObject = new JSONObject();
+
+    JSONArray ids = new JSONArray();
+
+    for (String id : externalIds) {
+      ids.put(id);
+    }
+
+    try {
+
+      postObject.put("ids", ids);
+
+    } catch (JSONException jse){
+      Log.i(TAG, "downloadImages: " + jse.toString());
+    }
+
+
+    RequestQueue mRequestQueue;
 
     // Set up the network to use HttpURLConnection as the HTTP client.
     Network network = new BasicNetwork(new HurlStack());
@@ -531,24 +544,28 @@ class SynchronizationUtils {
     mRequestQueue.start();
 
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-            Request.Method.GET,
+            Request.Method.POST,
             url,
-            null,
+            postObject,
             new Response.Listener<JSONObject>() {
               @Override
               public void onResponse(JSONObject response) {
 
                 try {
 
-                  String base64Image = response.getString("base_64_image");
+                  for (String id : externalIds) {
 
-                  byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
+                    String base64Image = response.getString(id);
 
-                  saveBytesToFile(imageAsBytes, "THISSHITWASDOWNLOADED.jpg", picturesPath);
+                    byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
+
+                    saveBytesToFile(imageAsBytes, id + ".jpg", picturesPath);
+
+                  }
 
 
                 } catch (Exception e) {
-                  Log.i(TAG, "JsonException in response: " + e.toString());
+                  Log.i(TAG, "response to jpg error: " + e.toString());
                 }
 
               }
@@ -557,7 +574,7 @@ class SynchronizationUtils {
             new Response.ErrorListener() {
               @Override
               public void onErrorResponse(VolleyError error) {
-                Log.i(TAG, "error in ");
+                Log.i(TAG, "downloadImages: ");
 
               }
             }
@@ -618,7 +635,13 @@ class SynchronizationUtils {
 
     return false;
 
+  }
 
+  static void cleanupUploadedCameras(List<SurveillanceCamera> cameras, CameraRepository cameraRepository){
+    for (SurveillanceCamera camera : cameras){
+      cameraRepository.deleteCameras(camera);
+
+    }
   }
 
 
