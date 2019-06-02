@@ -28,13 +28,14 @@
 
     <LinearLayout
         android:id="@+id/text_container"
-        android:layout_width="match_parent"
+        android:layout_width="0sp"
+        android:layout_weight="2"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="16dp">
+        android:paddingStart="16dp">
 
         <TextView
-            android:id="@+id/latitude_text_view"
+            android:id="@+id/history_item_text_view_1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -45,7 +46,7 @@
             tools:text="lutti" />
 
         <TextView
-            android:id="@+id/longitude_text_view"
+            android:id="@+id/history_item_text_view_2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -54,6 +55,35 @@
             android:textColor="@android:color/white"
             tools:text="one" />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0sp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/history_item_delete_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#c8333333"
+            android:padding="4dp"
+            android:src="@drawable/ic_close_red_24dp"
+            android:layout_gravity="center" />
+
+        <ImageButton
+            android:id="@+id/history_item_upload_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#c8333333"
+            android:src="@drawable/ic_file_upload_grey_24dp"
+            android:padding="4dp"
+            android:layout_gravity="center"
+            />
+
+    </LinearLayout>
+
+
 
 
 

@@ -71,8 +71,7 @@ class SynchronizationUtils {
 
     PersistableBundle syncJobExtras = new PersistableBundle();
 
-    syncJobExtras.putString("downloadUrl", sharedPreferences.getString("synchronizationURL", null) + "cameras/?");
-    syncJobExtras.putString("uploadUrl", sharedPreferences.getString("synchronizationURL", null) + "cameras/upload/location");
+    syncJobExtras.putString("baseUrl", sharedPreferences.getString("synchronizationURL", null));
     syncJobExtras.putString("area", sharedPreferences.getString("area", null));
     syncJobExtras.putString("start", sharedPreferences.getString("lastUpdated", null));
 
@@ -123,7 +122,7 @@ class SynchronizationUtils {
     // Start the queue
     mRequestQueue.start();
 
-   String URL = baseUrl + areaQuery;
+   String URL = baseUrl  + "cameras/?" + areaQuery;
 
     if (startQuery != null) {
       URL += "&" + startQuery;
@@ -277,7 +276,7 @@ class SynchronizationUtils {
   }
 
 
-  static void uploadSurveillanceCamera(List<SurveillanceCamera> camerasToUpload, final String url, final SharedPreferences sharedPreferences, final CameraRepository cameraRepository) {
+  static void uploadSurveillanceCamera(List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, final CameraRepository cameraRepository) {
 
     JSONArray postArray = new JSONArray();
 
@@ -322,9 +321,11 @@ class SynchronizationUtils {
     // Start the queue
     mRequestQueue.start();
 
+    String locationUrl = baseUrl + "cameras/upload/location";
+
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.POST,
-            url,
+            locationUrl,
             postObject,
             new Response.Listener<JSONObject>() {
               @Override
@@ -349,7 +350,7 @@ class SynchronizationUtils {
 
                   }
 
-                  String imageUploadUrl = sharedPreferences.getString("synchronizationURL", null) + "cameras/upload/image";
+                  String imageUploadUrl = baseUrl + "cameras/upload/image";
 
 
                   uploadImages(cameraRepository, imageUploadUrl, sharedPreferences);

@@ -1,11 +1,9 @@
 package org.tensorflow.demo;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
@@ -13,28 +11,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import org.osmdroid.api.IMapController;
-import org.osmdroid.api.IMapView;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.OverlayItem;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -45,6 +36,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     private final ImageView thumbnailImageView;
     private final TextView latitudeTextView;
     private final TextView longitudeTextView;
+    private final ImageButton deleteButton;
+    private final ImageButton uploadButton;
+
 
 
 
@@ -53,8 +47,11 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     private CameraViewHolder(View itemView) {
       super(itemView);
       thumbnailImageView = itemView.findViewById(R.id.thumbnail_image);
-      latitudeTextView = itemView.findViewById(R.id.latitude_text_view);
-      longitudeTextView = itemView.findViewById(R.id.longitude_text_view);
+      latitudeTextView = itemView.findViewById(R.id.history_item_text_view_1);
+      longitudeTextView = itemView.findViewById(R.id.history_item_text_view_2);
+      deleteButton = itemView.findViewById(R.id.history_item_delete_button);
+      uploadButton = itemView.findViewById(R.id.history_item_upload_button);
+
     }
 
   }
@@ -66,9 +63,17 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   private String picturesPath = SynchronizationUtils.picturesPath;
 
-  CameraListAdapter(Context context, LinearLayout detailLinearLayout) {
+  private final CameraRepository cameraRepository;
+  private final SharedPreferences sharedPreferences;
+
+  CameraListAdapter(Context context, LinearLayout detailLinearLayout, Application application) {
     mInflater = LayoutInflater.from(context);
-    mHistoryDetails = detailLinearLayout;}
+    mHistoryDetails = detailLinearLayout;
+    cameraRepository = new CameraRepository(application);
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+
+  }
 
   @Override
   public CameraViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -84,7 +89,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
   public void onBindViewHolder(final CameraViewHolder holder, int position) {
 
     if (mSurveillanceCameras != null) {
-      SurveillanceCamera current = mSurveillanceCameras.get(position);
+      final SurveillanceCamera current = mSurveillanceCameras.get(position);
 
       String mLatitude = String.valueOf(current.getLatitude());
       String mLongitude = String.valueOf(current.getLongitude());
@@ -95,6 +100,28 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       // holder.thumbnailImageView.
       holder.latitudeTextView.setText(mLatitude);
       holder.longitudeTextView.setText(mLongitude);
+
+      holder.deleteButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+          cameraRepository.deleteCameras(current);
+
+        }
+      });
+
+      holder.uploadButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+
+          SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), "http://192.168.178.137:5000/", sharedPreferences, cameraRepository);
+
+        }
+      });
+
+
+
       Picasso.get().load(mThumbnailPicture)
               .placeholder(R.drawable.ic_launcher)
               .into(holder.thumbnailImageView);

@@ -57,7 +57,7 @@ public class HistoryActivity extends AppCompatActivity {
     LayoutInflater layoutInflater = (LayoutInflater) HistoryActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     final LinearLayout rootView = findViewById(R.id.history_detail_linear);
-    final CameraListAdapter adapter = new CameraListAdapter(this, rootView);
+    final CameraListAdapter adapter = new CameraListAdapter(this, rootView, getApplication());
 
     recyclerView.setAdapter(adapter);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));

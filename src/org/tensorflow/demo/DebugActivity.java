@@ -228,7 +228,7 @@ public class DebugActivity extends AppCompatActivity {
         String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
 
         SynchronizationUtils.downloadCamerasFromServer(
-                baseURL + "cameras/?",
+                baseURL,
                 "area=" + sharedPreferences.getString("area", null),
                 sharedPreferences,
                 true,
@@ -350,7 +350,7 @@ public class DebugActivity extends AppCompatActivity {
       public void onClick(View view) {
         allCameras = cameraRepository.getAllCameras();
         String url = sharedPreferences.getString("synchronizationURL", null);
-        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url + "cameras/upload/location", sharedPreferences, cameraRepository);
+        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences, cameraRepository);
 
         List<String> externalIds = new ArrayList<>();
         String externalId = "145432e0e9c54d0d";

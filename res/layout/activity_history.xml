@@ -59,26 +59,44 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/history_detail_timestamp"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/history_info"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:padding="4dp"
-            android:text="Please select a camera"
-            android:textColor="#FFF"
-            android:layout_gravity="center"
-            />
+            >
 
-        <TextView
-            android:id="@+id/history_detail_upload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:padding="4dp"
-            android:layout_gravity="center"
-            android:textColor="#FFF"
-            />
+            <TextView
+                android:id="@+id/history_detail_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:padding="4dp"
+                android:text="Please select a camera"
+                android:textColor="#FFF"
+                android:layout_gravity="top"
+                />
+
+            <TextView
+                android:id="@+id/history_detail_upload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:padding="4dp"
+                android:layout_below="@id/history_detail_timestamp"
+                android:textColor="#FFF"
+                />
+
+
+
+
+
+
+
+
+
+            </RelativeLayout>
+
+
 
 
     </LinearLayout>

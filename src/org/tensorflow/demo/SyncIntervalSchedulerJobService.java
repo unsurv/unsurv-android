@@ -17,8 +17,7 @@ import java.util.TimeZone;
 
 public class SyncIntervalSchedulerJobService extends JobService {
 
-  private String downloadUrl;
-  private String uploadUrl;
+  private String baseUrl;
   private String areaQuery;
   private String startQuery;
   private SynchronizedCameraRepository synchronizedCameraRepository;
@@ -39,8 +38,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
     PersistableBundle intervalSchedulerExtras = jobParameters.getExtras();
 
 
-    downloadUrl = intervalSchedulerExtras.getString("downloadUrl");
-    uploadUrl = intervalSchedulerExtras.getString("uploadUrl");
+    baseUrl = intervalSchedulerExtras.getString("baseUrl");
     areaQuery = "area=" + intervalSchedulerExtras.getString("area");
     startQuery = "start=" + sharedPreferences.getString("lastUpdated", "01-01-2000");
 
@@ -67,7 +65,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
 
     SynchronizationUtils.downloadCamerasFromServer(
-            downloadUrl,
+            baseUrl,
             areaQuery,
             sharedPreferences,
             true,
@@ -77,7 +75,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
     List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
 
-    SynchronizationUtils.uploadSurveillanceCamera(camerasToUpload, uploadUrl, sharedPreferences, cameraRepository);
+    SynchronizationUtils.uploadSurveillanceCamera(camerasToUpload, baseUrl, sharedPreferences, cameraRepository);
 
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -116,7 +114,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
     protected void onPostExecute(Void nothingness) {
 
       SynchronizationUtils.downloadCamerasFromServer(
-              downloadUrl,
+              baseUrl,
               areaQuery,
               sharedPreferences,
               true,
