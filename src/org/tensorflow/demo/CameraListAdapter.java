@@ -8,12 +8,16 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -65,12 +69,14 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   private final CameraRepository cameraRepository;
   private final SharedPreferences sharedPreferences;
+  private final LayoutInflater layoutInflater;
 
-  CameraListAdapter(Context context, LinearLayout detailLinearLayout, Application application) {
+  CameraListAdapter(Context context, LinearLayout detailLinearLayout, Application application, LayoutInflater layoutInflater) {
     mInflater = LayoutInflater.from(context);
     mHistoryDetails = detailLinearLayout;
     cameraRepository = new CameraRepository(application);
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    this.layoutInflater = layoutInflater;
 
 
   }
@@ -105,7 +111,69 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         @Override
         public void onClick(View view) {
 
-          cameraRepository.deleteCameras(current);
+
+          // create popupView to ask user if he wants to delete camera
+          // saves preference if checkbox ticked
+
+          boolean quickDeleteCameras = sharedPreferences.getBoolean("quickDeleteCameras", false);
+
+          if (quickDeleteCameras){
+            cameraRepository.deleteCameras(current);
+
+          } else {
+
+            View popupView = layoutInflater.inflate(R.layout.delete_camera_popup, null);
+
+            final CheckBox dontAskAgainACheckBox = popupView.findViewById(R.id.delete_popup_dont_show_again_checkbox);
+
+            Button yesButton = popupView.findViewById(R.id.delete_popup_yes_button);
+            Button noButton = popupView.findViewById(R.id.delete_popup_no_button);
+
+            final PopupWindow popupWindow =
+                    new PopupWindow(popupView,
+                            RecyclerView.LayoutParams.WRAP_CONTENT,
+                            RecyclerView.LayoutParams.WRAP_CONTENT);
+
+
+
+            if (!popupWindow.isShowing()) {
+
+
+              popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+              yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+
+                  if (dontAskAgainACheckBox.isChecked()) {
+                    sharedPreferences.edit().putBoolean("quickDeleteCameras", true).apply();
+                  }
+                  cameraRepository.deleteCameras(current);
+
+                  popupWindow.dismiss();
+
+
+                }
+              });
+
+              noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                  if (dontAskAgainACheckBox.isChecked()) {
+                    sharedPreferences.edit().putBoolean("allowServerQueries", false).apply();
+                    sharedPreferences.edit().putBoolean("askForConnections", false).apply();
+
+                  }
+                  popupWindow.dismiss();
+
+                }
+              });
+            }
+
+          }
+
+
 
         }
       });
@@ -116,6 +184,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
 
           SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), "http://192.168.178.137:5000/", sharedPreferences, cameraRepository);
+
 
         }
       });

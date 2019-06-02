@@ -40,6 +40,14 @@
         android:title="Enable timestamps for captures"
         android:key="enableCaptureTimestamps"/>
 
+    <SwitchPreference
+        android:title="Delete cameras on upload"
+        android:key="deleteOnUpload"/>
+
+    <SwitchPreference
+        android:title="Delete cameras without popup"
+        android:key="quickDeleteCameras"/>
+
     <ListPreference
         android:title="Maximum simultaneous markers on the map"
         android:key="maxMapMarkers"

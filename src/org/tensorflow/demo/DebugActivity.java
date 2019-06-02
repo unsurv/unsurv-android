@@ -164,6 +164,9 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putString("apiKey", "abc").apply();
     sharedPreferences.edit().putString("apiKeyExpiration", "2018-01-01 00:00:00").apply();
     sharedPreferences.edit().putBoolean("showCaptureTimestamps", false).apply();
+    sharedPreferences.edit().putBoolean("deleteOnUpload", false).apply();
+    sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
+
 
 
     sharedPreferences.edit().putInt("minUploadDelay", 86400).apply(); // multiply by 1000 when called to get real value in ms

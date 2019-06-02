@@ -467,7 +467,12 @@ class SynchronizationUtils {
                 try {
 
                   JSONObject updatedInfo = response.getJSONObject("message");
-                  cleanupUploadedCameras(cameras, cameraRepository);
+
+                  boolean deleteOnUpload = sharedPreferences.getBoolean("deleteOnUpload", false);
+
+                  if (deleteOnUpload){
+                    cleanupUploadedCameras(cameras, cameraRepository);
+                  }
 
                 } catch (JSONException jse) {
                   Log.i(TAG, "JsonException in response: " + jse.toString());
