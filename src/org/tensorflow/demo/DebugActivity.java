@@ -46,6 +46,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -160,7 +161,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
     sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
     sharedPreferences.edit().putBoolean("askForConnections", true).apply();
-    sharedPreferences.edit().putBoolean("clusteringEnabled", true).apply();
+    sharedPreferences.edit().putBoolean("clusteringEnabled", false).apply();
     sharedPreferences.edit().putString("apiKey", "abc").apply();
     sharedPreferences.edit().putString("apiKeyExpiration", "2018-01-01 00:00:00").apply();
     sharedPreferences.edit().putBoolean("showCaptureTimestamps", false).apply();
@@ -205,6 +206,19 @@ public class DebugActivity extends AppCompatActivity {
     mapController.setZoom(14.0);
     mapController.setCenter(startPoint);
 
+
+    SynchronizedCamera debugCamera = new SynchronizedCamera(
+            "test_pixel_2.jpg",
+            "asd",
+            49.99819,
+            8.25949,
+            "no comments",
+            "2019-05-30",
+            "2019-05-30"
+
+    );
+
+    synchronizedCameraRepository.insert(Collections.singletonList(debugCamera));
 
 
     mapView.addMapListener(new DelayedMapListener(new MapListener() {
@@ -338,8 +352,23 @@ public class DebugActivity extends AppCompatActivity {
                 "2019-05-30",
                 false,
                 false);
+
+        SurveillanceCamera notRandomCamera = new SurveillanceCamera(
+                "test_pixel_2.jpg",
+                "test_nexus_10.jpg",
+                null,
+                49.99819,
+                8.25949,
+                "asd",
+                nullOrDate,
+                "2019-05-30",
+                false,
+                false);
+
+
         CameraRepository cameraRepository = new CameraRepository(getApplication());
         cameraRepository.insert(randomCamera);
+        cameraRepository.insert(notRandomCamera);
 
         randomCamerasAdded += 1;
 

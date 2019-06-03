@@ -105,7 +105,7 @@ public class StatisticsActivity extends AppCompatActivity {
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-
+    refreshSharedPreferencesObject();
     String homeZone = sharedPreferences.getString("area", null);
 
     String[] splitBorders = homeZone.split(",");
@@ -145,7 +145,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
     localBroadcastManager = LocalBroadcastManager.getInstance(StatisticsActivity.this);
 
-
+    refreshSharedPreferencesObject();
     String baseURL = sharedPreferences.getString("synchronizationURL", null);
     queryServerForStatistics(baseURL, "global", "2018-01-01", "2019-01-01");
 
@@ -196,6 +196,7 @@ public class StatisticsActivity extends AppCompatActivity {
     br = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
+        refreshSharedPreferencesObject();
         String baseURL = sharedPreferences.getString("synchronizationURL", null);
         queryServerForStatistics(baseURL, "global", "2018-01-01", "2019-01-01");
       }
@@ -243,7 +244,7 @@ public class StatisticsActivity extends AppCompatActivity {
     final String TAG = "StatisticsUtils";
     //TODO check api for negative values in left right top bottom see if still correct
 
-
+    refreshSharedPreferencesObject();
     SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, getApplicationContext());
 
     RequestQueue mRequestQueue;
@@ -330,6 +331,12 @@ public class StatisticsActivity extends AppCompatActivity {
     globalTodayTextView.setText(String.valueOf(globalTodayAmount));
     global28DaysTextView.setText(String.valueOf(global28DaysAmount));
     globalTotalTextView.setText(String.valueOf(globalTotalAmount));
+
+  }
+
+  private void refreshSharedPreferencesObject() {
+
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
   }
 }

@@ -55,7 +55,17 @@
             android:id="@+id/alarm_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ALARM"/>
+            android:text="SYNCJOB"/>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/start_tutorial"
@@ -68,14 +78,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="CHECK JOBS"/>
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0sp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
 
         <Button
             android:id="@+id/show_preferences"
@@ -89,6 +91,16 @@
             android:layout_height="wrap_content"
             android:text="ADD CAM"/>
 
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
         <Button
             android:id="@+id/upload_cameras"
             android:layout_width="wrap_content"
@@ -100,6 +112,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="KEY"/>
+
+
 
     </LinearLayout>
 

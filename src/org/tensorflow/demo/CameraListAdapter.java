@@ -26,6 +26,8 @@ import com.squareup.picasso.Picasso;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.IconOverlay;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
 
 import java.io.File;
@@ -64,6 +66,8 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
   private final LinearLayout mHistoryDetails;
 
   private List<SurveillanceCamera> mSurveillanceCameras;
+
+  private IconOverlay iconOverlay;
 
   private String picturesPath = SynchronizationUtils.PICTURES_PATH;
 
@@ -213,7 +217,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         public void onClick(View view) {
           Log.i("holder onClick:", "clicked position: " + holder.getAdapterPosition());
 
-
           int currentPosition = holder.getAdapterPosition();
           SurveillanceCamera currentCamera = mSurveillanceCameras.get(currentPosition);
 
@@ -228,6 +231,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
                   .placeholder(R.drawable.ic_launcher)
                   .into(detailImage);
 
+          detailMap.getOverlays().remove(iconOverlay);
 
           final IMapController mapController = detailMap.getController();
 
@@ -252,18 +256,13 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
           Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(view.getContext().getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
 
-          Marker cameraMarker = new Marker(detailMap);
-          cameraMarker.setPosition(cameraLocation);
-          cameraMarker.setIcon(cameraMarkerIcon);
-          cameraMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker, MapView mapView) {
-              return true;
-            }
-          });
 
+          iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
 
-          detailMap.getOverlays().add(cameraMarker);
+          detailMap.getOverlays().add(iconOverlay);
+
+          //detailMap.getOverlays().add(cameraMarker);
+          detailMap.invalidate();
 
 
         }

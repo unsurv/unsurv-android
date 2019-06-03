@@ -33,19 +33,19 @@ buildscript {
 
 
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        dependencies {
+            classpath 'com.android.tools.build:gradle:3.0.1'
 
+        }
     }
-}
 
-allprojects {
-    repositories {
-        jcenter()
-        google()
-        //MPAndroidCHart
-        maven { url 'https://jitpack.io' }
-    }
+    allprojects {
+        repositories {
+            jcenter()
+            google()
+            //MPAndroidCHart
+            maven { url 'https://jitpack.io' }
+        }
     }
 }
 

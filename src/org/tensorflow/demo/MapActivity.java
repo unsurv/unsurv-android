@@ -221,6 +221,7 @@ public class MapActivity extends AppCompatActivity {
 
         if (isZoomingOut) {
           reloadMarker();
+
         }
 
         closeAllInfoWindowsOn(mapView);
@@ -292,7 +293,7 @@ public class MapActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         if (!offlineMode) {
-          sharedPreferences.edit().putString("apiKeyExpiration", "2018-12-12 00:00:00").apply();
+
           queryServerForCameras("area=" + areaString);
         } else {
           updateAllCamerasInArea(true);
@@ -350,6 +351,7 @@ public class MapActivity extends AppCompatActivity {
               if (isInitialSpinnerSelection) {
                 isInitialSpinnerSelection = false;
 
+                refreshSharedPreferencesObject();
 
                 int savedValue = sharedPreferences.getInt("timemachineValueInDays", 0);
                 // if user set timeframe before use it
@@ -569,7 +571,7 @@ public class MapActivity extends AppCompatActivity {
     intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
 
     localBroadcastManager.registerReceiver(br, intentFilter);
-
+    refreshSharedPreferencesObject();
     reloadMarker();
   }
 
@@ -731,7 +733,7 @@ public class MapActivity extends AppCompatActivity {
                 " ,lonMax=" + lonMax +
                 ", zoom=" + zoom);
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        refreshSharedPreferencesObject();
 
         // TODO maybe move more or less static stuff out of background query? maybe keep to stay updated
 
@@ -967,6 +969,9 @@ public class MapActivity extends AppCompatActivity {
     //Drawable clusterCameraMarkerIcon = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 400, null);
     Drawable clusterCameraMarkerIcon = getDrawable(R.drawable.standard_camera_marker_15dpi);
 
+    //Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(view.getContext().getResources(), R.drawable.ic_close_red_24dp, 12, null);
+
+    refreshSharedPreferencesObject();
     boolean clusteringEnabled = sharedPreferences.getBoolean("clusteringEnabled", true);
 
     // normal behaviour if timemachine not active. clusters cameras
@@ -1174,6 +1179,11 @@ public class MapActivity extends AppCompatActivity {
   void queryServerForCameras(String queryString) {
 
     // aborts current query if API key expired. starts same query after a new API key is aquired
+    refreshSharedPreferencesObject();
+
+    String apiKey = sharedPreferences.getString("apiKey", null);
+    String apiKeyExp = sharedPreferences.getString("apiKeyExpiration", null);
+
 
     if (SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, getApplicationContext())){
       abortedServerQuery = true;
@@ -1196,6 +1206,7 @@ public class MapActivity extends AppCompatActivity {
     mRequestQueue.start();
 
     // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
+    refreshSharedPreferencesObject();
     String baseURL = sharedPreferences.getString("synchronizationURL", null) + "cameras/?";
 
     String url = baseURL + queryString;
@@ -1252,6 +1263,7 @@ public class MapActivity extends AppCompatActivity {
       public Map<String, String> getHeaders() throws AuthFailureError {
 
         Map<String, String> headers = new HashMap<>();
+        refreshSharedPreferencesObject();
         String apiKey = sharedPreferences.getString("apiKey", null);
         headers.put("Authorization", apiKey);
         headers.put("Content-Type", "application/json");
@@ -1305,6 +1317,12 @@ public class MapActivity extends AppCompatActivity {
         redrawMarkers(allCamerasInArea);
       }
     });
+
+  }
+
+  private void refreshSharedPreferencesObject() {
+
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
   }
 

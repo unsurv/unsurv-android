@@ -648,7 +648,8 @@ class SynchronizationUtils {
     Date currentDate = new Date(System.currentTimeMillis());
 
     try {
-      apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(sharedPreferences.getString("apiKeyExpiration", null));
+      String expiration = sharedPreferences.getString("apiKeyExpiration", null);
+      apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(expiration);
 
       if (apiKeyExpiration.before(currentDate)){
 
