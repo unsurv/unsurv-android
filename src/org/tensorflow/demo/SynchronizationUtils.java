@@ -6,7 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Camera;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
@@ -38,6 +37,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,8 +49,11 @@ import java.util.TimeZone;
 
 class SynchronizationUtils {
 
-  public static String picturesPath = Environment.getExternalStoragePublicDirectory(
+  public static String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
+
+  private static int UPLOAD_FAILED = 0;
+  private static int UPLOAD_SUCCESSFUL = 1;
 
   private static String TAG = "SynchronizationUtils";
 
@@ -276,7 +279,7 @@ class SynchronizationUtils {
   }
 
 
-  static void uploadSurveillanceCamera(List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, final CameraRepository cameraRepository) {
+  static void uploadSurveillanceCamera(final List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, final CameraRepository cameraRepository) {
 
     JSONArray postArray = new JSONArray();
 
@@ -353,7 +356,7 @@ class SynchronizationUtils {
                   String imageUploadUrl = baseUrl + "cameras/upload/image";
 
 
-                  uploadImages(cameraRepository, imageUploadUrl, sharedPreferences);
+                  uploadImages(camerasToUpload, cameraRepository, imageUploadUrl, sharedPreferences);
 
                 } catch (JSONException jse) {
                   Log.i(TAG, "JsonException in response: " + jse.toString());
@@ -400,20 +403,22 @@ class SynchronizationUtils {
   }
 
 
-  static void uploadImages(final CameraRepository cameraRepository, String url, final SharedPreferences sharedPreferences) {
+  static void uploadImages(final List<SurveillanceCamera> camerasForImageUpload, final CameraRepository cameraRepository, String url, final SharedPreferences sharedPreferences) {
 
-    final List<SurveillanceCamera> cameras = cameraRepository.getCamerasForImageUpload();
 
     HashMap<String, String> idToEncodedImageMap = new HashMap<>();
+    final HashMap<String, SurveillanceCamera> cameraMap = new HashMap<>();
 
     JSONArray postArray = new JSONArray();
 
     byte[] imageAsBytes;
     String imageAsBase64;
 
-    for (SurveillanceCamera camera : cameras){
+    for (int i = 0; i < camerasForImageUpload.size(); i++){
 
-      File imageFile = new File(picturesPath + camera.getThumbnailPath());
+      SurveillanceCamera currentCamera = camerasForImageUpload.get(i);
+
+      File imageFile = new File(PICTURES_PATH + currentCamera.getThumbnailPath());
       JSONObject singleCamera = new JSONObject();
 
       try {
@@ -422,9 +427,10 @@ class SynchronizationUtils {
 
         imageAsBase64 =  Base64.encodeToString(imageAsBytes, Base64.DEFAULT);
 
-        idToEncodedImageMap.put(camera.getExternalId(), imageAsBase64);
+        idToEncodedImageMap.put(currentCamera.getExternalId(), imageAsBase64);
+        cameraMap.put(currentCamera.getExternalId(), camerasForImageUpload.get(i));
 
-        singleCamera.put(camera.getExternalId(), imageAsBase64);
+        singleCamera.put(currentCamera.getExternalId(), imageAsBase64);
 
         postArray.put(singleCamera);
 
@@ -466,12 +472,30 @@ class SynchronizationUtils {
 
                 try {
 
-                  JSONObject updatedInfo = response.getJSONObject("message");
+                  JSONArray updatedInfo = response.getJSONArray("updated_info");
+
+                  for (int j = 0; j < updatedInfo.length(); j++){
+
+                    JSONObject currentResponseObject = (JSONObject) updatedInfo.get(j);
+
+                    SurveillanceCamera currentCamera = cameraMap.get(currentResponseObject.keys().next());
+
+                    JSONObject updatedInfoForCamera = updatedInfo.getJSONObject(j);
+
+                    int returnCodeByServer = updatedInfoForCamera.getInt(currentCamera.getExternalId());
+
+                    if (returnCodeByServer == UPLOAD_SUCCESSFUL){
+                      currentCamera.setUploadCompleted(true);
+                    }
+
+                    cameraRepository.updateCameras(currentCamera);
+
+                  }
 
                   boolean deleteOnUpload = sharedPreferences.getBoolean("deleteOnUpload", false);
 
                   if (deleteOnUpload){
-                    cleanupUploadedCameras(cameras, cameraRepository);
+                    cleanupUploadedCameras(camerasForImageUpload, cameraRepository);
                   }
 
                 } catch (JSONException jse) {
@@ -565,7 +589,7 @@ class SynchronizationUtils {
 
                     byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
 
-                    saveBytesToFile(imageAsBytes, id + ".jpg", picturesPath);
+                    saveBytesToFile(imageAsBytes, id + ".jpg", PICTURES_PATH);
 
                   }
 

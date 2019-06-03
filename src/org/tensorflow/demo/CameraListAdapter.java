@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -28,7 +29,6 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -65,11 +65,13 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   private List<SurveillanceCamera> mSurveillanceCameras;
 
-  private String picturesPath = SynchronizationUtils.picturesPath;
+  private String picturesPath = SynchronizationUtils.PICTURES_PATH;
 
   private final CameraRepository cameraRepository;
   private final SharedPreferences sharedPreferences;
   private final LayoutInflater layoutInflater;
+  private final Context ctx;
+
 
   CameraListAdapter(Context context, LinearLayout detailLinearLayout, Application application, LayoutInflater layoutInflater) {
     mInflater = LayoutInflater.from(context);
@@ -77,6 +79,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     cameraRepository = new CameraRepository(application);
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     this.layoutInflater = layoutInflater;
+    ctx = context;
 
 
   }
@@ -97,6 +100,8 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     if (mSurveillanceCameras != null) {
       final SurveillanceCamera current = mSurveillanceCameras.get(position);
 
+      final boolean currentCameraUploadComplete = current.getUploadCompleted();
+
       String mLatitude = String.valueOf(current.getLatitude());
       String mLongitude = String.valueOf(current.getLongitude());
       File mThumbnailPicture = new File(picturesPath + current.getThumbnailPath());
@@ -106,6 +111,11 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       // holder.thumbnailImageView.
       holder.latitudeTextView.setText(mLatitude);
       holder.longitudeTextView.setText(mLongitude);
+
+      if (currentCameraUploadComplete){
+        holder.uploadButton.setImageResource(R.drawable.ic_file_upload_green_24dp);
+        holder.uploadButton.setClickable(false);
+      }
 
       holder.deleteButton.setOnClickListener(new View.OnClickListener() {
         @Override
@@ -134,16 +144,14 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
                             RecyclerView.LayoutParams.WRAP_CONTENT,
                             RecyclerView.LayoutParams.WRAP_CONTENT);
 
-
-
             if (!popupWindow.isShowing()) {
 
 
               popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
               yesButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
 
                   if (dontAskAgainACheckBox.isChecked()) {
                     sharedPreferences.edit().putBoolean("quickDeleteCameras", true).apply();
@@ -152,9 +160,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
                   popupWindow.dismiss();
 
-
                 }
               });
+
 
               noButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -182,9 +190,14 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         @Override
         public void onClick(View view) {
 
+          if (!currentCameraUploadComplete) {
 
-          SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), "http://192.168.178.137:5000/", sharedPreferences, cameraRepository);
+            SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), "http://192.168.178.137:5000/", sharedPreferences, cameraRepository);
+            holder.uploadButton.setImageResource(R.drawable.ic_file_upload_green_24dp);
 
+          } else {
+            Toast.makeText(ctx, "Camera has already been uploaded.", Toast.LENGTH_SHORT).show();
+          }
 
         }
       });
@@ -223,7 +236,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
           // Setting starting position and zoom level.
           GeoPoint cameraLocation = new GeoPoint(lat, lon);
-          mapController.setZoom(15.0);
+          mapController.setZoom(16.0);
           mapController.setCenter(cameraLocation);
 
           String timestamp = mSurveillanceCameras.get(currentPosition).getTimestamp();

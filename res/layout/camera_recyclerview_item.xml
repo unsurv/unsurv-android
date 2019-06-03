@@ -69,7 +69,8 @@
             android:background="#c8333333"
             android:padding="4dp"
             android:src="@drawable/ic_close_red_24dp"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            />
 
         <ImageButton
             android:id="@+id/history_item_upload_button"

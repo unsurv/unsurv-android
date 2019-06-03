@@ -74,7 +74,6 @@ import org.tensorflow.demo.tracking.MultiBoxTracker;
 
 // MY CHANGES
 import java.io.FileOutputStream;
-import android.os.Environment;
 
 import static android.content.ContentValues.TAG;
 
@@ -239,7 +238,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private BorderedText borderedText;
 
-  private String picturesPath = SynchronizationUtils.picturesPath;
+  private String picturesPath = SynchronizationUtils.PICTURES_PATH;
   private static long timeLastPictureTaken = 0;
   private static final int DELAY_BETWEEN_CAPTURES = 500;
 
@@ -617,7 +616,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                   pooledCameraCaptures.clear();
 
-                  // TODO add "unsurv" to every picturesPath
+                  // TODO add "unsurv" to every PICTURES_PATH
                   CameraCapture cameraCapture1 = new CameraCapture(99.9f,
                           "190754878_thumbnail.jpg", "190754878.jpg",
                           10, 120, 50, 140,

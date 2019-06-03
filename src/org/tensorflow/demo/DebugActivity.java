@@ -83,7 +83,7 @@ public class DebugActivity extends AppCompatActivity {
 
   private WifiManager wifiManager;
 
-  private String picturesPath = SynchronizationUtils.picturesPath;
+  private String picturesPath = SynchronizationUtils.PICTURES_PATH;
 
   private int randomCamerasAdded;
   private List<SurveillanceCamera> allCameras = new ArrayList<>();
