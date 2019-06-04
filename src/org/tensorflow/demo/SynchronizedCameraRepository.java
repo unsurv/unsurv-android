@@ -117,6 +117,10 @@ public class SynchronizedCameraRepository {
     new insertAsyncTask(mSynchronizedCameraDao).execute((List)synchronizedCamera);
   }
 
+  public void update(SynchronizedCamera synchronizedCamera) {
+    new updateAsyncTask(mSynchronizedCameraDao).execute(synchronizedCamera);
+  }
+
   public void deleteAll() {
     mSynchronizedCameraDao.deleteAll();
   }
@@ -151,7 +155,7 @@ public class SynchronizedCameraRepository {
   private static class findByIDAsyncTask extends AsyncTask<String, Void, SynchronizedCamera> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+    private String TAG = "SynchronizedCameraRepository findByIdAsyncTask";
 
     findByIDAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -167,11 +171,30 @@ public class SynchronizedCameraRepository {
 
   }
 
+  private static class updateAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository updateAsyncTask";
+
+    updateAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected Void doInBackground(final SynchronizedCamera... params) {
+
+       mAsyncTaskDao.update(params[0]);
+
+      return null;
+    }
+
+  }
+
 
   private static class getStatisticsAsyncTask extends AsyncTask<Double, Void, List<StatisticsMap>> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+    private String TAG = "SynchronizedCameraRepository getStatsAsyncTask";
 
     getStatisticsAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -191,7 +214,7 @@ public class SynchronizedCameraRepository {
   private static class camerasInTimeframeAsyncTask extends AsyncTask<String, Void, Integer> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+    private String TAG = "SynchronizedCameraRepository inTimeframeAsyncTask";
 
     camerasInTimeframeAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -211,7 +234,7 @@ public class SynchronizedCameraRepository {
   private static class camerasInLastTwoMinutesAsyncTask extends AsyncTask<Void, Void, List<SynchronizedCamera>> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+    private String TAG = "SynchronizedCameraRepository inLastTwoMinutesAsyncTask";
 
     camerasInLastTwoMinutesAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -231,7 +254,7 @@ public class SynchronizedCameraRepository {
   private static class camerasTotalAsyncTask extends AsyncTask<Void, Void, Integer> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+    private String TAG = "SynchronizedCameraRepository camerasTotalCountAsyncTask";
 
     camerasTotalAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -251,7 +274,7 @@ public class SynchronizedCameraRepository {
   private static class findSlimCamerasInArea extends AsyncTask<Double, Void, List<SlimSynchronizedCamera>> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+    private String TAG = "SynchronizedCameraRepository finSlimCamerasAsyncTask";
 
     findSlimCamerasInArea(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;

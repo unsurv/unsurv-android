@@ -5,6 +5,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,9 @@ public interface SynchronizedCameraDao {
 
   @Insert
   void insert(SynchronizedCamera synchronizedCamera);
+
+  @Update
+  void update(SynchronizedCamera synchronizedCamera);
 
   @Query("SELECT * FROM synchronized_cameras")
   List<SynchronizedCamera> getAllCameras();

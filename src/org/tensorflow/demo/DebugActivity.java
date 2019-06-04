@@ -926,7 +926,7 @@ public class DebugActivity extends AppCompatActivity {
   }
 
 
-  void downloadImagesFromServer(String baseUrl, final List<String> externalIds, final SharedPreferences sharedPreferences) {
+  void downloadImagesFromServer(String baseUrl, final List<String> externalIds, final SynchronizedCameraRepository synchronizedCameraRepository, final SharedPreferences sharedPreferences) {
 
     JSONObject postObject = new JSONObject();
 
@@ -1021,6 +1021,14 @@ public class DebugActivity extends AppCompatActivity {
         int percentCompleted = (imagesDownloaded / currentBatchSize)*100;
         progressPercentage.setText(percentCompleted + " %");
 
+        for (String externalId : externalIds){
+
+          SynchronizedCamera camera = synchronizedCameraRepository.findByID(externalId);
+          camera.setImagePath(camera.getExternalID() + ".jpg");
+          synchronizedCameraRepository.update(camera);
+
+        }
+
 
       }
     });
@@ -1110,17 +1118,22 @@ public class DebugActivity extends AppCompatActivity {
         if (!downloadStoppedByUser) {
           downloadImagesFromServer(baseURL,
                   splitIds,
+                  synchronizedCameraRepository,
                   sharedPreferences);
         }
 
       }
 
 
+
     } else {
       downloadImagesFromServer(baseURL,
               idsForImageDownload,
+              synchronizedCameraRepository,
               sharedPreferences);
     }
+
+
 
   }
 
