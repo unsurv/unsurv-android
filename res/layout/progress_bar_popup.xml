@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="180dp"
+    android:layout_height="wrap_content"
+    android:background="#c8333333"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="Downloading cameras:"
+        />
+
+    <ProgressBar
+        android:id="@+id/determinateBar"
+        style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp" />
+
+    <TextView
+        android:id="@+id/progress_percentage_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0 %"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/progress_popup_cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CANCEL"/>
+
+        <Button
+            android:id="@+id/progress_popup_hide_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HIDE"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

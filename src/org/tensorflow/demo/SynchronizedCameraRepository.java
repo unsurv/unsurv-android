@@ -4,8 +4,6 @@ import android.app.Application;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class SynchronizedCameraRepository {
@@ -86,6 +84,19 @@ public class SynchronizedCameraRepository {
     } catch (Exception e) {
       Log.i("Background findByID Error: " , e.toString());
       return 0;
+    }
+
+  }
+
+
+  List<SynchronizedCamera> getCamerasAddedInLastTwoMinutes(){
+    try {
+
+      return new camerasInLastTwoMinutesAsyncTask(mSynchronizedCameraDao).execute().get();
+
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+      return null;
     }
 
   }
@@ -189,9 +200,29 @@ public class SynchronizedCameraRepository {
     @Override
     protected Integer doInBackground(final String... params) {
 
-      int camerasInTimeframe = mAsyncTaskDao.getCamerasAddedInTimeframe(params[0], params[1]);
+      int camerasInTimeframe = mAsyncTaskDao.getCamerasAddedInTimeframeAmount(params[0], params[1]);
 
       return camerasInTimeframe;
+    }
+
+  }
+
+
+  private static class camerasInLastTwoMinutesAsyncTask extends AsyncTask<Void, Void, List<SynchronizedCamera>> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+
+    camerasInLastTwoMinutesAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected List<SynchronizedCamera> doInBackground(final Void... params) {
+
+      List<SynchronizedCamera> camerasInLastTwoMInutes = mAsyncTaskDao.getCamerasAddedInLastTwoMinutes();
+
+      return camerasInLastTwoMInutes;
     }
 
   }

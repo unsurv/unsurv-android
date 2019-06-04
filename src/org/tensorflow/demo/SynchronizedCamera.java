@@ -24,7 +24,7 @@ public class SynchronizedCamera {
   private String uploadedAt;
 
 
-  public SynchronizedCamera (String imagePath,
+  public SynchronizedCamera (@Nullable String imagePath,
                              String externalID,
                              double latitude,
                              double longitude,

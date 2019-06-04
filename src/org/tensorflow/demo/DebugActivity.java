@@ -1,6 +1,8 @@
 package org.tensorflow.demo;
 
+import android.animation.LayoutTransition;
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.Context;
@@ -12,21 +14,44 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.MathUtils;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Network;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.NoCache;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
@@ -47,12 +72,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
+import static org.tensorflow.demo.SynchronizationUtils.PICTURES_PATH;
 
 
 public class DebugActivity extends AppCompatActivity {
@@ -80,15 +108,24 @@ public class DebugActivity extends AppCompatActivity {
   private ImageButton infoEscape;
 
   private List<CameraCapture> allCamerasInArea;
-  private List<SynchronizedCamera> camerasToSync;
+  private List<SynchronizedCamera> camerasToSync = new ArrayList<>();
 
   private WifiManager wifiManager;
 
-  private String picturesPath = SynchronizationUtils.PICTURES_PATH;
+  private String picturesPath = PICTURES_PATH;
 
   private int randomCamerasAdded;
   private List<SurveillanceCamera> allCameras = new ArrayList<>();
   private CameraRepository cameraRepository;
+
+  private ProgressBar progress;
+  private int imagesDownloaded;
+  private int currentBatchSize;
+
+  private LayoutInflater layoutInflater;
+  private TextView progressPercentage;
+
+  private boolean downloadStoppedByUser = false;
 
 
 
@@ -146,6 +183,7 @@ public class DebugActivity extends AppCompatActivity {
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
 
     randomCamerasAdded = 0;
+    imagesDownloaded = 0;
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -174,10 +212,14 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putInt("maxUploadDelay", 604800).apply();
 
     // SynchronizationUtils.getAPIkey(DebugActivity.this, sharedPreferences);
-
-
     // set in timemachineSpinner
     // sharedPreferences.edit().putInt("timemachineValue", null).apply();
+
+    progress = new ProgressBar(DebugActivity.this);
+
+     layoutInflater = (LayoutInflater) DebugActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+
 
     notificationPreference = sharedPreferences.getBoolean("notifications", false);
     debugTextView.setText(String.valueOf(notificationPreference));
@@ -243,14 +285,31 @@ public class DebugActivity extends AppCompatActivity {
       public void onClick(View view) {
 
         String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
+        String homeArea = sharedPreferences.getString("area", null);
 
+        /*
         SynchronizationUtils.downloadCamerasFromServer(
                 baseURL,
-                "area=" + sharedPreferences.getString("area", null),
+                "area=" + homeArea,
                 sharedPreferences,
                 true,
                 null,
                 synchronizedCameraRepository);
+         */
+
+
+        downloadCamerasFromServerWithProgressBar(
+                baseURL,
+                "area=" + homeArea,
+                sharedPreferences,
+                true,
+                null,
+                synchronizedCameraRepository);
+
+
+
+
+
 
       }
     });
@@ -758,6 +817,311 @@ public class DebugActivity extends AppCompatActivity {
 
 
     }
+  }
+
+
+  void downloadCamerasFromServerWithProgressBar(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
+
+    //TODO check api for negative values in left right top bottom see if still correct
+
+    camerasToSync.clear();
+
+    final SynchronizedCameraRepository crep = synchronizedCameraRepository;
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    String URL = baseUrl  + "cameras/?" + areaQuery;
+
+    if (startQuery != null) {
+      URL += "&" + startQuery;
+    }
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            URL,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+
+                JSONObject JSONToSynchronize;
+
+                try {
+
+                  for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
+                    JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
+
+                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(
+                            null,
+                            JSONToSynchronize.getString("id"),
+                            JSONToSynchronize.getDouble("lat"),
+                            JSONToSynchronize.getDouble("lon"),
+                            JSONToSynchronize.getString("comments"),
+                            JSONToSynchronize.getString("lastUpdated"),
+                            JSONToSynchronize.getString("uploadedAt")
+
+                    );
+
+                    camerasToSync.add(cameraToAdd);
+
+                  }
+
+                  if (insertIntoDb) {
+                    crep.insert(camerasToSync);
+                  }
+
+                } catch (Exception e) {
+                  Log.i(TAG, "onResponse: " + e.toString());
+
+                }
+
+              }
+            }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        // TODO: Handle Errors
+        Log.i(TAG, "Error in connection " + error.toString());
+      }
+    }) {
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+
+      startImageDownloadWithProgressBar();
+
+      }
+    });
+
+    mRequestQueue.add(jsonObjectRequest);
+
+  }
+
+
+  void downloadImagesFromServer(String baseUrl, final List<String> externalIds, final SharedPreferences sharedPreferences) {
+
+    JSONObject postObject = new JSONObject();
+
+    JSONArray ids = new JSONArray();
+
+    for (String id : externalIds) {
+      ids.put(id);
+    }
+
+    try {
+
+      postObject.put("ids", ids);
+
+    } catch (JSONException jse){
+      Log.i(TAG, "downloadImages: " + jse.toString());
+    }
+
+    String url = baseUrl + "images/";
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            postObject,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                try {
+
+                  for (String id : externalIds) {
+
+                    String base64Image = response.getString(id);
+
+                    byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
+
+                    SynchronizationUtils.saveBytesToFile(imageAsBytes, id + ".jpg", PICTURES_PATH);
+
+                  }
+
+
+                } catch (Exception e) {
+                  Log.i(TAG, "response to jpg error: " + e.toString());
+                }
+
+              }
+            },
+
+            new Response.ErrorListener() {
+              @Override
+              public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "downloadImages: " + error.toString());
+
+              }
+            }
+    ){
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+        Log.i(TAG, "post request finished");
+
+        imagesDownloaded += externalIds.size();
+        progress.setProgress(imagesDownloaded);
+        int percentCompleted = (imagesDownloaded / currentBatchSize)*100;
+        progressPercentage.setText(percentCompleted + " %");
+
+
+      }
+    });
+
+    mRequestQueue.add(jsonObjectRequest);
+
+
+  }
+
+  void startImageDownloadWithProgressBar(){
+
+    String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
+
+    imagesDownloaded = 0;
+
+    List<String> idsForImageDownload = new ArrayList<>();
+
+    for (SynchronizedCamera camera : camerasToSync){
+
+      idsForImageDownload.add(camera.getExternalID());
+
+    }
+
+    int size = idsForImageDownload.size();
+    currentBatchSize = size;
+
+    progress.setMax(size);
+
+    // split list in 10 "even"
+
+    List<List<String>> splitLists = new ArrayList<>();
+
+    int amountPerList = Math.floorDiv(size,  10);
+
+    for (int i = 0; i < 10; i++) {
+
+      int currentMinIndex = i * amountPerList;
+
+      if (i != 9){
+        splitLists.add(idsForImageDownload.subList(currentMinIndex, currentMinIndex + amountPerList));
+
+      } else {
+        splitLists.add(idsForImageDownload.subList(currentMinIndex, size));
+      }
+    }
+
+
+    if (size > 50){
+
+      View popupView = layoutInflater.inflate(R.layout.progress_bar_popup, null);
+
+      Button cancelButton = popupView.findViewById(R.id.progress_popup_cancel_button);
+      Button hideButton = popupView.findViewById(R.id.progress_popup_hide_button);
+      progressPercentage = popupView.findViewById(R.id.progress_percentage_text);
+
+      final PopupWindow popupWindow =
+              new PopupWindow(popupView,
+                      RecyclerView.LayoutParams.WRAP_CONTENT,
+                      RecyclerView.LayoutParams.WRAP_CONTENT);
+
+      if (!popupWindow.isShowing()) {
+
+        popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+            downloadStoppedByUser = true;
+            popupWindow.dismiss();
+
+          }
+        });
+
+
+        hideButton.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+
+            popupWindow.dismiss();
+
+          }
+        });
+      }
+
+      for (List<String> splitIds : splitLists) {
+
+        if (!downloadStoppedByUser) {
+          downloadImagesFromServer(baseURL,
+                  splitIds,
+                  sharedPreferences);
+        }
+
+      }
+
+
+    } else {
+      downloadImagesFromServer(baseURL,
+              idsForImageDownload,
+              sharedPreferences);
+    }
+
   }
 
 }

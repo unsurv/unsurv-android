@@ -48,7 +48,13 @@ public interface SynchronizedCameraDao {
 
   @Query("SELECT count(*) FROM synchronized_cameras " +
           "WHERE uploadedAt BETWEEN datetime(:startDate) and  datetime(:endDate)")
-  int getCamerasAddedInTimeframe(String startDate, String endDate);
+  int getCamerasAddedInTimeframeAmount(String startDate, String endDate);
+
+  @Query("SELECT * FROM synchronized_cameras " +
+          "WHERE uploadedAt BETWEEN datetime('now') and  datetime('now', '-2 minutes')")
+  List<SynchronizedCamera> getCamerasAddedInLastTwoMinutes();
+
+
 
   @Query("SELECT count(*) from synchronized_cameras")
   int getNumberOfCameras();

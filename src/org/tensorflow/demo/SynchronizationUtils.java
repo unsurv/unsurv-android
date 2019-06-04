@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +55,8 @@ class SynchronizationUtils {
   private static int UPLOAD_SUCCESSFUL = 1;
 
   private static String TAG = "SynchronizationUtils";
+
+
 
   static Boolean scheduleSyncIntervalJob (Context context, @Nullable PersistableBundle jobExtras) {
 
@@ -148,7 +149,7 @@ class SynchronizationUtils {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
-                            "test_pixel_2.jpg",
+                            null,
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
@@ -165,6 +166,8 @@ class SynchronizationUtils {
                   if (insertIntoDb) {
                     crep.insert(camerasToSync);
                   }
+
+
 
 
                 } catch (Exception e) {
@@ -198,7 +201,115 @@ class SynchronizationUtils {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
     ));
 
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+
+
+
+      }
+    });
+
     mRequestQueue.add(jsonObjectRequest);
+
+  }
+
+
+  static void downloadImagesFromServer(String baseUrl, final List<String> externalIds, final SharedPreferences sharedPreferences) {
+
+    JSONObject postObject = new JSONObject();
+
+    JSONArray ids = new JSONArray();
+
+    for (String id : externalIds) {
+      ids.put(id);
+    }
+
+    try {
+
+      postObject.put("ids", ids);
+
+    } catch (JSONException jse){
+      Log.i(TAG, "downloadImages: " + jse.toString());
+    }
+
+    String url = baseUrl + "images/";
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            postObject,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                try {
+
+                  for (String id : externalIds) {
+
+                    String base64Image = response.getString(id);
+
+                    byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
+
+                    saveBytesToFile(imageAsBytes, id + ".jpg", PICTURES_PATH);
+
+                  }
+
+
+                } catch (Exception e) {
+                  Log.i(TAG, "response to jpg error: " + e.toString());
+                }
+
+              }
+            },
+
+            new Response.ErrorListener() {
+              @Override
+              public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "downloadImages: ");
+
+              }
+            }
+    ){
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+        Log.i(TAG, "post request finished");
+      }
+    });
+
+    mRequestQueue.add(jsonObjectRequest);
+
 
   }
 
@@ -488,6 +599,8 @@ class SynchronizationUtils {
                       currentCamera.setUploadCompleted(true);
                     }
 
+                    // TODO add logic if upload failed
+
                     cameraRepository.updateCameras(currentCamera);
 
                   }
@@ -539,103 +652,6 @@ class SynchronizationUtils {
     });
 
     mRequestQueue.add(jsonObjectRequest);
-
-  }
-
-
-  static void downloadImages(String url, final List<String> externalIds, final SharedPreferences sharedPreferences) {
-
-    JSONObject postObject = new JSONObject();
-
-    JSONArray ids = new JSONArray();
-
-    for (String id : externalIds) {
-      ids.put(id);
-    }
-
-    try {
-
-      postObject.put("ids", ids);
-
-    } catch (JSONException jse){
-      Log.i(TAG, "downloadImages: " + jse.toString());
-    }
-
-
-    RequestQueue mRequestQueue;
-
-    // Set up the network to use HttpURLConnection as the HTTP client.
-    Network network = new BasicNetwork(new HurlStack());
-
-    // Instantiate the RequestQueue with the cache and network.
-    mRequestQueue = new RequestQueue(new NoCache(), network);
-
-    // Start the queue
-    mRequestQueue.start();
-
-    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-            Request.Method.POST,
-            url,
-            postObject,
-            new Response.Listener<JSONObject>() {
-              @Override
-              public void onResponse(JSONObject response) {
-
-                try {
-
-                  for (String id : externalIds) {
-
-                    String base64Image = response.getString(id);
-
-                    byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
-
-                    saveBytesToFile(imageAsBytes, id + ".jpg", PICTURES_PATH);
-
-                  }
-
-
-                } catch (Exception e) {
-                  Log.i(TAG, "response to jpg error: " + e.toString());
-                }
-
-              }
-            },
-
-            new Response.ErrorListener() {
-              @Override
-              public void onErrorResponse(VolleyError error) {
-                Log.i(TAG, "downloadImages: ");
-
-              }
-            }
-    ){
-      @Override
-      public Map<String, String> getHeaders() throws AuthFailureError {
-        Map<String, String> headers = new HashMap<>();
-        String apiKey = sharedPreferences.getString("apiKey", null);
-        headers.put("Authorization", apiKey);
-        headers.put("Content-Type", "application/json");
-
-        return headers;
-      }
-    };
-
-    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-            30000,
-            0,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-    ));
-
-    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-
-      @Override
-      public void onRequestFinished(Request<Object> request) {
-        Log.i(TAG, "post request finished");
-      }
-    });
-
-    mRequestQueue.add(jsonObjectRequest);
-
 
   }
 
