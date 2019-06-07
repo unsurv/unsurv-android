@@ -1,22 +1,24 @@
 package org.tensorflow.demo;
 
+import android.Manifest;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -24,11 +26,46 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryActivity extends AppCompatActivity {
 
   private CameraViewModel mCameraViewModel;
+  private int readStoragePermission;
+  private int writeStoragePermission;
+
+
+  @Override
+  protected void onResume() {
+
+    readStoragePermission = ContextCompat.checkSelfPermission(HistoryActivity.this,
+            Manifest.permission.READ_EXTERNAL_STORAGE);
+    writeStoragePermission = ContextCompat.checkSelfPermission(HistoryActivity.this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+
+    List<String> permissionList = new ArrayList<>();
+
+    if (readStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+    }
+
+    if (writeStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+
+    String[] neededPermissions = permissionList.toArray(new String[0]);
+
+    if (!permissionList.isEmpty()) {
+      ActivityCompat.requestPermissions(HistoryActivity.this, neededPermissions, 0);
+    }
+
+
+
+    super.onResume();
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

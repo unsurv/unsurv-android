@@ -1,13 +1,17 @@
 package org.tensorflow.demo;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,6 +35,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -79,6 +84,9 @@ public class StatisticsActivity extends AppCompatActivity {
   private LocalBroadcastManager localBroadcastManager;
   private IntentFilter intentFilter;
   private BroadcastReceiver br;
+
+  private int readStoragePermission;
+  private int writeStoragePermission;
 
 
 
@@ -205,6 +213,32 @@ public class StatisticsActivity extends AppCompatActivity {
     intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
 
     localBroadcastManager.registerReceiver(br, intentFilter);
+
+    readStoragePermission = ContextCompat.checkSelfPermission(StatisticsActivity.this,
+            Manifest.permission.READ_EXTERNAL_STORAGE);
+    writeStoragePermission = ContextCompat.checkSelfPermission(StatisticsActivity.this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+
+
+    List<String> permissionList = new ArrayList<>();
+
+    if (readStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+    }
+
+    if (writeStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+
+    String[] neededPermissions = permissionList.toArray(new String[0]);
+
+    if (!permissionList.isEmpty()) {
+      ActivityCompat.requestPermissions(StatisticsActivity.this, neededPermissions, 3);
+    }
+
+    super.onResume();
   }
 
   @Override

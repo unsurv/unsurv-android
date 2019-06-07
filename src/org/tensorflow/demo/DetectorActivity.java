@@ -16,9 +16,11 @@
 
 package org.tensorflow.demo;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -42,6 +44,8 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
@@ -289,6 +293,11 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private Boolean isTimeToCapture = false;
 
+  private int readStoragePermission;
+  private int writeStoragePermission;
+  private int cameraPermission;
+  private int fineLocationPermission;
+
 
 
   @Override
@@ -326,7 +335,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   @Override
   public void onResume() {
-    super.onResume();
 
     // Get updates from the accelerometer and magnetometer at a constant rate.
     // To make batch operations more efficient and reduce power consumption,
@@ -347,6 +355,46 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     }
 
     gpsLocation.execute();
+
+
+    readStoragePermission = ContextCompat.checkSelfPermission(DetectorActivity.this,
+            Manifest.permission.READ_EXTERNAL_STORAGE);
+    writeStoragePermission = ContextCompat.checkSelfPermission(DetectorActivity.this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    cameraPermission = ContextCompat.checkSelfPermission(DetectorActivity.this,
+            Manifest.permission.CAMERA);
+    fineLocationPermission = ContextCompat.checkSelfPermission(DetectorActivity.this,
+            Manifest.permission.ACCESS_FINE_LOCATION);
+
+
+    List<String> permissionList = new ArrayList<>();
+
+    if (readStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+    }
+
+    if (writeStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.CAMERA);
+    }
+
+    if (fineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+
+    String[] neededPermissions = permissionList.toArray(new String[0]);
+
+    if (!permissionList.isEmpty()) {
+      ActivityCompat.requestPermissions(DetectorActivity.this, neededPermissions, 1);
+    }
+
+    super.onResume();
+
+
   }
 
   @Override

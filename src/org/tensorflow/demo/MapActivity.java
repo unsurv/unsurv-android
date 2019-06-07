@@ -1,10 +1,12 @@
 package org.tensorflow.demo;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -12,6 +14,8 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -177,6 +181,10 @@ public class MapActivity extends AppCompatActivity {
   private BroadcastReceiver br;
 
   private boolean abortedServerQuery;
+
+  private int readStoragePermission;
+  private int writeStoragePermission;
+  private int fineLocationPermission;
 
 
   // TODO set max amount visible
@@ -573,6 +581,39 @@ public class MapActivity extends AppCompatActivity {
     localBroadcastManager.registerReceiver(br, intentFilter);
     refreshSharedPreferencesObject();
     reloadMarker();
+
+    readStoragePermission = ContextCompat.checkSelfPermission(MapActivity.this,
+            Manifest.permission.READ_EXTERNAL_STORAGE);
+    writeStoragePermission = ContextCompat.checkSelfPermission(MapActivity.this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    fineLocationPermission = ContextCompat.checkSelfPermission(MapActivity.this,
+            Manifest.permission.ACCESS_FINE_LOCATION);
+
+
+    List<String> permissionList = new ArrayList<>();
+
+    if (readStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+    }
+
+    if (writeStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+
+    if (fineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+
+    String[] neededPermissions = permissionList.toArray(new String[0]);
+
+    if (!permissionList.isEmpty()) {
+      ActivityCompat.requestPermissions(MapActivity.this, neededPermissions, 2);
+    }
+
+    super.onResume();
+
   }
 
   @Override
