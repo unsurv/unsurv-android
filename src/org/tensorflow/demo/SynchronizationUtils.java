@@ -78,6 +78,7 @@ class SynchronizationUtils {
     syncJobExtras.putString("baseUrl", sharedPreferences.getString("synchronizationURL", null));
     syncJobExtras.putString("area", sharedPreferences.getString("area", null));
     syncJobExtras.putString("start", sharedPreferences.getString("lastUpdated", null));
+    syncJobExtras.putBoolean("downloadImages", sharedPreferences.getBoolean("downloadImages", false));
 
 
     ComponentName componentName = new ComponentName(context, SyncIntervalSchedulerJobService.class);
@@ -216,13 +217,20 @@ class SynchronizationUtils {
   }
 
 
-  static void downloadImagesFromServer(String baseUrl, final List<String> externalIds, final SharedPreferences sharedPreferences) {
+  static void downloadImagesFromServer(String baseUrl, final List<SynchronizedCamera> cameras, final SharedPreferences sharedPreferences) {
+
+    final List<String> idsFromCameras = new ArrayList<>();
+
+    for (SynchronizedCamera camera : cameras) {
+      idsFromCameras.add(camera.getExternalID());
+    }
+
 
     JSONObject postObject = new JSONObject();
 
     JSONArray ids = new JSONArray();
 
-    for (String id : externalIds) {
+    for (String id : idsFromCameras) {
       ids.put(id);
     }
 
@@ -257,7 +265,7 @@ class SynchronizationUtils {
 
                 try {
 
-                  for (String id : externalIds) {
+                  for (String id : idsFromCameras) {
 
                     String base64Image = response.getString(id);
 
@@ -686,6 +694,7 @@ class SynchronizationUtils {
 
   static void cleanupUploadedCameras(List<SurveillanceCamera> cameras, CameraRepository cameraRepository){
     for (SurveillanceCamera camera : cameras){
+
       cameraRepository.deleteCameras(camera);
 
     }

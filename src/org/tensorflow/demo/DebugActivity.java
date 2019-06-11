@@ -178,6 +178,7 @@ public class DebugActivity extends AppCompatActivity {
     final Button addCam = findViewById(R.id.add_surveilllance_camera);
     final Button uploadCameras = findViewById(R.id.upload_cameras);
     final Button getKeyButton = findViewById(R.id.get_key);
+    final Button abortSyncButton = findViewById(R.id.abort_job);
 
     cameraRepository = new CameraRepository(getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
@@ -205,6 +206,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("showCaptureTimestamps", false).apply();
     sharedPreferences.edit().putBoolean("deleteOnUpload", false).apply();
     sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
+    sharedPreferences.edit().putBoolean("downloadImages", true).apply();
 
 
 
@@ -306,11 +308,6 @@ public class DebugActivity extends AppCompatActivity {
                 null,
                 synchronizedCameraRepository);
 
-
-
-
-
-
       }
     });
 
@@ -364,9 +361,9 @@ public class DebugActivity extends AppCompatActivity {
 
         JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
-        List<JobInfo> b = jobScheduler.getAllPendingJobs();
+        List<JobInfo> jobs = jobScheduler.getAllPendingJobs();
 
-        debugTextView.setText(b.toString());
+        debugTextView.setText(jobs.toString());
       }
     });
 
@@ -455,6 +452,19 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         SynchronizationUtils.getAPIkey(DebugActivity.this, sharedPreferences);
+      }
+    });
+
+    abortSyncButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
+
+        List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
+
+        jobScheduler.cancel(0);
+
       }
     });
 
@@ -1018,8 +1028,16 @@ public class DebugActivity extends AppCompatActivity {
 
         imagesDownloaded += externalIds.size();
         progress.setProgress(imagesDownloaded);
-        int percentCompleted = (imagesDownloaded / currentBatchSize)*100;
-        progressPercentage.setText(percentCompleted + " %");
+        int percentCompleted = 0;
+
+        if (currentBatchSize != 0) {
+          percentCompleted = (imagesDownloaded / currentBatchSize) * 100;
+        }
+
+        if (progressPercentage != null) {
+          // is null if server sends error
+          progressPercentage.setText(percentCompleted + " %");
+        }
 
         for (String externalId : externalIds){
 
@@ -1123,8 +1141,6 @@ public class DebugActivity extends AppCompatActivity {
         }
 
       }
-
-
 
     } else {
       downloadImagesFromServer(baseURL,

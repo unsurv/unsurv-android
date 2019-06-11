@@ -3,6 +3,7 @@ package org.tensorflow.demo;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
@@ -21,6 +22,9 @@ public interface SynchronizedCameraDao {
 
   @Update
   void update(SynchronizedCamera synchronizedCamera);
+
+  @Delete
+  void delete(SynchronizedCamera synchronizedCamera);
 
   @Query("SELECT * FROM synchronized_cameras")
   List<SynchronizedCamera> getAllCameras();
@@ -55,10 +59,8 @@ public interface SynchronizedCameraDao {
   int getCamerasAddedInTimeframeAmount(String startDate, String endDate);
 
   @Query("SELECT * FROM synchronized_cameras " +
-          "WHERE uploadedAt BETWEEN datetime('now') and  datetime('now', '-2 minutes')")
-  List<SynchronizedCamera> getCamerasAddedInLastTwoMinutes();
-
-
+          "WHERE uploadedAt BETWEEN datetime('now') and  datetime('now', '-2 minutes') AND imagePath IS NULL")
+  List<SynchronizedCamera> getRecentlyUpdatedCameras();
 
   @Query("SELECT count(*) from synchronized_cameras")
   int getNumberOfCameras();

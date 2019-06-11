@@ -113,6 +113,12 @@
             android:layout_height="wrap_content"
             android:text="KEY"/>
 
+        <Button
+            android:id="@+id/abort_job"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ABORT JOB"/>
+
 
 
     </LinearLayout>

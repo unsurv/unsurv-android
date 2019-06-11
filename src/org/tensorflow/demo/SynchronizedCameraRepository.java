@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SynchronizedCameraRepository {
@@ -121,7 +123,29 @@ public class SynchronizedCameraRepository {
     new updateAsyncTask(mSynchronizedCameraDao).execute(synchronizedCamera);
   }
 
+  public void delete(SynchronizedCamera synchronizedCamera) {
+
+    String current_path = SynchronizationUtils.PICTURES_PATH + synchronizedCamera.getImagePath();
+
+    File file = new File(current_path);
+    boolean deleted = file.delete();
+
+    new deleteAsyncTask(mSynchronizedCameraDao).execute(synchronizedCamera);
+  }
+
   public void deleteAll() {
+    List<SynchronizedCamera> allCameras = mSynchronizedCameraDao.getAllCameras();
+
+
+
+    for (SynchronizedCamera camera : allCameras) {
+      String current_path = SynchronizationUtils.PICTURES_PATH + camera.getImagePath();
+
+      File file = new File(current_path);
+      boolean deleted = file.delete();
+
+    }
+
     mSynchronizedCameraDao.deleteAll();
   }
 
@@ -190,6 +214,25 @@ public class SynchronizedCameraRepository {
 
   }
 
+  private static class deleteAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository updateAsyncTask";
+
+    deleteAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected Void doInBackground(final SynchronizedCamera... params) {
+
+      mAsyncTaskDao.delete(params[0]);
+
+      return null;
+    }
+
+  }
+
 
   private static class getStatisticsAsyncTask extends AsyncTask<Double, Void, List<StatisticsMap>> {
 
@@ -243,7 +286,7 @@ public class SynchronizedCameraRepository {
     @Override
     protected List<SynchronizedCamera> doInBackground(final Void... params) {
 
-      List<SynchronizedCamera> camerasInLastTwoMInutes = mAsyncTaskDao.getCamerasAddedInLastTwoMinutes();
+      List<SynchronizedCamera> camerasInLastTwoMInutes = mAsyncTaskDao.getRecentlyUpdatedCameras();
 
       return camerasInLastTwoMInutes;
     }

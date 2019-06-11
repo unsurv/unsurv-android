@@ -5,7 +5,10 @@ import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.io.File;
 import java.util.List;
+
+import static org.tensorflow.demo.SynchronizationUtils.PICTURES_PATH;
 
 public class CameraRepository {
 
@@ -42,6 +45,7 @@ public class CameraRepository {
   }
 
   void deleteCameras (SurveillanceCamera... surveillanceCameras) {
+
     new deleteAsyncTask(mCameraDao).execute(surveillanceCameras);
   }
 
@@ -140,6 +144,9 @@ public class CameraRepository {
 
     @Override
     protected Void doInBackground(final SurveillanceCamera... params) {
+      String cameraImagePath = params[0].getImagePath();
+      File file = new File(PICTURES_PATH + cameraImagePath);
+      boolean deleted = file.delete();
       mAsyncTaskDao.deleteCameras(params);
       return null;
     }

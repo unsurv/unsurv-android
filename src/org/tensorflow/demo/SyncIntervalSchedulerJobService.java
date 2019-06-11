@@ -4,12 +4,14 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -20,6 +22,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
   private String baseUrl;
   private String areaQuery;
   private String startQuery;
+  private boolean downloadImages;
   private SynchronizedCameraRepository synchronizedCameraRepository;
   private CameraRepository cameraRepository;
   private SharedPreferences sharedPreferences;
@@ -41,6 +44,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
     baseUrl = intervalSchedulerExtras.getString("baseUrl");
     areaQuery = "area=" + intervalSchedulerExtras.getString("area");
     startQuery = "start=" + sharedPreferences.getString("lastUpdated", "01-01-2000");
+    downloadImages = intervalSchedulerExtras.getBoolean("downloadImages");
 
     timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
@@ -73,10 +77,31 @@ public class SyncIntervalSchedulerJobService extends JobService {
             synchronizedCameraRepository
             );
 
+    if (downloadImages) {
+
+      Handler handler = new Handler();
+      handler.postDelayed(new Runnable() {
+        @Override
+        public void run() {
+
+          List<SynchronizedCamera> recentCameras = synchronizedCameraRepository.getCamerasAddedInLastTwoMinutes();
+
+          SynchronizationUtils.downloadImagesFromServer(
+                  baseUrl,
+                  recentCameras,
+                  sharedPreferences
+                  );
+        }
+      }, 30000);
+
+
+    }
+
+
+
     List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
 
     SynchronizationUtils.uploadSurveillanceCamera(camerasToUpload, baseUrl, sharedPreferences, cameraRepository);
-
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -113,14 +138,43 @@ public class SyncIntervalSchedulerJobService extends JobService {
     @Override
     protected void onPostExecute(Void nothingness) {
 
-      SynchronizationUtils.downloadCamerasFromServer(
-              baseUrl,
-              areaQuery,
-              sharedPreferences,
-              true,
-              startQuery,
-              synchronizedCameraRepository
-      );
+      Handler handler = new Handler();
+      handler.postDelayed(new Runnable() {
+        @Override
+        public void run() {
+
+          SynchronizationUtils.downloadCamerasFromServer(
+                  baseUrl,
+                  areaQuery,
+                  sharedPreferences,
+                  true,
+                  startQuery,
+                  synchronizedCameraRepository
+          );
+        }
+      }, 10000);
+
+
+
+      if (downloadImages) {
+
+        Handler imageDownloadHandler = new Handler();
+        imageDownloadHandler.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+
+            List<SynchronizedCamera> recentCameras = synchronizedCameraRepository.getCamerasAddedInLastTwoMinutes();
+
+            SynchronizationUtils.downloadImagesFromServer(
+                    baseUrl,
+                    recentCameras,
+                    sharedPreferences
+            );
+          }
+        }, 30000);
+
+
+      }
 
       SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
       timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));

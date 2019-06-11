@@ -46,7 +46,6 @@ public interface CameraDao {
           "BETWEEN datetime('2000-01-01') AND datetime('now')")
   List<SurveillanceCamera> getCamerasToUpload();
 
-
   @Query("SELECT * from local_surveillance_cameras")
   List<SurveillanceCamera> getAllCameras();
 
