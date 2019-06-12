@@ -24,7 +24,7 @@
 
     <SwitchPreference
         android:key="downloadImages"
-        android:title="Enable hold to capture" />
+        android:title="Download images" />
 
     <SwitchPreference
         android:title="Offline mode"

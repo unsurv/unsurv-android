@@ -1,7 +1,10 @@
 package org.tensorflow.demo;
 
 
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.os.Handler;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,6 +15,7 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.io.File;
+import java.util.Collections;
 
 public class CustomInfoWindow extends MarkerInfoWindow {
 
@@ -22,11 +26,13 @@ public class CustomInfoWindow extends MarkerInfoWindow {
 
   private String picturesPath;
 
+  private SharedPreferences sharedPreferences;
 
-  public CustomInfoWindow( final MapView mapView) {
+
+  public CustomInfoWindow(final MapView mapView, SharedPreferences sharedPreferences) {
     super(R.layout.camera_info_bubble, mapView);
 
-
+    this.sharedPreferences = sharedPreferences;
     infoImage = mView.findViewById(R.id.bubble_camera_image);
     infoLatestTimestamp = mView.findViewById(R.id.bubble_title);
     infoComment = mView.findViewById(R.id.bubble_description);
@@ -43,12 +49,43 @@ public class CustomInfoWindow extends MarkerInfoWindow {
     Marker marker = (Marker) item;
 
 
-    SynchronizedCamera selectedCamera = (SynchronizedCamera) marker.getRelatedObject();
+    final SynchronizedCamera selectedCamera = (SynchronizedCamera) marker.getRelatedObject();
 
     File thumbnail = new File(
             picturesPath + selectedCamera.getImagePath());
 
-    Picasso.get().load(thumbnail).into(infoImage);
+    Picasso.get()
+            .load(thumbnail)
+            .placeholder(R.drawable.ic_file_download_grey_48dp)
+            .into(infoImage);
+
+    infoImage.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        String baseUrl = sharedPreferences.getString("synchronizationURL", null);
+        SynchronizationUtils.downloadImagesFromServer(
+                baseUrl,
+                Collections.singletonList(selectedCamera),
+                sharedPreferences);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+
+            File updatedThumbnail = new File(picturesPath + selectedCamera.getImagePath());
+
+            infoImage.setImageDrawable(null);
+            Picasso.get().load(updatedThumbnail)
+                    .placeholder(R.drawable.ic_file_download_grey_48dp)
+                    .into(infoImage);
+
+          }
+        }, 500);
+
+
+      }
+    });
 
 
     infoLatestTimestamp.setText(selectedCamera.getLastUpdated());

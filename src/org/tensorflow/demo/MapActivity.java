@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -80,6 +81,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -803,7 +805,6 @@ public class MapActivity extends AppCompatActivity {
                 lonMax > offlineLonMax;
 
 
-
         // not in offline mode & outside offline area
         if (!offlineMode && outsideOfflineArea) {
 
@@ -1046,7 +1047,7 @@ public class MapActivity extends AppCompatActivity {
         cameraMarker.setIcon(clusterCameraMarkerIcon);
 
         cameraMarker.setRelatedObject(currentCamera);
-        cameraMarker.setInfoWindow(new CustomInfoWindow(mapView));
+        cameraMarker.setInfoWindow(new CustomInfoWindow(mapView, sharedPreferences));
         cameraMarker.setPanToView(false);
         //cameraMarker.setTitle(camerasToDisplay.get(i).getComments());
 
@@ -1079,7 +1080,6 @@ public class MapActivity extends AppCompatActivity {
             SynchronizedCamera nextCamera = iter.next();
             Date cameraLastUpdated = timestampIso8601DaysAccuracy.parse(nextCamera.getLastUpdated());
             if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
-
 
               overlayItemsToDisplay.add(new OverlayItem(
                       nextCamera.getExternalID(),
@@ -1159,7 +1159,7 @@ public class MapActivity extends AppCompatActivity {
                   infoWindow = new InfoWindow(R.layout.camera_info_window, mapView) {
                     @Override
                     public void onOpen(Object item) {
-                      SynchronizedCamera highlightedCamera = synchronizedCameraRepository.findByID(cameraItem.getUid());
+                      final SynchronizedCamera highlightedCamera = synchronizedCameraRepository.findByID(cameraItem.getUid());
 
                       infoWindow.setRelatedObject(highlightedCamera);
 
@@ -1173,7 +1173,38 @@ public class MapActivity extends AppCompatActivity {
                       File thumbnail = new File(picturesPath + highlightedCamera.getImagePath());
 
                       Picasso.get().load(thumbnail)
+                              .placeholder(R.drawable.ic_file_download_grey_48dp)
                               .into(infoImage);
+
+                      infoImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                          String baseUrl = sharedPreferences.getString("synchronizationURL", null);
+                          SynchronizationUtils.downloadImagesFromServer(
+                                  baseUrl,
+                                  Collections.singletonList(highlightedCamera),
+                                  sharedPreferences);
+
+                          Handler handler = new Handler();
+                          handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+                              File updatedThumbnail = new File(picturesPath + highlightedCamera.getImagePath());
+
+                              infoImage.setImageDrawable(null);
+                              Picasso.get().load(updatedThumbnail)
+                                      .placeholder(R.drawable.ic_file_download_grey_48dp)
+                                      .into(infoImage);
+
+                            }
+                          }, 500);
+
+
+                        }
+                      });
+
+
                       infoLatestTimestamp.setText(highlightedCamera.getLastUpdated());
                       infoComment.setText(highlightedCamera.getComments());
 
@@ -1268,7 +1299,7 @@ public class MapActivity extends AppCompatActivity {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
-                            "test_pixel_2.jpg",
+                            JSONToSynchronize.getString("id") + ".jpg",
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
