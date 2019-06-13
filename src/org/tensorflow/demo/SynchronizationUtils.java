@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.TimeZone;
 
 
@@ -156,7 +157,8 @@ class SynchronizationUtils {
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
                             JSONToSynchronize.getString("lastUpdated"),
-                            JSONToSynchronize.getString("uploadedAt")
+                            JSONToSynchronize.getString("uploadedAt"),
+                            JSONToSynchronize.getBoolean("manualCapture")
 
                     );
 
@@ -167,9 +169,6 @@ class SynchronizationUtils {
                   if (insertIntoDb) {
                     crep.insert(camerasToSync);
                   }
-
-
-
 
                 } catch (Exception e) {
                   Log.i(TAG, "onResponse: " + e.toString());
@@ -406,6 +405,8 @@ class SynchronizationUtils {
 
     for (int i=0; i < camerasToUpload.size(); i++) {
       JSONObject tmpJsonObject = new JSONObject();
+
+      // TODO add a non image upload option for manual captures
 
       try {
 
@@ -736,6 +737,24 @@ class SynchronizationUtils {
 
     fileOutputStream.write(bytes);
     fileOutputStream.close();
+  }
+
+  static String getSynchronizationDateWithRandomDelay(long currentTime, SharedPreferences sharedPreferences){
+
+    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+    Random random = new Random();
+
+    long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*2) * 1000; // 2 d
+    long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
+
+    long timeframe = maxDelay - minDelay;
+
+    long randomDelay = Math.round(timeframe * random.nextDouble()); // minDelay < x < maxDelay
+
+    return timestampIso8601.format(new Date(currentTime + randomDelay));
+
   }
 
 }

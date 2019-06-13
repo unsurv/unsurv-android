@@ -41,7 +41,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <!--
-    TODO uses cleartext only for developing DISABLE THAT SHIT
+    TODO uses cleartextTraffic only for developing DISABLE THAT SHIT
     -->
 
     <application
@@ -87,6 +87,10 @@
             android:parentActivityName=".DebugActivity"/>
 
         <activity android:name=".TutorialActivity"/>
+
+        <activity android:name=".ManualCaptureActivity"
+            android:label="Manual Capture"
+            android:parentActivityName=".DebugActivity"/>
 
         <service android:name=".SyncIntervalSchedulerJobService"
             android:label="SynchronizationScheduler"

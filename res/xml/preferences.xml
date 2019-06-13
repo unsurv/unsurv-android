@@ -43,6 +43,10 @@
         android:key="deleteOnUpload"/>
 
     <SwitchPreference
+        android:title="Always use manual capture"
+        android:key="alwaysEnableManualCapture"/>
+
+    <SwitchPreference
         android:title="Delete cameras without popup"
         android:key="quickDeleteCameras"/>
 

@@ -40,13 +40,13 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="0sp"
-        android:layout_weight="4"
+        android:layout_weight="8"
         android:background="#000"
         tools:context="org.tensorflow.demo.CameraActivity" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="40dp"
         android:orientation="horizontal"
         android:background="#000">
 
@@ -54,7 +54,7 @@
             android:id="@+id/location_status_view"
             android:layout_width="0sp"
             android:layout_height="match_parent"
-            android:layout_weight="4"
+            android:layout_weight="3"
             android:src="@drawable/ic_my_location_red_24dp"/>
 
         <TextView
@@ -67,11 +67,16 @@
             android:id="@+id/photo_status_view"
             android:layout_width="0sp"
             android:layout_height="match_parent"
-            android:layout_weight="4"
+            android:layout_weight="3"
             android:src="@drawable/ic_camera_alt_green_24dp"/>
 
+        <Button
+            android:id="@+id/manual_capture_button"
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
 
-
+            android:text="MANUAL"/>
 
 
 

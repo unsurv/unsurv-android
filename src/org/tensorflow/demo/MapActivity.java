@@ -59,6 +59,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -261,8 +262,12 @@ public class MapActivity extends AppCompatActivity {
     //enable pinch to zoom
     mapView.setMultiTouchControls(true);
 
+    // MAPNIK fix
+    // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+
     // TODO add choice + backup strategy here
     mapView.setTileSource(TileSourceFactory.OpenTopo);
+
 
     final IMapController mapController = mapView.getController();
 
@@ -1305,7 +1310,9 @@ public class MapActivity extends AppCompatActivity {
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
                             JSONToSynchronize.getString("lastUpdated"),
-                            JSONToSynchronize.getString("uploadedAt")
+                            JSONToSynchronize.getString("uploadedAt"),
+                            JSONToSynchronize.getBoolean("manualCapture")
+
 
                     );
 

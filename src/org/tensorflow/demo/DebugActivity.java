@@ -207,6 +207,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("deleteOnUpload", false).apply();
     sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
     sharedPreferences.edit().putBoolean("downloadImages", true).apply();
+    sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", true).apply();
 
 
 
@@ -237,6 +238,10 @@ public class DebugActivity extends AppCompatActivity {
     mapView.setTilesScaledToDpi(true);
     mapView.setClickable(true);
 
+
+    // MAPNIK fix
+    // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+
     mapView.setTileSource(TileSourceFactory.OpenTopo);
 
 
@@ -258,7 +263,8 @@ public class DebugActivity extends AppCompatActivity {
             8.25949,
             "no comments",
             "2019-05-30",
-            "2019-05-30"
+            "2019-05-30",
+            false
 
     );
 
@@ -407,6 +413,7 @@ public class DebugActivity extends AppCompatActivity {
                 nullOrDate,
                 "2019-05-30",
                 false,
+                false,
                 false);
 
         SurveillanceCamera notRandomCamera = new SurveillanceCamera(
@@ -418,6 +425,7 @@ public class DebugActivity extends AppCompatActivity {
                 "asd",
                 nullOrDate,
                 "2019-05-30",
+                false,
                 false,
                 false);
 
@@ -510,6 +518,7 @@ public class DebugActivity extends AppCompatActivity {
             "asd",
             null,
             "2019-05-30",
+            false,
             false,
             false);
 
@@ -878,7 +887,8 @@ public class DebugActivity extends AppCompatActivity {
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
                             JSONToSynchronize.getString("lastUpdated"),
-                            JSONToSynchronize.getString("uploadedAt")
+                            JSONToSynchronize.getString("uploadedAt"),
+                            false
 
                     );
 
@@ -1075,7 +1085,7 @@ public class DebugActivity extends AppCompatActivity {
 
     progress.setMax(size);
 
-    // split list in 10 "even"
+    // split list in 10 "even" (add rest of division to last part) parts
 
     List<List<String>> splitLists = new ArrayList<>();
 

@@ -23,6 +23,8 @@ public class SynchronizedCamera {
   private String lastUpdated;
   private String uploadedAt;
 
+  private boolean manualCapture;
+
 
   public SynchronizedCamera (@Nullable String imagePath,
                              String externalID,
@@ -30,7 +32,8 @@ public class SynchronizedCamera {
                              double longitude,
                              String comments,
                              String lastUpdated,
-                             String uploadedAt) {
+                             String uploadedAt,
+                             boolean manualCapture) {
 
     this.imagePath = imagePath;
     this.externalID = externalID;
@@ -39,6 +42,7 @@ public class SynchronizedCamera {
     this.comments = comments;
     this.lastUpdated = lastUpdated;
     this.uploadedAt = uploadedAt;
+    this.manualCapture = manualCapture;
   }
 
   public int getId() {
@@ -73,6 +77,8 @@ public class SynchronizedCamera {
     return uploadedAt;
   }
 
+  public boolean getManualCapture(){return manualCapture;}
+
   public void setId(int id) {
     this.id = id;
   }
@@ -104,4 +110,6 @@ public class SynchronizedCamera {
   public void setUploadedAt(String uploadedAt) {
     this.uploadedAt = uploadedAt;
   }
+
+  public void setManualCapture(boolean manualCapture){this.manualCapture = manualCapture;}
 }

@@ -54,6 +54,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -91,6 +92,16 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(null);
+
+    manualCameraCapture = findViewById(R.id.manual_capture_button);
+
+    manualCameraCapture.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
+        startActivity(manualCaptureIntent);
+      }
+    });
 
     cameraRoomDatabase = CameraRoomDatabase.getDatabase(this);
 
@@ -297,6 +308,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private int writeStoragePermission;
   private int cameraPermission;
   private int fineLocationPermission;
+
+  private Button manualCameraCapture;
 
 
 
@@ -917,7 +930,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     long randomDelay = Math.round(timeframe * random.nextDouble()); // minDelay < x < maxDelay
 
-    random.nextLong();
     currentTime = System.currentTimeMillis();
 
     boolean useTimestamp = sharedPreferences.getBoolean("enableCaptureTimestamps", false);
@@ -934,6 +946,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               timestampIso8601.format(new Date(currentTime)),
               timestampIso8601.format(new Date(currentTime + randomDelay)),
               false,
+              false,
               false
 
       ));
@@ -949,6 +962,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               sharedPreferences.getString("comment", "no comment"),
               null,
               timestampIso8601.format(new Date(currentTime + randomDelay)),
+              false,
               false,
               false
 

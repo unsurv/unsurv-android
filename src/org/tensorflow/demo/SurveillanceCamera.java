@@ -14,6 +14,7 @@ public class SurveillanceCamera {
 
   private String thumbnailPath;
 
+  @Nullable
   private String imagePath;
 
   @Nullable
@@ -30,10 +31,11 @@ public class SurveillanceCamera {
   private boolean locationUploaded;
 
   private boolean uploadCompleted;
+  private boolean manualCapture;
 
 
-  public SurveillanceCamera(String thumbnailPath,
-                       String imagePath,
+  public SurveillanceCamera(@Nullable String thumbnailPath,
+                       @Nullable String imagePath,
                        @Nullable String externalId,
                        double latitude,
                        double longitude,
@@ -41,7 +43,8 @@ public class SurveillanceCamera {
                        String timestamp,
                        String timeToSync,
                        boolean locationUploaded,
-                       boolean uploadCompleted){
+                       boolean uploadCompleted,
+                       boolean manualCapture){
 
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;
@@ -59,6 +62,8 @@ public class SurveillanceCamera {
     this.locationUploaded = locationUploaded;
 
     this.uploadCompleted = uploadCompleted;
+
+    this.manualCapture = manualCapture;
 
 
   }
@@ -105,6 +110,11 @@ public class SurveillanceCamera {
   public boolean getLocationUploaded(){
     return locationUploaded;
   }
+  public boolean getManualCapture(){
+    return manualCapture;
+  }
+
+
 
   public void setId(int id) {
     this.id = id;
@@ -140,4 +150,5 @@ public class SurveillanceCamera {
 
   public void setLocationUploaded(boolean locationUploaded){this.locationUploaded = locationUploaded; }
   public void setUploadCompleted(boolean uploadCompleted){this.uploadCompleted = uploadCompleted; }
+  public void setManualCapture(boolean manualCapture){this.manualCapture = manualCapture; }
 }
