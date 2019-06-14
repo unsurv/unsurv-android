@@ -93,6 +93,13 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(null);
 
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+    if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+      Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
+      startActivity(manualCaptureIntent);
+    }
+
     manualCameraCapture = findViewById(R.id.manual_capture_button);
 
     manualCameraCapture.setOnClickListener(new View.OnClickListener() {
@@ -128,9 +135,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             return true;
 
           case R.id.bottom_navigation_camera:
-            Intent cameraIntent = new Intent(DetectorActivity.this, DetectorActivity.class);
-            startActivity(cameraIntent);
-            return true;
+
+            if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+              Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
+              startActivity(manualCaptureIntent);
+              return true;
+            } else {
+              Intent cameraIntent = new Intent(DetectorActivity.this, DetectorActivity.class);
+              startActivity(cameraIntent);
+              return true;
+            }
+
 
           case R.id.bottom_navigation_map:
             Intent mapIntent = new Intent(DetectorActivity.this, MapActivity.class);
@@ -151,7 +166,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_camera).setChecked(true);
 
-    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
     buttonCaptureEnabled = sharedPreferences.getBoolean("buttonCapture", false);
 
     // Create folder structure in storage/.../Pictures/
@@ -310,6 +325,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private int fineLocationPermission;
 
   private Button manualCameraCapture;
+
+  private SharedPreferences sharedPreferences;
 
 
 

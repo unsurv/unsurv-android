@@ -149,6 +149,16 @@ public class ManualCaptureActivity extends AppCompatActivity {
       }
     });
 
+    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
+    setSupportActionBar(myToolbar);
+
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    //return super.onCreateOptionsMenu(menu);
+    getMenuInflater().inflate(R.menu.actionbar, menu);
+    return true;
   }
 
   @Override
@@ -166,13 +176,6 @@ public class ManualCaptureActivity extends AppCompatActivity {
         // Fall back on standard behaviour when user choice not recognized.
         return super.onOptionsItemSelected(item);
     }
-  }
-
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    //return super.onCreateOptionsMenu(menu);
-    getMenuInflater().inflate(R.menu.actionbar, menu);
-    return true;
   }
 
 

@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -580,9 +581,15 @@ public class DebugActivity extends AppCompatActivity {
             return true;
 
           case R.id.bottom_navigation_camera:
-            Intent cameraIntent = new Intent(DebugActivity.this, DetectorActivity.class);
-            startActivity(cameraIntent);
-            return true;
+            if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+              Intent manualCaptureIntent = new Intent(DebugActivity.this, ManualCaptureActivity.class);
+              startActivity(manualCaptureIntent);
+              return true;
+            } else {
+              Intent cameraIntent = new Intent(DebugActivity.this, DetectorActivity.class);
+              startActivity(cameraIntent);
+              return true;
+            }
 
           case R.id.bottom_navigation_map:
             Intent mapIntent = new Intent(DebugActivity.this, MapActivity.class);

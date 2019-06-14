@@ -174,9 +174,16 @@ public class StatisticsActivity extends AppCompatActivity {
             return true;
 
           case R.id.bottom_navigation_camera:
-            Intent cameraIntent = new Intent(StatisticsActivity.this, DetectorActivity.class);
-            startActivity(cameraIntent);
-            return true;
+            if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+              Intent manualCaptureIntent = new Intent(StatisticsActivity.this, ManualCaptureActivity.class);
+              startActivity(manualCaptureIntent);
+              return true;
+            } else {
+              Intent cameraIntent = new Intent(StatisticsActivity.this, DetectorActivity.class);
+              startActivity(cameraIntent);
+              return true;
+            }
+
 
           case R.id.bottom_navigation_map:
             Intent mapIntent = new Intent(StatisticsActivity.this, MapActivity.class);

@@ -412,6 +412,7 @@ class SynchronizationUtils {
 
         tmpJsonObject.put("lat", camerasToUpload.get(i).getLatitude());
         tmpJsonObject.put("lon", camerasToUpload.get(i).getLongitude());
+        tmpJsonObject.put("manual_capture", camerasToUpload.get(i).getManualCapture());
         tmpJsonObject.put("tmp_id", i);
 
         cameraMap.put(i, camerasToUpload.get(i));
@@ -537,6 +538,10 @@ class SynchronizationUtils {
     for (int i = 0; i < camerasForImageUpload.size(); i++){
 
       SurveillanceCamera currentCamera = camerasForImageUpload.get(i);
+
+      if (currentCamera.getManualCapture()) {
+        continue;
+      }
 
       File imageFile = new File(PICTURES_PATH + currentCamera.getThumbnailPath());
       JSONObject singleCamera = new JSONObject();

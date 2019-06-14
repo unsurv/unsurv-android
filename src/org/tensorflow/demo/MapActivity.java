@@ -546,9 +546,17 @@ public class MapActivity extends AppCompatActivity {
             return true;
 
           case R.id.bottom_navigation_camera:
-            Intent cameraIntent = new Intent(MapActivity.this, DetectorActivity.class);
-            startActivity(cameraIntent);
-            return true;
+
+            if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+              Intent manualCaptureIntent = new Intent(MapActivity.this, ManualCaptureActivity.class);
+              startActivity(manualCaptureIntent);
+              return true;
+            } else {
+              Intent cameraIntent = new Intent(MapActivity.this, DetectorActivity.class);
+              startActivity(cameraIntent);
+              return true;
+            }
+
 
           case R.id.bottom_navigation_map:
             Intent mapIntent = new Intent(MapActivity.this, MapActivity.class);
