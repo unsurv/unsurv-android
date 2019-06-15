@@ -48,7 +48,7 @@ import java.util.TimeZone;
 
 
 class SynchronizationUtils {
-
+  // accessible for every app for now
   public static String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
@@ -76,18 +76,20 @@ class SynchronizationUtils {
 
     PersistableBundle syncJobExtras = new PersistableBundle();
 
+    // server URL
     syncJobExtras.putString("baseUrl", sharedPreferences.getString("synchronizationURL", null));
+    // area to keep updated, set in tutorial
     syncJobExtras.putString("area", sharedPreferences.getString("area", null));
+    // last sync time
     syncJobExtras.putString("start", sharedPreferences.getString("lastUpdated", null));
     syncJobExtras.putBoolean("downloadImages", sharedPreferences.getBoolean("downloadImages", false));
-
 
     ComponentName componentName = new ComponentName(context, SyncIntervalSchedulerJobService.class);
 
     JobInfo.Builder jobBuilder  = new JobInfo.Builder(0, componentName); // Job ID
 
     jobBuilder.setExtras(syncJobExtras);
-
+    // interval
     jobBuilder.setPeriodic(30*1000, 5*1000);
     //jobBuilder.setPeriodic(syncIntervalInMillis);
 
@@ -128,8 +130,9 @@ class SynchronizationUtils {
     // Start the queue
     mRequestQueue.start();
 
-   String URL = baseUrl  + "cameras/?" + areaQuery;
-
+    // see API documentation
+    String URL = baseUrl  + "cameras/?" + areaQuery;
+    // add time contraint (pseudo: "cameras since 2018-01-01" = "start=2018-01-01" in URL) to query if needed
     if (startQuery != null) {
       URL += "&" + startQuery;
     }
@@ -166,6 +169,7 @@ class SynchronizationUtils {
 
                   }
 
+                  // local db insert
                   if (insertIntoDb) {
                     crep.insert(camerasToSync);
                   }
@@ -187,6 +191,7 @@ class SynchronizationUtils {
       public Map<String, String> getHeaders() throws AuthFailureError {
 
         Map<String, String> headers = new HashMap<>();
+        // temporary API key
         String apiKey = sharedPreferences.getString("apiKey", null);
         headers.put("Authorization", apiKey);
         headers.put("Content-Type", "application/json");
@@ -206,8 +211,6 @@ class SynchronizationUtils {
       @Override
       public void onRequestFinished(Request<Object> request) {
 
-
-
       }
     });
 
@@ -224,7 +227,7 @@ class SynchronizationUtils {
       idsFromCameras.add(camera.getExternalID());
     }
 
-
+    // object to add ids of images
     JSONObject postObject = new JSONObject();
 
     JSONArray ids = new JSONArray();
@@ -254,6 +257,7 @@ class SynchronizationUtils {
     // Start the queue
     mRequestQueue.start();
 
+    // posts JsonObject with array of wanted ids
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.POST,
             url,
@@ -266,6 +270,7 @@ class SynchronizationUtils {
 
                   for (String id : idsFromCameras) {
 
+                    // get image with key id
                     String base64Image = response.getString(id);
 
                     byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
@@ -273,7 +278,6 @@ class SynchronizationUtils {
                     saveBytesToFile(imageAsBytes, id + ".jpg", PICTURES_PATH);
 
                   }
-
 
                 } catch (Exception e) {
                   Log.i(TAG, "response to jpg error: " + e.toString());
@@ -338,7 +342,6 @@ class SynchronizationUtils {
 
     String completeURL = baseURL + "getKey";
 
-
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.GET,
             completeURL,
@@ -401,9 +404,13 @@ class SynchronizationUtils {
 
     JSONArray postArray = new JSONArray();
 
+    // local map to prevent camera mixups if list order not the same.
+    // id is just an int incremented from 0.
     final HashMap<Integer, SurveillanceCamera> cameraMap = new HashMap<>();
 
     for (int i=0; i < camerasToUpload.size(); i++) {
+
+      // single camera data
       JSONObject tmpJsonObject = new JSONObject();
 
       // TODO add a non image upload option for manual captures
@@ -413,8 +420,10 @@ class SynchronizationUtils {
         tmpJsonObject.put("lat", camerasToUpload.get(i).getLatitude());
         tmpJsonObject.put("lon", camerasToUpload.get(i).getLongitude());
         tmpJsonObject.put("manual_capture", camerasToUpload.get(i).getManualCapture());
+        // here so we don't have to rely on list order
         tmpJsonObject.put("tmp_id", i);
 
+        // tmp_id : SurveillanceCamera mapping to query in response
         cameraMap.put(i, camerasToUpload.get(i));
 
       } catch (JSONException jse) {
@@ -455,16 +464,20 @@ class SynchronizationUtils {
               @Override
               public void onResponse(JSONObject response) {
 
+                // Server sets tmp uuids and sends them back
                 try {
 
                   JSONArray updatedInfo = response.getJSONArray("updated_info");
 
                   for (int j = 0; j < updatedInfo.length(); j++){
 
+                    // access map to not mix things
                     SurveillanceCamera currentCamera = cameraMap.get(j);
 
+                    // access object from server with same id as tmp_id from local map
                     JSONObject updatedInfoForCamera = updatedInfo.getJSONObject(j);
 
+                    // tmp uuid4 set by server
                     String idSetByServer = updatedInfoForCamera.getString(String.valueOf(j));
 
                     currentCamera.setExternalId(idSetByServer);
@@ -480,7 +493,6 @@ class SynchronizationUtils {
                   }
 
                   String imageUploadUrl = baseUrl + "cameras/upload/image";
-
 
                   uploadImages(camerasToUpload, cameraRepository, imageUploadUrl, sharedPreferences);
 
@@ -544,6 +556,7 @@ class SynchronizationUtils {
 
       SurveillanceCamera currentCamera = camerasForImageUpload.get(i);
 
+      // skip manual captures
       if (currentCamera.getManualCapture() || currentCamera.getUploadCompleted()) {
         continue;
       }
@@ -551,6 +564,7 @@ class SynchronizationUtils {
       File imageFile = new File(PICTURES_PATH + currentCamera.getThumbnailPath());
       JSONObject singleCamera = new JSONObject();
 
+      // create a map with tmpUuidFromServer: imageAsBase64
       try {
 
         imageAsBytes = readFileToBytes(imageFile);
@@ -574,6 +588,7 @@ class SynchronizationUtils {
 
     try {
 
+      // JsonObject where images contains an array with (uuid1:base64img1, uuid2:base64img2, ...)
       postObject.put("images", postArray);
 
     } catch (JSONException jse) {
@@ -595,11 +610,14 @@ class SynchronizationUtils {
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.POST,
             url,
+            // id:img map gets uploaded
             postObject,
             new Response.Listener<JSONObject>() {
               @Override
               public void onResponse(JSONObject response) {
 
+                // response contains a upload successful map (uuid1:integer1, ...) check this and
+                // update local db accordingly
                 try {
 
                   JSONArray updatedInfo = response.getJSONArray("updated_info");
@@ -608,12 +626,14 @@ class SynchronizationUtils {
 
                     JSONObject currentResponseObject = (JSONObject) updatedInfo.get(j);
 
+                    // access local map with uuid from server
                     SurveillanceCamera currentCamera = cameraMap.get(currentResponseObject.keys().next());
 
                     JSONObject updatedInfoForCamera = updatedInfo.getJSONObject(j);
 
                     int returnCodeByServer = updatedInfoForCamera.getInt(currentCamera.getExternalId());
 
+                    // update camera if upload successful
                     if (returnCodeByServer == UPLOAD_SUCCESSFUL){
                       currentCamera.setUploadCompleted(true);
                     }
@@ -721,9 +741,13 @@ class SynchronizationUtils {
 
     try {
 
+      // tries to read file in one go
       int read = fis.read(bytes, 0, size);
+
+      // if file is too big
       if (read < size) {
         int remain = size - read;
+        // reads and appends to read from tmpBuff until file is read
         while (remain > 0) {
           read = fis.read(tmpBuff, 0, remain);
           System.arraycopy(tmpBuff, 0, bytes, size - remain, read);
@@ -749,6 +773,12 @@ class SynchronizationUtils {
     fileOutputStream.close();
   }
 
+  /**
+   * returns a YYYY-MM-DD string with random delay in range minUploadDelay < x < maxUploadDelay
+   * @param currentTime
+   * @param sharedPreferences
+   * @return
+   */
   static String getSynchronizationDateWithRandomDelay(long currentTime, SharedPreferences sharedPreferences){
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
