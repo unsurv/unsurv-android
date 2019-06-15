@@ -152,6 +152,9 @@ public class ManualCaptureActivity extends AppCompatActivity {
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
 
+    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_camera).setChecked(true);
+
+
   }
 
   @Override

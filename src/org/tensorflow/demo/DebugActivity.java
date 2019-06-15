@@ -416,8 +416,8 @@ public class DebugActivity extends AppCompatActivity {
                 false,
                 false,
                 false);
-
-        SurveillanceCamera notRandomCamera = new SurveillanceCamera(
+/*
+SurveillanceCamera notRandomCamera = new SurveillanceCamera(
                 "test_pixel_2.jpg",
                 "test_nexus_10.jpg",
                 null,
@@ -430,10 +430,14 @@ public class DebugActivity extends AppCompatActivity {
                 false,
                 false);
 
+      cameraRepository.insert(notRandomCamera);
+
+ */
+
 
         CameraRepository cameraRepository = new CameraRepository(getApplication());
         cameraRepository.insert(randomCamera);
-        cameraRepository.insert(notRandomCamera);
+
 
         randomCamerasAdded += 1;
 

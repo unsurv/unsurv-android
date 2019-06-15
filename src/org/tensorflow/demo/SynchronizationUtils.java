@@ -156,9 +156,9 @@ class SynchronizationUtils {
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("lastUpdated"),
-                            JSONToSynchronize.getString("uploadedAt"),
-                            JSONToSynchronize.getBoolean("manualCapture")
+                            JSONToSynchronize.getString("last_updated"),
+                            JSONToSynchronize.getString("uploaded_at"),
+                            JSONToSynchronize.getBoolean("manual_capture")
 
                     );
 
@@ -470,6 +470,11 @@ class SynchronizationUtils {
                     currentCamera.setExternalId(idSetByServer);
                     currentCamera.setLocationUploaded(true);
 
+                    // completed upload here when no img was taken
+                    if (currentCamera.getManualCapture()) {
+                      currentCamera.setUploadCompleted(true);
+                    }
+
                     cameraRepository.updateCameras(currentCamera);
 
                   }
@@ -539,7 +544,7 @@ class SynchronizationUtils {
 
       SurveillanceCamera currentCamera = camerasForImageUpload.get(i);
 
-      if (currentCamera.getManualCapture()) {
+      if (currentCamera.getManualCapture() || currentCamera.getUploadCompleted()) {
         continue;
       }
 

@@ -1317,9 +1317,9 @@ public class MapActivity extends AppCompatActivity {
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("lastUpdated"),
-                            JSONToSynchronize.getString("uploadedAt"),
-                            JSONToSynchronize.getBoolean("manualCapture")
+                            JSONToSynchronize.getString("last_updated"),
+                            JSONToSynchronize.getString("uploaded_at"),
+                            JSONToSynchronize.getBoolean("manual_capture")
 
 
                     );
