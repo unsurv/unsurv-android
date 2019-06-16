@@ -99,7 +99,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
 
   @Override
-  public void onBindViewHolder(final CameraViewHolder holder, int position) {
+  public void onBindViewHolder(final CameraViewHolder holder, final int position) {
 
     if (mSurveillanceCameras != null) {
       final SurveillanceCamera current = mSurveillanceCameras.get(position);
@@ -132,7 +132,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
           boolean quickDeleteCameras = sharedPreferences.getBoolean("quickDeleteCameras", false);
 
           if (quickDeleteCameras){
+
             cameraRepository.deleteCameras(current);
+            notifyItemRemoved(position);
 
           } else {
 
@@ -161,8 +163,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
                     sharedPreferences.edit().putBoolean("quickDeleteCameras", true).apply();
                   }
                   cameraRepository.deleteCameras(current);
-
                   popupWindow.dismiss();
+                  notifyItemRemoved(position);
+
 
                 }
               });
