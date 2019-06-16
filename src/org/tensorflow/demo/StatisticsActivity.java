@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Network;
 import com.android.volley.Request;
@@ -33,7 +35,6 @@ import com.android.volley.toolbox.NoCache;
 
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,6 +42,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class StatisticsActivity extends AppCompatActivity {
@@ -114,14 +116,6 @@ public class StatisticsActivity extends AppCompatActivity {
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
     refreshSharedPreferencesObject();
-    String homeZone = sharedPreferences.getString("area", null);
-
-    String[] splitBorders = homeZone.split(",");
-
-    latMin = Double.valueOf(splitBorders[0]);
-    latMax = Double.valueOf(splitBorders[1]);
-    lonMin = Double.valueOf(splitBorders[2]);
-    lonMax = Double.valueOf(splitBorders[3]);
 
     long currentTime = System.currentTimeMillis();
     Date currentDate = new Date(currentTime);
@@ -142,9 +136,8 @@ public class StatisticsActivity extends AppCompatActivity {
     Date twentyEightDaysBeforeToday = cal.getTime();
 
     totalLocal28Days = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
-
     totalLocal = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
-    totalByUser = StatisticsUtils.totalCamerasAddedByUser(cameraRepository);
+    totalByUser = StatisticsUtils.totalCamerasCapturedOnDevice(cameraRepository);
 
     totalInAreaTextView.setText(String.valueOf(totalLocal));
     local7DaysTextView.setText(String.valueOf(local7DaysAmount));
@@ -155,7 +148,9 @@ public class StatisticsActivity extends AppCompatActivity {
 
     refreshSharedPreferencesObject();
     String baseURL = sharedPreferences.getString("synchronizationURL", null);
-    queryServerForStatistics(baseURL, "global", "2018-01-01", "2019-01-01");
+    String today = timestampIso8601.format(new Date(currentTime));
+
+    queryServerForStatistics(baseURL, "global", "2018-01-01", today);
 
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
@@ -245,6 +240,8 @@ public class StatisticsActivity extends AppCompatActivity {
       ActivityCompat.requestPermissions(StatisticsActivity.this, neededPermissions, 3);
     }
 
+    updateLocalTextViews();
+
     super.onResume();
   }
 
@@ -280,7 +277,7 @@ public class StatisticsActivity extends AppCompatActivity {
   }
 
 
-  void queryServerForStatistics(String baseURL, String area, String startDate, String endDate){
+  void queryServerForStatistics(String baseURL, String area, @Nullable String startDate,@Nullable String endDate){
 
     final String TAG = "StatisticsUtils";
     //TODO check api for negative values in left right top bottom see if still correct
@@ -328,7 +325,6 @@ public class StatisticsActivity extends AppCompatActivity {
                   globalTotalAmount = JSONFromServer.getInt("global_total");
 
 
-
                 } catch (Exception e) {
                   Log.i(TAG, "onResponse: " + e.toString());
 
@@ -341,7 +337,17 @@ public class StatisticsActivity extends AppCompatActivity {
         // TODO: Handle Errors
       }
     }
-    );
+    ){
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = new HashMap<>();
+        String apiKey = sharedPreferences.getString("apiKey", null);
+        headers.put("Authorization", apiKey);
+        headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };;
 
     jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
             30000,
@@ -356,7 +362,7 @@ public class StatisticsActivity extends AppCompatActivity {
       @Override
       public void onRequestFinished(Request<Object> request) {
 
-        redrawGlobalTextViews();
+        updateGlobalTextViews();
 
       }
     });
@@ -364,14 +370,59 @@ public class StatisticsActivity extends AppCompatActivity {
   }
 
   /**
-   * updates all TextViews which rely on outside data
+   * Query for data before updating TextViews. Updates all TextViews which rely on outside data.
    */
 
-  void redrawGlobalTextViews(){
+  void updateGlobalTextViews(){
 
-    globalTodayTextView.setText(String.valueOf(globalTodayAmount));
-    global28DaysTextView.setText(String.valueOf(global28DaysAmount));
-    globalTotalTextView.setText(String.valueOf(globalTotalAmount));
+    if (globalTodayAmount > 1000){
+      globalTodayTextView.setText(getThousandsInNumber(globalTodayAmount));
+    } else {
+      globalTodayTextView.setText(String.valueOf(globalTodayAmount));
+    }
+
+    if (global28DaysAmount > 1000){
+      global28DaysTextView.setText(getThousandsInNumber(global28DaysAmount));
+    } else {
+      global28DaysTextView.setText(String.valueOf(global28DaysAmount));
+    }
+
+    if (globalTotalAmount > 1000){
+      globalTotalTextView.setText(getThousandsInNumber(globalTotalAmount));
+    } else {
+      globalTotalTextView.setText(String.valueOf(globalTotalAmount));
+    }
+
+  }
+
+  void updateLocalTextViews(){
+
+    long currentTime = System.currentTimeMillis();
+    Date currentDate = new Date(currentTime);
+
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(currentDate);
+
+    // cal.add(Calendar.MONTH, -12);
+
+    cal.add(Calendar.DATE, -7);
+    Date sevenDaysBeforeToday = cal.getTime();
+
+    // data from -7 days until today
+    local7DaysAmount = StatisticsUtils.getTotalCamerasInTimeframeFromDb(sevenDaysBeforeToday, currentDate, synchronizedCameraRepository);
+
+    // only subtract 21 here because we've subtracted 7 earlier
+    cal.add(Calendar.DATE, -21);
+    Date twentyEightDaysBeforeToday = cal.getTime();
+
+    totalLocal28Days = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
+    totalLocal = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
+    totalByUser = StatisticsUtils.totalCamerasCapturedOnDevice(cameraRepository);
+
+    totalInAreaTextView.setText(String.valueOf(totalLocal));
+    local7DaysTextView.setText(String.valueOf(local7DaysAmount));
+    local28DaysTextView.setText(String.valueOf(totalLocal28Days));
+    totalByUserTextView.setText(String.valueOf(totalByUser));
 
   }
 
@@ -379,5 +430,22 @@ public class StatisticsActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+  }
+
+  /**
+   * Returns a abbreviated version of large numbers. 18324 => 18.3 k
+   * @param number
+   * @return
+   */
+  private String getThousandsInNumber(int number){
+    int thousandsInNumber = Math.floorDiv(number,  1000);
+
+    int amountAboveThousands = number % (thousandsInNumber*1000);
+
+    int hundredsAboveThousands = Math.floorDiv(amountAboveThousands, 100);
+
+    //char abbreviatedHundreds = String.valueOf(hundredsInNumber).charAt(0);
+
+    return thousandsInNumber + "." + hundredsAboveThousands + " k";
   }
 }

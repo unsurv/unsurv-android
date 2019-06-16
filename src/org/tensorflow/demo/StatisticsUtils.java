@@ -81,7 +81,7 @@ public class StatisticsUtils {
     return synchronizedCameraRepository.getTotalAmountInDb();
   }
 
-  static int totalCamerasAddedByUser(CameraRepository cameraRepository){
+  static int totalCamerasCapturedOnDevice(CameraRepository cameraRepository){
     return cameraRepository.getCamerasAddedByUserCount();
   }
 

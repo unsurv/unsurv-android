@@ -113,7 +113,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="1"
                     android:textSize="14sp"
-                    android:hint="total added by you"
+                    android:hint="captures by you"
                     android:gravity="center"
                     />
 
@@ -188,7 +188,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="1"
                     android:textSize="14sp"
-                    android:hint="global tot"
+                    android:hint="cameras global total"
                     android:gravity="center"
                     />
 

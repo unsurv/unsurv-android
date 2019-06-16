@@ -43,6 +43,7 @@ public class HistoryActivity extends AppCompatActivity {
   @Override
   protected void onResume() {
 
+    // check permissions on resume
     readStoragePermission = ContextCompat.checkSelfPermission(HistoryActivity.this,
             Manifest.permission.READ_EXTERNAL_STORAGE);
     writeStoragePermission = ContextCompat.checkSelfPermission(HistoryActivity.this,
@@ -59,14 +60,12 @@ public class HistoryActivity extends AppCompatActivity {
       permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-
+    // transfer list to string array for requestPermissions method
     String[] neededPermissions = permissionList.toArray(new String[0]);
 
     if (!permissionList.isEmpty()) {
       ActivityCompat.requestPermissions(HistoryActivity.this, neededPermissions, 0);
     }
-
-
 
     super.onResume();
   }
@@ -78,10 +77,16 @@ public class HistoryActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+    // small map at top-right to show camera location
     MapView detailMap = findViewById(R.id.history_detail_map);
+
     detailMap.setTilesScaledToDpi(true);
     detailMap.setClickable(false);
     detailMap.setMultiTouchControls(false);
+
+    // MAPNIK fix
+    // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+    // TODO add choice + backup strategy here
     detailMap.setTileSource(TileSourceFactory.OpenTopo);
 
     final CustomZoomButtonsController zoomController = detailMap.getZoomController();
@@ -89,14 +94,27 @@ public class HistoryActivity extends AppCompatActivity {
 
     final IMapController mapController = detailMap.getController();
 
-    // Setting starting position and zoom level.
-    GeoPoint startPoint = new GeoPoint(50.0027, 8.2771);
-    mapController.setZoom(15.0);
-    mapController.setCenter(startPoint);
+    String homeZone = sharedPreferences.getString("area", null);
 
+    String[] coordinates = homeZone.split(",");
+
+    double latMin = Double.valueOf(coordinates[0]);
+    double latMax = Double.valueOf(coordinates[1]);
+    double lonMin = Double.valueOf(coordinates[2]);
+    double lonMax = Double.valueOf(coordinates[3]);
+
+    // homezone center as start if no camera is chosen yet
+    double centerLat = (latMin + latMax) / 2;
+    double centerLon = (lonMin + lonMax) / 2;
+
+    // Setting starting position and zoom level.
+    GeoPoint startPoint = new GeoPoint(centerLat, centerLon);
+    mapController.setZoom(10.0);
+    mapController.setCenter(startPoint);
 
     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.camera_recyclerview);
 
+    // needed in adapter to show PopupWindows
     LayoutInflater layoutInflater = (LayoutInflater) HistoryActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     final LinearLayout rootView = findViewById(R.id.history_detail_linear);
@@ -106,7 +124,7 @@ public class HistoryActivity extends AppCompatActivity {
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     mCameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
-
+    // LiveData
     mCameraViewModel.getAllCameras().observe(this, new Observer<List<SurveillanceCamera>>() {
       @Override
       public void onChanged(@Nullable List<SurveillanceCamera> surveillanceCameras) {
