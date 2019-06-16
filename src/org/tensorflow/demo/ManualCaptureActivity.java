@@ -161,6 +161,11 @@ public class ManualCaptureActivity extends AppCompatActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     //return super.onCreateOptionsMenu(menu);
     getMenuInflater().inflate(R.menu.actionbar, menu);
+
+    // No need for a refresh Button in a capture activity.
+    MenuItem item = menu.findItem(R.id.action_refresh);
+    item.setVisible(false);
+
     return true;
   }
 

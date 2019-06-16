@@ -152,7 +152,6 @@ public class MapActivity extends AppCompatActivity {
 
   private AreaOfflineAvailableRepository areaOfflineAvailableRepository;
   private List<AreaOfflineAvailable> areasOfflineAvailable = new ArrayList<>();
-  private ImageButton refreshButton;
   private SimpleDateFormat timestampIso8601DaysAccuracy;
   private SimpleDateFormat timestampIso8601SecondsAccuracy;
   private Date latestUpdateForArea;
@@ -302,21 +301,6 @@ public class MapActivity extends AppCompatActivity {
     ViewGroup.LayoutParams layoutParams = mapLayout.getLayoutParams();
 
     offlineMode = sharedPreferences.getBoolean("offlineMode", true);
-
-    refreshButton = findViewById(R.id.map_refresh_button);
-    refreshButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if (!offlineMode) {
-
-          queryServerForCameras("area=" + areaString);
-        } else {
-          updateAllCamerasInArea(true);
-          redrawMarkers(allCamerasInArea);
-        }
-
-      }
-    });
 
     timemachineButton = findViewById(R.id.map_timemachine_button);
 
@@ -655,6 +639,27 @@ public class MapActivity extends AppCompatActivity {
       case R.id.action_settings:
         Intent settingsIntent = new Intent(MapActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
+
+
+        if (!offlineMode) {
+
+          queryServerForCameras("area=" + areaString);
+        } else {
+          updateAllCamerasInArea(true);
+          redrawMarkers(allCamerasInArea);
+        }
+
+        return true;
+
+      case R.id.action_refresh:
+
+        if (!offlineMode) {
+
+          queryServerForCameras("area=" + areaString);
+        } else {
+          updateAllCamerasInArea(true);
+          redrawMarkers(allCamerasInArea);
+        }
 
         return true;
 

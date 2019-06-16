@@ -90,6 +90,9 @@ public class StatisticsActivity extends AppCompatActivity {
   private int readStoragePermission;
   private int writeStoragePermission;
 
+  private SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+  private String baseURL;
 
 
 
@@ -112,7 +115,6 @@ public class StatisticsActivity extends AppCompatActivity {
     global28DaysTextView = findViewById(R.id.global_28days_statistics);
     globalTotalTextView = findViewById(R.id.global_total_statistics);
 
-    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
     refreshSharedPreferencesObject();
@@ -147,7 +149,7 @@ public class StatisticsActivity extends AppCompatActivity {
     localBroadcastManager = LocalBroadcastManager.getInstance(StatisticsActivity.this);
 
     refreshSharedPreferencesObject();
-    String baseURL = sharedPreferences.getString("synchronizationURL", null);
+    baseURL = sharedPreferences.getString("synchronizationURL", null);
     String today = timestampIso8601.format(new Date(currentTime));
 
     queryServerForStatistics(baseURL, "global", "2018-01-01", today);
@@ -270,6 +272,19 @@ public class StatisticsActivity extends AppCompatActivity {
 
         return true;
 
+      case R.id.action_refresh:
+
+        long currentTime = System.currentTimeMillis();
+
+        String today = timestampIso8601.format(new Date(currentTime));
+
+        queryServerForStatistics(baseURL, "global", "2018-01-01", today);
+
+        updateGlobalTextViews();
+        updateLocalTextViews();
+
+        return true;
+
       default:
         // Fall back on standard behaviour when user choice not recognized.
         return super.onOptionsItemSelected(item);
@@ -376,19 +391,19 @@ public class StatisticsActivity extends AppCompatActivity {
   void updateGlobalTextViews(){
 
     if (globalTodayAmount > 1000){
-      globalTodayTextView.setText(getThousandsInNumber(globalTodayAmount));
+      globalTodayTextView.setText(abbreviateLargeNumber(globalTodayAmount));
     } else {
       globalTodayTextView.setText(String.valueOf(globalTodayAmount));
     }
 
     if (global28DaysAmount > 1000){
-      global28DaysTextView.setText(getThousandsInNumber(global28DaysAmount));
+      global28DaysTextView.setText(abbreviateLargeNumber(global28DaysAmount));
     } else {
       global28DaysTextView.setText(String.valueOf(global28DaysAmount));
     }
 
     if (globalTotalAmount > 1000){
-      globalTotalTextView.setText(getThousandsInNumber(globalTotalAmount));
+      globalTotalTextView.setText(abbreviateLargeNumber(globalTotalAmount));
     } else {
       globalTotalTextView.setText(String.valueOf(globalTotalAmount));
     }
@@ -437,7 +452,7 @@ public class StatisticsActivity extends AppCompatActivity {
    * @param number
    * @return
    */
-  private String getThousandsInNumber(int number){
+  private String abbreviateLargeNumber(int number){
     int thousandsInNumber = Math.floorDiv(number,  1000);
 
     int amountAboveThousands = number % (thousandsInNumber*1000);
