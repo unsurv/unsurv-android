@@ -305,7 +305,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private Boolean buttonCaptureEnabled;
 
-  final File pictureDirectory = new File(picturesPath + "/unsurv/");
+  final File pictureDirectory = new File(picturesPath);
 
   private Boolean captureButtonIsBeingHeld = false;
 
@@ -350,6 +350,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       case R.id.action_settings:
         Intent settingsIntent = new Intent(DetectorActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
+
+        return true;
+
+      case R.id.action_training:
+        Intent trainingCaptureIntent = new Intent(DetectorActivity.this, TrainingImageCaptureActivity.class);
+        startActivity(trainingCaptureIntent);
 
         return true;
 

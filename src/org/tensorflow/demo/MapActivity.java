@@ -640,15 +640,6 @@ public class MapActivity extends AppCompatActivity {
         Intent settingsIntent = new Intent(MapActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
 
-
-        if (!offlineMode) {
-
-          queryServerForCameras("area=" + areaString);
-        } else {
-          updateAllCamerasInArea(true);
-          redrawMarkers(allCamerasInArea);
-        }
-
         return true;
 
       case R.id.action_refresh:

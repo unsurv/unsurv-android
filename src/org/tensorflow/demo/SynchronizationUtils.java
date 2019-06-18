@@ -52,6 +52,9 @@ class SynchronizationUtils {
   public static String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
 
+  public static String TRAINING_IMAGES_PATH = Environment.getExternalStoragePublicDirectory(
+          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/training/";
+
   private static int UPLOAD_FAILED = 0;
   private static int UPLOAD_SUCCESSFUL = 1;
 
@@ -764,6 +767,11 @@ class SynchronizationUtils {
   }
 
   static void saveBytesToFile(byte[] bytes, String filename, String path) throws IOException {
+
+    File directoryCheck = new File(path);
+    if (!directoryCheck.exists()){
+      directoryCheck.mkdirs();
+    }
 
     File file = new File(path + filename);
 

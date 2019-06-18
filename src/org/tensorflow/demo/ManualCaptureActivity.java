@@ -128,7 +128,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
             return true;
 
           case R.id.bottom_navigation_camera:
-            Intent cameraIntent = new Intent(ManualCaptureActivity.this, DetectorActivity.class);
+            Intent cameraIntent = new Intent(ManualCaptureActivity.this, ManualCaptureActivity.class);
             startActivity(cameraIntent);
             return true;
 

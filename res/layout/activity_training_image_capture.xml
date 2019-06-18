@@ -1,0 +1,65 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="9">
+
+            <TextureView
+                android:id="@+id/training_texture_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <ImageView
+                android:src="@drawable/ic_camera_grey_72dp"
+                android:id="@+id/training_capture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"/>
+
+
+
+
+        </RelativeLayout>
+
+
+
+        <android.support.design.widget.BottomNavigationView
+
+            android:id="@+id/navigation"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="1"
+            android:layout_gravity="start"
+            android:background="#000"
+            app:itemTextColor="@color/cardview_dark_background"
+            app:menu="@menu/bottom_navigation_items"/>
+
+    </LinearLayout>
+
+</LinearLayout>

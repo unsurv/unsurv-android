@@ -150,7 +150,11 @@ public class DebugActivity extends AppCompatActivity {
 
         return true;
 
+      case R.id.action_training:
+        Intent trainingCaptureIntent = new Intent(DebugActivity.this, TrainingImageCaptureActivity.class);
+        startActivity(trainingCaptureIntent);
 
+        return true;
 
       default:
         // Fall back on standard behaviour when user choice not recognized.

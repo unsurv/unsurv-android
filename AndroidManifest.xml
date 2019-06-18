@@ -66,7 +66,7 @@
 
         <activity
             android:name=".HistoryActivity"
-            android:label="History"
+            android:label="unsurv"
             android:parentActivityName=".DebugActivity"/>
         <activity
 
@@ -75,11 +75,11 @@
             android:parentActivityName=".DebugActivity"/>
         <activity
             android:name=".MapActivity"
-            android:label="Map"
+            android:label="unsurv"
             android:parentActivityName=".DebugActivity"/>
         <activity
             android:name=".StatisticsActivity"
-            android:label="Statistics"
+            android:label="unsurv"
             android:parentActivityName=".DebugActivity"/>
 
         <activity android:name=".SettingsActivity"
@@ -90,6 +90,10 @@
 
         <activity android:name=".ManualCaptureActivity"
             android:label="Manual Capture"
+            android:parentActivityName=".DebugActivity"/>
+
+        <activity android:name=".TrainingImageCaptureActivity"
+            android:label="Train Detection Model"
             android:parentActivityName=".DebugActivity"/>
 
         <service android:name=".SyncIntervalSchedulerJobService"
