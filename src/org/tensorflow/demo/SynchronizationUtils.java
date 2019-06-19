@@ -50,7 +50,7 @@ import java.util.TimeZone;
 class SynchronizationUtils {
   // accessible for every app for now
   public static String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(
-          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
+          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/";
 
   public static String TRAINING_IMAGES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/training/";
