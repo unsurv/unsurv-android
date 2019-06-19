@@ -1,22 +1,20 @@
-
-
 /*
-* Copyright 2017 The Android Open Source Project
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2017 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-package com.example.android.camera2basic;
+package org.tensorflow.demo;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,6 +27,7 @@ import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -51,14 +50,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
-import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -72,8 +71,9 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class Camera2BasicFragment extends Fragment
-        implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
+public class TrainingImageCaptureActivity extends AppCompatActivity
+        implements View.OnClickListener,
+        ActivityCompat.OnRequestPermissionsResultCallback{
 
   /**
    * Conversion from screen rotation to JPEG orientation.
@@ -81,6 +81,11 @@ public class Camera2BasicFragment extends Fragment
   private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
   private static final int REQUEST_CAMERA_PERMISSION = 1;
   private static final String FRAGMENT_DIALOG = "dialog";
+
+  public float fingerSpacing = 0;
+  public int zoomLevel = 1;
+
+  private Rect zoomedImage;
 
   static {
     ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -207,7 +212,7 @@ public class Camera2BasicFragment extends Fragment
       mCameraOpenCloseLock.release();
       cameraDevice.close();
       mCameraDevice = null;
-      Activity activity = getActivity();
+      Activity activity = TrainingImageCaptureActivity.this;
       if (null != activity) {
         activity.finish();
       }
@@ -355,7 +360,7 @@ public class Camera2BasicFragment extends Fragment
    * @param text The message to show
    */
   private void showToast(final String text) {
-    final Activity activity = getActivity();
+    final Activity activity = TrainingImageCaptureActivity.this;
     if (activity != null) {
       activity.runOnUiThread(new Runnable() {
         @Override
@@ -415,27 +420,17 @@ public class Camera2BasicFragment extends Fragment
     }
   }
 
-  public static Camera2BasicFragment newInstance() {
-    return new Camera2BasicFragment();
-  }
-
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
-  }
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-  @Override
-  public void onViewCreated(final View view, Bundle savedInstanceState) {
-    view.findViewById(R.id.picture).setOnClickListener(this);
-    view.findViewById(R.id.info).setOnClickListener(this);
-    mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-  }
+    setContentView(R.layout.activity_training_image_capture);
 
-  @Override
-  public void onActivityCreated(Bundle savedInstanceState) {
-    super.onActivityCreated(savedInstanceState);
-    mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+    findViewById(R.id.picture).setOnClickListener(this);
+    findViewById(R.id.info).setOnClickListener(this);
+    mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
+    mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, "asd.jpg");
+
   }
 
   @Override
@@ -452,6 +447,70 @@ public class Camera2BasicFragment extends Fragment
     } else {
       mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
     }
+
+    mTextureView.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View view, MotionEvent motionEvent) {
+
+        try {
+          Activity activity = TrainingImageCaptureActivity.this;
+          CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+          CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraId);
+          float maxzoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10;
+
+          Rect m = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+          int action = motionEvent.getAction();
+          float current_finger_spacing;
+
+          if (motionEvent.getPointerCount() > 1) {
+            // Multi touch logic
+            current_finger_spacing = getFingerSpacing(motionEvent);
+            if(fingerSpacing != 0){
+              if(current_finger_spacing  > fingerSpacing + 15 && maxzoom > zoomLevel){
+                zoomLevel++;
+              } else if (current_finger_spacing < fingerSpacing + 15 && zoomLevel > 1){
+                zoomLevel--;
+              }
+              int minW = (int) (m.width() / maxzoom);
+              int minH = (int) (m.height() / maxzoom);
+              int difW = m.width() - minW;
+              int difH = m.height() - minH;
+              int cropW = difW / 100 * zoomLevel;
+              int cropH = difH / 100 * zoomLevel;
+              cropW -= cropW & 3;
+              cropH -= cropH & 3;
+              zoomedImage = new Rect(cropW, cropH, m.width() - cropW, m.height() - cropH);
+              mPreviewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
+            }
+            fingerSpacing = current_finger_spacing;
+          } else{
+            if (action == MotionEvent.ACTION_UP) {
+              //single touch logic
+            }
+          }
+
+          try {
+            mCaptureSession
+                    .setRepeatingRequest(mPreviewRequestBuilder.build(), mCaptureCallback, null);
+          } catch (CameraAccessException e) {
+            e.printStackTrace();
+          } catch (NullPointerException ex) {
+            ex.printStackTrace();
+          }
+        } catch (CameraAccessException e) {
+          throw new RuntimeException("can not access camera.", e);
+        }
+        return true;
+
+      }
+    });
+
+  }
+
+  private float getFingerSpacing(MotionEvent event) {
+    float x = event.getX(0) - event.getX(1);
+    float y = event.getY(0) - event.getY(1);
+    return (float) Math.sqrt(x * x + y * y);
   }
 
   @Override
@@ -463,24 +522,11 @@ public class Camera2BasicFragment extends Fragment
 
   private void requestCameraPermission() {
     if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-      new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
-    } else {
       requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
     }
   }
 
-  @Override
-  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                         @NonNull int[] grantResults) {
-    if (requestCode == REQUEST_CAMERA_PERMISSION) {
-      if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-        ErrorDialog.newInstance(getString(R.string.request_permission))
-                .show(getChildFragmentManager(), FRAGMENT_DIALOG);
-      }
-    } else {
-      super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-  }
+
 
   /**
    * Sets up member variables related to camera.
@@ -490,7 +536,7 @@ public class Camera2BasicFragment extends Fragment
    */
   @SuppressWarnings("SuspiciousNameCombination")
   private void setUpCameraOutputs(int width, int height) {
-    Activity activity = getActivity();
+    Activity activity = TrainingImageCaptureActivity.this;
     CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
     try {
       for (String cameraId : manager.getCameraIdList()) {
@@ -513,8 +559,8 @@ public class Camera2BasicFragment extends Fragment
         Size largest = Collections.max(
                 Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
                 new CompareSizesByArea());
-        mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
-                ImageFormat.JPEG, /*maxImages*/2);
+        mImageReader = ImageReader.newInstance(2048, 1536,
+                ImageFormat.JPEG, /*maxImages*/1);
         mImageReader.setOnImageAvailableListener(
                 mOnImageAvailableListener, mBackgroundHandler);
 
@@ -592,23 +638,22 @@ public class Camera2BasicFragment extends Fragment
     } catch (NullPointerException e) {
       // Currently an NPE is thrown when the Camera2API is used but not supported on the
       // device this code runs.
-      ErrorDialog.newInstance(getString(R.string.camera_error))
-              .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+      Log.i(TAG, "NPE: " + e.toString());
     }
   }
 
   /**
-   * Opens the camera specified by {@link Camera2BasicFragment#mCameraId}.
+   * Opens the camera specified by {}.
    */
   private void openCamera(int width, int height) {
-    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+    if (ContextCompat.checkSelfPermission(TrainingImageCaptureActivity.this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
       requestCameraPermission();
       return;
     }
     setUpCameraOutputs(width, height);
     configureTransform(width, height);
-    Activity activity = getActivity();
+    Activity activity = TrainingImageCaptureActivity.this;
     CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
     try {
       if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
@@ -706,8 +751,6 @@ public class Camera2BasicFragment extends Fragment
                     // Auto focus should be continuous for camera preview.
                     mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
                             CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-                    // Flash is automatically enabled when necessary.
-                    setAutoFlash(mPreviewRequestBuilder);
 
                     // Finally, we start displaying the camera preview.
                     mPreviewRequest = mPreviewRequestBuilder.build();
@@ -739,7 +782,7 @@ public class Camera2BasicFragment extends Fragment
    * @param viewHeight The height of `mTextureView`
    */
   private void configureTransform(int viewWidth, int viewHeight) {
-    Activity activity = getActivity();
+    Activity activity = TrainingImageCaptureActivity.this;
     if (null == mTextureView || null == mPreviewSize || null == activity) {
       return;
     }
@@ -780,6 +823,8 @@ public class Camera2BasicFragment extends Fragment
               CameraMetadata.CONTROL_AF_TRIGGER_START);
       // Tell #mCaptureCallback to wait for the lock.
       mState = STATE_WAITING_LOCK;
+      mPreviewRequestBuilder.set(CaptureRequest.JPEG_QUALITY, Integer.valueOf(95).byteValue());
+
       mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
               mBackgroundHandler);
     } catch (CameraAccessException e) {
@@ -811,7 +856,7 @@ public class Camera2BasicFragment extends Fragment
    */
   private void captureStillPicture() {
     try {
-      final Activity activity = getActivity();
+      final Activity activity = TrainingImageCaptureActivity.this;
       if (null == activity || null == mCameraDevice) {
         return;
       }
@@ -823,7 +868,9 @@ public class Camera2BasicFragment extends Fragment
       // Use the same AE and AF modes as the preview.
       captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
               CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-      setAutoFlash(captureBuilder);
+
+      captureBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
+
 
       // Orientation
       int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -893,10 +940,11 @@ public class Camera2BasicFragment extends Fragment
         break;
       }
       case R.id.info: {
-        Activity activity = getActivity();
+        Activity activity = TrainingImageCaptureActivity.this;
         if (null != activity) {
           new AlertDialog.Builder(activity)
-                  .setMessage(R.string.intro_message)
+                  .setMessage("This sample demonstrates the basic use of Camera2 API. Check the source code to see how\n" +
+                          "you can display camera preview and take pictures.")
                   .setPositiveButton(android.R.string.ok, null)
                   .show();
         }
@@ -904,6 +952,7 @@ public class Camera2BasicFragment extends Fragment
       }
     }
   }
+
 
   private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
     if (mFlashSupported) {
