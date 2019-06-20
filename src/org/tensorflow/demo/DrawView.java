@@ -6,24 +6,21 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.support.v4.widget.ImageViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
-import java.io.File;
 
 @SuppressLint("AppCompatCustomView")
 public class DrawView extends ImageView {
+
+  public static int REGULAR_CAMERA = 0;
+  public static int DOME_CAMERA = 1;
 
   static String TAG = "DrawView";
 
   String mPathToImage;
   Paint mPaint;
-  Rect mRect;
-  //int[] mViewXYStart = new int[2];
   int mViewWidth;
   int mViewHeight;
 
@@ -32,28 +29,39 @@ public class DrawView extends ImageView {
 
   static int TOUCH_TOLERANCE = 10;
 
+  // touch start coordinates
   float rectXStart = 0;
   float rectYStart = 0;
 
+  // touch stop coordinates
   float rectXStop = 0;
   float rectYStop = 0;
 
-  boolean drawFinished = false;
+  boolean touchFinished = false;
+  boolean stopDrawing = false;
 
 
 
-  public DrawView(Context context, String pathToImage) {
+  public DrawView(Context context, String pathToImage, int cameraType) {
     super(context);
 
     mPaint = new Paint();
 
-    mPaint.setColor(Color.BLUE);
-    mPaint.setStrokeWidth(7);
-    mPaint.setStyle(Paint.Style.STROKE);
+    if (cameraType == REGULAR_CAMERA){
+      mPaint.setColor(Color.GREEN);
+      mPaint.setStrokeWidth(10);
+      mPaint.setStyle(Paint.Style.STROKE);
+    }
+
+    if (cameraType == DOME_CAMERA){
+      mPaint.setColor(Color.BLUE);
+      mPaint.setStrokeWidth(10);
+      mPaint.setStyle(Paint.Style.STROKE);
+    }
+
+
 
     mPathToImage = pathToImage;
-
-    mRect = new Rect();
 
   }
 
@@ -71,16 +79,42 @@ public class DrawView extends ImageView {
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
 
-    //getLocationOnScreen(mViewXYStart);
     mViewWidth = getWidth();
     mViewHeight = getHeight();
 
-    if (rectXStop != 0 || rectYStop != 0) {
-      canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
+    if (!stopDrawing) {
+
+      // draw one last time after touch finished
+      if (touchFinished){
+        canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
+        stopDrawing = true;
+
+        // reset starting points
+        rectXStart = 0;
+        rectYStart = 0;
+
+        rectXStop = 0;
+        rectYStop = 0;
+
+      } else {
+        // draw regularly while touching
+        canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
+      }
     }
 
 
   }
+
+  // TODO intent.putextra with file path to start activity
+
+  // TODO add 2 buttons in activity (regular / dome) + 3rd save button, one is always active, if other button is pressed:
+  // TODO remove drawview, create new drawview from db values with picture + rect of different color
+
+  // TODO use percentage * true size to get pixel value for db storage
+
+  // TODO in drawactivity setup surveillance camera obj with array of int values for cameras for each camera class
+  // TODO in give drawview already marked cameras in constructor, draw rect in corresponding colors
+  // TODO in drawactivity create method for touching rect (truepixelToTouchxyConversion method needed) and undo button to delete rects, update db after
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
@@ -88,9 +122,6 @@ public class DrawView extends ImageView {
 
     float x = event.getX();
     float y = event.getY();
-
-    mViewWidth = getWidth();
-    mViewHeight = getHeight();
 
     // touch from user in relation to view width / height
     imageXTouchingPercent = x / mViewWidth;
@@ -104,17 +135,12 @@ public class DrawView extends ImageView {
     int trueImageHeight = bitmapOptions.outHeight;
 
 
-    Log.i(TAG, String.valueOf(imageXTouchingPercent));
-    Log.i(TAG, String.valueOf(imageYTouchingPercent));
-
     switch (event.getAction()) {
       case MotionEvent.ACTION_DOWN:
         touch_start(x, y);
-        invalidate();
         break;
       case MotionEvent.ACTION_MOVE:
         touch_move(x, y);
-        invalidate();
         break;
       case MotionEvent.ACTION_UP:
         touch_up();
@@ -126,10 +152,9 @@ public class DrawView extends ImageView {
   }
 
   private void touch_start(float x, float y) {
-    //mPath.reset();
-    if (drawFinished) {
 
-    }
+    touchFinished = false;
+    stopDrawing = false;
 
     rectXStart = x;
     rectYStart = y;
@@ -139,15 +164,16 @@ public class DrawView extends ImageView {
     float dx = x - rectXStart;
     float dy = y - rectYStart;
 
-    if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+    if (Math.abs(dx) >= TOUCH_TOLERANCE || Math.abs(dy) >= TOUCH_TOLERANCE) {
      rectXStop = rectXStart + dx;
      rectYStop = rectYStart + dy;
+     invalidate();
     }
   }
 
   private void touch_up() {
 
-    drawFinished = true;
+    touchFinished = true;
 
   }
 }

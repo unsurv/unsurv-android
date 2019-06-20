@@ -466,9 +466,9 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
             // Multi touch logic
             current_finger_spacing = getFingerSpacing(motionEvent);
             if(fingerSpacing != 0){
-              if(current_finger_spacing  > fingerSpacing + 15 && maxzoom > zoomLevel){
+              if(current_finger_spacing  > fingerSpacing + 10 && maxzoom > zoomLevel){
                 zoomLevel++;
-              } else if (current_finger_spacing < fingerSpacing + 15 && zoomLevel > 1){
+              } else if (current_finger_spacing < fingerSpacing + 10 && zoomLevel > 1){
                 zoomLevel--;
               }
               int minW = (int) (m.width() / maxzoom);
