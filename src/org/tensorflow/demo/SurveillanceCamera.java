@@ -35,16 +35,17 @@ public class SurveillanceCamera {
 
 
   public SurveillanceCamera(@Nullable String thumbnailPath,
-                       @Nullable String imagePath,
-                       @Nullable String externalId,
-                       double latitude,
-                       double longitude,
-                       String comment,
-                       String timestamp,
-                       String timeToSync,
-                       boolean locationUploaded,
-                       boolean uploadCompleted,
-                       boolean manualCapture){
+                            @Nullable String imagePath,
+                            @Nullable String externalId,
+                            double latitude,
+                            double longitude,
+                            @Nullable String comment,
+                            @Nullable String timestamp,
+
+                            String timeToSync,
+                            boolean locationUploaded,
+                            boolean uploadCompleted,
+                            boolean manualCapture){
 
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;

@@ -22,13 +22,15 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
   private ImageButton addRegularCameraButton;
   private ImageButton addDomeCameraButton;
+  private ImageButton saveButton;
+  private ImageButton undoButton;
 
   private int cameraType;
   private String pathToImage;
   private File imageFile;
 
-  private  DrawView regularDrawView;
-  private  DrawView domeDrawView;
+
+  private  DrawView drawView;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     imageFile = new File(pathToImage);
 
-    final DrawView drawView = new DrawView(this, pathToImage, cameraType);
+    drawView = new DrawView(this, pathToImage, cameraType);
 
     drawingRelativeLayout.addView(drawView, 0);
 
@@ -51,22 +53,16 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     addRegularCameraButton = findViewById(R.id.add_regular_camera_button);
     addDomeCameraButton = findViewById(R.id.add_dome_camera_button);
+    saveButton = findViewById(R.id.drawing_save_button);
+    undoButton = findViewById(R.id.drawing_undo);
 
-    regularDrawView = new DrawView(DrawOnTrainingImageActivity.this, pathToImage, DrawView.REGULAR_CAMERA);
-    domeDrawView = new DrawView(DrawOnTrainingImageActivity.this, pathToImage, DrawView.DOME_CAMERA);
 
     addRegularCameraButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
 
         cameraType = DrawView.REGULAR_CAMERA;
-        drawingRelativeLayout.removeView(drawView);
-        drawingRelativeLayout.removeView(regularDrawView);
-        drawingRelativeLayout.removeView(domeDrawView);
-
-        drawingRelativeLayout.addView(regularDrawView, 0);
-
-        Picasso.get().load(imageFile).into(regularDrawView);
+        drawView.setCameraType(cameraType);
 
       }
     });
@@ -76,18 +72,24 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       public void onClick(View view) {
 
         cameraType = DrawView.DOME_CAMERA;
-        drawingRelativeLayout.removeView(drawView);
-        drawingRelativeLayout.removeView(regularDrawView);
-        drawingRelativeLayout.removeView(domeDrawView);
+        drawView.setCameraType(cameraType);
 
-        drawingRelativeLayout.addView(domeDrawView, 0);
-
-        Picasso.get().load(imageFile).into(domeDrawView);
       }
     });
 
+    saveButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        drawView.saveCamera();
+      }
+    });
 
-
+    undoButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        drawView.undo();
+      }
+    });
 
 
   }

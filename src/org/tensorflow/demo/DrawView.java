@@ -6,9 +6,17 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewParent;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+
+import java.util.Collections;
 
 
 @SuppressLint("AppCompatCustomView")
@@ -37,8 +45,23 @@ public class DrawView extends ImageView {
   float rectXStop = 0;
   float rectYStop = 0;
 
+
+  // touch start coordinates in relation to the size of the view touched
+  float rectXStartPercent = 0;
+  float rectYStartPercent = 0;
+
+  // touch stop coordinates in relation to the size of the view touched
+  float rectXStopPercent = 0;
+  float rectYStopPercent = 0;
+
   boolean touchFinished = false;
   boolean stopDrawing = false;
+
+  int cameraType;
+
+  int trueImageWidth;
+  int trueImageHeight;
+  Rect touchRectInImagePixels;
 
 
 
@@ -46,21 +69,6 @@ public class DrawView extends ImageView {
     super(context);
 
     mPaint = new Paint();
-
-    if (cameraType == REGULAR_CAMERA){
-      mPaint.setColor(Color.GREEN);
-      mPaint.setStrokeWidth(10);
-      mPaint.setStyle(Paint.Style.STROKE);
-    }
-
-    if (cameraType == DOME_CAMERA){
-      mPaint.setColor(Color.BLUE);
-      mPaint.setStrokeWidth(10);
-      mPaint.setStyle(Paint.Style.STROKE);
-    }
-
-
-
     mPathToImage = pathToImage;
 
   }
@@ -82,12 +90,25 @@ public class DrawView extends ImageView {
     mViewWidth = getWidth();
     mViewHeight = getHeight();
 
+    if (cameraType == REGULAR_CAMERA){
+      mPaint.setColor(Color.GREEN);
+      mPaint.setStrokeWidth(10);
+      mPaint.setStyle(Paint.Style.STROKE);
+    }
+
+    if (cameraType == DOME_CAMERA){
+      mPaint.setColor(Color.BLUE);
+      mPaint.setStrokeWidth(10);
+      mPaint.setStyle(Paint.Style.STROKE);
+    }
+
     if (!stopDrawing) {
 
       // draw one last time after touch finished
       if (touchFinished){
         canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
         stopDrawing = true;
+
 
         // reset starting points
         rectXStart = 0;
@@ -116,6 +137,7 @@ public class DrawView extends ImageView {
   // TODO in give drawview already marked cameras in constructor, draw rect in corresponding colors
   // TODO in drawactivity create method for touching rect (truepixelToTouchxyConversion method needed) and undo button to delete rects, update db after
 
+  // TODO use array(int, rect) to support multiple cameras drawn in activity
   @Override
   public boolean onTouchEvent(MotionEvent event) {
 
@@ -131,8 +153,8 @@ public class DrawView extends ImageView {
 
     BitmapFactory.decodeFile(mPathToImage, bitmapOptions);
 
-    int trueImageWidth = bitmapOptions.outWidth;
-    int trueImageHeight = bitmapOptions.outHeight;
+    trueImageWidth = bitmapOptions.outWidth;
+    trueImageHeight = bitmapOptions.outHeight;
 
 
     switch (event.getAction()) {
@@ -158,6 +180,10 @@ public class DrawView extends ImageView {
 
     rectXStart = x;
     rectYStart = y;
+
+    rectXStartPercent = x / mViewWidth;
+    rectYStartPercent = y / mViewHeight;
+
   }
 
   private void touch_move(float x, float y) {
@@ -167,6 +193,10 @@ public class DrawView extends ImageView {
     if (Math.abs(dx) >= TOUCH_TOLERANCE || Math.abs(dy) >= TOUCH_TOLERANCE) {
      rectXStop = rectXStart + dx;
      rectYStop = rectYStart + dy;
+
+     rectXStopPercent = rectXStop / mViewWidth;
+     rectYStopPercent = rectYStop / mViewHeight;
+
      invalidate();
     }
   }
@@ -176,4 +206,66 @@ public class DrawView extends ImageView {
     touchFinished = true;
 
   }
+
+  public int translateTouchPointsToImagePixel(float touchInPercent, int imageAxisSize){
+    int pixelValue = (int) Math.floor(touchInPercent * imageAxisSize);
+
+    if (pixelValue > imageAxisSize) {
+      return imageAxisSize;
+    } else {
+      return pixelValue;
+    }
+
+  }
+
+  public void setCameraType(int cameraType) {
+    this.cameraType = cameraType;
+  }
+
+  public void saveCamera(){
+
+    if (touchFinished){
+      // x / y of touch start in image pixel value
+      int imageXStartPixelTouched = translateTouchPointsToImagePixel(rectXStartPercent, trueImageHeight);
+      int imageYStartPixelTouched = translateTouchPointsToImagePixel(rectYStartPercent, trueImageWidth);
+
+      // x / y of touch stop in image pixel value
+      int imageXStopPixelTouched = translateTouchPointsToImagePixel(rectXStopPercent, trueImageHeight);
+      int imageYStopPixelTouched = translateTouchPointsToImagePixel(rectYStopPercent, trueImageWidth);
+
+
+      // touch coordinates start in top left corner, therefore left is the smaller of both values etc.
+      int left = returnSmallerInt(imageXStartPixelTouched, imageXStopPixelTouched);
+      int top = returnSmallerInt(imageYStartPixelTouched, imageYStopPixelTouched);
+      int right = returnBiggerInt(imageXStartPixelTouched, imageXStopPixelTouched);
+      int bottom = returnBiggerInt(imageYStartPixelTouched, imageYStopPixelTouched);
+
+      touchRectInImagePixels = new Rect(left, top, right, bottom);
+
+      Log.i(TAG, "img pixel rect: " + touchRectInImagePixels.toShortString());
+
+
+    }
+  }
+
+  public void undo(){
+    invalidate();
+  }
+
+  int returnBiggerInt(int first, int last){
+    if (first > last){
+      return first;
+    } else {
+      return last;
+    }
+  }
+
+  int returnSmallerInt(int first, int last){
+    if (first < last){
+      return first;
+    } else {
+      return last;
+    }
+  }
+
 }
