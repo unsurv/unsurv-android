@@ -184,6 +184,7 @@ public class DebugActivity extends AppCompatActivity {
     final Button uploadCameras = findViewById(R.id.upload_cameras);
     final Button getKeyButton = findViewById(R.id.get_key);
     final Button abortSyncButton = findViewById(R.id.abort_job);
+    final Button drawButton = findViewById(R.id.draw);
 
     cameraRepository = new CameraRepository(getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
@@ -482,6 +483,14 @@ SurveillanceCamera notRandomCamera = new SurveillanceCamera(
 
         jobScheduler.cancel(0);
 
+      }
+    });
+
+    drawButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent drawIntent = new Intent(DebugActivity.this, DrawOnTrainingImageActivity.class);
+        startActivity(drawIntent);
       }
     });
 

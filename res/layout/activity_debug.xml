@@ -119,6 +119,12 @@
             android:layout_height="wrap_content"
             android:text="ABORT JOB"/>
 
+        <Button
+            android:id="@+id/draw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DRAW"/>
+
 
 
     </LinearLayout>

@@ -96,6 +96,12 @@
             android:label="Train Detection Model"
             android:parentActivityName=".DebugActivity"/>
 
+        <activity android:name=".DrawOnTrainingImageActivity"
+            android:label="Mark Cameras"
+            android:parentActivityName=".DebugActivity"/>
+
+
+
         <service android:name=".SyncIntervalSchedulerJobService"
             android:label="SynchronizationScheduler"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
