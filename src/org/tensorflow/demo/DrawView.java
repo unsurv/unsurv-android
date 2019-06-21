@@ -10,13 +10,8 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewParent;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
-import java.util.Collections;
 
 
 @SuppressLint("AppCompatCustomView")
@@ -62,6 +57,8 @@ public class DrawView extends ImageView {
   int trueImageWidth;
   int trueImageHeight;
   Rect touchRectInImagePixels;
+
+
 
 
 
@@ -220,6 +217,7 @@ public class DrawView extends ImageView {
 
   public void setCameraType(int cameraType) {
     this.cameraType = cameraType;
+    invalidate();
   }
 
   public void saveCamera(){

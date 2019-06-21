@@ -354,7 +354,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         return true;
 
       case R.id.action_training:
-        Intent trainingCaptureIntent = new Intent(DetectorActivity.this, TrainingImageCaptureActivity.class);
+        Intent trainingCaptureIntent = new Intent(DetectorActivity.this, CaptureTrainingImageActivity.class);
         startActivity(trainingCaptureIntent);
 
         return true;
@@ -974,7 +974,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               timestampIso8601.format(new Date(currentTime + randomDelay)),
               false,
               false,
-              false
+              false,
+              false,
+              null
 
       ));
 
@@ -991,13 +993,13 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               timestampIso8601.format(new Date(currentTime + randomDelay)),
               false,
               false,
-              false
+              false,
+              false,
+              null
 
       ));
 
     }
-
-
 
 
   }

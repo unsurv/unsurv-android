@@ -13,7 +13,7 @@ import java.util.List;
 public interface CameraDao {
 
   @Insert(onConflict = 1)
-  void insert(SurveillanceCamera surveillanceCamera);
+  long insert(SurveillanceCamera surveillanceCamera);
 
   @Update
   void updateCameras(SurveillanceCamera... surveillanceCameras);
@@ -54,6 +54,9 @@ public interface CameraDao {
 
   @Query("SELECT * from local_surveillance_cameras WHERE uploadCompleted")
   List<SurveillanceCamera> getUploadedCameras();
+
+  @Query("SELECT * from local_surveillance_cameras WHERE id = :id")
+  SurveillanceCamera findById(long id);
 
 
 

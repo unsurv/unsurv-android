@@ -22,6 +22,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
@@ -45,6 +47,7 @@ import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -63,15 +66,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class TrainingImageCaptureActivity extends AppCompatActivity
+public class CaptureTrainingImageActivity extends AppCompatActivity
         implements View.OnClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback{
 
@@ -82,10 +88,15 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
   private static final int REQUEST_CAMERA_PERMISSION = 1;
   private static final String FRAGMENT_DIALOG = "dialog";
 
-  public float fingerSpacing = 0;
-  public int zoomLevel = 1;
+  private float fingerSpacing = 0;
+  private int zoomLevel = 1;
+  private CameraRepository cameraRepository;
+
+  private SharedPreferences sharedPreferences;
 
   private Rect zoomedImage;
+
+  private long insertDbId;
 
   static {
     ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -212,7 +223,7 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
       mCameraOpenCloseLock.release();
       cameraDevice.close();
       mCameraDevice = null;
-      Activity activity = TrainingImageCaptureActivity.this;
+      Activity activity = CaptureTrainingImageActivity.this;
       if (null != activity) {
         activity.finish();
       }
@@ -360,7 +371,7 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
    * @param text The message to show
    */
   private void showToast(final String text) {
-    final Activity activity = TrainingImageCaptureActivity.this;
+    final Activity activity = CaptureTrainingImageActivity.this;
     if (activity != null) {
       activity.runOnUiThread(new Runnable() {
         @Override
@@ -429,6 +440,11 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
     findViewById(R.id.picture).setOnClickListener(this);
     findViewById(R.id.info).setOnClickListener(this);
     mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
+
+
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    cameraRepository = new CameraRepository(getApplication());
+
     mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, "asd.jpg");
 
   }
@@ -453,7 +469,7 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
       public boolean onTouch(View view, MotionEvent motionEvent) {
 
         try {
-          Activity activity = TrainingImageCaptureActivity.this;
+          Activity activity = CaptureTrainingImageActivity.this;
           CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
           CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraId);
           float maxzoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10;
@@ -536,7 +552,7 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
    */
   @SuppressWarnings("SuspiciousNameCombination")
   private void setUpCameraOutputs(int width, int height) {
-    Activity activity = TrainingImageCaptureActivity.this;
+    Activity activity = CaptureTrainingImageActivity.this;
     CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
     try {
       for (String cameraId : manager.getCameraIdList()) {
@@ -646,14 +662,14 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
    * Opens the camera specified by {}.
    */
   private void openCamera(int width, int height) {
-    if (ContextCompat.checkSelfPermission(TrainingImageCaptureActivity.this, Manifest.permission.CAMERA)
+    if (ContextCompat.checkSelfPermission(CaptureTrainingImageActivity.this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
       requestCameraPermission();
       return;
     }
     setUpCameraOutputs(width, height);
     configureTransform(width, height);
-    Activity activity = TrainingImageCaptureActivity.this;
+    Activity activity = CaptureTrainingImageActivity.this;
     CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
     try {
       if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
@@ -782,7 +798,7 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
    * @param viewHeight The height of `mTextureView`
    */
   private void configureTransform(int viewWidth, int viewHeight) {
-    Activity activity = TrainingImageCaptureActivity.this;
+    Activity activity = CaptureTrainingImageActivity.this;
     if (null == mTextureView || null == mPreviewSize || null == activity) {
       return;
     }
@@ -855,8 +871,10 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
    * {@link #mCaptureCallback} from both {@link #lockFocus()}.
    */
   private void captureStillPicture() {
+
+
     try {
-      final Activity activity = TrainingImageCaptureActivity.this;
+      final Activity activity = CaptureTrainingImageActivity.this;
       if (null == activity || null == mCameraDevice) {
         return;
       }
@@ -886,12 +904,20 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
           showToast("Saved: " + mFile);
           Log.d(TAG, mFile.toString());
           unlockFocus();
+
+          Intent drawOnImageIntent = new Intent(CaptureTrainingImageActivity.this, DrawOnTrainingImageActivity.class);
+
+          drawOnImageIntent.putExtra("surveillanceCameraId", insertDbId);
+
+          startActivity(drawOnImageIntent);
         }
       };
 
       mCaptureSession.stopRepeating();
       mCaptureSession.abortCaptures();
       mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
+
+
     } catch (CameraAccessException e) {
       e.printStackTrace();
     }
@@ -937,10 +963,48 @@ public class TrainingImageCaptureActivity extends AppCompatActivity
     switch (view.getId()) {
       case R.id.picture: {
         takePicture();
+
+
+        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        long currentTime = System.currentTimeMillis();
+
+        String currentDateOrNull;
+
+        if (sharedPreferences.getBoolean("showCaptureTimestamps", false)){
+          currentDateOrNull = timestampIso8601.format(new Date(currentTime));
+        } else {
+          currentDateOrNull = null;
+        }
+
+        SurveillanceCamera trainingCamera = new SurveillanceCamera(
+                null,
+                null,
+                null,
+                0,
+                0,
+                "asd",
+                currentDateOrNull,
+                SynchronizationUtils.getSynchronizationDateWithRandomDelay(currentTime, sharedPreferences),
+                false,
+                false,
+                false,
+                true,
+                null);
+
+        insertDbId = cameraRepository.insert(trainingCamera);
+
+        mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, insertDbId +".jpg");
+
+        trainingCamera.setImagePath(insertDbId +".jpg");
+        cameraRepository.updateCameras(trainingCamera);
+
+
         break;
       }
       case R.id.info: {
-        Activity activity = TrainingImageCaptureActivity.this;
+        Activity activity = CaptureTrainingImageActivity.this;
         if (null != activity) {
           new AlertDialog.Builder(activity)
                   .setMessage("This sample demonstrates the basic use of Camera2 API. Check the source code to see how\n" +

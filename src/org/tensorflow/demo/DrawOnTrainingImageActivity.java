@@ -1,5 +1,6 @@
 package org.tensorflow.demo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
@@ -28,6 +29,8 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
   private int cameraType;
   private String pathToImage;
   private File imageFile;
+  private CameraRepository cameraRepository;
+  private SurveillanceCamera currentTrainingCamera;
 
 
   private  DrawView drawView;
@@ -37,11 +40,18 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_draw_on_image);
 
+    Intent intent = getIntent();
+    long dbId = intent.getLongExtra("surveillanceCameraId", 0);
+
+    cameraRepository = new CameraRepository(getApplication());
+
+    currentTrainingCamera = cameraRepository.findByDbId(dbId);
+
     cameraType = DrawView.REGULAR_CAMERA;
 
     final RelativeLayout drawingRelativeLayout = findViewById(R.id.drawing_relative);
 
-    pathToImage = SynchronizationUtils.TRAINING_IMAGES_PATH + "asd.jpg";
+    pathToImage = SynchronizationUtils.TRAINING_IMAGES_PATH + currentTrainingCamera.getId() + ".jpg";
 
     imageFile = new File(pathToImage);
 

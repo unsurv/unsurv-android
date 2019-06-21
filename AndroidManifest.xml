@@ -92,7 +92,7 @@
             android:label="Manual Capture"
             android:parentActivityName=".DebugActivity"/>
 
-        <activity android:name=".TrainingImageCaptureActivity"
+        <activity android:name=".CaptureTrainingImageActivity"
             android:label="Train Detection Model"
             android:parentActivityName=".DebugActivity"/>
 

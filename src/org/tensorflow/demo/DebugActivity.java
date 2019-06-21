@@ -1,8 +1,6 @@
 package org.tensorflow.demo;
 
-import android.animation.LayoutTransition;
 import android.app.Application;
-import android.app.ProgressDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.Context;
@@ -12,12 +10,10 @@ import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.MathUtils;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -151,7 +146,7 @@ public class DebugActivity extends AppCompatActivity {
         return true;
 
       case R.id.action_training:
-        Intent trainingCaptureIntent = new Intent(DebugActivity.this, TrainingImageCaptureActivity.class);
+        Intent trainingCaptureIntent = new Intent(DebugActivity.this, CaptureTrainingImageActivity.class);
         startActivity(trainingCaptureIntent);
 
         return true;
@@ -420,7 +415,9 @@ public class DebugActivity extends AppCompatActivity {
                 "2019-05-30",
                 false,
                 false,
-                false);
+                false,
+                false,
+                null);
 /*
 SurveillanceCamera notRandomCamera = new SurveillanceCamera(
                 "test_pixel_2.jpg",
@@ -538,7 +535,9 @@ SurveillanceCamera notRandomCamera = new SurveillanceCamera(
             "2019-05-30",
             false,
             false,
-            false);
+            false,
+            false,
+            null);
 
     CameraRepository cameraRepository = new CameraRepository(getApplication());
     cameraRepository.insert(testCamera);

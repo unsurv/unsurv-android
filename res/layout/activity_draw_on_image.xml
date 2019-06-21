@@ -67,6 +67,7 @@
             android:background="@drawable/ic_cancel_red_24dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:layout_margin="20dp"
 
             />
 

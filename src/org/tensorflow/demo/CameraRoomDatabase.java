@@ -80,7 +80,9 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
                 timestampIso8601.format(new Date(System.currentTimeMillis() + rng.nextInt(1000*60*60*24))),
                 false,
                 false,
-                false);
+                false,
+                false,
+                null);
         mDao.insert(surveillanceCamera);
       }
 

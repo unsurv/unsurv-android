@@ -91,6 +91,14 @@ public class ManualCaptureActivity extends AppCompatActivity {
 
         long currentTime = System.currentTimeMillis();
 
+        String currentDateOrNull;
+
+        if (sharedPreferences.getBoolean("showCaptureTimestamps", false)){
+          currentDateOrNull = timestampIso8601.format(new Date(currentTime));
+        } else {
+          currentDateOrNull = null;
+        }
+
         SurveillanceCamera manualCamera = new SurveillanceCamera(
                 null,
                 null,
@@ -98,11 +106,13 @@ public class ManualCaptureActivity extends AppCompatActivity {
                 center.getLatitude(),
                 center.getLongitude(),
                 "",
-                timestampIso8601.format(new Date(currentTime)),
+                currentDateOrNull,
                 SynchronizationUtils.getSynchronizationDateWithRandomDelay(currentTime, sharedPreferences),
                 false,
                 false,
-                true
+                true,
+                false,
+                null
 
         );
 

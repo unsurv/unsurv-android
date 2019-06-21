@@ -2,6 +2,7 @@ package org.tensorflow.demo;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.graphics.Camera;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -26,8 +27,16 @@ public class CameraRepository {
       return mAllSurveillanceCameras;
   }
 
-  public void insert (SurveillanceCamera surveillanceCamera) {
-    new insertAsyncTask(mCameraDao).execute(surveillanceCamera);
+  public long insert (SurveillanceCamera surveillanceCamera) {
+
+    try {
+      return new insertAsyncTask(mCameraDao).execute(surveillanceCamera).get();
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+      return 0;
+    }
+
+
   }
 
   int getCamerasAddedByUserCount(){
@@ -88,9 +97,22 @@ public class CameraRepository {
 
   }
 
+  SurveillanceCamera findByDbId(long dbId){
+
+    try {
+      SurveillanceCamera camera = new findByIDAsyncTask(mCameraDao).execute(dbId).get();
+      return camera;
+
+    } catch (Exception e) {
+      Log.i("Background findByDbId Error: " , e.toString());
+      return null;
+    }
+
+  }
 
 
-  private static class insertAsyncTask extends AsyncTask<SurveillanceCamera, Void, Void> {
+
+  private static class insertAsyncTask extends AsyncTask<SurveillanceCamera, Void, Long> {
 
     private CameraDao mAsyncTaskDao;
 
@@ -99,9 +121,8 @@ public class CameraRepository {
     }
 
     @Override
-    protected Void doInBackground(final SurveillanceCamera... params) {
-      mAsyncTaskDao.insert(params[0]);
-      return null;
+    protected Long doInBackground(final SurveillanceCamera... params) {
+      return mAsyncTaskDao.insert(params[0]);
     }
   }
 
@@ -193,6 +214,25 @@ public class CameraRepository {
     protected List<SurveillanceCamera> doInBackground(Void... params) {
       return mAsyncTaskDao.getCamerasForImageUpload();
     }
+  }
+
+  private static class findByIDAsyncTask extends AsyncTask<Long, Void, SurveillanceCamera> {
+
+    private CameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository findByIdAsyncTask";
+
+    findByIDAsyncTask(CameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected SurveillanceCamera doInBackground(final Long... params) {
+
+      SurveillanceCamera queriedCamera = mAsyncTaskDao.findById(params[0]);
+
+      return queriedCamera;
+    }
+
   }
 
 

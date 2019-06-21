@@ -32,6 +32,10 @@ public class SurveillanceCamera {
 
   private boolean uploadCompleted;
   private boolean manualCapture;
+  private boolean trainingCapture;
+
+  // rectangles drawn in DrawOnTrainingImageActivities
+  private String drawnRectsAsString;
 
 
   public SurveillanceCamera(@Nullable String thumbnailPath,
@@ -41,11 +45,12 @@ public class SurveillanceCamera {
                             double longitude,
                             @Nullable String comment,
                             @Nullable String timestamp,
-
                             String timeToSync,
                             boolean locationUploaded,
                             boolean uploadCompleted,
-                            boolean manualCapture){
+                            boolean manualCapture,
+                            boolean trainingCapture,
+                            @Nullable String drawnRectsAsString){
 
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;
@@ -65,6 +70,9 @@ public class SurveillanceCamera {
     this.uploadCompleted = uploadCompleted;
 
     this.manualCapture = manualCapture;
+
+    this.trainingCapture = trainingCapture;
+    this.drawnRectsAsString = drawnRectsAsString;
 
 
   }
@@ -115,6 +123,14 @@ public class SurveillanceCamera {
     return manualCapture;
   }
 
+  public boolean getTrainingCapture(){
+    return trainingCapture;
+  }
+
+  public String getDrawnRectsAsString(){
+    return drawnRectsAsString;
+  }
+
 
 
   public void setId(int id) {
@@ -152,4 +168,9 @@ public class SurveillanceCamera {
   public void setLocationUploaded(boolean locationUploaded){this.locationUploaded = locationUploaded; }
   public void setUploadCompleted(boolean uploadCompleted){this.uploadCompleted = uploadCompleted; }
   public void setManualCapture(boolean manualCapture){this.manualCapture = manualCapture; }
+  public void setTrainingCapture(boolean trainingCapture){this.trainingCapture = trainingCapture; }
+
+  public void setDrawnRectsAsString(String drawnRectsAsString) {
+    this.drawnRectsAsString = drawnRectsAsString;
+  }
 }
