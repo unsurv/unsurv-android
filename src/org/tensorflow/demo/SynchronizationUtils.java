@@ -391,6 +391,7 @@ class SynchronizationUtils {
 
       @Override
       public void onRequestFinished(Request<Object> request) {
+
         Intent intent = new Intent();
         intent.setAction("org.unsurv.API_KEY_CHANGED");
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);

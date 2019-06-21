@@ -74,6 +74,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -96,7 +97,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
 
   private Rect zoomedImage;
 
-  private long insertDbId;
+  private int insertDbId;
 
   static {
     ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -905,11 +906,22 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
           Log.d(TAG, mFile.toString());
           unlockFocus();
 
-          Intent drawOnImageIntent = new Intent(CaptureTrainingImageActivity.this, DrawOnTrainingImageActivity.class);
+          // start drawing activity 1 sec after capture to give db some time to save data
+          Handler handler = new Handler();
+          handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
-          drawOnImageIntent.putExtra("surveillanceCameraId", insertDbId);
+              Intent drawOnImageIntent = new Intent(CaptureTrainingImageActivity.this, DrawOnTrainingImageActivity.class);
 
-          startActivity(drawOnImageIntent);
+              drawOnImageIntent.putExtra("surveillanceCameraId", insertDbId);
+
+              startActivity(drawOnImageIntent);
+
+            }
+          }, 1000);
+
+
         }
       };
 
@@ -978,9 +990,12 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
           currentDateOrNull = null;
         }
 
+        String trainingImageUuid = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+        mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, trainingImageUuid +".jpg");
+
         SurveillanceCamera trainingCamera = new SurveillanceCamera(
                 null,
-                null,
+                trainingImageUuid +".jpg",
                 null,
                 0,
                 0,
@@ -993,13 +1008,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
                 true,
                 null);
 
-        insertDbId = cameraRepository.insert(trainingCamera);
-
-        mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, insertDbId +".jpg");
-
-        trainingCamera.setImagePath(insertDbId +".jpg");
-        cameraRepository.updateCameras(trainingCamera);
-
+        insertDbId = (int) cameraRepository.insert(trainingCamera);
 
         break;
       }

@@ -11,7 +11,9 @@
      limitations under the License.
 -->
 <!-- Layout for a single list item -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    android:id="@+id/history_item_linear_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -32,21 +34,21 @@
         android:layout_weight="2"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingStart="16dp">
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
         <TextView
-            android:id="@+id/history_item_text_view_1"
+            android:id="@+id/history_item_text_view_top"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="bottom"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="@android:color/white"
-            android:textStyle="bold"
             tools:text="lutti" />
 
         <TextView
-            android:id="@+id/history_item_text_view_2"
+            android:id="@+id/history_item_text_view_bottom"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -58,9 +60,19 @@
 
     <LinearLayout
         android:layout_width="0sp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_height="match_parent"
         android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/history_item_draw_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#c8333333"
+            android:src="@drawable/ic_brush_grey_24dp"
+            android:padding="4dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
 
         <ImageButton
             android:id="@+id/history_item_delete_button"
@@ -81,6 +93,8 @@
             android:padding="4dp"
             android:layout_gravity="center"
             />
+
+
 
     </LinearLayout>
 

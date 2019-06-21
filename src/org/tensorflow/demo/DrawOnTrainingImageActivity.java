@@ -41,7 +41,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
     setContentView(R.layout.activity_draw_on_image);
 
     Intent intent = getIntent();
-    long dbId = intent.getLongExtra("surveillanceCameraId", 0);
+    int dbId = intent.getIntExtra("surveillanceCameraId", 0);
 
     cameraRepository = new CameraRepository(getApplication());
 
@@ -51,7 +51,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     final RelativeLayout drawingRelativeLayout = findViewById(R.id.drawing_relative);
 
-    pathToImage = SynchronizationUtils.TRAINING_IMAGES_PATH + currentTrainingCamera.getId() + ".jpg";
+    pathToImage = SynchronizationUtils.TRAINING_IMAGES_PATH + currentTrainingCamera.getImagePath();
 
     imageFile = new File(pathToImage);
 

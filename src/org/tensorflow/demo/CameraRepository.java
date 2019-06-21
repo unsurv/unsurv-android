@@ -97,7 +97,7 @@ public class CameraRepository {
 
   }
 
-  SurveillanceCamera findByDbId(long dbId){
+  SurveillanceCamera findByDbId(int dbId){
 
     try {
       SurveillanceCamera camera = new findByIDAsyncTask(mCameraDao).execute(dbId).get();
@@ -216,7 +216,7 @@ public class CameraRepository {
     }
   }
 
-  private static class findByIDAsyncTask extends AsyncTask<Long, Void, SurveillanceCamera> {
+  private static class findByIDAsyncTask extends AsyncTask<Integer, Void, SurveillanceCamera> {
 
     private CameraDao mAsyncTaskDao;
     private String TAG = "SynchronizedCameraRepository findByIdAsyncTask";
@@ -226,7 +226,7 @@ public class CameraRepository {
     }
 
     @Override
-    protected SurveillanceCamera doInBackground(final Long... params) {
+    protected SurveillanceCamera doInBackground(final Integer... params) {
 
       SurveillanceCamera queriedCamera = mAsyncTaskDao.findById(params[0]);
 

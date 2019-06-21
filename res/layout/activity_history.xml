@@ -60,29 +60,46 @@
         </LinearLayout>
 
         <RelativeLayout
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:id="@+id/history_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             >
 
             <TextView
+                android:id="@+id/history_detail_captured_static_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Captured on: "
+                />
+
+            <TextView
                 android:id="@+id/history_detail_timestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:padding="4dp"
+                android:layout_toEndOf="@id/history_detail_captured_static_text"
                 android:text="Please select a camera"
                 android:textColor="#FFF"
                 android:layout_gravity="top"
                 />
 
             <TextView
+                android:id="@+id/history_detail_upload_static_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload on: "
+                android:layout_below="@id/history_detail_captured_static_text"/>
+
+
+            <TextView
                 android:id="@+id/history_detail_upload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:padding="4dp"
                 android:layout_below="@id/history_detail_timestamp"
+                android:layout_alignStart="@id/history_detail_timestamp"
                 android:textColor="#FFF"
                 />
 
