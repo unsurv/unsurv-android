@@ -2,7 +2,6 @@ package org.tensorflow.demo;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,8 +14,6 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.gson.JsonObject;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +22,7 @@ import org.json.JSONObject;
 @SuppressLint("AppCompatCustomView")
 public class DrawView extends ImageView {
 
+  // camera types
   public static int REGULAR_CAMERA = 0;
   public static int DOME_CAMERA = 1;
 
@@ -32,16 +30,20 @@ public class DrawView extends ImageView {
 
   String mPathToImage;
   Paint mPaint;
+
+  // paint for corresponding camera types
   Paint mRegularPaint;
   Paint mDomePaint;
 
-
+  // view height, width from display in display pixels
   int mViewWidth;
   int mViewHeight;
 
-  float imageXTouchingPercent = 0;
-  float imageYTouchingPercent = 0;
+  // used reading touch input, value is percent of complete width/height
+  float imageViewXTouchingPercent = 0;
+  float imageViewYTouchingPercent = 0;
 
+  // min value in pixels for drawing to trigger // TODO change for different display sizes
   static int TOUCH_TOLERANCE = 10;
 
   // touch start coordinates
@@ -51,7 +53,6 @@ public class DrawView extends ImageView {
   // touch stop coordinates
   float rectXStop = 0;
   float rectYStop = 0;
-
 
   // touch start coordinates in relation to the size of the view touched
   float rectXStartPercent = 0;
@@ -63,31 +64,28 @@ public class DrawView extends ImageView {
 
   boolean touchFinished = false;
   boolean stopDrawing = false;
+  boolean firstTimeLaunched;
 
   int cameraType;
 
+  // actual size of jpg in pixels
   int trueImageWidth;
   int trueImageHeight;
+
+  // drawn rect in img pixels
   Rect touchRectInImagePixels;
 
   CameraRepository mCameraRepository;
   Context mContext;
 
+  // already saved rects as json array / string
+  JSONArray rectArray;
   String drawnCameras;
 
   SurveillanceCamera mCamera;
 
-  JSONArray rectArray;
-
+  // tmp object used for drawing saved rects
   Rect rectFromDb;
-
-  boolean firstTimeLaunched;
-
-  Canvas mCanvas;
-
-
-
-
 
 
   public DrawView(Context context, SurveillanceCamera camera, CameraRepository cameraRepository) {
@@ -101,11 +99,11 @@ public class DrawView extends ImageView {
     mRegularPaint = new Paint();
     mDomePaint = new Paint();
 
+    // orange
     mRegularPaint.setColor(Color.parseColor("#C96700"));
     mRegularPaint.setStrokeWidth(10);
     mRegularPaint.setStyle(Paint.Style.STROKE);
 
-    // orange
     mDomePaint.setColor(Color.BLUE);
     mDomePaint.setStrokeWidth(10);
     mDomePaint.setStyle(Paint.Style.STROKE);
@@ -119,7 +117,6 @@ public class DrawView extends ImageView {
 
     BitmapFactory.decodeFile(mPathToImage, bitmapOptions);
 
-
     // Image is taken in portrait mode. outheight outputs as if in landscape mode, therefore we change values
     trueImageWidth = bitmapOptions.outHeight;
     trueImageHeight = bitmapOptions.outWidth;
@@ -130,6 +127,7 @@ public class DrawView extends ImageView {
 
     try {
 
+      // populate drawnCameras if data already present
       if (drawnCameras != null){
         rectArray = new JSONArray(drawnCameras);
       } else {
@@ -156,11 +154,11 @@ public class DrawView extends ImageView {
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
 
-    mCanvas = canvas;
-
+    // view size in pixels, portrait mode is forced so width < height
     mViewWidth = getWidth();
     mViewHeight = getHeight();
 
+    // set color for different types
     if (cameraType == REGULAR_CAMERA){
       mPaint = mRegularPaint;
     }
@@ -169,15 +167,13 @@ public class DrawView extends ImageView {
       mPaint = mDomePaint;
     }
 
-
-
     if (!stopDrawing) {
 
       // draw one time after touch finished or when first creating view
       if (touchFinished || firstTimeLaunched){
 
-        // cant draw from touch when first launched
         if (firstTimeLaunched) {
+          // cant draw from touch when first launched, just draw rects already present
           firstTimeLaunched = false;
         } else {
           // touch event finished
@@ -191,22 +187,25 @@ public class DrawView extends ImageView {
           try {
             JSONObject tmpObj = (JSONObject) rectArray.get(i);
 
+            // key sets type of camera, see static ints for types
             if (tmpObj.keys().next().equals(String.valueOf(REGULAR_CAMERA))){
               mPaint = mRegularPaint;
             } else {
               mPaint = mDomePaint;
             }
 
+            // acces value of JSONObj
             String rectAsStringWithImagePixel = tmpObj.getString(tmpObj.keys().next());
 
+            // example data: "10 70 200 600" left top right bottom
             String[] splitRect = rectAsStringWithImagePixel.split(" ");
 
+            // translate img pixel values in rect to view pixels on phone display here
             int left = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[0]), trueImageWidth) * mViewWidth);
             int top = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[1]), trueImageHeight) * mViewHeight);
             int right = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[2]), trueImageWidth) * mViewWidth);
             int bottom = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[3]), trueImageHeight) * mViewHeight);
 
-            //Rect rect = Rect.unflattenFromString(rectAsStringWithImagePixel);
             rectFromDb.left = left;
             rectFromDb.top = top;
             rectFromDb.right = right;
@@ -220,53 +219,26 @@ public class DrawView extends ImageView {
           }
         }
 
-
-
-
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-          @Override
-          public void run() {
-
-
-
-          }
-        }, 1000);
-
-
-
       } else {
         // draw regularly while touching
         canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
+        // TODO maybe only draw every xth touch movement to save some computaion
       }
     }
 
 
   }
 
-  // TODO intent.putextra with file path to start activity
-
-  // TODO add 2 buttons in activity (regular / dome) + 3rd save button, one is always active, if other button is pressed:
-  // TODO remove drawview, create new drawview from db values with picture + rect of different color
-
-  // TODO use percentage * true size to get pixel value for db storage
-
-  // TODO in drawactivity setup surveillance camera obj with array of int values for cameras for each camera class
-  // TODO in give drawview already marked cameras in constructor, draw rect in corresponding colors
-  // TODO in drawactivity create method for touching rect (truepixelToTouchxyConversion method needed) and undo button to delete rects, update db after
-
-  // TODO use array(int, rect) to support multiple cameras drawn in activity
   @Override
   public boolean onTouchEvent(MotionEvent event) {
 
-
+    // x / y in view pixel values, starting at 0/0 in top left of view and using display pixels from there on
     float x = event.getX();
     float y = event.getY();
 
     // touch from user in relation to view width / height
-    imageXTouchingPercent = x / mViewWidth;
-    imageYTouchingPercent = y / mViewHeight;
+    imageViewXTouchingPercent = x / mViewWidth;
+    imageViewYTouchingPercent = y / mViewHeight;
 
     switch (event.getAction()) {
       case MotionEvent.ACTION_DOWN:
@@ -286,6 +258,7 @@ public class DrawView extends ImageView {
 
   private void touch_start(float x, float y) {
 
+    // started drawing
     touchFinished = false;
     stopDrawing = false;
 
@@ -298,9 +271,12 @@ public class DrawView extends ImageView {
   }
 
   private void touch_move(float x, float y) {
+
+    // distance moved while touching
     float dx = x - rectXStart;
     float dy = y - rectYStart;
 
+    // refresh and draw new rect on screen if movement > tolerance
     if (Math.abs(dx) >= TOUCH_TOLERANCE || Math.abs(dy) >= TOUCH_TOLERANCE) {
      rectXStop = rectXStart + dx;
      rectYStop = rectYStart + dy;
@@ -318,6 +294,12 @@ public class DrawView extends ImageView {
 
   }
 
+  /**
+   * given a percentage position of touch event, return img pixel equivalent
+   * @param touchInPercent
+   * @param imageAxisSize
+   * @return
+   */
   public int translateTouchPointsToImagePixel(float touchInPercent, int imageAxisSize){
     int pixelValue = (int) Math.floor(touchInPercent * imageAxisSize);
 
@@ -328,6 +310,12 @@ public class DrawView extends ImageView {
     }
   }
 
+  /**
+   * translates back from image pixels to percent of img axis size touched
+   * @param imagePixel
+   * @param imageAxisSize
+   * @return
+   */
   public float translateImagePixelToPercent(int imagePixel, int imageAxisSize){
 
     float percentInImage = (float) imagePixel / imageAxisSize;
@@ -340,6 +328,9 @@ public class DrawView extends ImageView {
     invalidate();
   }
 
+  /**
+   * Called from button in DrawOnTrainingImageActivity. Saves one drawn rect to db.
+   */
   public void saveCamera(){
 
     if (touchFinished){
@@ -373,6 +364,7 @@ public class DrawView extends ImageView {
 
         JSONObject singleDrawnRect = new JSONObject();
 
+        // "cameraType":"left top right bottom"
         singleDrawnRect.put(String.valueOf(cameraType), touchRectInImagePixels.flattenToString());
 
         rectArray.put(singleDrawnRect);
@@ -382,10 +374,11 @@ public class DrawView extends ImageView {
         Log.i(TAG, "jsonException: " + e.toString());
       }
 
+      // JSON as string to save in db
       drawnCameras = rectArray.toString();
 
+      // updating obj and saving to db
       mCamera.setDrawnRectsAsString(drawnCameras);
-
       mCameraRepository.updateCameras(mCamera);
 
     } else {
@@ -393,28 +386,20 @@ public class DrawView extends ImageView {
     }
   }
 
+  /**
+   * removes last drawn rect and updates view accordingly
+   */
   public void undo(){
 
-    try {
+    rectArray.remove(rectArray.length() - 1);
 
-      JSONObject rectoToRemove = (JSONObject) rectArray.get(rectArray.length() - 1);
-      rectArray.remove(rectArray.length() - 1);
-      drawnCameras = rectArray.toString();
-      mCamera.setDrawnRectsAsString(drawnCameras);
-      mCameraRepository.updateCameras(mCamera);
+    // update and save to db
+    drawnCameras = rectArray.toString();
+    mCamera.setDrawnRectsAsString(drawnCameras);
+    mCameraRepository.updateCameras(mCamera);
 
-      // Redraw as if just launched. Since update SurveillanceCameraObject is queried again for drawing,
-      // removed camera will not be shown
-      firstTimeLaunched = true;
-      stopDrawing = false;
+    refresh();
 
-
-
-    } catch (JSONException e){
-      Log.i(TAG, "jsonException: " + e.toString());
-    }
-
-    invalidate();
   }
 
   int returnBiggerInt(int first, int last){
@@ -434,8 +419,8 @@ public class DrawView extends ImageView {
   }
 
   public void refresh(){
-    // Redraw as if just launched. Since update SurveillanceCameraObject is queried again for drawing,
-    // removed camera will not be shown
+    // Redraw as if just launched. Since updated SurveillanceCameraObject is queried again for drawing,
+    // removed camera will not be shown.
     firstTimeLaunched = true;
     stopDrawing = false;
 
