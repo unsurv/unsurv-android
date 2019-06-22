@@ -2,16 +2,22 @@ package org.tensorflow.demo;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 @SuppressLint("AppCompatCustomView")
@@ -24,6 +30,10 @@ public class DrawView extends ImageView {
 
   String mPathToImage;
   Paint mPaint;
+  Paint mRegularPaint;
+  Paint mDomePaint;
+
+
   int mViewWidth;
   int mViewHeight;
 
@@ -58,15 +68,68 @@ public class DrawView extends ImageView {
   int trueImageHeight;
   Rect touchRectInImagePixels;
 
+  CameraRepository mCameraRepository;
+  Context mContext;
+
+  String drawnCameras;
+
+  SurveillanceCamera mCamera;
+
+  JSONArray rectArray;
+
+  Rect rectFromDb;
 
 
 
 
-  public DrawView(Context context, String pathToImage, int cameraType) {
+
+
+  public DrawView(Context context, SurveillanceCamera camera, CameraRepository cameraRepository) {
     super(context);
 
+    mContext = context;
+
     mPaint = new Paint();
-    mPathToImage = pathToImage;
+    mRegularPaint = new Paint();
+    mDomePaint = new Paint();
+
+    mRegularPaint.setColor(Color.GREEN);
+    mRegularPaint.setStrokeWidth(10);
+    mRegularPaint.setStyle(Paint.Style.STROKE);
+
+    mDomePaint.setColor(Color.BLUE);
+    mDomePaint.setStrokeWidth(10);
+    mDomePaint.setStyle(Paint.Style.STROKE);
+
+    mPathToImage = SynchronizationUtils.TRAINING_IMAGES_PATH + camera.getImagePath();
+    mCameraRepository = cameraRepository;
+
+    mCamera = camera;
+
+    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+
+    BitmapFactory.decodeFile(mPathToImage, bitmapOptions);
+
+
+    // Image is taken in portrait mode. outheight outputs as if in landscape mode, therefore we change values
+    trueImageWidth = bitmapOptions.outHeight;
+    trueImageHeight = bitmapOptions.outWidth;
+
+    rectFromDb = new Rect();
+
+    drawnCameras = mCamera.getDrawnRectsAsString();
+
+    try {
+
+      if (drawnCameras != null){
+        rectArray = new JSONArray(drawnCameras);
+      } else {
+        rectArray = new JSONArray();
+      }
+
+    } catch (JSONException e){
+      Log.i(TAG, "jsonException: " + e.toString());
+    }
 
   }
 
@@ -88,31 +151,80 @@ public class DrawView extends ImageView {
     mViewHeight = getHeight();
 
     if (cameraType == REGULAR_CAMERA){
-      mPaint.setColor(Color.GREEN);
-      mPaint.setStrokeWidth(10);
-      mPaint.setStyle(Paint.Style.STROKE);
+      mPaint = mRegularPaint;
     }
 
     if (cameraType == DOME_CAMERA){
-      mPaint.setColor(Color.BLUE);
-      mPaint.setStrokeWidth(10);
-      mPaint.setStyle(Paint.Style.STROKE);
+      mPaint = mDomePaint;
     }
+
+
 
     if (!stopDrawing) {
 
       // draw one last time after touch finished
       if (touchFinished){
         canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
+
         stopDrawing = true;
 
+        for (int i=0; i < rectArray.length(); i++){
 
-        // reset starting points
-        rectXStart = 0;
-        rectYStart = 0;
+          try {
+            JSONObject tmpObj = (JSONObject) rectArray.get(i);
 
-        rectXStop = 0;
-        rectYStop = 0;
+            if (tmpObj.keys().next().equals(String.valueOf(REGULAR_CAMERA))){
+              mPaint = mRegularPaint;
+            } else {
+              mPaint = mDomePaint;
+            }
+
+            String rectAsStringWithImagePixel = tmpObj.getString(tmpObj.keys().next());
+
+            String[] splitRect = rectAsStringWithImagePixel.split(" ");
+
+            // 0 935 1508 2033
+
+            float asd = translateImagePixelToPercent(Integer.parseInt(splitRect[0]), trueImageWidth);
+
+            int left = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[0]), trueImageWidth) * mViewWidth);
+            int top = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[1]), trueImageHeight) * mViewHeight);
+            int right = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[2]), trueImageWidth) * mViewWidth);
+            int bottom = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[3]), trueImageHeight) * mViewHeight);
+
+
+
+            // TODO acces string and compute view coords
+
+            //Rect rect = Rect.unflattenFromString(rectAsStringWithImagePixel);
+            rectFromDb.left = left;
+            rectFromDb.top = top;
+            rectFromDb.right = right;
+            rectFromDb.bottom = bottom;
+
+            canvas.drawRect(rectFromDb, mPaint);
+
+
+          } catch (JSONException e){
+            Log.i(TAG, "jsonException: " + e.toString());
+          }
+        }
+
+
+
+
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+
+
+
+          }
+        }, 1000);
+
+
 
       } else {
         // draw regularly while touching
@@ -145,14 +257,6 @@ public class DrawView extends ImageView {
     // touch from user in relation to view width / height
     imageXTouchingPercent = x / mViewWidth;
     imageYTouchingPercent = y / mViewHeight;
-
-    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-
-    BitmapFactory.decodeFile(mPathToImage, bitmapOptions);
-
-    trueImageWidth = bitmapOptions.outWidth;
-    trueImageHeight = bitmapOptions.outHeight;
-
 
     switch (event.getAction()) {
       case MotionEvent.ACTION_DOWN:
@@ -212,7 +316,13 @@ public class DrawView extends ImageView {
     } else {
       return pixelValue;
     }
+  }
 
+  public float translateImagePixelToPercent(int imagePixel, int imageAxisSize){
+
+    float percentInImage = (float) imagePixel / imageAxisSize;
+
+    return percentInImage;
   }
 
   public void setCameraType(int cameraType) {
@@ -223,13 +333,14 @@ public class DrawView extends ImageView {
   public void saveCamera(){
 
     if (touchFinished){
+
       // x / y of touch start in image pixel value
-      int imageXStartPixelTouched = translateTouchPointsToImagePixel(rectXStartPercent, trueImageHeight);
-      int imageYStartPixelTouched = translateTouchPointsToImagePixel(rectYStartPercent, trueImageWidth);
+      int imageXStartPixelTouched = translateTouchPointsToImagePixel(rectXStartPercent, trueImageWidth);
+      int imageYStartPixelTouched = translateTouchPointsToImagePixel(rectYStartPercent, trueImageHeight);
 
       // x / y of touch stop in image pixel value
-      int imageXStopPixelTouched = translateTouchPointsToImagePixel(rectXStopPercent, trueImageHeight);
-      int imageYStopPixelTouched = translateTouchPointsToImagePixel(rectYStopPercent, trueImageWidth);
+      int imageXStopPixelTouched = translateTouchPointsToImagePixel(rectXStopPercent, trueImageWidth);
+      int imageYStopPixelTouched = translateTouchPointsToImagePixel(rectYStopPercent, trueImageHeight);
 
 
       // touch coordinates start in top left corner, therefore left is the smaller of both values etc.
@@ -240,13 +351,43 @@ public class DrawView extends ImageView {
 
       touchRectInImagePixels = new Rect(left, top, right, bottom);
 
-      Log.i(TAG, "img pixel rect: " + touchRectInImagePixels.toShortString());
+      Log.i(TAG, "img pixel rect: " + touchRectInImagePixels.flattenToString());
+
+      try {
+
+        if (drawnCameras != null){
+          rectArray = new JSONArray(drawnCameras);
+        } else {
+          rectArray = new JSONArray();
+        }
+
+        JSONObject singleDrawnRect = new JSONObject();
+
+        singleDrawnRect.put(String.valueOf(cameraType), touchRectInImagePixels.flattenToString());
+
+        rectArray.put(singleDrawnRect);
 
 
+      } catch (JSONException e){
+        Log.i(TAG, "jsonException: " + e.toString());
+      }
+
+      drawnCameras = rectArray.toString();
+
+      mCamera.setDrawnRectsAsString(drawnCameras);
+
+      mCameraRepository.updateCameras(mCamera);
+
+      Rect a = new Rect();
+
+
+    } else {
+      Toast.makeText(mContext, "Please finish drawing before saving", Toast.LENGTH_SHORT).show();
     }
   }
 
   public void undo(){
+
     invalidate();
   }
 

@@ -55,7 +55,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     imageFile = new File(pathToImage);
 
-    drawView = new DrawView(this, pathToImage, cameraType);
+    drawView = new DrawView(this, currentTrainingCamera, cameraRepository);
 
     drawingRelativeLayout.addView(drawView, 0);
 
