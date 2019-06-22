@@ -38,6 +38,8 @@ public class HistoryActivity extends AppCompatActivity {
   private int readStoragePermission;
   private int writeStoragePermission;
   private SharedPreferences sharedPreferences;
+  private BottomNavigationView bottomNavigationView;
+
 
 
   @Override
@@ -214,7 +216,6 @@ public class HistoryActivity extends AppCompatActivity {
     }
   }
 
-  private BottomNavigationView bottomNavigationView;
 }
 
 

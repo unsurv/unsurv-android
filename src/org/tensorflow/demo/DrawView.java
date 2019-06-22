@@ -15,6 +15,8 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,6 +81,10 @@ public class DrawView extends ImageView {
 
   Rect rectFromDb;
 
+  boolean firstTimeLaunched;
+
+  Canvas mCanvas;
+
 
 
 
@@ -87,16 +93,19 @@ public class DrawView extends ImageView {
   public DrawView(Context context, SurveillanceCamera camera, CameraRepository cameraRepository) {
     super(context);
 
+    firstTimeLaunched = true;
+
     mContext = context;
 
     mPaint = new Paint();
     mRegularPaint = new Paint();
     mDomePaint = new Paint();
 
-    mRegularPaint.setColor(Color.GREEN);
+    mRegularPaint.setColor(Color.parseColor("#C96700"));
     mRegularPaint.setStrokeWidth(10);
     mRegularPaint.setStyle(Paint.Style.STROKE);
 
+    // orange
     mDomePaint.setColor(Color.BLUE);
     mDomePaint.setStrokeWidth(10);
     mDomePaint.setStyle(Paint.Style.STROKE);
@@ -147,6 +156,8 @@ public class DrawView extends ImageView {
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
 
+    mCanvas = canvas;
+
     mViewWidth = getWidth();
     mViewHeight = getHeight();
 
@@ -162,9 +173,16 @@ public class DrawView extends ImageView {
 
     if (!stopDrawing) {
 
-      // draw one last time after touch finished
-      if (touchFinished){
-        canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
+      // draw one time after touch finished or when first creating view
+      if (touchFinished || firstTimeLaunched){
+
+        // cant draw from touch when first launched
+        if (firstTimeLaunched) {
+          firstTimeLaunched = false;
+        } else {
+          // touch event finished
+          canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
+        }
 
         stopDrawing = true;
 
@@ -183,18 +201,10 @@ public class DrawView extends ImageView {
 
             String[] splitRect = rectAsStringWithImagePixel.split(" ");
 
-            // 0 935 1508 2033
-
-            float asd = translateImagePixelToPercent(Integer.parseInt(splitRect[0]), trueImageWidth);
-
             int left = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[0]), trueImageWidth) * mViewWidth);
             int top = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[1]), trueImageHeight) * mViewHeight);
             int right = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[2]), trueImageWidth) * mViewWidth);
             int bottom = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[3]), trueImageHeight) * mViewHeight);
-
-
-
-            // TODO acces string and compute view coords
 
             //Rect rect = Rect.unflattenFromString(rectAsStringWithImagePixel);
             rectFromDb.left = left;
@@ -378,15 +388,31 @@ public class DrawView extends ImageView {
 
       mCameraRepository.updateCameras(mCamera);
 
-      Rect a = new Rect();
-
-
     } else {
       Toast.makeText(mContext, "Please finish drawing before saving", Toast.LENGTH_SHORT).show();
     }
   }
 
   public void undo(){
+
+    try {
+
+      JSONObject rectoToRemove = (JSONObject) rectArray.get(rectArray.length() - 1);
+      rectArray.remove(rectArray.length() - 1);
+      drawnCameras = rectArray.toString();
+      mCamera.setDrawnRectsAsString(drawnCameras);
+      mCameraRepository.updateCameras(mCamera);
+
+      // Redraw as if just launched. Since update SurveillanceCameraObject is queried again for drawing,
+      // removed camera will not be shown
+      firstTimeLaunched = true;
+      stopDrawing = false;
+
+
+
+    } catch (JSONException e){
+      Log.i(TAG, "jsonException: " + e.toString());
+    }
 
     invalidate();
   }
@@ -405,6 +431,16 @@ public class DrawView extends ImageView {
     } else {
       return last;
     }
+  }
+
+  public void refresh(){
+    // Redraw as if just launched. Since update SurveillanceCameraObject is queried again for drawing,
+    // removed camera will not be shown
+    firstTimeLaunched = true;
+    stopDrawing = false;
+
+    invalidate();
+
   }
 
 }
