@@ -417,7 +417,7 @@ public class DebugActivity extends AppCompatActivity {
                 false,
                 false,
                 false,
-                null);
+                "");
 /*
 SurveillanceCamera notRandomCamera = new SurveillanceCamera(
                 "test_pixel_2.jpg",

@@ -976,7 +976,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               false,
               false,
               false,
-              null
+              ""
 
       ));
 
@@ -995,7 +995,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               false,
               false,
               false,
-              null
+              ""
 
       ));
 

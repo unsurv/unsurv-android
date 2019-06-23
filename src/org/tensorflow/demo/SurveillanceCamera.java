@@ -50,7 +50,7 @@ public class SurveillanceCamera {
                             boolean uploadCompleted,
                             boolean manualCapture,
                             boolean trainingCapture,
-                            @Nullable String drawnRectsAsString){
+                            String drawnRectsAsString){
 
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;

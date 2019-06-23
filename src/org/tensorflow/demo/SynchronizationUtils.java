@@ -414,6 +414,7 @@ class SynchronizationUtils {
 
     for (int i=0; i < camerasToUpload.size(); i++) {
 
+      SurveillanceCamera currentCamera = camerasToUpload.get(i);
       // single camera data
       JSONObject tmpJsonObject = new JSONObject();
 
@@ -421,9 +422,15 @@ class SynchronizationUtils {
 
       try {
 
-        tmpJsonObject.put("lat", camerasToUpload.get(i).getLatitude());
-        tmpJsonObject.put("lon", camerasToUpload.get(i).getLongitude());
-        tmpJsonObject.put("manual_capture", camerasToUpload.get(i).getManualCapture());
+        String drawn_cameras = currentCamera.getDrawnRectsAsString();
+
+        tmpJsonObject.put("training_capture", currentCamera.getTrainingCapture());
+        tmpJsonObject.put("drawn_cameras", drawn_cameras);
+
+
+        tmpJsonObject.put("lat", currentCamera.getLatitude());
+        tmpJsonObject.put("lon", currentCamera.getLongitude());
+        tmpJsonObject.put("manual_capture", currentCamera.getManualCapture());
         // here so we don't have to rely on list order
         tmpJsonObject.put("tmp_id", i);
 
@@ -565,7 +572,14 @@ class SynchronizationUtils {
         continue;
       }
 
-      File imageFile = new File(PICTURES_PATH + currentCamera.getThumbnailPath());
+      File imageFile;
+
+      // if camera is a training image
+      if (currentCamera.getTrainingCapture()){
+        imageFile = new File(TRAINING_IMAGES_PATH+ currentCamera.getImagePath());
+      } else {
+        imageFile = new File(PICTURES_PATH + currentCamera.getThumbnailPath());
+      }
       JSONObject singleCamera = new JSONObject();
 
       // create a map with tmpUuidFromServer: imageAsBase64

@@ -112,7 +112,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
                 false,
                 true,
                 false,
-                null
+                ""
 
         );
 

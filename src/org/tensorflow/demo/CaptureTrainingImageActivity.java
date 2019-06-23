@@ -576,7 +576,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
         Size largest = Collections.max(
                 Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
                 new CompareSizesByArea());
-        mImageReader = ImageReader.newInstance(2048, 1536,
+        mImageReader = ImageReader.newInstance(1024, 768,
                 ImageFormat.JPEG, /*maxImages*/1);
         mImageReader.setOnImageAvailableListener(
                 mOnImageAvailableListener, mBackgroundHandler);

@@ -65,7 +65,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
       SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
       timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-      for (int i = 0; i < 1; i++) {
+      for (int i = 0; i < 3; i++) {
         Random rng = new Random();
         double randomLat = (rng.nextDouble() * 2 - 1) / 10;
         double randomLong = (rng.nextDouble() * 2 - 1) / 10;
@@ -81,9 +81,26 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
                 false,
                 false,
                 false,
+                false,
+                "");
+
+
+        SurveillanceCamera trainingCamera = new SurveillanceCamera(
+                "test_pixel_2.jpg", "asd.jpg",
+                null,
+                0, 0,
+                "",
+                timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),
+                timestampIso8601.format(new Date(System.currentTimeMillis() + rng.nextInt(1000*60*60*24))),
+                false,
+                false,
+                false,
                 true,
-                null);
-        mDao.insert(surveillanceCamera);
+                "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]");
+
+
+
+        mDao.insert(trainingCamera);
       }
 
 
