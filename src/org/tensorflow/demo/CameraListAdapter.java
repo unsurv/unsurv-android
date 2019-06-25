@@ -149,12 +149,13 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       if (currentCameraUploadComplete){
         holder.uploadButton.setImageResource(R.drawable.ic_file_upload_green_24dp);
         holder.uploadButton.setClickable(false);
+      } else {
+        holder.uploadButton.setImageResource(R.drawable.ic_file_upload_grey_24dp);
       }
 
       holder.drawButton.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
 
           Intent drawOnImageIntent = new Intent(ctx, DrawOnTrainingImageActivity.class);
 
@@ -244,8 +245,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
           if (!currentCameraUploadComplete) {
 
             SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), "http://192.168.178.137:5000/", sharedPreferences, cameraViewModel, null, false);
-            notifyItemChanged(position);
-
           } else {
             Toast.makeText(ctx, "Camera has already been uploaded.", Toast.LENGTH_SHORT).show();
           }
