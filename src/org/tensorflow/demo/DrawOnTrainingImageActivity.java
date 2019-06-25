@@ -1,7 +1,9 @@
 package org.tensorflow.demo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -10,6 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import com.squareup.picasso.Picasso;
@@ -30,6 +35,8 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
   private CameraRepository cameraRepository;
   private SurveillanceCamera currentTrainingCamera;
 
+  private Context context;
+
   private SharedPreferences sharedPreferences;
 
 
@@ -41,9 +48,13 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     setContentView(R.layout.activity_draw_on_image);
 
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    context = this;
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
     Intent intent = getIntent();
     int dbId = intent.getIntExtra("surveillanceCameraId", 0);
@@ -54,17 +65,39 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     cameraType = DrawView.REGULAR_CAMERA;
 
-    final RelativeLayout drawingRelativeLayout = findViewById(R.id.drawing_relative);
-
     pathToImage = SynchronizationUtils.TRAINING_IMAGES_PATH + currentTrainingCamera.getImagePath();
 
     imageFile = new File(pathToImage);
 
-    drawView = new DrawView(this, currentTrainingCamera, cameraRepository);
+    final RelativeLayout parentRelativeLayout = findViewById(R.id.drawing_relative);
 
-    drawingRelativeLayout.addView(drawView, 0);
+    final ViewTreeObserver viewTreeObserver = parentRelativeLayout.getViewTreeObserver();
 
-    Picasso.get().load(imageFile).into(drawView);
+    viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+      @Override
+      public void onGlobalLayout() {
+
+        drawView = new DrawView(context, currentTrainingCamera, cameraRepository);
+
+        // force drawView to be 4:3
+        int parentLayoutWidth = parentRelativeLayout.getWidth();
+
+        int drawViewHeight = (int) Math.ceil(4/3.0 * parentLayoutWidth);
+
+        // effectively "match parent" for layout_width and 1.33 * width for height for a total 4:3 format
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(parentLayoutWidth, drawViewHeight);
+
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+        parentRelativeLayout.addView(drawView, 0, layoutParams);
+
+        Picasso.get().load(imageFile).into(drawView);
+
+      }
+    });
+
+
+
 
     addRegularCameraButton = findViewById(R.id.add_regular_camera_button);
     addDomeCameraButton = findViewById(R.id.add_dome_camera_button);
@@ -98,7 +131,6 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
         drawView.saveCamera();
       }
     });
-
     undoButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -106,14 +138,8 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       }
     });
 
-
     android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
-
-
-
-
-
 
     bottomNavigationView = findViewById(R.id.navigation);
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
