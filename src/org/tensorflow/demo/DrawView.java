@@ -100,7 +100,7 @@ public class DrawView extends ImageView {
     mDomePaint = new Paint();
 
     // orange
-    mRegularPaint.setColor(Color.parseColor("#C96700"));
+    mRegularPaint.setColor(Color.parseColor("#ff5555"));
     mRegularPaint.setStrokeWidth(10);
     mRegularPaint.setStyle(Paint.Style.STROKE);
 

@@ -68,6 +68,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -418,27 +419,24 @@ public class DebugActivity extends AppCompatActivity {
                 false,
                 false,
                 "");
-/*
-SurveillanceCamera notRandomCamera = new SurveillanceCamera(
-                "test_pixel_2.jpg",
-                "test_nexus_10.jpg",
+
+
+        SurveillanceCamera notRandomCamera = new SurveillanceCamera("test_pixel_2.jpg",
+                "asd.jpg",
                 null,
-                49.99819,
-                8.25949,
-                "asd",
-                nullOrDate,
-                "2019-05-30",
+                0, 0,
+                "",
+                "2018-01-01",
+                "2018-02-02",
                 false,
                 false,
-                false);
-
-      cameraRepository.insert(notRandomCamera);
-
- */
+                false,
+                true,
+                "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]");
 
 
-        CameraRepository cameraRepository = new CameraRepository(getApplication());
-        cameraRepository.insert(randomCamera);
+        cameraRepository.insert(notRandomCamera);
+        // cameraRepository.insert(randomCamera);
 
 
         randomCamerasAdded += 1;
