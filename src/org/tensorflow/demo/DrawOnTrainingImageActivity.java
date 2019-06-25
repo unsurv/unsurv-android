@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -96,7 +97,18 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
         Picasso.get().load(imageFile).into(drawView);
 
+
+        // start drawing activity 1 sec after capture to give db some time to save data
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            drawView.refresh();
+          }
+        }, 500);
+
         parentRelativeLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
       }
     });
 

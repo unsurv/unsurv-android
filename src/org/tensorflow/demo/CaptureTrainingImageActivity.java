@@ -921,7 +921,6 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
             }
           }, 1000);
 
-
         }
       };
 

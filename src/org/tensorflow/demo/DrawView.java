@@ -196,8 +196,8 @@ public class DrawView extends ImageView {
           canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
         }
 
-        stopDrawing = true;
         drawCameras(canvas);
+        stopDrawing = true;
 
       } else {
         // draw regularly while touching
@@ -402,6 +402,7 @@ public class DrawView extends ImageView {
     // Redraw as if just launched. Since updated SurveillanceCameraObject is queried again for drawing,
     // removed camera will not be shown.
     firstTimeLaunched = true;
+
     stopDrawing = false;
 
     invalidate();
