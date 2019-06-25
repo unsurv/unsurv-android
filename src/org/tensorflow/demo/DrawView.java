@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -75,7 +74,7 @@ public class DrawView extends ImageView {
   // drawn rect in img pixels
   Rect touchRectInImagePixels;
 
-  CameraRepository mCameraRepository;
+  CameraViewModel mCameraViewModel;
   Context mContext;
 
   // already saved rects as json array / string
@@ -87,8 +86,10 @@ public class DrawView extends ImageView {
   // tmp object used for drawing saved rects
   Rect rectFromDb;
 
+  public Canvas mCanvas;
 
-  public DrawView(Context context, SurveillanceCamera camera, CameraRepository cameraRepository) {
+
+  public DrawView(Context context, SurveillanceCamera camera, CameraViewModel cameraViewModel) {
     super(context);
 
     firstTimeLaunched = true;
@@ -109,7 +110,7 @@ public class DrawView extends ImageView {
     mDomePaint.setStyle(Paint.Style.STROKE);
 
     mPathToImage = SynchronizationUtils.TRAINING_IMAGES_PATH + camera.getImagePath();
-    mCameraRepository = cameraRepository;
+    mCameraViewModel = cameraViewModel;
 
     mCamera = camera;
 
@@ -154,9 +155,12 @@ public class DrawView extends ImageView {
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
 
+    mCanvas = canvas;
+
     // view size in pixels, portrait mode is forced so width < height
     mViewWidth = getWidth();
     mViewHeight = getHeight();
+
 
     // set color for different types
     if (cameraType == REGULAR_CAMERA){
@@ -175,49 +179,25 @@ public class DrawView extends ImageView {
         if (firstTimeLaunched) {
           // cant draw from touch when first launched, just draw rects already present
           firstTimeLaunched = false;
+          drawnCameras = mCamera.getDrawnRectsAsString();
+
+          // draw cameras from db by populating rectarray
+          if (!drawnCameras.isEmpty()){
+            try{
+              rectArray = new JSONArray(drawnCameras);
+
+            } catch (JSONException e){
+              Log.i(TAG, "no drawn cameras present");
+            }
+          }
+
         } else {
           // touch event finished
           canvas.drawRect(rectXStart, rectYStart, rectXStop, rectYStop, mPaint);
         }
 
         stopDrawing = true;
-
-        for (int i=0; i < rectArray.length(); i++){
-
-          try {
-            JSONObject tmpObj = (JSONObject) rectArray.get(i);
-
-            // key sets type of camera, see static ints for types
-            if (tmpObj.keys().next().equals(String.valueOf(REGULAR_CAMERA))){
-              mPaint = mRegularPaint;
-            } else {
-              mPaint = mDomePaint;
-            }
-
-            // acces value of JSONObj
-            String rectAsStringWithImagePixel = tmpObj.getString(tmpObj.keys().next());
-
-            // example data: "10 70 200 600" left top right bottom
-            String[] splitRect = rectAsStringWithImagePixel.split(" ");
-
-            // translate img pixel values in rect to view pixels on phone display here
-            int left = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[0]), trueImageWidth) * mViewWidth);
-            int top = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[1]), trueImageHeight) * mViewHeight);
-            int right = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[2]), trueImageWidth) * mViewWidth);
-            int bottom = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[3]), trueImageHeight) * mViewHeight);
-
-            rectFromDb.left = left;
-            rectFromDb.top = top;
-            rectFromDb.right = right;
-            rectFromDb.bottom = bottom;
-
-            canvas.drawRect(rectFromDb, mPaint);
-
-
-          } catch (JSONException e){
-            Log.i(TAG, "jsonException: " + e.toString());
-          }
-        }
+        drawCameras(canvas);
 
       } else {
         // draw regularly while touching
@@ -379,7 +359,7 @@ public class DrawView extends ImageView {
 
       // updating obj and saving to db
       mCamera.setDrawnRectsAsString(drawnCameras);
-      mCameraRepository.updateCameras(mCamera);
+      mCameraViewModel.update(mCamera);
 
     } else {
       Toast.makeText(mContext, "Please finish drawing before saving", Toast.LENGTH_SHORT).show();
@@ -396,7 +376,7 @@ public class DrawView extends ImageView {
     // update and save to db
     drawnCameras = rectArray.toString();
     mCamera.setDrawnRectsAsString(drawnCameras);
-    mCameraRepository.updateCameras(mCamera);
+    mCameraViewModel.update(mCamera);
 
     refresh();
 
@@ -426,6 +406,46 @@ public class DrawView extends ImageView {
 
     invalidate();
 
+  }
+
+  private void drawCameras(Canvas canvas){
+
+    for (int i=0; i < rectArray.length(); i++){
+
+      try {
+        JSONObject tmpObj = (JSONObject) rectArray.get(i);
+
+        // key sets type of camera, see static ints for types
+        if (tmpObj.keys().next().equals(String.valueOf(REGULAR_CAMERA))){
+          mPaint = mRegularPaint;
+        } else {
+          mPaint = mDomePaint;
+        }
+
+        // acces value of JSONObj
+        String rectAsStringWithImagePixel = tmpObj.getString(tmpObj.keys().next());
+
+        // example data: "10 70 200 600" left top right bottom
+        String[] splitRect = rectAsStringWithImagePixel.split(" ");
+
+        // translate img pixel values in rect to view pixels on phone display here
+        int left = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[0]), trueImageWidth) * mViewWidth);
+        int top = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[1]), trueImageHeight) * mViewHeight);
+        int right = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[2]), trueImageWidth) * mViewWidth);
+        int bottom = (int) Math.floor(translateImagePixelToPercent(Integer.parseInt(splitRect[3]), trueImageHeight) * mViewHeight);
+
+        rectFromDb.left = left;
+        rectFromDb.top = top;
+        rectFromDb.right = right;
+        rectFromDb.bottom = bottom;
+
+        canvas.drawRect(rectFromDb, mPaint);
+
+
+      } catch (JSONException e){
+        Log.i(TAG, "jsonException: " + e.toString());
+      }
+    }
   }
 
 }

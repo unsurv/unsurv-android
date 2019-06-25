@@ -23,4 +23,8 @@ public class CameraViewModel extends AndroidViewModel {
 
   public void insert(SurveillanceCamera surveillanceCamera) {mRepository.insert(surveillanceCamera);}
 
+  public void update(SurveillanceCamera surveillanceCamera) {mRepository.updateCameras(surveillanceCamera);}
+
+  public void delete(SurveillanceCamera surveillanceCamera) {mRepository.deleteCameras(surveillanceCamera);}
+
 }

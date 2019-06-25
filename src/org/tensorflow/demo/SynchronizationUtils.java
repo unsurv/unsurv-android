@@ -403,8 +403,16 @@ class SynchronizationUtils {
 
   }
 
-
-  static void uploadSurveillanceCamera(final List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, final CameraRepository cameraRepository) {
+  /**
+   * repository as fallback if viewmodel not available (here in Jobservice)
+   *
+   * @param camerasToUpload
+   * @param baseUrl
+   * @param sharedPreferences
+   * @param cameraViewModel
+   * @param cameraRepository
+   */
+  static void uploadSurveillanceCamera(final List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, @Nullable  final CameraViewModel cameraViewModel, @Nullable final CameraRepository cameraRepository, final boolean useRepository) {
 
     JSONArray postArray = new JSONArray();
 
@@ -499,13 +507,24 @@ class SynchronizationUtils {
                       currentCamera.setUploadCompleted(true);
                     }
 
-                    cameraRepository.updateCameras(currentCamera);
+                    if (useRepository) {
+                      cameraRepository.updateCameras(currentCamera);
+                    } else {
+
+                      cameraViewModel.update(currentCamera);
+                    }
+
 
                   }
 
                   String imageUploadUrl = baseUrl + "cameras/upload/image";
 
-                  uploadImages(camerasToUpload, cameraRepository, imageUploadUrl, sharedPreferences);
+                  if (useRepository) {
+                    uploadImages(camerasToUpload, imageUploadUrl, sharedPreferences, null, cameraRepository, true);
+                  } else {
+                    uploadImages(camerasToUpload, imageUploadUrl, sharedPreferences, cameraViewModel, null, false);
+                  }
+
 
                 } catch (JSONException jse) {
                   Log.i(TAG, "JsonException in response: " + jse.toString());
@@ -552,7 +571,7 @@ class SynchronizationUtils {
   }
 
 
-  static void uploadImages(final List<SurveillanceCamera> camerasForImageUpload, final CameraRepository cameraRepository, String url, final SharedPreferences sharedPreferences) {
+  static void uploadImages(final List<SurveillanceCamera> camerasForImageUpload, String url, final SharedPreferences sharedPreferences, @Nullable final CameraViewModel cameraViewModel, @Nullable final CameraRepository cameraRepository, final boolean useRepository) {
 
 
     HashMap<String, String> idToEncodedImageMap = new HashMap<>();
@@ -658,14 +677,25 @@ class SynchronizationUtils {
 
                     // TODO add logic if upload failed
 
-                    cameraRepository.updateCameras(currentCamera);
+                    if (useRepository) {
+                      cameraRepository.updateCameras(currentCamera);
+                    } else {
+                      cameraViewModel.update(currentCamera);
+                    }
 
                   }
 
                   boolean deleteOnUpload = sharedPreferences.getBoolean("deleteOnUpload", false);
 
                   if (deleteOnUpload){
-                    cleanupUploadedCameras(camerasForImageUpload, cameraRepository);
+
+                    if (useRepository) {
+                      cleanupUploadedCameras(camerasForImageUpload, null, cameraRepository, true);
+                    } else {
+
+                      cleanupUploadedCameras(camerasForImageUpload, cameraViewModel, null, false);
+                    }
+
                   }
 
                 } catch (JSONException jse) {
@@ -741,12 +771,21 @@ class SynchronizationUtils {
 
   }
 
-  static void cleanupUploadedCameras(List<SurveillanceCamera> cameras, CameraRepository cameraRepository){
-    for (SurveillanceCamera camera : cameras){
+  static void cleanupUploadedCameras(List<SurveillanceCamera> cameras, @Nullable CameraViewModel cameraViewModel, @Nullable CameraRepository cameraRepository, boolean useRepository){
 
-      cameraRepository.deleteCameras(camera);
+    if (useRepository){
+      for (SurveillanceCamera camera : cameras){
+        cameraRepository.deleteCameras(camera);
 
+      }
+    } else {
+
+      for (SurveillanceCamera camera : cameras){
+        cameraViewModel.delete(camera);
+
+      }
     }
+
   }
 
 

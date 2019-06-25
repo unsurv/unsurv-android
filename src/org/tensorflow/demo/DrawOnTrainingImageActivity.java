@@ -1,5 +1,6 @@
 package org.tensorflow.demo;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,6 +34,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
   private String pathToImage;
   private File imageFile;
   private CameraRepository cameraRepository;
+  private CameraViewModel cameraViewModel;
   private SurveillanceCamera currentTrainingCamera;
 
   private Context context;
@@ -60,6 +62,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
     int dbId = intent.getIntExtra("surveillanceCameraId", 0);
 
     cameraRepository = new CameraRepository(getApplication());
+    cameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
 
     currentTrainingCamera = cameraRepository.findByDbId(dbId);
 
@@ -77,7 +80,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       @Override
       public void onGlobalLayout() {
 
-        drawView = new DrawView(context, currentTrainingCamera, cameraRepository);
+        drawView = new DrawView(context, currentTrainingCamera, cameraViewModel);
 
         // force drawView to be 4:3
         int parentLayoutWidth = parentRelativeLayout.getWidth();
@@ -93,11 +96,9 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
         Picasso.get().load(imageFile).into(drawView);
 
+        parentRelativeLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
       }
     });
-
-
-
 
     addRegularCameraButton = findViewById(R.id.add_regular_camera_button);
     addDomeCameraButton = findViewById(R.id.add_dome_camera_button);

@@ -1,6 +1,8 @@
 package org.tensorflow.demo;
 
+import android.app.Activity;
 import android.app.Application;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -81,12 +83,14 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
   private final SharedPreferences sharedPreferences;
   private final LayoutInflater layoutInflater;
   private final Context ctx;
+  private CameraViewModel cameraViewModel;
 
 
-  CameraListAdapter(Context context, LinearLayout detailLinearLayout, Application application, LayoutInflater layoutInflater) {
+  CameraListAdapter(Context context, LinearLayout detailLinearLayout, Application application, LayoutInflater layoutInflater, CameraViewModel cameraViewModel) {
     mInflater = LayoutInflater.from(context);
     mHistoryDetails = detailLinearLayout;
     cameraRepository = new CameraRepository(application);
+    this.cameraViewModel = cameraViewModel;
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     this.layoutInflater = layoutInflater;
     ctx = context;
@@ -239,7 +243,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
           if (!currentCameraUploadComplete) {
 
-            SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), "http://192.168.178.137:5000/", sharedPreferences, cameraRepository);
+            SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), "http://192.168.178.137:5000/", sharedPreferences, cameraViewModel, null, false);
             notifyItemChanged(position);
 
           } else {

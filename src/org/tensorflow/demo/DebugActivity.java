@@ -3,6 +3,7 @@ package org.tensorflow.demo;
 import android.app.Application;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -68,7 +69,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -123,6 +123,8 @@ public class DebugActivity extends AppCompatActivity {
   private TextView progressPercentage;
 
   private boolean downloadStoppedByUser = false;
+
+  private CameraViewModel cameraViewModel;
 
 
 
@@ -184,6 +186,7 @@ public class DebugActivity extends AppCompatActivity {
 
     cameraRepository = new CameraRepository(getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
+    cameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
 
     randomCamerasAdded = 0;
     imagesDownloaded = 0;
@@ -451,7 +454,7 @@ public class DebugActivity extends AppCompatActivity {
       public void onClick(View view) {
         allCameras = cameraRepository.getAllCameras();
         String url = sharedPreferences.getString("synchronizationURL", null);
-        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences, cameraRepository);
+        SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences, cameraViewModel, null, false);
 
         List<String> externalIds = new ArrayList<>();
         String externalId = "145432e0e9c54d0d";

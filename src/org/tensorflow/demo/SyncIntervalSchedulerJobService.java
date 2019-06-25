@@ -2,6 +2,7 @@ package org.tensorflow.demo;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -97,11 +98,9 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
     }
 
-
-
     List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
 
-    SynchronizationUtils.uploadSurveillanceCamera(camerasToUpload, baseUrl, sharedPreferences, cameraRepository);
+    SynchronizationUtils.uploadSurveillanceCamera(camerasToUpload, baseUrl, sharedPreferences, null, cameraRepository, true);
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
