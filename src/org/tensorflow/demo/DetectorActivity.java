@@ -336,8 +336,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     getMenuInflater().inflate(R.menu.actionbar, menu);
 
     // No need for a refresh Button in a capture activity.
-    MenuItem item = menu.findItem(R.id.action_refresh);
-    item.setVisible(false);
+    MenuItem refreshItem = menu.findItem(R.id.action_refresh);
+    refreshItem.setVisible(false);
     return true;
   }
 

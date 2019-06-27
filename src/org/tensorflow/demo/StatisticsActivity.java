@@ -257,6 +257,10 @@ public class StatisticsActivity extends AppCompatActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     //return super.onCreateOptionsMenu(menu);
     getMenuInflater().inflate(R.menu.actionbar, menu);
+
+    MenuItem trainingItem = menu.findItem(R.id.action_training);
+    trainingItem.setVisible(false);
+
     return true;
   }
 

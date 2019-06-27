@@ -195,6 +195,7 @@ public class HistoryActivity extends AppCompatActivity {
       MenuItem item = menu.findItem(R.id.action_refresh);
       item.setVisible(false);
 
+
       return true;
     }
 
@@ -209,6 +210,10 @@ public class HistoryActivity extends AppCompatActivity {
           startActivity(settingsIntent);
 
           return true;
+
+        case R.id.action_training:
+          Intent trainingCaptureIntent = new Intent(HistoryActivity.this, CaptureTrainingImageActivity.class);
+          startActivity(trainingCaptureIntent);
 
 
 

@@ -173,8 +173,8 @@ public class ManualCaptureActivity extends AppCompatActivity {
     getMenuInflater().inflate(R.menu.actionbar, menu);
 
     // No need for a refresh Button in a capture activity.
-    MenuItem item = menu.findItem(R.id.action_refresh);
-    item.setVisible(false);
+    MenuItem refreshItem = menu.findItem(R.id.action_refresh);
+    refreshItem.setVisible(false);
 
     return true;
   }
@@ -187,6 +187,12 @@ public class ManualCaptureActivity extends AppCompatActivity {
       case R.id.action_settings:
         Intent settingsIntent = new Intent(ManualCaptureActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
+
+        return true;
+
+      case R.id.action_training:
+        Intent trainingCaptureIntent = new Intent(ManualCaptureActivity.this, CaptureTrainingImageActivity.class);
+        startActivity(trainingCaptureIntent);
 
         return true;
 
