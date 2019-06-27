@@ -71,7 +71,7 @@
                 android:id="@+id/history_detail_captured_static_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Captured on: "
+                android:text="@string/captured_info_text"
                 />
 
             <TextView
@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:layout_toEndOf="@id/history_detail_captured_static_text"
-                android:text="Please select a camera"
+                android:text="@string/select_camera"
                 android:textColor="#FFF"
                 android:layout_gravity="top"
                 />
@@ -89,9 +89,8 @@
                 android:id="@+id/history_detail_upload_static_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Upload on: "
+                android:text="@string/upload_info_text"
                 android:layout_below="@id/history_detail_captured_static_text"/>
-
 
             <TextView
                 android:id="@+id/history_detail_upload"

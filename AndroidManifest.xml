@@ -48,7 +48,7 @@
         android:allowBackup="true"
         android:debuggable="true"
         android:icon="@drawable/unsurv_logo"
-        android:label="unsurv"
+        android:label="@string/app_label"
         android:theme="@style/Theme.AppCompat.NoActionBar"
 
         android:usesCleartextTraffic="true">
@@ -66,38 +66,37 @@
 
         <activity
             android:name=".HistoryActivity"
-            android:label="unsurv"
+            android:label="@string/history_label"
             android:parentActivityName=".DebugActivity"/>
         <activity
 
             android:name=".DetectorActivity"
-            android:label="unsurv"
+            android:label="@string/detector_label"
             android:parentActivityName=".DebugActivity"/>
         <activity
             android:name=".MapActivity"
-            android:label="unsurv"
+            android:label="@string/map_label"
             android:parentActivityName=".DebugActivity"/>
         <activity
             android:name=".StatisticsActivity"
-            android:label="unsurv"
+            android:label="@string/statistics_label"
             android:parentActivityName=".DebugActivity"/>
 
         <activity android:name=".SettingsActivity"
-            android:label="Settings"
+            android:label="@string/settings_label"
             android:parentActivityName=".DebugActivity"/>
 
         <activity android:name=".TutorialActivity"/>
 
         <activity android:name=".ManualCaptureActivity"
-            android:label="Manual Capture"
+            android:label="@string/manual_capture_label"
             android:parentActivityName=".DebugActivity"/>
 
         <activity android:name=".CaptureTrainingImageActivity"
-            android:label="Train Detection Model"
             android:parentActivityName=".DebugActivity"/>
 
         <activity android:name=".DrawOnTrainingImageActivity"
-            android:label="Mark Cameras"
+            android:label="@string/draw_on_training_image_label"
             android:parentActivityName=".DebugActivity"/>
 
 

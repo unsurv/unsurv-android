@@ -3,7 +3,6 @@
 <LinearLayout
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,24 +28,25 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/total_cameras_statistics"
+            android:id="@+id/total_cameras_in_area_statistics"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="720"
+            android:hint="@string/zero_placeholder_statistics"
             android:textSize="80sp"
             android:gravity="center"
             />
 
         <TextView
+            android:id="@+id/total_cameras_in_area_info_statistics"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:textSize="24sp"
-            android:hint="cameras total in your area"
             android:gravity="center"
             />
 
 
         <LinearLayout
+            android:baselineAligned="false"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -65,7 +65,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="3"
                     android:gravity="center"
-                    android:hint="7d"
+                    android:text="@string/zero_placeholder_statistics"
                     android:textSize="60sp"
                     />
 
@@ -74,7 +74,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="1"
                     android:textSize="14sp"
-                    android:hint="added in the last 7 days"
+                    android:text="@string/added_7d_text"
                     android:gravity="center"
                     />
 
@@ -85,7 +85,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="3"
                     android:gravity="center"
-                    android:hint="28d"
+                    android:hint="@string/zero_placeholder_statistics"
                     android:textSize="60sp"
                     />
 
@@ -94,7 +94,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="1"
                     android:textSize="14sp"
-                    android:hint="added in the last 28 days"
+                    android:text="@string/added_28d_text"
                     android:gravity="center"
                     />
 
@@ -104,16 +104,16 @@
                     android:layout_height="0sp"
                     android:layout_weight="3"
                     android:gravity="center"
-                    android:hint="total"
+                    android:hint="@string/zero_placeholder_statistics"
                     android:textSize="60sp"
                     />
 
                 <TextView
+                    android:id="@+id/added_by_user_info_statistics"
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="1"
                     android:textSize="14sp"
-                    android:hint="captures by you"
                     android:gravity="center"
                     />
 
@@ -140,7 +140,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="3"
                     android:gravity="center"
-                    android:hint="gtoday"
+                    android:hint="@string/zero_placeholder_statistics"
                     android:textSize="60sp"
                     />
 
@@ -149,7 +149,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="1"
                     android:textSize="14sp"
-                    android:hint="added globally today"
+                    android:text="@string/global_today_text"
                     android:gravity="center"
                     />
 
@@ -160,7 +160,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="3"
                     android:gravity="center"
-                    android:hint="28 glo"
+                    android:hint="@string/zero_placeholder_statistics"
                     android:textSize="60sp"
                     />
 
@@ -169,7 +169,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="1"
                     android:textSize="14sp"
-                    android:hint="added globally in the last 28 days"
+                    android:text="@string/global_28d_text"
                     android:gravity="center"
                     />
 
@@ -179,7 +179,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="3"
                     android:gravity="center"
-                    android:hint="global"
+                    android:hint="@string/zero_placeholder_statistics"
                     android:textSize="60sp"
                     />
 
@@ -188,7 +188,7 @@
                     android:layout_height="0sp"
                     android:layout_weight="1"
                     android:textSize="14sp"
-                    android:hint="cameras global total"
+                    android:text="@string/global_total_text"
                     android:gravity="center"
                     />
 

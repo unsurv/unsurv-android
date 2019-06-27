@@ -55,7 +55,7 @@
             android:id="@+id/map_count_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Total cameras: 1200"
+            android:hint="@string/total_cameras_in_map_hint"
             android:layout_marginBottom="20dp"
             android:layout_marginStart="20dp"
             android:textSize="16sp"

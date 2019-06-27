@@ -482,7 +482,7 @@ public class MapActivity extends AppCompatActivity {
               SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
               timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
               // Show current date in timemachine
-              timeframeTextView.setText("All cameras until: " + timestampIso8601.format(currentSeekBarDate));
+              timeframeTextView.setText(getString(R.string.timemachine_text, timestampIso8601.format(currentSeekBarDate)));
               redrawMarkers(allCamerasInArea);
 
             }
@@ -1047,7 +1047,8 @@ public class MapActivity extends AppCompatActivity {
 
       cameraCluster.setIcon(clusterIcon);
 
-      amountOnMap.setText("Total cameras: " + itemsToDisplay.size());
+      amountOnMap.setText(getString(R.string.total_cameras_in_map, itemsToDisplay.size()));
+
       for (int i = 0; i < itemsToDisplay.size(); i++) {
         Marker cameraMarker = new Marker(mapView);
         SynchronizedCamera currentCamera = itemsToDisplay.get(i);
@@ -1149,13 +1150,12 @@ public class MapActivity extends AppCompatActivity {
 
             break;
 
-
           }
         }
 
       }
 
-      amountOnMap.setText("Total cameras: " + overlayItemsToDisplay.size());
+      amountOnMap.setText(getString(R.string.total_cameras_in_map, overlayItemsToDisplay.size()));
       cameraOverlay = new ItemizedIconOverlay<>(overlayItemsToDisplay, cameraMarkerIcon,
               new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 

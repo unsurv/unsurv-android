@@ -51,9 +51,11 @@ public class StatisticsActivity extends AppCompatActivity {
   private CameraRoomDatabase cameraDb;
 
   private TextView totalInAreaTextView;
+  private TextView totalInAreaInfoTextView;
   private TextView local7DaysTextView;
   private TextView local28DaysTextView;
   private TextView totalByUserTextView;
+  private TextView totalByUserInfoTextView;
   private TextView globalTodayTextView;
   private TextView global28DaysTextView;
   private TextView globalTotalTextView;
@@ -105,11 +107,13 @@ public class StatisticsActivity extends AppCompatActivity {
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
     cameraRepository = new CameraRepository(getApplication());
 
-    totalInAreaTextView = findViewById(R.id.total_cameras_statistics);
+    totalInAreaTextView = findViewById(R.id.total_cameras_in_area_statistics);
+    totalInAreaInfoTextView = findViewById(R.id.total_cameras_in_area_info_statistics);
 
     local7DaysTextView = findViewById(R.id.added_past_7_days_statistics);
     local28DaysTextView = findViewById(R.id.added_past_28_days_statistics);
     totalByUserTextView = findViewById(R.id.added_by_user_statistics);
+    totalByUserInfoTextView = findViewById(R.id.added_by_user_info_statistics);
 
     globalTodayTextView = findViewById(R.id.global_today_statistics);
     global28DaysTextView = findViewById(R.id.global_28days_statistics);
@@ -120,31 +124,7 @@ public class StatisticsActivity extends AppCompatActivity {
     refreshSharedPreferencesObject();
 
     long currentTime = System.currentTimeMillis();
-    Date currentDate = new Date(currentTime);
-
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(currentDate);
-
-    // cal.add(Calendar.MONTH, -12);
-
-    cal.add(Calendar.DATE, -7);
-    Date sevenDaysBeforeToday = cal.getTime();
-
-    // data from -7 days until today
-    local7DaysAmount = StatisticsUtils.getTotalCamerasInTimeframeFromDb(sevenDaysBeforeToday, currentDate, synchronizedCameraRepository);
-
-    // only subtract 21 here because we've subtracted 7 earlier
-    cal.add(Calendar.DATE, -21);
-    Date twentyEightDaysBeforeToday = cal.getTime();
-
-    totalLocal28Days = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
-    totalLocal = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
-    totalByUser = StatisticsUtils.totalCamerasCapturedOnDevice(cameraRepository);
-
-    totalInAreaTextView.setText(String.valueOf(totalLocal));
-    local7DaysTextView.setText(String.valueOf(local7DaysAmount));
-    local28DaysTextView.setText(String.valueOf(totalLocal28Days));
-    totalByUserTextView.setText(String.valueOf(totalByUser));
+    updateLocalTextViews();
 
     localBroadcastManager = LocalBroadcastManager.getInstance(StatisticsActivity.this);
 
@@ -437,6 +417,27 @@ public class StatisticsActivity extends AppCompatActivity {
     totalLocal28Days = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
     totalLocal = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
     totalByUser = StatisticsUtils.totalCamerasCapturedOnDevice(cameraRepository);
+
+    // "camera" instead of cameras when there is only 1 camera in your homezone
+    if (totalLocal == 1){
+      String infoText = getResources().getQuantityString(R.plurals.number_of_cameras_in_area, 1);
+
+      totalInAreaInfoTextView.setText(infoText);
+    } else {
+      String infoText = getResources().getQuantityString(R.plurals.number_of_cameras_in_area, 0);
+
+      totalInAreaInfoTextView.setText(infoText);
+    }
+
+    if (totalByUser == 1){
+      String infoText = getResources().getQuantityString(R.plurals.captures_by_user, 1);
+
+      totalByUserInfoTextView.setText(infoText);
+    } else {
+      String infoText = getResources().getQuantityString(R.plurals.captures_by_user, 0);
+
+      totalByUserInfoTextView.setText(infoText);
+    }
 
     totalInAreaTextView.setText(String.valueOf(totalLocal));
     local7DaysTextView.setText(String.valueOf(local7DaysAmount));

@@ -22,4 +22,53 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- App and toolbar labels-->
+    <string name="app_label">unsurv</string>
+    <string name="history_label">History</string>
+    <string name="detector_label">Detect Cameras</string>
+    <string name="map_label">Map</string>
+    <string name="statistics_label">Statistics</string>
+    <string name="settings_label">Settings</string>
+    <string name="manual_capture_label">Manual Capture</string>
+    <string name="draw_on_training_image_label">Draw Cameras</string>
+
+
+    <!-- TextView contents -->
+
+    <!--in HistoryActivity-->
+    <string name="captured_info_text">Captured on: </string>
+    <string name="upload_info_text">Upload on: </string>
+    <string name="select_camera">Please select a camera</string>
+
+    <!--in DetectorActivity-->
+    <string name="manual_capture_button_text">MANUAL</string>
+
+    <!--in MapActivity-->
+    <string name="total_cameras_in_map_hint">Total cameras: 1200</string>
+    <string name="total_cameras_in_map">Total cameras: %d</string>
+    <string name="timemachine_text">All cameras until: %s</string>
+
+    <!--in StatisticsActivity-->
+
+    <plurals name="number_of_cameras_in_area">
+    <item quantity="one">camera in your area</item>
+    <item quantity="other">cameras in your area</item>
+    </plurals>
+
+    <plurals name="captures_by_user">
+        <item quantity="one">capture by you</item>
+        <item quantity="other">captures by you</item>
+    </plurals>
+
+    <string name="added_7d_text">added in the last 7 days</string>
+    <string name="added_28d_text">added in the last 28 days</string>
+    <string name="global_today_text">added globally today</string>
+    <string name="global_28d_text">added globally in the last 28 days</string>
+    <string name="global_total_text">cameras global total</string>
+    <string name="zero_placeholder_statistics">0</string>
+
+
+
+
 </resources>
