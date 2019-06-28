@@ -330,6 +330,8 @@ class SynchronizationUtils {
 
   static void getAPIkey(final Context context, final SharedPreferences sharedPreferences) {
 
+    final boolean errorInQuery;
+
     RequestQueue mRequestQueue;
 
     // Set up the network to use HttpURLConnection as the HTTP client.
@@ -392,10 +394,14 @@ class SynchronizationUtils {
       @Override
       public void onRequestFinished(Request<Object> request) {
 
-        Intent intent = new Intent();
-        intent.setAction("org.unsurv.API_KEY_CHANGED");
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
-        localBroadcastManager.sendBroadcast(intent);
+
+        if (request.hasHadResponseDelivered()){
+          Intent intent = new Intent();
+          intent.setAction("org.unsurv.API_KEY_CHANGED");
+          LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
+          localBroadcastManager.sendBroadcast(intent);
+        }
+
       }
     });
 

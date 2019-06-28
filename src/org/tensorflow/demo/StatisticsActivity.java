@@ -95,6 +95,7 @@ public class StatisticsActivity extends AppCompatActivity {
   private SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
   private String baseURL;
+  private String today;
 
 
 
@@ -130,7 +131,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
     refreshSharedPreferencesObject();
     baseURL = sharedPreferences.getString("synchronizationURL", null);
-    String today = timestampIso8601.format(new Date(currentTime));
+    today = timestampIso8601.format(new Date(currentTime));
 
     queryServerForStatistics(baseURL, "global", "2018-01-01", today);
 
@@ -184,6 +185,9 @@ public class StatisticsActivity extends AppCompatActivity {
   @Override
   protected void onResume() {
     super.onResume();
+
+    long currentTime = System.currentTimeMillis();
+    today = timestampIso8601.format(new Date(currentTime));
 
     br = new BroadcastReceiver() {
       @Override
@@ -260,7 +264,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         long currentTime = System.currentTimeMillis();
 
-        String today = timestampIso8601.format(new Date(currentTime));
+        today = timestampIso8601.format(new Date(currentTime));
 
         queryServerForStatistics(baseURL, "global", "2018-01-01", today);
 
@@ -278,7 +282,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
   void queryServerForStatistics(String baseURL, String area, @Nullable String startDate,@Nullable String endDate){
 
-    final String TAG = "StatisticsUtils";
+    final String TAG = "StatisticsUtils, queryServer";
     //TODO check api for negative values in left right top bottom see if still correct
 
     refreshSharedPreferencesObject();
