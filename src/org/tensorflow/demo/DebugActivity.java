@@ -212,7 +212,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("deleteOnUpload", false).apply();
     sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
     sharedPreferences.edit().putBoolean("downloadImages", true).apply();
-    sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", true).apply();
+    sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", false).apply();
 
 
 
@@ -225,7 +225,7 @@ public class DebugActivity extends AppCompatActivity {
 
     progress = new ProgressBar(DebugActivity.this);
 
-     layoutInflater = (LayoutInflater) DebugActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    layoutInflater = (LayoutInflater) DebugActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
 

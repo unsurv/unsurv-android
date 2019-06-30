@@ -26,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -46,6 +47,7 @@ import android.text.TextUtils;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -62,6 +64,11 @@ import org.tensorflow.demo.env.Logger;
 
 public class CameraConnectionFragment extends Fragment {
   private static final Logger LOGGER = new Logger();
+
+  // needed for zooming
+  private float fingerSpacing = 0;
+  private int zoomLevel = 1;
+  private Rect zoomedImage;
 
   /**
    * The camera preview size will be chosen to be the smallest frame by pixel size capable of
@@ -158,7 +165,7 @@ public class CameraConnectionFragment extends Fragment {
           // This method is called when the camera is opened.  We start camera preview here.
           cameraOpenCloseLock.release();
           cameraDevice = cd;
-          createCameraPreviewSession();
+          createCameraPreviewSession(getActivity());
         }
 
         @Override
@@ -492,10 +499,71 @@ public class CameraConnectionFragment extends Fragment {
   /**
    * Creates a new {@link CameraCaptureSession} for camera preview.
    */
-  private void createCameraPreviewSession() {
+  private void createCameraPreviewSession(final Activity activity) {
     try {
       final SurfaceTexture texture = textureView.getSurfaceTexture();
       assert texture != null;
+
+      textureView.setOnTouchListener(new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+          // trying zoom
+          CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+
+          try {
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            float maxzoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10;
+
+            Rect m = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+            int action = motionEvent.getAction();
+            float current_finger_spacing;
+
+            if (motionEvent.getPointerCount() > 1) {
+              // Multi touch logic
+              current_finger_spacing = getFingerSpacing(motionEvent);
+              if(fingerSpacing != 0){
+                if(current_finger_spacing  > fingerSpacing + 10 && maxzoom > zoomLevel){
+                  zoomLevel++;
+                } else if (current_finger_spacing < fingerSpacing + 10 && zoomLevel > 1){
+                  zoomLevel--;
+                }
+                int minW = (int) (m.width() / maxzoom);
+                int minH = (int) (m.height() / maxzoom);
+                int difW = m.width() - minW;
+                int difH = m.height() - minH;
+                int cropW = difW / 100 * zoomLevel;
+                int cropH = difH / 100 * zoomLevel;
+                cropW -= cropW & 3;
+                cropH -= cropH & 3;
+                zoomedImage = new Rect(cropW, cropH, m.width() - cropW, m.height() - cropH);
+                previewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
+              }
+              fingerSpacing = current_finger_spacing;
+            } else{
+              if (action == MotionEvent.ACTION_UP) {
+                //single touch logic
+              }
+            }
+          } catch (CameraAccessException e) {
+            e.printStackTrace();
+          }
+
+
+
+
+          try {
+            captureSession
+                    .setRepeatingRequest(previewRequestBuilder.build(), captureCallback, null);
+          } catch (CameraAccessException e) {
+            e.printStackTrace();
+          } catch (NullPointerException ex) {
+            ex.printStackTrace();
+          }
+
+          return true;
+        }
+      });
+
 
       // We configure the size of default buffer to be the size of camera preview we want.
       texture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
@@ -635,5 +703,11 @@ public class CameraConnectionFragment extends Fragment {
               })
           .create();
     }
+  }
+
+  private float getFingerSpacing(MotionEvent event) {
+    float x = event.getX(0) - event.getX(1);
+    float y = event.getY(0) - event.getY(1);
+    return (float) Math.sqrt(x * x + y * y);
   }
 }

@@ -315,7 +315,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
             detailTimestamp.setText(timestamp);
 
           } else {
-            detailTimestamp.setText("Enable \"Capture Timestamps\" in settings to see capture time");
+            detailTimestamp.setText("Enable \"Capture Timestamps\" to see capture time");
           }
 
           detailUpload.setText(mSurveillanceCameras.get(currentPosition).getTimeToSync());

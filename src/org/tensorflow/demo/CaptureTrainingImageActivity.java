@@ -890,7 +890,6 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
 
       captureBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
 
-
       // Orientation
       int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
       captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));

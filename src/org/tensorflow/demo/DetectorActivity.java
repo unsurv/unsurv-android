@@ -312,7 +312,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private ArrayList<CameraCapture> pooledCameraCaptures = new ArrayList<>();
 
   private long timePoolCaptureStarted = 0;
-  private int poolDurationInMillis = 3000; //TODO add setting to set duration.
+  private int poolDurationInMillis = 5000; //TODO add setting to set duration.
   private int delayBetweenPoolsInMillis = 10000; //TODO add setting to set duration.
 
   private Long currentTime;
@@ -702,8 +702,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 // End pooling, analyze pool and clear list.
                 if (!pooledCameraCaptures.isEmpty()) {
 
-                  pooledCameraCaptures.clear();
-
+                  /*
                   // TODO add "unsurv" to every PICTURES_PATH
                   CameraCapture cameraCapture1 = new CameraCapture(99.9f,
                           "190754878_thumbnail.jpg", "190754878.jpg",
@@ -733,8 +732,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                   pooledCameraCaptures.add(cameraCapture2);
                   pooledCameraCaptures.add(cameraCapture3);
                   pooledCameraCaptures.add(cameraCapture4);
+                   */
 
                   processCapturePool(pooledCameraCaptures);
+                  pooledCameraCaptures.clear();
                 }
 
               } else
@@ -825,9 +826,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         Matrix turnMatrix = new Matrix();
         turnMatrix.postRotate(90);
 
+        long currentTime = System.currentTimeMillis();
+
+        String imageFilename = currentTime + ".jpg";
+        String thumbnailFilename = currentTime + "_thumbnail.jpg";
+
         // Create files, for now with timestamp as name
-        File outputFile = new File(pictureDirectory, System.currentTimeMillis() + ".jpg");
-        File thumbnailFile = new File(pictureDirectory, System.currentTimeMillis() + "_thumbnail.jpg");
+        File outputFile = new File(pictureDirectory, imageFilename);
+        File thumbnailFile = new File(pictureDirectory, thumbnailFilename);
 
         out = new FileOutputStream(outputFile);
 
@@ -865,8 +871,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
         CameraCapture currentCamera = new CameraCapture(
                 result.getConfidence(),
-                thumbnailFile.getPath(),
-                outputFile.getPath(),
+                thumbnailFilename,
+                imageFilename,
                 cameraLeft, cameraRight, cameraTop, cameraBottom,
                 cameraLatitude, cameraLongitude, cameraAccuracy,
                 azimuth, pitch, roll
@@ -939,67 +945,78 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       }
     }
 
-    Location intersectReference = allIntersectsfromCaptures.get(0);
-    List<Pair<Double, Double>> intersectsInCoordinates = LocationUtils.transferLocationsTo2dCoordinates(allIntersectsfromCaptures);
+    try{
+      Location intersectReference = allIntersectsfromCaptures.get(0);
+      List<Pair<Double, Double>> intersectsInCoordinates = LocationUtils.transferLocationsTo2dCoordinates(allIntersectsfromCaptures);
 
-    Location cameraEstimate = LocationUtils.approximateCameraPosition(intersectsInCoordinates, intersectReference);
+      Location cameraEstimate = LocationUtils.approximateCameraPosition(intersectsInCoordinates, intersectReference);
 
 
-    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+      SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+      timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-    Random random = new Random();
+      Random random = new Random();
 
-    long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*2) * 1000; // 2 d
-    long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
+      long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*2) * 1000; // 2 d
+      long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
 
-    long timeframe = maxDelay - minDelay;
+      long timeframe = maxDelay - minDelay;
 
-    long randomDelay = Math.round(timeframe * random.nextDouble()); // minDelay < x < maxDelay
+      long randomDelay = Math.round(timeframe * random.nextDouble()); // minDelay < x < maxDelay
 
-    currentTime = System.currentTimeMillis();
+      currentTime = System.currentTimeMillis();
 
-    boolean useTimestamp = sharedPreferences.getBoolean("enableCaptureTimestamps", false);
+      boolean useTimestamp = sharedPreferences.getBoolean("enableCaptureTimestamps", false);
 
-    if (useTimestamp) {
+      if (useTimestamp) {
 
-      cameraRepository.insert(new SurveillanceCamera(
-              biggestConfidence.getThumbnailPath(),
-              biggestConfidence.getImagePath(),
-              null,
-              cameraEstimate.getLatitude(),
-              cameraEstimate.getLongitude(),
-              sharedPreferences.getString("comment", "no comment"),
-              timestampIso8601.format(new Date(currentTime)),
-              timestampIso8601.format(new Date(currentTime + randomDelay)),
-              false,
-              false,
-              false,
-              false,
-              ""
+        cameraRepository.insert(new SurveillanceCamera(
+                biggestConfidence.getThumbnailPath(),
+                biggestConfidence.getImagePath(),
+                null,
+                cameraEstimate.getLatitude(),
+                cameraEstimate.getLongitude(),
+                sharedPreferences.getString("comment", "no comment"),
+                timestampIso8601.format(new Date(currentTime)),
+                timestampIso8601.format(new Date(currentTime + randomDelay)),
+                false,
+                false,
+                false,
+                false,
+                ""
 
-      ));
+        ));
 
-    } else {
+        Toast.makeText(this, "successfully captured camera", Toast.LENGTH_SHORT).show();
 
-      cameraRepository.insert(new SurveillanceCamera(
-              biggestConfidence.getThumbnailPath(),
-              biggestConfidence.getImagePath(),
-              null,
-              cameraEstimate.getLatitude(),
-              cameraEstimate.getLongitude(),
-              sharedPreferences.getString("comment", "no comment"),
-              null,
-              timestampIso8601.format(new Date(currentTime + randomDelay)),
-              false,
-              false,
-              false,
-              false,
-              ""
+      } else {
 
-      ));
+        cameraRepository.insert(new SurveillanceCamera(
+                biggestConfidence.getThumbnailPath(),
+                biggestConfidence.getImagePath(),
+                null,
+                cameraEstimate.getLatitude(),
+                cameraEstimate.getLongitude(),
+                sharedPreferences.getString("comment", "no comment"),
+                null,
+                timestampIso8601.format(new Date(currentTime + randomDelay)),
+                false,
+                false,
+                false,
+                false,
+                ""
 
+        ));
+
+        Toast.makeText(this, "successfully captured camera", Toast.LENGTH_SHORT).show();
+
+      }
+
+    } catch (Exception e){
+      Log.i(TAG, "failed to create a capture pool");
     }
+
+
 
 
   }
