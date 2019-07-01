@@ -992,6 +992,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
         mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, trainingImageUuid +".jpg");
 
         SurveillanceCamera trainingCamera = new SurveillanceCamera(
+                0,
                 null,
                 trainingImageUuid +".jpg",
                 null,

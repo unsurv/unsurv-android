@@ -359,6 +359,7 @@ public class DrawView extends ImageView {
 
       // updating obj and saving to db
       mCamera.setDrawnRectsAsString(drawnCameras);
+      mCamera.setCameraType(cameraType);
       mCameraViewModel.update(mCamera);
 
     } else {

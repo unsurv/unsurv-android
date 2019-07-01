@@ -12,6 +12,8 @@ public class SurveillanceCamera {
   @PrimaryKey(autoGenerate = true)
   private int id;
 
+  private int cameraType;
+
   private String thumbnailPath;
 
   @Nullable
@@ -38,7 +40,7 @@ public class SurveillanceCamera {
   private String drawnRectsAsString;
 
 
-  public SurveillanceCamera(String cameraType,
+  public SurveillanceCamera(int cameraType,
                             @Nullable String thumbnailPath,
                             @Nullable String imagePath,
                             @Nullable String externalId,
@@ -53,6 +55,7 @@ public class SurveillanceCamera {
                             boolean trainingCapture,
                             String drawnRectsAsString){
 
+    this.cameraType = cameraType;
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;
 
@@ -83,6 +86,8 @@ public class SurveillanceCamera {
   public int getId() {
     return id;
   }
+
+  public int getCameraType(){return cameraType;}
 
   public String getThumbnailPath() {
     return thumbnailPath;
@@ -137,6 +142,8 @@ public class SurveillanceCamera {
   public void setId(int id) {
     this.id = id;
   }
+
+  public void setCameraType(int type){this.cameraType = type;}
 
   public void setThumbnailPath(String mThumbnailPath) {
     this.thumbnailPath = mThumbnailPath;

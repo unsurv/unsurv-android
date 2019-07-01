@@ -100,6 +100,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
         }
 
         SurveillanceCamera manualCamera = new SurveillanceCamera(
+                0,
                 null,
                 null,
                 null,

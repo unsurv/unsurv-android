@@ -1,15 +1,11 @@
 package org.tensorflow.demo;
 
-import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -27,11 +23,6 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import org.osmdroid.api.IMapController;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.IconOverlay;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -48,8 +39,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     private final TextView bottomTextViewInItem;
     private final ImageButton deleteButton;
     private final ImageButton uploadButton;
-    private final ImageButton drawButton;
-    private final LinearLayout linearLayout;
+    private final LinearLayout detailLinearLayout;
 
 
 
@@ -63,19 +53,15 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       bottomTextViewInItem = itemView.findViewById(R.id.history_item_text_view_bottom);
       deleteButton = itemView.findViewById(R.id.history_item_delete_button);
       uploadButton = itemView.findViewById(R.id.history_item_upload_button);
-      drawButton = itemView.findViewById(R.id.history_item_draw_button);
-      linearLayout = itemView.findViewById(R.id.history_item_linear_layout);
+      detailLinearLayout = itemView.findViewById(R.id.history_item_linear_layout);
 
     }
 
   }
 
   private final LayoutInflater mInflater;
-  private final LinearLayout mHistoryDetails;
 
   private List<SurveillanceCamera> mSurveillanceCameras;
-
-  private IconOverlay iconOverlay;
 
   private String picturesPath = SynchronizationUtils.PICTURES_PATH;
 
@@ -86,9 +72,8 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
   private CameraViewModel cameraViewModel;
 
 
-  CameraListAdapter(Context context, LinearLayout detailLinearLayout, Application application, LayoutInflater layoutInflater, CameraViewModel cameraViewModel) {
+  CameraListAdapter(Context context, Application application, LayoutInflater layoutInflater, CameraViewModel cameraViewModel) {
     mInflater = LayoutInflater.from(context);
-    mHistoryDetails = detailLinearLayout;
     cameraRepository = new CameraRepository(application);
     this.cameraViewModel = cameraViewModel;
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -116,15 +101,13 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       final boolean currentCameraUploadComplete = current.getUploadCompleted();
 
-      String mLatitude = String.valueOf(current.getLatitude());
-      String mLongitude = String.valueOf(current.getLongitude());
-
       File mThumbnailPicture;
-      if (current.getTrainingCapture()){
+      final boolean trainingCapture = current.getTrainingCapture();
+
+      if (trainingCapture){
         // camera is a training image not a capture with obj detection
         mThumbnailPicture = new File(SynchronizationUtils.TRAINING_IMAGES_PATH + current.getImagePath());
-        holder.linearLayout.setBackgroundColor(Color.GRAY);
-        holder.drawButton.setVisibility(View.VISIBLE);
+        holder.detailLinearLayout.setBackgroundColor(Color.GRAY);
 
       } else {
         mThumbnailPicture = new File(picturesPath + current.getThumbnailPath());
@@ -152,18 +135,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       } else {
         holder.uploadButton.setImageResource(R.drawable.ic_file_upload_grey_24dp);
       }
-
-      holder.drawButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-          Intent drawOnImageIntent = new Intent(ctx, DrawOnTrainingImageActivity.class);
-
-          drawOnImageIntent.putExtra("surveillanceCameraId", current.getId());
-
-          ctx.startActivity(drawOnImageIntent);
-        }
-      });
 
       holder.deleteButton.setOnClickListener(new View.OnClickListener() {
         @Override
@@ -195,7 +166,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
             if (!popupWindow.isShowing()) {
 
-
               popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
               yesButton.setOnClickListener(new View.OnClickListener() {
@@ -203,11 +173,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
                 public void onClick(View view) {
 
                   holder.thumbnailImageView.setVisibility(View.INVISIBLE);
-                  TextView detailTimestamp = mHistoryDetails.findViewById(R.id.history_detail_timestamp);
-                  TextView detailUpload = mHistoryDetails.findViewById(R.id.history_detail_upload);
-
-                  detailTimestamp.setText("Please select a camera");
-                  detailUpload.setText("");
 
                   if (dontAskAgainACheckBox.isChecked()) {
                     sharedPreferences.edit().putBoolean("quickDeleteCameras", true).apply();
@@ -233,8 +198,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
           }
 
-
-
         }
       });
 
@@ -252,8 +215,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         }
       });
 
-
-
       Picasso.get().load(mThumbnailPicture)
               .placeholder(R.drawable.ic_launcher)
               .into(holder.thumbnailImageView);
@@ -261,26 +222,27 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       holder.itemView.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+
+
+
           Log.i("holder onClick:", "clicked position: " + holder.getAdapterPosition());
 
           int currentPosition = holder.getAdapterPosition();
           SurveillanceCamera currentCamera = mSurveillanceCameras.get(currentPosition);
 
-          MapView detailMap = mHistoryDetails.findViewById(R.id.history_detail_map);
-          TextView detailTimestamp = mHistoryDetails.findViewById(R.id.history_detail_timestamp);
-          TextView detailUpload = mHistoryDetails.findViewById(R.id.history_detail_upload);
-          ImageView detailImage = mHistoryDetails.findViewById(R.id.history_detail_image);
 
-          File cameraImage;
-
-          if (currentCamera.getTrainingCapture()) {
+          if (trainingCapture) {
             // camera is a training image not a capture with obj detection
 
             // if delete was last action image view is invisible
             holder.thumbnailImageView.setVisibility(View.VISIBLE);
 
-            cameraImage = new File(SynchronizationUtils.TRAINING_IMAGES_PATH + currentCamera.getImagePath());
-            detailMap.setVisibility(View.INVISIBLE);
+            Intent drawOnImageIntent = new Intent(ctx, DrawOnTrainingImageActivity.class);
+
+            drawOnImageIntent.putExtra("surveillanceCameraId", currentCamera.getId());
+
+            ctx.startActivity(drawOnImageIntent);
+
 
           } else {
             // camera is captured via obj detection
@@ -288,48 +250,13 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
             // if delete was last action image view is invisible
             holder.thumbnailImageView.setVisibility(View.VISIBLE);
 
-            cameraImage = new File(picturesPath + currentCamera.getThumbnailPath());
-            detailMap.setVisibility(View.VISIBLE);
+            Intent editCameraIntent = new Intent(ctx, EditCameraActivity.class);
+
+            editCameraIntent.putExtra("surveillanceCameraId", currentCamera.getId());
+
+            ctx.startActivity(editCameraIntent);
 
           }
-
-          Picasso.get().load(cameraImage)
-                  .placeholder(R.drawable.ic_launcher)
-                  .into(detailImage);
-
-          detailMap.getOverlays().remove(iconOverlay);
-
-          final IMapController mapController = detailMap.getController();
-
-          double lat = mSurveillanceCameras.get(currentPosition).getLatitude();
-          double lon = mSurveillanceCameras.get(currentPosition).getLongitude();
-
-          // Setting starting position and zoom level.
-          GeoPoint cameraLocation = new GeoPoint(lat, lon);
-          mapController.setZoom(16.0);
-          mapController.setCenter(cameraLocation);
-
-          String timestamp = mSurveillanceCameras.get(currentPosition).getTimestamp();
-
-          if (timestamp != null) {
-            detailTimestamp.setText(timestamp);
-
-          } else {
-            detailTimestamp.setText("Enable \"Capture Timestamps\" to see capture time");
-          }
-
-          detailUpload.setText(mSurveillanceCameras.get(currentPosition).getTimeToSync());
-
-          Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(view.getContext().getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
-
-
-          iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
-
-          detailMap.getOverlays().add(iconOverlay);
-
-          //detailMap.getOverlays().add(cameraMarker);
-          detailMap.invalidate();
-
 
         }
       });

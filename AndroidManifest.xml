@@ -74,6 +74,11 @@
             android:label="@string/draw_on_training_image_label"
             android:parentActivityName=".DebugActivity" />
 
+        <activity
+            android:name=".EditCameraActivity"
+            android:label="@string/edit_camera_label"
+            android:parentActivityName=".DebugActivity" />
+
         <service
             android:name=".SyncIntervalSchedulerJobService"
             android:label="SynchronizationScheduler"

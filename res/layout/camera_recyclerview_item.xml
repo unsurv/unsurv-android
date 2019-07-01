@@ -59,20 +59,10 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="0sp"
-        android:layout_weight="2"
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/history_item_draw_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="#c8333333"
-            android:src="@drawable/ic_brush_grey_24dp"
-            android:padding="4dp"
-            android:layout_gravity="center"
-            android:visibility="invisible"/>
 
         <ImageButton
             android:id="@+id/history_item_delete_button"

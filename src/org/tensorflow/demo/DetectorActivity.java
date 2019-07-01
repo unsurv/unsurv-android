@@ -396,42 +396,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     gpsLocation.execute();
 
-
-    readStoragePermission = ContextCompat.checkSelfPermission(DetectorActivity.this,
-            Manifest.permission.READ_EXTERNAL_STORAGE);
-    writeStoragePermission = ContextCompat.checkSelfPermission(DetectorActivity.this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    cameraPermission = ContextCompat.checkSelfPermission(DetectorActivity.this,
-            Manifest.permission.CAMERA);
-    fineLocationPermission = ContextCompat.checkSelfPermission(DetectorActivity.this,
-            Manifest.permission.ACCESS_FINE_LOCATION);
-
-
-    List<String> permissionList = new ArrayList<>();
-
-    if (readStoragePermission != PackageManager.PERMISSION_GRANTED) {
-      permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-    }
-
-    if (writeStoragePermission != PackageManager.PERMISSION_GRANTED) {
-      permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    }
-
-    if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
-      permissionList.add(Manifest.permission.CAMERA);
-    }
-
-    if (fineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-      permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-
-    String[] neededPermissions = permissionList.toArray(new String[0]);
-
-    if (!permissionList.isEmpty()) {
-      ActivityCompat.requestPermissions(DetectorActivity.this, neededPermissions, 1);
-    }
-
     super.onResume();
 
 
@@ -870,7 +834,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         CameraCapture currentCamera = new CameraCapture(
-                result.getId(),
+                Integer.valueOf(result.getId()),
                 result.getConfidence(),
                 thumbnailFilename,
                 imageFilename,
@@ -972,12 +936,13 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       if (useTimestamp) {
 
         cameraRepository.insert(new SurveillanceCamera(
+                biggestConfidence.getId(),
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,
                 cameraEstimate.getLatitude(),
                 cameraEstimate.getLongitude(),
-                sharedPreferences.getString("comment", "no comment"),
+                sharedPreferences.getString("comment", ""),
                 timestampIso8601.format(new Date(currentTime)),
                 timestampIso8601.format(new Date(currentTime + randomDelay)),
                 false,
@@ -993,12 +958,13 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       } else {
 
         cameraRepository.insert(new SurveillanceCamera(
+                biggestConfidence.getId(),
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,
                 cameraEstimate.getLatitude(),
                 cameraEstimate.getLongitude(),
-                sharedPreferences.getString("comment", "no comment"),
+                sharedPreferences.getString("comment", ""),
                 null,
                 timestampIso8601.format(new Date(currentTime + randomDelay)),
                 false,

@@ -14,14 +14,17 @@
  limitations under the License.
 -->
 <resources>
+
     <string name="description_info">Info</string>
     <string name="request_permission">This sample needs camera permission.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
     <string name="title_activity_history">HistoryActivity</string>
     <string name="title_activity_main">MainActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--general-->
+    <string name="timestamp_not_available">not displayed</string>
+    <string name="no_comment">no comments available</string>
 
     <!-- App and toolbar labels-->
     <string name="app_label">unsurv</string>
@@ -32,9 +35,8 @@
     <string name="settings_label">Settings</string>
     <string name="manual_capture_label">Manual Capture</string>
     <string name="draw_on_training_image_label">Draw Cameras</string>
+    <string name="edit_camera_label">Edit Camera</string>
 
-
-    <!-- TextView contents -->
 
     <!--in HistoryActivity-->
     <string name="captured_info_text">Captured on: </string>

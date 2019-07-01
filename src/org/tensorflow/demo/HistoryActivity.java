@@ -81,49 +81,13 @@ public class HistoryActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-    // small map at top-right to show camera location
-    MapView detailMap = findViewById(R.id.history_detail_map);
-
-    detailMap.setTilesScaledToDpi(true);
-    detailMap.setClickable(false);
-    detailMap.setMultiTouchControls(false);
-
-    // MAPNIK fix
-    // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
-    // TODO add choice + backup strategy here
-    detailMap.setTileSource(TileSourceFactory.OpenTopo);
-
-    final CustomZoomButtonsController zoomController = detailMap.getZoomController();
-    zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
-
-    final IMapController mapController = detailMap.getController();
-
-    String homeZone = sharedPreferences.getString("area", null);
-
-    String[] coordinates = homeZone.split(",");
-
-    double latMin = Double.valueOf(coordinates[0]);
-    double latMax = Double.valueOf(coordinates[1]);
-    double lonMin = Double.valueOf(coordinates[2]);
-    double lonMax = Double.valueOf(coordinates[3]);
-
-    // homezone center as start if no camera is chosen yet
-    double centerLat = (latMin + latMax) / 2;
-    double centerLon = (lonMin + lonMax) / 2;
-
-    // Setting starting position and zoom level.
-    GeoPoint startPoint = new GeoPoint(centerLat, centerLon);
-    mapController.setZoom(10.0);
-    mapController.setCenter(startPoint);
-
     recyclerView = (RecyclerView) findViewById(R.id.camera_recyclerview);
     mCameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
 
     // needed in adapter to show PopupWindows
     LayoutInflater layoutInflater = (LayoutInflater) HistoryActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    final LinearLayout rootView = findViewById(R.id.history_detail_linear);
-    adapter = new CameraListAdapter(this, rootView, getApplication(), layoutInflater, mCameraViewModel);
+    adapter = new CameraListAdapter(this, getApplication(), layoutInflater, mCameraViewModel);
 
     recyclerView.setAdapter(adapter);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));

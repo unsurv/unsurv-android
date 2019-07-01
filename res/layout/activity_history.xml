@@ -22,13 +22,11 @@
         />
 
 
-
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/camera_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0sp"
-        android:layout_weight="5"
+        android:layout_weight="9"
 
         tools:listitem="@layout/camera_recyclerview_item" />
 

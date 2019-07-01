@@ -407,13 +407,17 @@ public class DebugActivity extends AppCompatActivity {
           nullOrDate = "2018-01-02";
         }
 
+        // 50.000 * random.nextFloat(),
+        // 8.0000 * random.nextFloat(),
+
 
         SurveillanceCamera randomCamera = new SurveillanceCamera(
+                0,
                 "test_pixel_2.jpg",
                 "test_nexus_10.jpg",
                 null,
-                50.000 * random.nextFloat(),
-                8.0000 * random.nextFloat(),
+                50.00165,
+                8.25941,
                 "asd",
                 nullOrDate,
                 "2019-05-30",
@@ -424,7 +428,9 @@ public class DebugActivity extends AppCompatActivity {
                 "");
 
 
-        SurveillanceCamera notRandomCamera = new SurveillanceCamera("test_pixel_2.jpg",
+        SurveillanceCamera notRandomCamera = new SurveillanceCamera(
+                0,
+                "test_pixel_2.jpg",
                 "asd.jpg",
                 null,
                 0, 0,
@@ -438,7 +444,7 @@ public class DebugActivity extends AppCompatActivity {
                 "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]");
 
 
-        cameraRepository.insert(notRandomCamera);
+        cameraRepository.insert(randomCamera);
         // cameraRepository.insert(randomCamera);
 
 
@@ -499,25 +505,25 @@ public class DebugActivity extends AppCompatActivity {
 
 
 
-    CameraCapture cameraCapture1 = new CameraCapture(99.9f,
+    CameraCapture cameraCapture1 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99452, 8.24688,
             10.3345, 3.1414 - 3.14/10, 12.3313, 170.3332);
 
-    CameraCapture cameraCapture2 = new CameraCapture(99.9f,
+    CameraCapture cameraCapture2 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99455, 8.24705,
             10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
 
-    CameraCapture cameraCapture3 = new CameraCapture(99.9f,
+    CameraCapture cameraCapture3 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99458, 8.24725,
             10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
 
-    CameraCapture cameraCapture4 = new CameraCapture(99.9f,
+    CameraCapture cameraCapture4 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99455, 8.24740,
@@ -526,6 +532,7 @@ public class DebugActivity extends AppCompatActivity {
     List<CameraCapture> captureListTest = Arrays.asList(cameraCapture1, cameraCapture2, cameraCapture3, cameraCapture4);
 
     SurveillanceCamera testCamera = new SurveillanceCamera(
+            0,
             "test_pixel_2.jpg",
             "asd",
             null,
