@@ -870,6 +870,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         CameraCapture currentCamera = new CameraCapture(
+                result.getId(),
                 result.getConfidence(),
                 thumbnailFilename,
                 imageFilename,

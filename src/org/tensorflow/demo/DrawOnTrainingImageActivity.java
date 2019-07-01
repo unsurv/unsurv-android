@@ -98,7 +98,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
         Picasso.get().load(imageFile).into(drawView);
 
 
-        // start drawing activity 1 sec after capture to give db some time to save data
+        // start drawing activity 0.5 sec after capture to give db some time to save data
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
           @Override
@@ -122,7 +122,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        cameraType = DrawView.REGULAR_CAMERA;
+        cameraType = SynchronizationUtils.REGULAR_CAMERA;
         drawView.setCameraType(cameraType);
 
       }
@@ -132,7 +132,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        cameraType = DrawView.DOME_CAMERA;
+        cameraType = SynchronizationUtils.DOME_CAMERA;
         drawView.setCameraType(cameraType);
 
       }

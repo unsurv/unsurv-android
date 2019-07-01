@@ -38,7 +38,8 @@ public class SurveillanceCamera {
   private String drawnRectsAsString;
 
 
-  public SurveillanceCamera(@Nullable String thumbnailPath,
+  public SurveillanceCamera(String cameraType,
+                            @Nullable String thumbnailPath,
                             @Nullable String imagePath,
                             @Nullable String externalId,
                             double latitude,

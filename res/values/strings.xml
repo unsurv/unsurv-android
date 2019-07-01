@@ -52,8 +52,8 @@
     <!--in StatisticsActivity-->
 
     <plurals name="number_of_cameras_in_area">
-    <item quantity="one">camera in your area</item>
-    <item quantity="other">cameras in your area</item>
+        <item quantity="one">camera in your area</item>
+        <item quantity="other">cameras in your area</item>
     </plurals>
 
     <plurals name="captures_by_user">
@@ -67,6 +67,12 @@
     <string name="global_28d_text">added globally in the last 28 days</string>
     <string name="global_total_text">cameras global total</string>
     <string name="zero_placeholder_statistics">0</string>
+
+    <!--in EditCameraActivity-->
+
+    <string name="timestamp_text">Camera captured on:</string>
+    <string name="upload_text">Camera upload on:</string>
+    <string name="comment_text">Comments:</string>
 
 
 

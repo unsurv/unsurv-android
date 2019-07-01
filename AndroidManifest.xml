@@ -1,18 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
- Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.tensorflow.demo">
 
@@ -30,19 +16,13 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"  />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-
-    <!--
-    TODO uses cleartextTraffic only for developing DISABLE THAT SHIT
-    -->
 
     <application
         android:allowBackup="true"
@@ -50,12 +30,10 @@
         android:icon="@drawable/unsurv_logo"
         android:label="@string/app_label"
         android:theme="@style/Theme.AppCompat.NoActionBar"
-
         android:usesCleartextTraffic="true">
         <activity
             android:name=".DebugActivity"
             android:label="unsurv"
-
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -63,51 +41,43 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".HistoryActivity"
             android:label="@string/history_label"
-            android:parentActivityName=".DebugActivity"/>
+            android:parentActivityName=".DebugActivity" />
         <activity
-
             android:name=".DetectorActivity"
             android:label="@string/detector_label"
-            android:parentActivityName=".DebugActivity"/>
+            android:parentActivityName=".DebugActivity" />
         <activity
             android:name=".MapActivity"
             android:label="@string/map_label"
-            android:parentActivityName=".DebugActivity"/>
+            android:parentActivityName=".DebugActivity" />
         <activity
             android:name=".StatisticsActivity"
             android:label="@string/statistics_label"
-            android:parentActivityName=".DebugActivity"/>
-
-        <activity android:name=".SettingsActivity"
+            android:parentActivityName=".DebugActivity" />
+        <activity
+            android:name=".SettingsActivity"
             android:label="@string/settings_label"
-            android:parentActivityName=".DebugActivity"/>
-
-        <activity android:name=".TutorialActivity"/>
-
-        <activity android:name=".ManualCaptureActivity"
+            android:parentActivityName=".DebugActivity" />
+        <activity android:name=".TutorialActivity" />
+        <activity
+            android:name=".ManualCaptureActivity"
             android:label="@string/manual_capture_label"
-            android:parentActivityName=".DebugActivity"/>
-
-        <activity android:name=".CaptureTrainingImageActivity"
-            android:parentActivityName=".DebugActivity"/>
-
-        <activity android:name=".DrawOnTrainingImageActivity"
+            android:parentActivityName=".DebugActivity" />
+        <activity
+            android:name=".CaptureTrainingImageActivity"
+            android:parentActivityName=".DebugActivity" />
+        <activity
+            android:name=".DrawOnTrainingImageActivity"
             android:label="@string/draw_on_training_image_label"
-            android:parentActivityName=".DebugActivity"/>
+            android:parentActivityName=".DebugActivity" />
 
-
-
-        <service android:name=".SyncIntervalSchedulerJobService"
+        <service
+            android:name=".SyncIntervalSchedulerJobService"
             android:label="SynchronizationScheduler"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
-
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
-    
-    
 
 </manifest>

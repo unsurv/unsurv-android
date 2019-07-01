@@ -163,11 +163,11 @@ public class DrawView extends ImageView {
 
 
     // set color for different types
-    if (cameraType == REGULAR_CAMERA){
+    if (cameraType == SynchronizationUtils.REGULAR_CAMERA){
       mPaint = mRegularPaint;
     }
 
-    if (cameraType == DOME_CAMERA){
+    if (cameraType == SynchronizationUtils.DOME_CAMERA){
       mPaint = mDomePaint;
     }
 

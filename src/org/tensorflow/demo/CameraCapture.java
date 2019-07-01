@@ -7,6 +7,8 @@ public class CameraCapture {
 
   private int id;
 
+  private int cameraType;
+
   private float confidence;
 
   private String thumbnailPath;
@@ -31,21 +33,22 @@ public class CameraCapture {
 
 
 
-  CameraCapture(float confidence,
-                       String thumbnailPath,
-                       String imagePath,
-                       int cameraLeft,
-                       int cameraRight,
-                       int cameraTop,
-                       int cameraBottom,
-                       double latitude,
-                       double longitude,
-                       double accuracy,
-                       double azimuth,
-                       double pitch,
-                       double roll
-                       ){
+  CameraCapture(int cameraType,
+                float confidence,
+                String thumbnailPath,
+                String imagePath,
+                int cameraLeft,
+                int cameraRight,
+                int cameraTop,
+                int cameraBottom,
+                double latitude,
+                double longitude,
+                double accuracy,
+                double azimuth,
+                double pitch,
+                double roll){
 
+    this.cameraType = cameraType;
     this.confidence = confidence;
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;
@@ -145,6 +148,10 @@ public class CameraCapture {
     return id;
   }
 
+  public int getCameraType() {
+    return cameraType;
+  }
+
   public float getConfidence() {
     return confidence;
   }
@@ -199,6 +206,10 @@ public class CameraCapture {
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  public void setCameraType(int cameraType) {
+    this.cameraType = cameraType;
   }
 
   public void setConfidence(float confidence) {
