@@ -16,11 +16,9 @@
 
 package org.tensorflow.demo;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -44,8 +42,6 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
@@ -91,111 +87,6 @@ import static android.content.ContentValues.TAG;
  */
 public class DetectorActivity extends CameraActivity implements OnImageAvailableListener, SensorEventListener  {
 
-  @Override
-  protected void onCreate(final Bundle savedInstanceState) {
-    super.onCreate(null);
-
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-    if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
-      Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
-      startActivity(manualCaptureIntent);
-    }
-
-    manualCameraCapture = findViewById(R.id.manual_capture_button);
-
-    manualCameraCapture.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
-        startActivity(manualCaptureIntent);
-      }
-    });
-
-    cameraRoomDatabase = CameraRoomDatabase.getDatabase(this);
-
-    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-    accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-    magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
-    setSupportActionBar(myToolbar);
-
-    BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
-
-    // Handle bottom navigation bar clicks
-    bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-      @Override
-      public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()){
-
-          case R.id.bottom_navigation_history:
-            Intent historyIntent = new Intent(DetectorActivity.this, HistoryActivity.class);
-            startActivity(historyIntent);
-            return true;
-
-          case R.id.bottom_navigation_camera:
-
-            if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
-              Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
-              startActivity(manualCaptureIntent);
-              return true;
-            } else {
-              Intent cameraIntent = new Intent(DetectorActivity.this, DetectorActivity.class);
-              startActivity(cameraIntent);
-              return true;
-            }
-
-
-          case R.id.bottom_navigation_map:
-            Intent mapIntent = new Intent(DetectorActivity.this, MapActivity.class);
-            startActivity(mapIntent);
-            return true;
-
-          case R.id.bottom_navigation_stats:
-            Intent statsIntent = new Intent(DetectorActivity.this, StatisticsActivity.class);
-            startActivity(statsIntent);
-            return true;
-
-        }
-
-        return false;
-
-      }
-    });
-
-    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_camera).setChecked(true);
-
-
-    buttonCaptureEnabled = sharedPreferences.getBoolean("buttonCapture", false);
-
-    // Create folder structure in storage/.../Pictures/
-    pictureDirectory.mkdirs();
-
-    photoStatusView = findViewById(R.id.photo_status_view);
-
-    photoStatusView.setOnTouchListener(new View.OnTouchListener() {
-      @Override
-      public boolean onTouch(View view, MotionEvent motionEvent) {
-
-        switch (motionEvent.getAction()) {
-          case MotionEvent.ACTION_DOWN:
-            captureButtonIsBeingHeld = true;
-            return true;
-
-          case MotionEvent.ACTION_UP:
-            captureButtonIsBeingHeld = false;
-            return true;
-        }
-
-
-        return false;
-      }
-    });
-
-  }
 
   private CameraRoomDatabase cameraRoomDatabase;
 
@@ -210,10 +101,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private static final String MB_OUTPUT_SCORES_NAME = "output_scores/Reshape";
   private static final String MB_MODEL_FILE = "file:///android_asset/multibox_model.pb";
   private static final String MB_LOCATION_FILE =
-      "file:///android_asset/multibox_location_priors.txt";
+          "file:///android_asset/multibox_location_priors.txt";
   private static final int TF_OD_API_INPUT_SIZE = 300;
   private static final String TF_OD_API_MODEL_FILE =
-      "file:///android_asset/ssd_mobilenet_v1_android_export.pb";
+          "file:///android_asset/ssd_mobilenet_v1_android_export.pb";
   private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/coco_labels_list.txt";
 
   // Configuration values for tiny-yolo-voc. Note that the graph is not included with TensorFlow and
@@ -321,14 +212,125 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private Boolean isTimeToCapture = false;
 
-  private int readStoragePermission;
-  private int writeStoragePermission;
-  private int cameraPermission;
-  private int fineLocationPermission;
-
   private Button manualCameraCapture;
 
   private SharedPreferences sharedPreferences;
+
+  private LocationManager locationManager;
+  private MyLocationListener locationListener;
+  private Location currentLocation;
+
+
+
+
+  @Override
+  protected void onCreate(final Bundle savedInstanceState) {
+    super.onCreate(null);
+
+    locationListener = new MyLocationListener();
+
+
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+    if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+      Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
+      startActivity(manualCaptureIntent);
+    }
+
+    manualCameraCapture = findViewById(R.id.manual_capture_button);
+
+    manualCameraCapture.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
+        startActivity(manualCaptureIntent);
+      }
+    });
+
+    cameraRoomDatabase = CameraRoomDatabase.getDatabase(this);
+
+    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
+    setSupportActionBar(myToolbar);
+
+    BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
+
+    // Handle bottom navigation bar clicks
+    bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+      @Override
+      public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+
+          case R.id.bottom_navigation_history:
+            Intent historyIntent = new Intent(DetectorActivity.this, HistoryActivity.class);
+            startActivity(historyIntent);
+            return true;
+
+          case R.id.bottom_navigation_camera:
+
+            if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+              Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
+              startActivity(manualCaptureIntent);
+              return true;
+            } else {
+              Intent cameraIntent = new Intent(DetectorActivity.this, DetectorActivity.class);
+              startActivity(cameraIntent);
+              return true;
+            }
+
+
+          case R.id.bottom_navigation_map:
+            Intent mapIntent = new Intent(DetectorActivity.this, MapActivity.class);
+            startActivity(mapIntent);
+            return true;
+
+          case R.id.bottom_navigation_stats:
+            Intent statsIntent = new Intent(DetectorActivity.this, StatisticsActivity.class);
+            startActivity(statsIntent);
+            return true;
+
+        }
+
+        return false;
+
+      }
+    });
+
+    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_camera).setChecked(true);
+
+
+    buttonCaptureEnabled = sharedPreferences.getBoolean("buttonCapture", false);
+
+    // Create folder structure in storage/.../Pictures/
+    pictureDirectory.mkdirs();
+
+    photoStatusView = findViewById(R.id.photo_status_view);
+
+    photoStatusView.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View view, MotionEvent motionEvent) {
+
+        switch (motionEvent.getAction()) {
+          case MotionEvent.ACTION_DOWN:
+            captureButtonIsBeingHeld = true;
+            return true;
+
+          case MotionEvent.ACTION_UP:
+            captureButtonIsBeingHeld = false;
+            return true;
+        }
+
+
+        return false;
+      }
+    });
+
+  }
 
 
 
@@ -408,11 +410,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     super.onPause();
 
     // Don't receive any more updates from either sensor.
-    mSensorManager.unregisterListener(this);
-
-
-
     gpsLocation.cancel(true);
+    locationManager.removeUpdates(locationListener);
+    mSensorManager.unregisterListener(this);
+  }
+
+  @Override
+  public synchronized void onDestroy() {
+    super.onDestroy();
   }
 
   // Get readings from accelerometer and magnetometer. To simplify calculations,
@@ -1041,18 +1046,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     //TODO put location handling in own class, maybe use osmdroid implementation
 
     private final Context mContext;
-    private Location currentLocation;
 
 
     private String locationProvider = LocationManager.GPS_PROVIDER;
 
-    private LocationManager locationManager;
-    private myLocationListener locationListener;
-
-
     @Override
     protected void onPreExecute() {
-      locationListener = new myLocationListener();
       locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
       try{
@@ -1065,12 +1064,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     @Override
     protected Location doInBackground(Void... voids) {
-
-
-      //if (isCancelled()){
-      // locationManager.removeUpdates(locationListener);
-      //  locationManager = null;
-      //}
       return null;
     }
 
@@ -1093,107 +1086,103 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     }
 
-
-    private boolean isBetterLocation(Location location, Location currentBestLocation){
-      if (currentBestLocation == null) {
-        // A new location is always better than no location
-        return true;
-      }
-
-      // Check whether the new location fix is newer or older
-      long timeDelta = location.getTime() - currentBestLocation.getTime();
-      boolean isNewer = timeDelta > 0;
-
-      // Check whether the new location fix is more or less accurate
-      int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
-      boolean isLessAccurate = accuracyDelta > 0;
-      boolean isMoreAccurate = accuracyDelta < 0;
-      boolean isSignificantlyLessAccurate = accuracyDelta > 50;
-
-
-      // Determine location quality using a combination of timeliness and accuracy
-      if (isMoreAccurate) {
-        return true;
-      } else if (isNewer && !isLessAccurate) {
-        return true;
-      } else if (isNewer && !isSignificantlyLessAccurate) {
-        return true;
-      }
-      return false;
-
-    }
-
-    private class myLocationListener implements LocationListener{
-
-      @Override
-      public void onLocationChanged(Location location) {
-        if (currentBestLocation == null) {
-          currentBestLocation = currentLocation;
-        }
-
-        try {
-          currentLocation = location;
-          final float locationAccuracy = location.getAccuracy();
-
-          locationStatusView = findViewById(R.id.location_status_view);
-          photoStatusView = findViewById(R.id.photo_status_view);
-          locationDebugTextView = findViewById(R.id.location_debug);
-
-          runOnUiThread(new Runnable(){
-            @Override
-            public void run(){
-              // Displays location accuracy (radius with 68 % confidence) for debugging purposes.
-              // locationDebugTextView.setText("GPS Accuracy:\n" + String.valueOf(locationAccuracy));
-              // locationDebugTextView.setTextSize(10);
-
-
-              if (locationAccuracy > 15) {
-                locationStatusView.setImageResource(R.drawable.ic_my_location_red_24dp);
-              } else if (locationAccuracy < 15 && locationAccuracy > 3 ) {
-                locationStatusView.setImageResource(R.drawable.ic_my_location_orange_24dp);
-              } else if (locationAccuracy < 3) {
-                locationStatusView.setImageResource(R.drawable.ic_my_location_green_24dp);
-              }
-
-              }
-            }
-          );
-
-          Log.i(TAG, "onLocationChanged:\n" + location.getLatitude() + "\n" + location.getLongitude() + "\n" + location.getAccuracy());
-
-          // Compare best location vs current location.
-          if (isBetterLocation(currentLocation, currentBestLocation)) {
-            currentBestLocation = currentLocation;
-          }
-
-        }
-        catch (Exception e){
-          Log.d(TAG, "onLocationChanged: Location getting Error" , e);
-          Toast.makeText(getApplicationContext(),"Unable to get Location", Toast.LENGTH_LONG).show();
-        }
-
-      }
-
-      @Override
-      public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.i("onStatusChanged", "onStatusChanged");
-      }
-
-      @Override
-      public void onProviderEnabled(String provider) {
-        Log.i("onProviderEnabled", "onProviderEnabled");
-      }
-
-      @Override
-      public void onProviderDisabled(String provider) {
-        Log.i("OnProviderDisabled", "OnProviderDisabled");
-      }
-    }
-
-
-
   }
 
 
+  public class MyLocationListener implements LocationListener{
+
+    @Override
+    public void onLocationChanged(Location location) {
+      if (currentBestLocation == null) {
+        currentBestLocation = currentLocation;
+      }
+
+      try {
+        currentLocation = location;
+        final float locationAccuracy = location.getAccuracy();
+
+        locationStatusView = findViewById(R.id.location_status_view);
+        photoStatusView = findViewById(R.id.photo_status_view);
+        locationDebugTextView = findViewById(R.id.location_debug);
+
+        runOnUiThread(new Runnable(){
+                        @Override
+                        public void run(){
+                          // Displays location accuracy (radius with 68 % confidence) for debugging purposes.
+                          // locationDebugTextView.setText("GPS Accuracy:\n" + String.valueOf(locationAccuracy));
+                          // locationDebugTextView.setTextSize(10);
+
+
+                          if (locationAccuracy > 15) {
+                            locationStatusView.setImageResource(R.drawable.ic_my_location_red_24dp);
+                          } else if (locationAccuracy < 15 && locationAccuracy > 3 ) {
+                            locationStatusView.setImageResource(R.drawable.ic_my_location_orange_24dp);
+                          } else if (locationAccuracy < 3) {
+                            locationStatusView.setImageResource(R.drawable.ic_my_location_green_24dp);
+                          }
+
+                        }
+                      }
+        );
+
+        Log.i(TAG, "onLocationChanged:\n" + location.getLatitude() + "\n" + location.getLongitude() + "\n" + location.getAccuracy());
+
+        // Compare best location vs current location.
+        if (isBetterLocation(currentLocation, currentBestLocation)) {
+          currentBestLocation = currentLocation;
+        }
+
+      }
+      catch (Exception e){
+        Log.d(TAG, "onLocationChanged: Location getting Error" , e);
+        Toast.makeText(getApplicationContext(),"Unable to get Location", Toast.LENGTH_LONG).show();
+      }
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+      Log.i("onStatusChanged", "onStatusChanged");
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+      Log.i("onProviderEnabled", "onProviderEnabled");
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+      Log.i("OnProviderDisabled", "OnProviderDisabled");
+    }
+  }
+
+  private boolean isBetterLocation(Location location, Location currentBestLocation){
+    if (currentBestLocation == null) {
+      // A new location is always better than no location
+      return true;
+    }
+
+    // Check whether the new location fix is newer or older
+    long timeDelta = location.getTime() - currentBestLocation.getTime();
+    boolean isNewer = timeDelta > 0;
+
+    // Check whether the new location fix is more or less accurate
+    int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+    boolean isLessAccurate = accuracyDelta > 0;
+    boolean isMoreAccurate = accuracyDelta < 0;
+    boolean isSignificantlyLessAccurate = accuracyDelta > 50;
+
+
+    // Determine location quality using a combination of timeliness and accuracy
+    if (isMoreAccurate) {
+      return true;
+    } else if (isNewer && !isLessAccurate) {
+      return true;
+    } else if (isNewer && !isSignificantlyLessAccurate) {
+      return true;
+    }
+    return false;
+
+  }
 
 }
