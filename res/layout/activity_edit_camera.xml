@@ -13,19 +13,36 @@
         android:id="@+id/edit_camera_container"
         android:layout_width="match_parent"
         android:layout_height="0sp"
-        android:layout_weight="9"
+        android:layout_weight="8"
         android:orientation="vertical">
 
-
-        <ImageView
-            android:padding="2dp"
-            android:id="@+id/edit_camera_detail_image"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            />
+            android:layout_height="180dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:padding="2dp"
+                android:id="@+id/edit_camera_detail_image"
+                android:layout_width="0sp"
+                android:layout_weight="4"
+                android:layout_margin="4dp"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/edit_camera_choose_recyclerview"
+                android:scrollbars="vertical"
+                android:layout_width="0sp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+
+
+
 
         <org.osmdroid.views.MapView
             android:layout_margin="8dp"
@@ -47,24 +64,31 @@
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="36dp"
                     android:text="@string/timestamp_text"
                     android:layout_marginEnd="4dp"
-                    android:gravity="end"/>
+                    android:gravity="end|center_vertical"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="@string/timestamp_text"
+                    android:layout_marginEnd="4dp"
+                    android:gravity="end|center_vertical"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
                     android:text="@string/upload_text"
                     android:layout_marginEnd="4dp"
-                    android:gravity="end"/>
+                    android:gravity="end|center_vertical"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="36dp"
                     android:text="@string/comment_text"
                     android:layout_marginEnd="4dp"
-                    android:gravity="end"/>
+                    android:gravity="end|center_vertical"/>
 
             </LinearLayout>
 
@@ -77,25 +101,45 @@
                 <TextView
                     android:id="@+id/edit_camera_timestamp_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="36dp"
                     android:layout_marginStart="4dp"
-                    android:gravity="start"/>
+                    android:gravity="start|center_vertical"/>
 
                 <TextView
                     android:id="@+id/edit_camera_upload_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="36dp"
                     android:layout_marginStart="4dp"
-                    android:gravity="start"/>
+                    android:gravity="start|center_vertical"/>
 
                 <TextView
                     android:id="@+id/edit_camera_comments_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="36dp"
                     android:layout_marginStart="4dp"
-                    android:gravity="start"/>
+                    android:gravity="start|center_vertical"/>
 
             </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"/>
+
+            <ImageButton
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:layout_margin="10dp"/>
+
+
 
         </LinearLayout>
 

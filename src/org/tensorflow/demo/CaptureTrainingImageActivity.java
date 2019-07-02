@@ -1005,7 +1005,8 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
                 false,
                 false,
                 true,
-                null);
+                null,
+                "");
 
         insertDbId = (int) cameraRepository.insert(trainingCamera);
 

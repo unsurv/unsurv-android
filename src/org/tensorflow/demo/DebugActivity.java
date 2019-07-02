@@ -425,7 +425,8 @@ public class DebugActivity extends AppCompatActivity {
                 false,
                 false,
                 false,
-                "");
+                "",
+                "\"[test_pixel_2.jpg,1562076737965_thumbnail.jpg,1562076726264_thumbnail.jpg]\"");
 
 
         SurveillanceCamera notRandomCamera = new SurveillanceCamera(
@@ -441,7 +442,8 @@ public class DebugActivity extends AppCompatActivity {
                 false,
                 false,
                 true,
-                "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]");
+                "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]",
+                "");
 
 
         cameraRepository.insert(randomCamera);
@@ -545,7 +547,8 @@ public class DebugActivity extends AppCompatActivity {
             false,
             false,
             false,
-            null);
+            null,
+            "");
 
     CameraRepository cameraRepository = new CameraRepository(getApplication());
     cameraRepository.insert(testCamera);

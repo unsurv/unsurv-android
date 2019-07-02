@@ -71,6 +71,8 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
+
+import org.json.JSONArray;
 import org.tensorflow.demo.OverlayView.DrawCallback;
 import org.tensorflow.demo.env.BorderedText;
 import org.tensorflow.demo.env.ImageUtils;
@@ -407,6 +409,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     // Don't receive any more updates from either sensor.
     mSensorManager.unregisterListener(this);
+
+
 
     gpsLocation.cancel(true);
   }
@@ -888,8 +892,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     CameraCapture biggestConfidence = cameraPool.get(0); // is sorted
 
 
+    JSONArray allCaptureFilenames = new JSONArray();
+
     // Get Capture with biggest confidence for thumbnail/picture.
     for (int k=0; k < cameraPool.size(); k++) {
+      allCaptureFilenames.put(cameraPool.get(k).getThumbnailPath());
+
       if (cameraPool.get(k).getConfidence() > biggestConfidence.getConfidence()) {
         biggestConfidence = cameraPool.get(k);
       }
@@ -911,6 +919,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     }
 
     try{
+
       Location intersectReference = allIntersectsfromCaptures.get(0);
       List<Pair<Double, Double>> intersectsInCoordinates = LocationUtils.transferLocationsTo2dCoordinates(allIntersectsfromCaptures);
 
@@ -932,6 +941,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       currentTime = System.currentTimeMillis();
 
       boolean useTimestamp = sharedPreferences.getBoolean("enableCaptureTimestamps", false);
+      String captureFilenames = allCaptureFilenames.toString();
 
       if (useTimestamp) {
 
@@ -949,7 +959,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 false,
                 false,
                 false,
-                ""
+                "",
+                captureFilenames
 
         ));
 
@@ -971,7 +982,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 false,
                 false,
                 false,
-                ""
+                "",
+                captureFilenames
 
         ));
 
@@ -1053,6 +1065,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     @Override
     protected Location doInBackground(Void... voids) {
+
+
+      //if (isCancelled()){
+      // locationManager.removeUpdates(locationListener);
+      //  locationManager = null;
+      //}
       return null;
     }
 

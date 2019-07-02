@@ -38,6 +38,7 @@ public class SurveillanceCamera {
 
   // rectangles drawn in DrawOnTrainingImageActivities
   private String drawnRectsAsString;
+  private String captureFilenames;
 
 
   public SurveillanceCamera(int cameraType,
@@ -53,7 +54,8 @@ public class SurveillanceCamera {
                             boolean uploadCompleted,
                             boolean manualCapture,
                             boolean trainingCapture,
-                            String drawnRectsAsString){
+                            String drawnRectsAsString,
+                            String captureFilenames){
 
     this.cameraType = cameraType;
     this.thumbnailPath = thumbnailPath;
@@ -77,6 +79,7 @@ public class SurveillanceCamera {
 
     this.trainingCapture = trainingCapture;
     this.drawnRectsAsString = drawnRectsAsString;
+    this.captureFilenames = captureFilenames;
 
 
   }
@@ -137,7 +140,9 @@ public class SurveillanceCamera {
     return drawnRectsAsString;
   }
 
-
+  public String getCaptureFilenames() {
+    return captureFilenames;
+  }
 
   public void setId(int id) {
     this.id = id;
@@ -181,4 +186,11 @@ public class SurveillanceCamera {
   public void setDrawnRectsAsString(String drawnRectsAsString) {
     this.drawnRectsAsString = drawnRectsAsString;
   }
+
+  public void setCaptureFilenames(String captureFilenames) {
+    this.captureFilenames = captureFilenames;
+  }
+
+//TODO add delete function to delete all Files connected to specific camera
+
 }

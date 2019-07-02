@@ -39,9 +39,6 @@
 
 
     <!--in HistoryActivity-->
-    <string name="captured_info_text">Captured on: </string>
-    <string name="upload_info_text">Upload on: </string>
-    <string name="select_camera">Please select a camera</string>
 
     <!--in DetectorActivity-->
     <string name="manual_capture_button_text">MANUAL</string>

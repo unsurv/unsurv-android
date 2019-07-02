@@ -83,6 +83,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
                 false,
                 false,
                 false,
+                "",
                 "");
 
 
@@ -98,7 +99,8 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
                 false,
                 false,
                 true,
-                "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]");
+                "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]",
+                "");
 
 
 

@@ -43,9 +43,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
 
 
-
-
-
     private CameraViewHolder(View itemView) {
       super(itemView);
       thumbnailImageView = itemView.findViewById(R.id.thumbnail_image);
@@ -80,14 +77,11 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     this.layoutInflater = layoutInflater;
     ctx = context;
 
-
   }
 
   @Override
   public CameraViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     final View itemView = mInflater.inflate(R.layout.camera_recyclerview_item, parent, false);
-
-
 
     return new CameraViewHolder(itemView);
   }

@@ -6,9 +6,13 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,6 +31,8 @@ import java.io.File;
 
 public class EditCameraActivity extends AppCompatActivity {
 
+  BottomNavigationView bottomNavigationView;
+
   CameraRepository cameraRepository;
   CameraViewModel cameraViewModel;
 
@@ -40,6 +46,10 @@ public class EditCameraActivity extends AppCompatActivity {
   TextView uploadTextView;
   TextView commentsTextView;
   File cameraImage;
+
+  RecyclerView recyclerView;
+  RecyclerView.Adapter adapter;
+  RecyclerView.LayoutManager layoutManager;
 
   IconOverlay iconOverlay;
 
@@ -60,6 +70,7 @@ public class EditCameraActivity extends AppCompatActivity {
 
     parentLayout = findViewById(R.id.edit_camera_container);
     cameraImageView = findViewById(R.id.edit_camera_detail_image);
+    recyclerView = findViewById(R.id.edit_camera_choose_recyclerview);
     map = findViewById(R.id.edit_camera_map);
     timestampTextView = findViewById(R.id.edit_camera_timestamp_text);
     uploadTextView = findViewById(R.id.edit_camera_upload_text);
@@ -78,61 +89,56 @@ public class EditCameraActivity extends AppCompatActivity {
     cameraIsTrainingImage = cameraToEdit.getTrainingCapture();
 
 
+    cameraImage = new File(picturesPath + cameraToEdit.getThumbnailPath());
 
-
-
-    if (cameraIsTrainingImage){
-      parentLayout.removeView(map);
-
-
-      cameraImage = new File(trainingPath + cameraToEdit.getImagePath());
-
-      Picasso.get().load(cameraImage)
+    Picasso.get().load(cameraImage)
               .placeholder(R.drawable.ic_launcher)
               .into(cameraImageView);
 
-    } else {
+    recyclerView.setHasFixedSize(true);
+    recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-      cameraImage = new File(picturesPath + cameraToEdit.getThumbnailPath());
-
-      Picasso.get().load(cameraImage)
-              .placeholder(R.drawable.ic_launcher)
-              .into(cameraImageView);
-
-      map.setTilesScaledToDpi(true);
-      map.setClickable(false);
-      map.setMultiTouchControls(true);
-
-      // MAPNIK fix
-      // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
-      // TODO add choice + backup strategy here
-      map.setTileSource(TileSourceFactory.OpenTopo);
-
-      final CustomZoomButtonsController zoomController = map.getZoomController();
-      zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
-
-      final IMapController mapController = map.getController();
-
-      double lat = cameraToEdit.getLatitude();
-      double lon = cameraToEdit.getLongitude();
+    String[] filenames = cameraToEdit.getCaptureFilenames()
+            .replace("\"", "")
+            .replace("[", "")
+            .replace("]", "")
+            .split(",");
+    adapter = new ChooseImageAdapter(this, filenames);
+    recyclerView.setAdapter(adapter);
 
 
-      // Setting starting position and zoom level.
-      GeoPoint cameraLocation = new GeoPoint(lat, lon);
-      mapController.setZoom(16.0);
-      mapController.setCenter(cameraLocation);
+    map.setTilesScaledToDpi(true);
+    map.setClickable(false);
+    map.setMultiTouchControls(true);
 
-      Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(this.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
+    // MAPNIK fix
+    // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+    // TODO add choice + backup strategy here
+    map.setTileSource(TileSourceFactory.OpenTopo);
+
+    final CustomZoomButtonsController zoomController = map.getZoomController();
+    zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+
+    final IMapController mapController = map.getController();
+
+    double lat = cameraToEdit.getLatitude();
+    double lon = cameraToEdit.getLongitude();
 
 
-      iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+    // Setting starting position and zoom level.
+    GeoPoint cameraLocation = new GeoPoint(lat, lon);
+    mapController.setZoom(16.0);
+    mapController.setCenter(cameraLocation);
 
-      map.getOverlays().add(iconOverlay);
+    Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(this.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
 
-      //detailMap.getOverlays().add(cameraMarker);
-      map.invalidate();
-    }
 
+    iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+    map.getOverlays().add(iconOverlay);
+
+    //detailMap.getOverlays().add(cameraMarker);
+    map.invalidate();
 
 
     String timestampAsDate = cameraToEdit.getTimestamp();
@@ -159,6 +165,51 @@ public class EditCameraActivity extends AppCompatActivity {
 
 
     // TODO listview with different images, save abort buttons, editable mapview, change upload date with + /- buttons
+
+
+    bottomNavigationView = findViewById(R.id.navigation);
+    bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+      @Override
+      public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+
+          case R.id.bottom_navigation_history:
+            Intent historyIntent = new Intent(EditCameraActivity.this, HistoryActivity.class);
+            startActivity(historyIntent);
+            return true;
+
+          case R.id.bottom_navigation_camera:
+            if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+              Intent manualCaptureIntent = new Intent(EditCameraActivity.this, ManualCaptureActivity.class);
+              startActivity(manualCaptureIntent);
+              return true;
+            } else {
+              Intent cameraIntent = new Intent(EditCameraActivity.this, DetectorActivity.class);
+              startActivity(cameraIntent);
+              return true;
+
+            }
+
+          case R.id.bottom_navigation_map:
+            Intent mapIntent = new Intent(EditCameraActivity.this, MapActivity.class);
+            startActivity(mapIntent);
+            return true;
+
+          case R.id.bottom_navigation_stats:
+            Intent statsIntent = new Intent(EditCameraActivity.this, StatisticsActivity.class);
+            startActivity(statsIntent);
+            return true;
+
+        }
+
+        return false;
+
+      }
+    });
+
+    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_history).setChecked(true);
 
 
 
