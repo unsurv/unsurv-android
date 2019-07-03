@@ -13,16 +13,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.IconOverlay;
 
@@ -39,17 +44,24 @@ public class EditCameraActivity extends AppCompatActivity {
   SurveillanceCamera cameraToEdit;
   SharedPreferences sharedPreferences;
 
+  Drawable cameraMarkerIcon;
+
   LinearLayout parentLayout;
   ImageView cameraImageView;
   MapView map;
   TextView timestampTextView;
   TextView uploadTextView;
   TextView commentsTextView;
+  Button saveButton;
+  Button editButton;
+  ImageButton resetMapButton;
+  ImageView editLocationMarker;
+
   File cameraImage;
+  IMapController mapController;
 
   RecyclerView recyclerView;
   RecyclerView.Adapter adapter;
-  RecyclerView.LayoutManager layoutManager;
 
   IconOverlay iconOverlay;
 
@@ -75,6 +87,10 @@ public class EditCameraActivity extends AppCompatActivity {
     timestampTextView = findViewById(R.id.edit_camera_timestamp_text);
     uploadTextView = findViewById(R.id.edit_camera_upload_text);
     commentsTextView = findViewById(R.id.edit_camera_comments_text);
+    saveButton = findViewById(R.id.camera_edit_save_button);
+    editButton = findViewById(R.id.camera_edit_edit_button);
+    resetMapButton = findViewById(R.id.edit_camera_reset_map_position);
+    editLocationMarker = findViewById(R.id.edit_camera_center_marker);
 
     Intent startIntent = getIntent();
 
@@ -89,7 +105,8 @@ public class EditCameraActivity extends AppCompatActivity {
     cameraIsTrainingImage = cameraToEdit.getTrainingCapture();
 
 
-    cameraImage = new File(picturesPath + cameraToEdit.getThumbnailPath());
+    String thumbnailPath = cameraToEdit.getThumbnailPath();
+    cameraImage = new File(picturesPath + thumbnailPath);
 
     Picasso.get().load(cameraImage)
               .placeholder(R.drawable.ic_launcher)
@@ -103,7 +120,8 @@ public class EditCameraActivity extends AppCompatActivity {
             .replace("[", "")
             .replace("]", "")
             .split(",");
-    adapter = new ChooseImageAdapter(this, filenames);
+
+    adapter = new ChooseImageAdapter(this, filenames, cameraImageView, cameraToEdit, cameraRepository);
     recyclerView.setAdapter(adapter);
 
 
@@ -119,7 +137,7 @@ public class EditCameraActivity extends AppCompatActivity {
     final CustomZoomButtonsController zoomController = map.getZoomController();
     zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 
-    final IMapController mapController = map.getController();
+    mapController = map.getController();
 
     double lat = cameraToEdit.getLatitude();
     double lon = cameraToEdit.getLongitude();
@@ -130,8 +148,7 @@ public class EditCameraActivity extends AppCompatActivity {
     mapController.setZoom(16.0);
     mapController.setCenter(cameraLocation);
 
-    Drawable cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(this.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
-
+    cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(this.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
 
     iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
 
@@ -160,6 +177,53 @@ public class EditCameraActivity extends AppCompatActivity {
     if (comment.isEmpty() || comment.equals("no comment")){
       commentsTextView.setText(getString(R.string.no_comment));
     }
+
+
+    saveButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        IGeoPoint center = map.getMapCenter();
+        double newLat = center.getLatitude();
+        double newLon = center.getLongitude();
+
+        cameraToEdit.setLatitude(newLat);
+        cameraToEdit.setLongitude(newLon);
+
+        editLocationMarker.setVisibility(View.INVISIBLE);
+
+        generateMarkerOverlayWithCurrentLocation();
+
+        cameraRepository.updateCameras(cameraToEdit);
+        adapter.notifyDataSetChanged();
+
+
+
+        // TODO if editbutton touched get map center and add as coords
+      }
+    });
+
+    editButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        map.getOverlays().remove(iconOverlay);
+        editLocationMarker.setVisibility(View.VISIBLE);
+        map.invalidate();
+
+
+      }
+    });
+
+    resetMapButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        editLocationMarker.setVisibility(View.INVISIBLE);
+        generateMarkerOverlayWithCurrentLocation();
+
+      }
+    });
+
 
 
 
@@ -212,6 +276,20 @@ public class EditCameraActivity extends AppCompatActivity {
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_history).setChecked(true);
 
 
+
+  }
+
+  void generateMarkerOverlayWithCurrentLocation(){
+
+    // Setting starting position and zoom level.
+    GeoPoint cameraLocation = new GeoPoint(cameraToEdit.getLatitude(), cameraToEdit.getLongitude());
+    mapController.setZoom(16.0);
+    mapController.setCenter(cameraLocation);
+
+    iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+    map.getOverlays().add(iconOverlay);
+    map.invalidate();
 
   }
 

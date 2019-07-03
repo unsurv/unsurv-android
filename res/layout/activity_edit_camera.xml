@@ -13,12 +13,13 @@
         android:id="@+id/edit_camera_container"
         android:layout_width="match_parent"
         android:layout_height="0sp"
-        android:layout_weight="8"
+        android:layout_weight="9"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="0sp"
+            android:layout_weight="3"
             android:orientation="horizontal">
 
             <ImageView
@@ -42,18 +43,55 @@
         </LinearLayout>
 
 
-
-
-        <org.osmdroid.views.MapView
-            android:layout_margin="8dp"
-            android:id="@+id/edit_camera_map"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp">
-        </org.osmdroid.views.MapView>
+            android:layout_height="0sp"
+            android:layout_weight="3">
+
+            <org.osmdroid.views.MapView
+                android:layout_margin="8dp"
+                android:id="@+id/edit_camera_map"
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+            </org.osmdroid.views.MapView>
+
+
+            <TextView
+                android:id="@+id/cheat_center_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                />
+
+            <ImageView
+                android:id="@+id/edit_camera_center_marker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/standard_camera_marker_5_dpi"
+                android:layout_above="@id/cheat_center_view"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"/>
+
+            <ImageButton
+                android:id="@+id/edit_camera_reset_map_position"
+                android:src="@drawable/ic_restore_grey_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="10dp"
+                />
+
+        </RelativeLayout>
+
+
+
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0sp"
+            android:layout_weight="3"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -61,13 +99,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="@string/timestamp_text"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="end|center_vertical"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -125,19 +156,26 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="1"
             android:orientation="horizontal">
 
-            <ImageButton
-                android:layout_width="0sp"
-                android:layout_height="match_parent"
-                android:layout_weight="5"/>
-
-            <ImageButton
+            <Button
+                android:id="@+id/camera_edit_edit_button"
+                android:text="@string/edit_button"
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight="5"
-                android:layout_margin="10dp"/>
+                android:layout_margin="5dp"/>
+
+            <Button
+                android:id="@+id/camera_edit_save_button"
+                android:text="@string/save_button"
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:layout_margin="5dp"
+                />
 
 
 

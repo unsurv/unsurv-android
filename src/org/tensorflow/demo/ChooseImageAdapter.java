@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.squareup.picasso.Picasso;
 import java.io.File;
@@ -30,16 +29,27 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
   private static String picturesPath = SynchronizationUtils.PICTURES_PATH;
 
 
-  ChooseImageAdapter(Context context, String[] filenames){
+  private Context ctx;
+  private String[] mFilenames;
+  private LayoutInflater layoutInflater;
+  private ImageView mChosenCameraImageView;
+  private SurveillanceCamera mCurrentSurveillanceCamera;
+  private CameraRepository mCameraRepository;
+
+
+  ChooseImageAdapter(Context context,
+                     String[] filenames,
+                     ImageView chosenCameraImageView,
+                     SurveillanceCamera currentCamera,
+                     CameraRepository cameraRepository){
     ctx = context;
     layoutInflater = LayoutInflater.from(ctx);
-    this.filenames = filenames;
+    mFilenames = filenames;
+    mChosenCameraImageView = chosenCameraImageView;
+    mCurrentSurveillanceCamera = currentCamera;
+    mCameraRepository = cameraRepository;
 
   }
-
-  private Context ctx;
-  private String[] filenames;
-  private LayoutInflater layoutInflater;
 
 
 
@@ -56,23 +66,46 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
   }
 
   @Override
-  public void onBindViewHolder(@NonNull ChooseViewHolder holder, int i) {
+  public void onBindViewHolder(final @NonNull ChooseViewHolder holder,int i) {
 
     ImageView imgView = holder.itemView.findViewById(R.id.choose_image_edit_camera);
-
+    ImageView checkmarkView = holder.itemView.findViewById(R.id.choose_image_checkmark);
+    checkmarkView.setVisibility(View.INVISIBLE);
     String filePath;
 
     try {
 
-      filePath = filenames[i];
+      filePath = mFilenames[i];
       File imgFile = new File(picturesPath + filePath);
 
       Picasso.get().load(imgFile)
               .placeholder(R.drawable.ic_launcher)
               .into(imgView);
+
+      if (filePath.equals(mCurrentSurveillanceCamera.getThumbnailPath())){
+        checkmarkView.setVisibility(View.VISIBLE);
+      }
+
     } catch (Exception e) {
       Log.i(TAG, e.toString());
     }
+
+    holder.itemView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        String chosenImageFilePath = mFilenames[holder.getAdapterPosition()];
+        File imgFile = new File(picturesPath + chosenImageFilePath);
+
+        Picasso.get().load(imgFile)
+                .placeholder(R.drawable.ic_launcher)
+                .into(mChosenCameraImageView);
+
+        mCurrentSurveillanceCamera.setThumbnailPath(chosenImageFilePath);
+
+      }
+
+    });
 
   }
 
@@ -80,6 +113,6 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
 
   @Override
   public int getItemCount() {
-    return filenames.length;
+    return mFilenames.length;
   }
 }

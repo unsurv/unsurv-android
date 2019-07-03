@@ -72,6 +72,9 @@
     <string name="timestamp_text">Camera captured on:</string>
     <string name="upload_text">Camera upload on:</string>
     <string name="comment_text">Comments:</string>
+    <string name="edit_button">EDIT LOCATION</string>
+    <string name="save_button">SAVE</string>
+
 
 
 
