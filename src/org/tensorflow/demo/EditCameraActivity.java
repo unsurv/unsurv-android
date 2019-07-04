@@ -30,8 +30,10 @@ import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.IconOverlay;
+import org.osmdroid.views.overlay.Overlay;
 
 import java.io.File;
+import java.util.List;
 
 
 public class EditCameraActivity extends AppCompatActivity {
@@ -184,17 +186,21 @@ public class EditCameraActivity extends AppCompatActivity {
     editButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        map.getOverlays().remove(iconOverlay);
+
 
         if(isBeingEdited) {
           // stop editing
           isBeingEdited = false;
-          resetMapButton.callOnClick();
+          resetMap();
 
         } else {
           isBeingEdited = true;
+
+          map.getOverlays().removeAll(map.getOverlays());
+          List<Overlay> asd = EditCameraActivity.this.map.getOverlays();
+          EditCameraActivity.this.map.invalidate();
           editLocationMarker.setVisibility(View.VISIBLE);
-          map.invalidate();
+          EditCameraActivity.this.map.invalidate();
         }
 
 
@@ -206,9 +212,10 @@ public class EditCameraActivity extends AppCompatActivity {
     saveButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        map.getOverlays().remove(iconOverlay);
+
 
         if (isBeingEdited){
+
           IGeoPoint center = map.getMapCenter();
           double newLat = center.getLatitude();
           double newLon = center.getLongitude();
@@ -219,10 +226,17 @@ public class EditCameraActivity extends AppCompatActivity {
           editLocationMarker.setVisibility(View.INVISIBLE);
 
           generateMarkerOverlayWithCurrentLocation();
+          List<Overlay> asd = map.getOverlays();
 
           cameraRepository.updateCameras(cameraToEdit);
           adapter.notifyDataSetChanged();
           isBeingEdited = false;
+
+
+        } else {
+          List<Overlay> asd = map.getOverlays();
+
+          resetMap();
         }
 
 
@@ -236,9 +250,7 @@ public class EditCameraActivity extends AppCompatActivity {
     resetMapButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        editLocationMarker.setVisibility(View.INVISIBLE);
-        generateMarkerOverlayWithCurrentLocation();
-
+        resetMap();
       }
     });
 
@@ -309,6 +321,14 @@ public class EditCameraActivity extends AppCompatActivity {
     map.getOverlays().add(iconOverlay);
     map.invalidate();
 
+  }
+
+  void resetMap(){
+    if (isBeingEdited){
+      isBeingEdited = false;
+    }
+    editLocationMarker.setVisibility(View.INVISIBLE);
+    generateMarkerOverlayWithCurrentLocation();
   }
 
 
