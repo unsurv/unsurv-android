@@ -15,6 +15,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,13 +29,10 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
-import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.IconOverlay;
-import org.osmdroid.views.overlay.Overlay;
 
 import java.io.File;
-import java.util.List;
 
 
 public class EditCameraActivity extends AppCompatActivity {
@@ -51,6 +50,8 @@ public class EditCameraActivity extends AppCompatActivity {
   LinearLayout parentLayout;
   ImageView cameraImageView;
   MapView map;
+  CheckBox standardCheckBox;
+  CheckBox domeCheckBox;
   TextView timestampTextView;
   TextView uploadTextView;
   TextView commentsTextView;
@@ -72,6 +73,9 @@ public class EditCameraActivity extends AppCompatActivity {
 
   boolean isBeingEdited = false;
 
+  boolean standardChecked = false;
+  boolean domeChecked = false;
+
   private static String picturesPath = SynchronizationUtils.PICTURES_PATH;
   private static String trainingPath = SynchronizationUtils.TRAINING_IMAGES_PATH;
 
@@ -88,6 +92,8 @@ public class EditCameraActivity extends AppCompatActivity {
     cameraImageView = findViewById(R.id.edit_camera_detail_image);
     recyclerView = findViewById(R.id.edit_camera_choose_recyclerview);
     map = findViewById(R.id.edit_camera_map);
+    standardCheckBox = findViewById(R.id.edit_camera_checkbox_standard);
+    domeCheckBox = findViewById(R.id.edit_camera_checkbox_dome);
     timestampTextView = findViewById(R.id.edit_camera_timestamp_text);
     uploadTextView = findViewById(R.id.edit_camera_upload_text);
     commentsTextView = findViewById(R.id.edit_camera_comments_text);
@@ -161,6 +167,46 @@ public class EditCameraActivity extends AppCompatActivity {
     //detailMap.getOverlays().add(cameraMarker);
     map.invalidate();
 
+    switch (cameraType){
+
+      case SynchronizationUtils.STANDARD_CAMERA:
+        standardCheckBox.setChecked(true);
+        standardChecked = true;
+        break;
+
+      case SynchronizationUtils.DOME_CAMERA:
+        domeCheckBox.setChecked(true);
+        domeChecked = true;
+        break;
+
+    }
+
+    standardCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+        if (b){
+          cameraToEdit.setCameraType(SynchronizationUtils.STANDARD_CAMERA);
+          standardChecked = true;
+          domeChecked = false;
+          domeCheckBox.setChecked(false);
+        }
+
+      }
+    });
+
+    domeCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+        if (b){
+          cameraToEdit.setCameraType(SynchronizationUtils.DOME_CAMERA);
+          domeChecked = true;
+          standardChecked = false;
+          standardCheckBox.setChecked(false);
+        }
+      }
+    });
 
     String timestampAsDate = cameraToEdit.getTimestamp();
 

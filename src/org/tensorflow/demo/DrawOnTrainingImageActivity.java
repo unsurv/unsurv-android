@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -122,7 +121,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        cameraType = SynchronizationUtils.REGULAR_CAMERA;
+        cameraType = SynchronizationUtils.STANDARD_CAMERA;
         drawView.setCameraType(cameraType);
 
       }

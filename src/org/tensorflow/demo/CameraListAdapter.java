@@ -5,10 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -117,7 +114,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         mThumbnailPicture = new File(picturesPath + current.getThumbnailPath());
 
         switch (cameraType){
-          case SynchronizationUtils.REGULAR_CAMERA:
+          case SynchronizationUtils.STANDARD_CAMERA:
             holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#ff5555"));
 
             break;
