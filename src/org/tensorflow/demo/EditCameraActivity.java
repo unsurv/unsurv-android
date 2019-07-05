@@ -232,17 +232,14 @@ public class EditCameraActivity extends AppCompatActivity {
 
 
         } else {
-          List<Overlay> asd = map.getOverlays();
+          cameraRepository.updateCameras(cameraToEdit);
+          adapter.notifyDataSetChanged();
 
           resetMap();
         }
 
-
-
-        // TODO if editbutton touched get map center and add as coords
       }
     });
-
 
 
     resetMapButton.setOnClickListener(new View.OnClickListener() {
@@ -252,12 +249,7 @@ public class EditCameraActivity extends AppCompatActivity {
       }
     });
 
-
-
-
-
     // TODO listview with different images, save abort buttons, editable mapview, change upload date with + /- buttons
-
 
     bottomNavigationView = findViewById(R.id.navigation);
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {

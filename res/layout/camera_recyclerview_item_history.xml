@@ -10,6 +10,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+
 <!-- Layout for a single list item -->
 <LinearLayout
     android:id="@+id/history_item_linear_layout"
@@ -20,7 +21,13 @@
 
     android:orientation="horizontal">
 
+    <View
+        android:id="@+id/type_bar"
+        android:layout_width="5dp"
+        android:layout_height="match_parent" />
+
     <ImageView
+        android:layout_margin="2dp"
         android:id="@+id/thumbnail_image"
         android:layout_width="88dp"
         android:layout_height="88dp"
@@ -43,6 +50,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="bottom"
+            android:text="@string/upload_text"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="@android:color/white"
             tools:text="lutti" />

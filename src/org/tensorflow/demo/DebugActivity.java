@@ -428,6 +428,23 @@ public class DebugActivity extends AppCompatActivity {
                 "",
                 "\"[test_pixel_2.jpg,1562076737965_thumbnail.jpg,1562076726264_thumbnail.jpg]\"");
 
+        SurveillanceCamera randomCamera2 = new SurveillanceCamera(
+                1,
+                "test_pixel_2.jpg",
+                "test_nexus_10.jpg",
+                null,
+                50.00165,
+                8.25941,
+                "asd",
+                nullOrDate,
+                "2019-05-30",
+                false,
+                false,
+                false,
+                false,
+                "",
+                "\"[test_pixel_2.jpg,1562076737965_thumbnail.jpg,1562076726264_thumbnail.jpg]\"");
+
 
         SurveillanceCamera notRandomCamera = new SurveillanceCamera(
                 0,
@@ -447,7 +464,8 @@ public class DebugActivity extends AppCompatActivity {
 
 
         cameraRepository.insert(randomCamera);
-        // cameraRepository.insert(randomCamera);
+        cameraRepository.insert(randomCamera2);
+        // cameraRepository.insert(notRandomCamera);
 
 
         randomCamerasAdded += 1;

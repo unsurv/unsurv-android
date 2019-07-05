@@ -49,7 +49,7 @@ import java.util.TimeZone;
 
 class SynchronizationUtils {
   // accessible for every app for now
-  public static String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(
+  public  static String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/";
 
   public static String TRAINING_IMAGES_PATH = Environment.getExternalStoragePublicDirectory(
@@ -58,8 +58,8 @@ class SynchronizationUtils {
   private static int UPLOAD_FAILED = 0;
   private static int UPLOAD_SUCCESSFUL = 1;
 
-  public static int REGULAR_CAMERA = 0;
-  public static int DOME_CAMERA = 1;
+  public final static int REGULAR_CAMERA = 0;
+  public final static int DOME_CAMERA = 1;
 
   private static String TAG = "SynchronizationUtils";
 

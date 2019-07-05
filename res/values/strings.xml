@@ -25,6 +25,10 @@
     <!--general-->
     <string name="timestamp_not_available">not displayed</string>
     <string name="no_comment">no comments available</string>
+    <string name="timestamp_text">Camera captured on:</string>
+    <string name="upload_text">Camera upload on:</string>
+    <string name="comment_text">Comments:</string>
+
 
     <!-- App and toolbar labels-->
     <string name="app_label">unsurv</string>
@@ -69,9 +73,6 @@
 
     <!--in EditCameraActivity-->
 
-    <string name="timestamp_text">Camera captured on:</string>
-    <string name="upload_text">Camera upload on:</string>
-    <string name="comment_text">Comments:</string>
     <string name="edit_button">EDIT LOCATION</string>
     <string name="save_button">SAVE</string>
 

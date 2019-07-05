@@ -28,7 +28,7 @@
         android:layout_height="0sp"
         android:layout_weight="9"
 
-        tools:listitem="@layout/camera_recyclerview_item" />
+        tools:listitem="@layout/camera_recyclerview_item_history" />
 
     <android.support.design.widget.BottomNavigationView
 

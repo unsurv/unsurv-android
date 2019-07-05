@@ -58,7 +58,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
                                                                 int viewType) {
     // TODO display only one checkmark, need to pass big imageview in constructor
 
-    View itemView = layoutInflater.inflate(R.layout.camera_listview_item_edit_camera, parent, false);
+    View itemView = layoutInflater.inflate(R.layout.camera_recyclerview_item_edit_camera, parent, false);
 
 
     return new ChooseViewHolder(itemView);

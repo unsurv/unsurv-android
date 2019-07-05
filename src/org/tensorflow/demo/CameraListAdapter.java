@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -34,6 +37,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
 
   class CameraViewHolder extends RecyclerView.ViewHolder {
+    private final View cameraTypeBar;
     private final ImageView thumbnailImageView;
     private final TextView topTextViewInItem;
     private final TextView bottomTextViewInItem;
@@ -45,6 +49,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
     private CameraViewHolder(View itemView) {
       super(itemView);
+      cameraTypeBar = itemView.findViewById(R.id.type_bar);
       thumbnailImageView = itemView.findViewById(R.id.thumbnail_image);
       topTextViewInItem = itemView.findViewById(R.id.history_item_text_view_top);
       bottomTextViewInItem = itemView.findViewById(R.id.history_item_text_view_bottom);
@@ -81,14 +86,14 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   @Override
   public CameraViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-    final View itemView = mInflater.inflate(R.layout.camera_recyclerview_item, parent, false);
+    final View itemView = mInflater.inflate(R.layout.camera_recyclerview_item_history, parent, false);
 
     return new CameraViewHolder(itemView);
   }
 
 
   @Override
-  public void onBindViewHolder(final CameraViewHolder holder, final int position) {
+  public void onBindViewHolder(final CameraViewHolder holder, int position) {
 
     if (mSurveillanceCameras != null) {
       final SurveillanceCamera current = mSurveillanceCameras.get(position);
@@ -97,14 +102,32 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       File mThumbnailPicture;
       final boolean trainingCapture = current.getTrainingCapture();
+      int cameraType = current.getCameraType();
 
       if (trainingCapture){
         // camera is a training image not a capture with obj detection
         mThumbnailPicture = new File(SynchronizationUtils.TRAINING_IMAGES_PATH + current.getImagePath());
-        holder.detailLinearLayout.setBackgroundColor(Color.GRAY);
+
+        //holder.detailLinearLayout.setBackgroundColor(Color.GRAY);
+
+        holder.cameraTypeBar.setBackgroundColor(Color.GREEN);
 
       } else {
+
         mThumbnailPicture = new File(picturesPath + current.getThumbnailPath());
+
+        switch (cameraType){
+          case SynchronizationUtils.REGULAR_CAMERA:
+            holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#ff5555"));
+
+            break;
+
+          case SynchronizationUtils.DOME_CAMERA:
+            holder.cameraTypeBar.setBackgroundColor(Color.BLUE);
+
+            break;
+        }
+
       }
 
 
@@ -114,14 +137,13 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       // holder.thumbnailImageView.
 
-      if (mComment.isEmpty()){
-        holder.topTextViewInItem.setText("no comment");
+      holder.bottomTextViewInItem.setText(uploadDate);
 
-      } else {
-        holder.topTextViewInItem.setText(mComment);
-      }
 
-      holder.bottomTextViewInItem.setText("Upload on: " + uploadDate);
+      Picasso.get().load(mThumbnailPicture)
+              .placeholder(R.drawable.ic_launcher)
+              .into(holder.thumbnailImageView);
+
 
       if (currentCameraUploadComplete){
         holder.uploadButton.setImageResource(R.drawable.ic_file_upload_green_24dp);
@@ -142,7 +164,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
           if (quickDeleteCameras){
 
             cameraRepository.deleteCameras(current);
-            notifyItemRemoved(position);
+            notifyItemRemoved(holder.getAdapterPosition());
 
           } else {
 
@@ -173,7 +195,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
                   }
                   cameraRepository.deleteCameras(current);
                   popupWindow.dismiss();
-                  notifyItemRemoved(position);
+                  notifyItemRemoved(holder.getAdapterPosition());
 
 
                 }
@@ -209,9 +231,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         }
       });
 
-      Picasso.get().load(mThumbnailPicture)
-              .placeholder(R.drawable.ic_launcher)
-              .into(holder.thumbnailImageView);
+
 
       holder.itemView.setOnClickListener(new View.OnClickListener() {
         @Override
