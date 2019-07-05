@@ -197,7 +197,6 @@ public class EditCameraActivity extends AppCompatActivity {
           isBeingEdited = true;
 
           map.getOverlays().removeAll(map.getOverlays());
-          List<Overlay> asd = EditCameraActivity.this.map.getOverlays();
           EditCameraActivity.this.map.invalidate();
           editLocationMarker.setVisibility(View.VISIBLE);
           EditCameraActivity.this.map.invalidate();
@@ -226,7 +225,6 @@ public class EditCameraActivity extends AppCompatActivity {
           editLocationMarker.setVisibility(View.INVISIBLE);
 
           generateMarkerOverlayWithCurrentLocation();
-          List<Overlay> asd = map.getOverlays();
 
           cameraRepository.updateCameras(cameraToEdit);
           adapter.notifyDataSetChanged();

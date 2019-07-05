@@ -512,7 +512,7 @@ public class CameraConnectionFragment extends Fragment {
 
           try {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-            float maxzoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10;
+            float maxZoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
 
             Rect m = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
             int action = motionEvent.getAction();
@@ -522,13 +522,13 @@ public class CameraConnectionFragment extends Fragment {
               // Multi touch logic
               current_finger_spacing = getFingerSpacing(motionEvent);
               if(fingerSpacing != 0){
-                if(current_finger_spacing  > fingerSpacing + 10 && maxzoom > zoomLevel){
+                if(current_finger_spacing  > fingerSpacing + 10 && maxZoom > zoomLevel){
                   zoomLevel++;
                 } else if (current_finger_spacing < fingerSpacing + 10 && zoomLevel > 1){
                   zoomLevel--;
                 }
-                int minW = (int) (m.width() / maxzoom);
-                int minH = (int) (m.height() / maxzoom);
+                int minW = (int) (m.width() / maxZoom);
+                int minH = (int) (m.height() / maxZoom);
                 int difW = m.width() - minW;
                 int difH = m.height() - minH;
                 int cropW = difW / 100 * zoomLevel;

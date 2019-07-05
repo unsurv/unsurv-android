@@ -473,7 +473,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
           Activity activity = CaptureTrainingImageActivity.this;
           CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
           CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraId);
-          float maxzoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10;
+          float maxZoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
 
           Rect m = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
           int action = motionEvent.getAction();
@@ -483,13 +483,18 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
             // Multi touch logic
             current_finger_spacing = getFingerSpacing(motionEvent);
             if(fingerSpacing != 0){
-              if(current_finger_spacing  > fingerSpacing + 10 && maxzoom > zoomLevel){
+              if(current_finger_spacing  > fingerSpacing + 10 && maxZoom > zoomLevel){
+                // don't zoom if already at max zoom
                 zoomLevel++;
+
               } else if (current_finger_spacing < fingerSpacing + 10 && zoomLevel > 1){
                 zoomLevel--;
               }
-              int minW = (int) (m.width() / maxzoom);
-              int minH = (int) (m.height() / maxzoom);
+
+              Log.i(TAG, "zoom:" + zoomLevel);
+              Log.i(TAG, "maxZoom:" + zoomLevel);
+              int minW = (int) (m.width() / maxZoom);
+              int minH = (int) (m.height() / maxZoom);
               int difW = m.width() - minW;
               int difH = m.height() - minH;
               int cropW = difW / 100 * zoomLevel;
@@ -1005,7 +1010,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
                 false,
                 false,
                 true,
-                null,
+                "",
                 "");
 
         insertDbId = (int) cameraRepository.insert(trainingCamera);
