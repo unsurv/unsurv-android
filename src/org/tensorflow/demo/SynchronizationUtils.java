@@ -784,7 +784,7 @@ class SynchronizationUtils {
 
     if (useRepository){
       for (SurveillanceCamera camera : cameras){
-        cameraRepository.deleteCameras(camera);
+        cameraRepository.deleteCamera(camera);
 
       }
     } else {
@@ -866,6 +866,64 @@ class SynchronizationUtils {
 
     return timestampIso8601.format(new Date(currentTime + randomDelay));
 
+  }
+
+
+  static int deleteImagesForCamera(SurveillanceCamera camera){
+
+    File imageFile;
+    File thumbnailFile;
+    File multipleCaptureFile;
+    String[] multipleCapturesFilenames;
+
+    int deletedFiles = 0;
+
+
+    try {
+      if (camera.getTrainingCapture()){
+        imageFile = new File(TRAINING_IMAGES_PATH + camera.getImagePath());
+        if (imageFile.delete()){
+          deletedFiles++;
+        }
+      } else {
+        imageFile = new File(PICTURES_PATH + camera.getImagePath());
+        if (imageFile.delete()){
+          deletedFiles++;
+        }
+      }
+    } catch (Exception e){
+      Log.i(TAG, "deleteImages:" + e);
+    }
+
+
+    try {
+      thumbnailFile = new File(PICTURES_PATH + camera.getThumbnailPath());
+      if (thumbnailFile.delete()){
+        deletedFiles++;
+      }
+    } catch (Exception e){
+      Log.i(TAG, "deleteImages:" + e);
+    }
+
+    try {
+      multipleCapturesFilenames = camera.getCaptureFilenames()
+              .replace("\"", "")
+              .replace("[", "")
+              .replace("]", "")
+              .split(",");
+
+      for (String path : multipleCapturesFilenames){
+        multipleCaptureFile = new File(PICTURES_PATH + path);
+        if (multipleCaptureFile.delete()){
+          deletedFiles++;
+        }
+      }
+
+    } catch (Exception e){
+      Log.i(TAG, "deleteImages:" + e);
+    }
+
+    return deletedFiles;
   }
 
 }

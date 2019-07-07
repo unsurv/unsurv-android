@@ -160,7 +160,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
           if (quickDeleteCameras){
 
-            cameraRepository.deleteCameras(current);
+            cameraRepository.deleteCamera(current);
             notifyItemRemoved(holder.getAdapterPosition());
 
           } else {
@@ -190,7 +190,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
                   if (dontAskAgainACheckBox.isChecked()) {
                     sharedPreferences.edit().putBoolean("quickDeleteCameras", true).apply();
                   }
-                  cameraRepository.deleteCameras(current);
+                  cameraRepository.deleteCamera(current);
                   popupWindow.dismiss();
                   notifyItemRemoved(holder.getAdapterPosition());
 

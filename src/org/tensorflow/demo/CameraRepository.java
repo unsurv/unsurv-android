@@ -53,7 +53,7 @@ public class CameraRepository {
     new updateAsyncTask(mCameraDao).execute(surveillanceCameras);
   }
 
-  void deleteCameras (SurveillanceCamera... surveillanceCameras) {
+  void deleteCamera(SurveillanceCamera... surveillanceCameras) {
 
     new deleteAsyncTask(mCameraDao).execute(surveillanceCameras);
   }
@@ -165,9 +165,10 @@ public class CameraRepository {
 
     @Override
     protected Void doInBackground(final SurveillanceCamera... params) {
-      String cameraImagePath = params[0].getImagePath();
-      File file = new File(PICTURES_PATH + cameraImagePath);
-      boolean deleted = file.delete();
+
+      int deletedFiles = SynchronizationUtils.deleteImagesForCamera(params[0]);
+      Log.i("deleteCameraAsync", "deleted " + deletedFiles + " files");
+
       mAsyncTaskDao.deleteCameras(params);
       return null;
     }
