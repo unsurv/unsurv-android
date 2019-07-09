@@ -39,6 +39,7 @@
     <string name="settings_label">Settings</string>
     <string name="manual_capture_label">Manual Capture</string>
     <string name="draw_on_training_image_label">Draw Cameras</string>
+    <string name="training_capture_label">Training</string>
     <string name="edit_camera_label">Edit Camera</string>
 
 

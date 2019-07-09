@@ -129,7 +129,7 @@ public class DrawView extends ImageView {
     try {
 
       // populate drawnCameras if data already present
-      if (drawnCameras != null){
+      if (!drawnCameras.isEmpty()){
         rectArray = new JSONArray(drawnCameras);
       } else {
         rectArray = new JSONArray();

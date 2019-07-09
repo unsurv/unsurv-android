@@ -445,6 +445,8 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     cameraRepository = new CameraRepository(getApplication());
+    List<SurveillanceCamera> asd = cameraRepository.getAllCameras();
+    Log.i(TAG, String.valueOf(asd.size()));
 
     mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, "asd.jpg");
 
@@ -582,7 +584,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
                 Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
                 new CompareSizesByArea());
         mImageReader = ImageReader.newInstance(1024, 768,
-                ImageFormat.JPEG, /*maxImages*/1);
+                ImageFormat.JPEG, /*maxImages*/5);
         mImageReader.setOnImageAvailableListener(
                 mOnImageAvailableListener, mBackgroundHandler);
 
@@ -907,23 +909,8 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
                                        @NonNull CaptureRequest request,
                                        @NonNull TotalCaptureResult result) {
           showToast("Saved: " + mFile);
-          Log.d(TAG, mFile.toString());
+          Log.i(TAG, mFile.toString());
           unlockFocus();
-
-          // start drawing activity 1 sec after capture to give db some time to save data
-          Handler handler = new Handler();
-          handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-              Intent drawOnImageIntent = new Intent(CaptureTrainingImageActivity.this, DrawOnTrainingImageActivity.class);
-
-              drawOnImageIntent.putExtra("surveillanceCameraId", insertDbId);
-
-              startActivity(drawOnImageIntent);
-
-            }
-          }, 1000);
 
         }
       };
@@ -931,6 +918,21 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
       mCaptureSession.stopRepeating();
       mCaptureSession.abortCaptures();
       mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
+
+      // start drawing activity .5 sec after capture to give db some time to save data
+      Handler handler = new Handler();
+      handler.postDelayed(new Runnable() {
+        @Override
+        public void run() {
+
+          Intent drawOnImageIntent = new Intent(CaptureTrainingImageActivity.this, DrawOnTrainingImageActivity.class);
+
+          drawOnImageIntent.putExtra("surveillanceCameraId", insertDbId);
+
+          startActivity(drawOnImageIntent);
+
+        }
+      }, 500);
 
 
     } catch (CameraAccessException e) {

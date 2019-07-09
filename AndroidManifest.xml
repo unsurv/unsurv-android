@@ -25,12 +25,14 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:debuggable="true"
         android:icon="@drawable/unsurv_logo"
         android:label="@string/app_label"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
+        <!-- CLEARTEXT JUST HERE FOR DEBUGGING REMOVE LATER!!!!-->
+
         <activity
             android:name=".DebugActivity"
             android:label="unsurv"
@@ -39,20 +41,28 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".HistoryActivity"
             android:label="@string/history_label"
             android:parentActivityName=".DebugActivity" />
+
         <activity
             android:name=".DetectorActivity"
             android:label="@string/detector_label"
-            android:parentActivityName=".DebugActivity" />
+            android:parentActivityName=".DebugActivity">
+
+
+        </activity>
+
         <activity
             android:name=".MapActivity"
             android:label="@string/map_label"
             android:parentActivityName=".DebugActivity" />
+
         <activity
             android:name=".StatisticsActivity"
             android:label="@string/statistics_label"
@@ -61,14 +71,24 @@
             android:name=".SettingsActivity"
             android:label="@string/settings_label"
             android:parentActivityName=".DebugActivity" />
+
         <activity android:name=".TutorialActivity" />
+
         <activity
             android:name=".ManualCaptureActivity"
             android:label="@string/manual_capture_label"
-            android:parentActivityName=".DebugActivity" />
+            android:parentActivityName=".DebugActivity" >
+
+
+        </activity>
+
         <activity
             android:name=".CaptureTrainingImageActivity"
-            android:parentActivityName=".DebugActivity" />
+            android:label="@string/training_capture_label"
+            android:parentActivityName=".DebugActivity">
+
+        </activity>
+
         <activity
             android:name=".DrawOnTrainingImageActivity"
             android:label="@string/draw_on_training_image_label"
