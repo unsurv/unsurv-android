@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000"
+    android:background="@color/standardBackground"
     >
 
     <android.support.v7.widget.Toolbar
@@ -24,24 +24,22 @@
         android:layout_width="match_parent"
         android:layout_height="0sp"
         android:layout_weight="9"
-        android:background="#000"
+        android:background="@color/standardBackground"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/total_cameras_in_area_statistics"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/zero_placeholder_statistics"
-            android:textSize="80sp"
-            android:gravity="center"
+            style="@style/statisticsMainCountText"
+            android:text="@string/zero_placeholder_statistics"
             />
 
         <TextView
             android:id="@+id/total_cameras_in_area_info_statistics"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:textSize="24sp"
-            android:gravity="center"
+            style="@style/statisticsMainText"
             />
 
 
@@ -56,7 +54,6 @@
                 android:layout_width="0sp"
                 android:layout_weight="5"
                 android:layout_height="match_parent"
-                android:background="#000"
                 android:orientation="vertical">
 
                 <TextView
@@ -64,18 +61,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="3"
-                    android:gravity="center"
+                    style="@style/statisticsCountText"
                     android:text="@string/zero_placeholder_statistics"
-                    android:textSize="60sp"
+
                     />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="1"
-                    android:textSize="14sp"
                     android:text="@string/added_7d_text"
-                    android:gravity="center"
+                    style="@style/statisticsText"
+
                     />
 
 
@@ -84,18 +81,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="3"
-                    android:gravity="center"
-                    android:hint="@string/zero_placeholder_statistics"
-                    android:textSize="60sp"
+                    style="@style/statisticsCountText"
+                    android:text="@string/zero_placeholder_statistics"
                     />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="1"
-                    android:textSize="14sp"
                     android:text="@string/added_28d_text"
-                    android:gravity="center"
+                    style="@style/statisticsText"
                     />
 
                 <TextView
@@ -103,9 +98,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="3"
-                    android:gravity="center"
-                    android:hint="@string/zero_placeholder_statistics"
-                    android:textSize="60sp"
+                    style="@style/statisticsCountText"
+                    android:text="@string/zero_placeholder_statistics"
                     />
 
                 <TextView
@@ -113,14 +107,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="1"
-                    android:textSize="14sp"
-                    android:gravity="center"
+                    style="@style/statisticsText"
                     />
-
-
-
-
-
 
             </LinearLayout>
 
@@ -130,7 +118,6 @@
                 android:layout_width="0sp"
                 android:layout_weight="5"
                 android:layout_height="match_parent"
-                android:background="#000"
                 android:orientation="vertical">
 
 
@@ -139,18 +126,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="3"
-                    android:gravity="center"
-                    android:hint="@string/zero_placeholder_statistics"
-                    android:textSize="60sp"
+                    style="@style/statisticsCountText"
+                    android:text="@string/zero_placeholder_statistics"
                     />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="1"
-                    android:textSize="14sp"
                     android:text="@string/global_today_text"
-                    android:gravity="center"
+                    style="@style/statisticsText"
                     />
 
 
@@ -159,18 +144,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="3"
-                    android:gravity="center"
-                    android:hint="@string/zero_placeholder_statistics"
-                    android:textSize="60sp"
+                    android:text="@string/zero_placeholder_statistics"
+                    style="@style/statisticsCountText"
                     />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="1"
-                    android:textSize="14sp"
                     android:text="@string/global_28d_text"
-                    android:gravity="center"
+                    style="@style/statisticsText"
                     />
 
                 <TextView
@@ -178,18 +161,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="3"
-                    android:gravity="center"
-                    android:hint="@string/zero_placeholder_statistics"
-                    android:textSize="60sp"
+                    android:text="@string/zero_placeholder_statistics"
+                    style="@style/statisticsCountText"
                     />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
                     android:layout_weight="1"
-                    android:textSize="14sp"
                     android:text="@string/global_total_text"
-                    android:gravity="center"
+                    style="@style/statisticsText"
+
                     />
 
 

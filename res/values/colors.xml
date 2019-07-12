@@ -16,4 +16,20 @@
 -->
 <resources>
     <color name="control_background">#cc4285f4</color>
+
+    <!--   color for the app bar and other primary UI elements -->
+    <color name="colorPrimary">#232323</color>
+
+    <!--   a darker variant of the primary color, used for
+           the status bar (on Android 5.0+) and contextual app bars -->
+    <color name="colorPrimaryDark">#161616</color>
+
+    <!--   a secondary color for controls like checkboxes and text fields -->
+    <color name="colorAccent">#3baf58</color>
+
+
+    <!-- general stuff -->
+    <color name="standardBackground">#2d2d2d</color>
+    <color name="recyclerviewItemBackground">#383838</color>
+
 </resources>

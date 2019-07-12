@@ -188,8 +188,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
   private ImageView locationStatusView;
-  private ImageButton photoStatusView;
-  private TextView locationDebugTextView;
+  private ImageView photoStatusView;
 
   private final int STATUS_RED = 0;
   private final int STATUS_GREEN = 1;
@@ -213,6 +212,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private Boolean isTimeToCapture = false;
 
   private Button manualCameraCapture;
+  private Button trainingCameraCapture;
 
   private SharedPreferences sharedPreferences;
 
@@ -238,6 +238,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     }
 
     manualCameraCapture = findViewById(R.id.manual_capture_button);
+    trainingCameraCapture = findViewById(R.id.training_capture_button);
 
     manualCameraCapture.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -247,14 +248,20 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       }
     });
 
+    trainingCameraCapture.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent trainingCaptureIntent = new Intent(DetectorActivity.this, CaptureTrainingImageActivity.class);
+        startActivity(trainingCaptureIntent);
+      }
+    });
+
     cameraRoomDatabase = CameraRoomDatabase.getDatabase(this);
 
     mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
-    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
-    setSupportActionBar(myToolbar);
 
     BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
 
@@ -311,25 +318,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     photoStatusView = findViewById(R.id.photo_status_view);
 
-    photoStatusView.setOnTouchListener(new View.OnTouchListener() {
-      @Override
-      public boolean onTouch(View view, MotionEvent motionEvent) {
-
-        switch (motionEvent.getAction()) {
-          case MotionEvent.ACTION_DOWN:
-            captureButtonIsBeingHeld = true;
-            return true;
-
-          case MotionEvent.ACTION_UP:
-            captureButtonIsBeingHeld = false;
-            return true;
-        }
-
-
-        return false;
-      }
-    });
-
   }
 
 
@@ -345,31 +333,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     return true;
   }
 
-
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-
-      case R.id.action_settings:
-        Intent settingsIntent = new Intent(DetectorActivity.this, SettingsActivity.class);
-        startActivity(settingsIntent);
-
-        return true;
-
-      case R.id.action_training:
-        Intent trainingCaptureIntent = new Intent(DetectorActivity.this, CaptureTrainingImageActivity.class);
-        startActivity(trainingCaptureIntent);
-
-        return true;
-
-
-
-      default:
-        // Fall back on standard behaviour when user choice not recognized.
-        return super.onOptionsItemSelected(item);
-    }
-  }
 
   @Override
   public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -583,12 +546,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         azimuth = mOrientationAngles[0];
         pitch = mOrientationAngles[1];
         roll = mOrientationAngles[2];
-
-        locationDebugTextView = findViewById(R.id.location_debug);
-        locationDebugTextView.setText("az: " + String.valueOf(azimuth)
-                + "\npi: " + String.valueOf(pitch)
-                + "\nro: " + String.valueOf(roll));
-        locationDebugTextView.setTextSize(5);
 
       }
     });
@@ -1103,7 +1060,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
         locationStatusView = findViewById(R.id.location_status_view);
         photoStatusView = findViewById(R.id.photo_status_view);
-        locationDebugTextView = findViewById(R.id.location_debug);
 
         runOnUiThread(new Runnable(){
                         @Override

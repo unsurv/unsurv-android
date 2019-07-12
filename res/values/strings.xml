@@ -44,6 +44,9 @@
 
 
     <!--in HistoryActivity-->
+    <string name="dont_ask_again">Don\'t ask again</string>
+    <string name="permanently_delete_camera">Permanently delete this camera?</string>
+
 
     <!--in DetectorActivity-->
     <string name="manual_capture_button_text">MANUAL</string>

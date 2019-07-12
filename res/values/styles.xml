@@ -15,4 +15,39 @@
 -->
 <resources>
     <style name="MaterialTheme" parent="android:Theme.Material.Light.NoActionBar.Fullscreen" />
+
+    <style name="EditedThemeAppCompatNoActionBar" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+    <!-- StatisticsActivity -->
+
+    <style name="statisticsMainCountText">
+        <item name="android:textSize">80sp</item>
+        <item name="android:gravity">center</item>
+
+    </style>
+
+    <style name="statisticsMainText">
+        <item name="android:textSize">24sp</item>
+        <item name="android:gravity">center</item>
+
+    </style>
+
+    <style name="statisticsCountText">
+        <item name="android:textSize">60sp</item>
+        <item name="android:gravity">center</item>
+
+    </style>
+
+    <style name="statisticsText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
+
+    </style>
+
+
 </resources>
