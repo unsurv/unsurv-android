@@ -433,15 +433,12 @@ public class StatisticsActivity extends AppCompatActivity {
       totalInAreaInfoTextView.setText(infoText);
     }
 
-    if (totalByUser == 1){
-      String infoText = getResources().getQuantityString(R.plurals.captures_by_user, 1);
+
+      String infoText = getResources().getQuantityString(R.plurals.captures_by_user, totalByUser);
 
       totalByUserInfoTextView.setText(infoText);
-    } else {
-      String infoText = getResources().getQuantityString(R.plurals.captures_by_user, 0);
 
-      totalByUserInfoTextView.setText(infoText);
-    }
+
 
     totalInAreaTextView.setText(String.valueOf(totalLocal));
     local7DaysTextView.setText(String.valueOf(local7DaysAmount));

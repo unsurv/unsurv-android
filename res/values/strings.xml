@@ -51,9 +51,15 @@
     <!--in DetectorActivity-->
     <string name="manual_capture_button_text">MANUAL</string>
 
+    <string name="general_total_camera_text">Cameras in this area:</string>
+
+
     <!--in MapActivity-->
-    <string name="total_cameras_in_map_hint">Total cameras: 1200</string>
-    <string name="total_cameras_in_map">Total cameras: %d</string>
+    <plurals name="total_cameras_in_map_text">
+        <item quantity="one">camera in this area</item>
+        <item quantity="other">cameras in this area</item>
+    </plurals>
+
     <string name="timemachine_text">All cameras until: %s</string>
 
     <!--in StatisticsActivity-->

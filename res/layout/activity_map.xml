@@ -35,34 +35,59 @@
             android:id="@+id/my_location_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@drawable/ic_my_location_black_24dp"
+            android:src="@drawable/ic_my_location_white_24dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_margin="20dp"/>
+            android:layout_margin="10dp"/>
+
+        <ImageButton
+            android:id="@+id/map_info_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_info_outline_white_24dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="110dp"
+            android:layout_marginEnd="10dp"
+            />
 
         <ImageButton
             android:id="@+id/map_timemachine_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@drawable/ic_access_time_black_24dp"
+            android:src="@drawable/ic_access_time_white_24dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginBottom="90dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="60dp"
+            android:layout_marginEnd="10dp"
             />
 
         <TextView
             android:id="@+id/map_count_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/total_cameras_in_map_hint"
-            android:layout_marginBottom="20dp"
-            android:layout_marginStart="20dp"
-            android:textSize="16sp"
-            android:textColor="#000"
-            android:background="#888"
-            android:layout_alignParentBottom="true"
+            android:textSize="36sp"
+            android:textColor="#FFF"
+            android:background="@color/standardBackground"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+
             />
+
+
+        <TextView
+            android:id="@+id/map_cameras_in_frame_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:textSize="12sp"
+            android:textColor="#FFF"
+            android:background="@color/standardBackground"
+            android:layout_below="@+id/map_count_textview"
+
+            />
+
+
 
     </RelativeLayout>
 

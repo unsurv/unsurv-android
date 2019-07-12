@@ -59,7 +59,6 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
-import org.osmdroid.config.Configuration;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -67,6 +66,7 @@ import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
@@ -134,6 +134,7 @@ public class MapActivity extends AppCompatActivity {
   private String lastArea = "";
 
   private ImageButton timemachineButton;
+  private ImageButton infoButton;
   private View timemachineView;
   private View timeframeView;
 
@@ -161,10 +162,10 @@ public class MapActivity extends AppCompatActivity {
   private double lonMin;
   private double lonMax;
 
-  private String latMinString;
-  private String latMaxString;
-  private String lonMinString;
-  private String lonMaxString;
+  String latMinString;
+  String latMaxString;
+  String lonMinString;
+  String lonMaxString;
 
   private String areaString;
 
@@ -176,17 +177,19 @@ public class MapActivity extends AppCompatActivity {
 
   private String picturesPath = SynchronizationUtils.PICTURES_PATH;
 
-  private TextView amountOnMap;
+  private TextView amountOnMapTextView;
+  private TextView infoTextView;
+  boolean infoIsShown = false;
 
   private LocalBroadcastManager localBroadcastManager;
-  private IntentFilter intentFilter;
+  IntentFilter intentFilter;
   private BroadcastReceiver br;
 
   private boolean abortedServerQuery;
 
-  private int readStoragePermission;
-  private int writeStoragePermission;
-  private int fineLocationPermission;
+  int readStoragePermission;
+  int writeStoragePermission;
+  int fineLocationPermission;
 
 
   // TODO set max amount visible
@@ -267,15 +270,39 @@ public class MapActivity extends AppCompatActivity {
     // TODO add choice + backup strategy here
     mapView.setTileSource(TileSourceFactory.OpenTopo);
 
-
     final IMapController mapController = mapView.getController();
+
+    final CustomZoomButtonsController zoomController = mapView.getZoomController();
+    zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 
     // Setting starting position and zoom level.
     GeoPoint startPoint = new GeoPoint(50.0027, 8.2771);
     mapController.setZoom(7.0);
     mapController.setCenter(startPoint);
 
-    amountOnMap = findViewById(R.id.map_count_textview);
+    amountOnMapTextView = findViewById(R.id.map_count_textview);
+    infoTextView = findViewById(R.id.map_cameras_in_frame_text);
+
+    amountOnMapTextView.setVisibility(View.GONE);
+    infoTextView.setVisibility(View.GONE);
+
+    infoButton = findViewById(R.id.map_info_button);
+    infoButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        if (!infoIsShown){
+          amountOnMapTextView.setVisibility(View.VISIBLE);
+          infoTextView.setVisibility(View.VISIBLE);
+          infoIsShown = true;
+
+        } else {
+          amountOnMapTextView.setVisibility(View.GONE);
+          infoTextView.setVisibility(View.GONE);
+          infoIsShown = false;
+        }
+      }
+    });
 
     // myLocationOverlay
     myLocationOverlay = new MyLocationNewOverlay(mapView);
@@ -1047,7 +1074,10 @@ public class MapActivity extends AppCompatActivity {
 
       cameraCluster.setIcon(clusterIcon);
 
-      amountOnMap.setText(getString(R.string.total_cameras_in_map, itemsToDisplay.size()));
+      int size = camerasToDisplay.size();
+      amountOnMapTextView.setText(String.valueOf(size));
+      String infoText = getResources().getQuantityString(R.plurals.total_cameras_in_map_text, size);
+      infoTextView.setText(infoText);
 
       for (int i = 0; i < itemsToDisplay.size(); i++) {
         Marker cameraMarker = new Marker(mapView);
@@ -1155,7 +1185,11 @@ public class MapActivity extends AppCompatActivity {
 
       }
 
-      amountOnMap.setText(getString(R.string.total_cameras_in_map, overlayItemsToDisplay.size()));
+      int size = camerasToDisplay.size();
+      amountOnMapTextView.setText(String.valueOf(overlayItemsToDisplay.size()));
+      String infoText = getResources().getQuantityString(R.plurals.total_cameras_in_map_text, size);
+      infoTextView.setText(infoText);
+
       cameraOverlay = new ItemizedIconOverlay<>(overlayItemsToDisplay, cameraMarkerIcon,
               new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 

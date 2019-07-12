@@ -211,8 +211,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private Boolean isTimeToCapture = false;
 
-  private Button manualCameraCapture;
-  private Button trainingCameraCapture;
+  Button manualCameraCapture;
+  Button trainingCameraCapture;
 
   private SharedPreferences sharedPreferences;
 

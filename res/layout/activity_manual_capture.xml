@@ -57,7 +57,7 @@
                 android:id="@+id/manual_save_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@drawable/ic_save_black_24dp"
+                android:src="@drawable/ic_save_white_24dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="20dp"/>
