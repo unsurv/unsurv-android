@@ -66,12 +66,11 @@
             android:id="@+id/map_count_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="36sp"
+            android:textSize="18sp"
             android:textColor="#FFF"
             android:background="@color/standardBackground"
-            android:layout_alignParentEnd="true"
+            android:layout_toStartOf="@id/map_cameras_in_frame_text"
             android:layout_marginTop="10dp"
-
             />
 
 
@@ -80,10 +79,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:textSize="12sp"
+            android:textSize="18sp"
             android:textColor="#FFF"
             android:background="@color/standardBackground"
-            android:layout_below="@+id/map_count_textview"
+            android:layout_marginTop="10dp"
 
             />
 
@@ -99,8 +98,12 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="start"
-        android:background="#000"
-        app:menu="@menu/bottom_navigation_items"/>
+        android:background="@color/colorPrimary"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/bottom_navigation_items"
+        app:itemTextColor="@color/bottom_navigation"
+        app:itemIconTint="@color/bottom_navigation"
+        />
 
 
 </LinearLayout>

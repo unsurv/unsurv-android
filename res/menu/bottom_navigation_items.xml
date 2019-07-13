@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Color gets changed when creating view, don't add more drawables to keep app size small -->
+
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/bottom_navigation_history"
         android:title=""
         android:icon="@drawable/ic_history_black_24dp" />
+
 
     <item android:id="@+id/bottom_navigation_camera"
         android:title=""

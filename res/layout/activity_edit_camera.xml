@@ -243,11 +243,14 @@
 
         android:id="@+id/navigation"
         android:layout_width="match_parent"
-        android:layout_height="0sp"
-        android:layout_weight="1"
+        android:layout_height="56dp"
         android:layout_gravity="start"
-        android:background="#000"
-        app:menu="@menu/bottom_navigation_items"/>
+        android:background="@color/colorPrimary"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/bottom_navigation_items"
+        app:itemTextColor="@color/bottom_navigation"
+        app:itemIconTint="@color/bottom_navigation"
+        />
 
 
 

@@ -1076,7 +1076,7 @@ public class MapActivity extends AppCompatActivity {
 
       int size = camerasToDisplay.size();
       amountOnMapTextView.setText(String.valueOf(size));
-      String infoText = getResources().getQuantityString(R.plurals.total_cameras_in_map_text, size);
+      String infoText = " " + getResources().getQuantityString(R.plurals.total_cameras_in_map_text, size);
       infoTextView.setText(infoText);
 
       for (int i = 0; i < itemsToDisplay.size(); i++) {
@@ -1187,7 +1187,7 @@ public class MapActivity extends AppCompatActivity {
 
       int size = camerasToDisplay.size();
       amountOnMapTextView.setText(String.valueOf(overlayItemsToDisplay.size()));
-      String infoText = getResources().getQuantityString(R.plurals.total_cameras_in_map_text, size);
+      String infoText = " " + getResources().getQuantityString(R.plurals.total_cameras_in_map_text, size);
       infoTextView.setText(infoText);
 
       cameraOverlay = new ItemizedIconOverlay<>(overlayItemsToDisplay, cameraMarkerIcon,

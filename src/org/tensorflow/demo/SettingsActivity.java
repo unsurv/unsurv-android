@@ -29,6 +29,12 @@ public class SettingsActivity extends AppCompatActivity {
 
     bottomNavigationView = findViewById(R.id.navigation);
 
+    // bottomNavigationView.getMenu().setGroupCheckable(0, false, true);
+
+    int size = bottomNavigationView.getMenu().size();
+    for (int i = 0; i < size; i++) {
+      bottomNavigationView.getMenu().getItem(i).setCheckable(false);
+    }
 
     // Handle bottom navigation bar clicks
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
