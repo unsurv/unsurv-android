@@ -26,7 +26,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
   }
 
   private static String TAG = "choose Image adapter:";
-  private static String picturesPath = StorageUtils.SYNCHRONIZED_PATH;
+  private static String imagesPath = StorageUtils.CAPTURES_PATH;
 
 
   private Context ctx;
@@ -76,7 +76,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
     try {
 
       filePath = mFilenames[i];
-      File imgFile = new File(picturesPath + filePath);
+      File imgFile = new File(imagesPath + filePath);
 
       Picasso.get().load(imgFile)
               .placeholder(R.drawable.ic_launcher)
@@ -95,7 +95,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
       public void onClick(View view) {
 
         String chosenImageFilePath = mFilenames[holder.getAdapterPosition()];
-        File imgFile = new File(picturesPath + chosenImageFilePath);
+        File imgFile = new File(imagesPath + chosenImageFilePath);
 
         Picasso.get().load(imgFile)
                 .placeholder(R.drawable.ic_launcher)

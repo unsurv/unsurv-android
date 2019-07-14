@@ -6,73 +6,103 @@
     android:summary="Settings for unsurv">
 
 
-    <SwitchPreference
-        android:key="notifications"
-        app:title="Enable message notifications"
-        android:summary= "Test Switch Preference"/>
+    <PreferenceCategory
+        android:key="@string/storage_title"
+        android:layout="@layout/preference_category_storage">
 
-    <Preference
-        app:title="Send feedback"
-        android:summary="Report technical issues or suggest new features"/>
+        <Preference
+            android:key="clear_synchronized"
+            android:title="Clear images for synchronized cameras"/>
 
-    <Preference
-        android:key="clear_synchronized"
-        android:title="Clear images for synchronized cameras"/>
+        <Preference
+            android:key="clear_captures"
+            android:title="Clear your captures"/>
+        <Preference
+            android:key="clear_training"
+            android:title="Clear your training images"/>
 
-    <Preference
-        android:key="clear_captures"
-        android:title="Clear your captures"/>
+    </PreferenceCategory>
 
-    <Preference
-        android:key="clear_training"
-        android:title="Clear your training images"/>
 
-    <EditTextPreference
-        android:key="synchronizationUrl"
-        android:title="Server to synchronize with"/>
+    <PreferenceCategory
+        android:key="@string/general_title"
+        android:layout="@layout/preference_category_general">
 
-    <SwitchPreference
-        android:key="buttonCapture"
-        android:title="Enable hold to capture" />
+        <SwitchPreference
+            android:title="Offline mode"
+            android:key="offlineMode"/>
 
-    <SwitchPreference
-        android:key="downloadImages"
-        android:title="Download images" />
+        <SwitchPreference
+            android:key="notifications"
+            android:title="Enable message notifications" />
 
-    <SwitchPreference
-        android:title="Offline mode"
-        android:key="offlineMode"/>
 
-    <SwitchPreference
-        android:title="Enable clustering of markers"
-        android:key="clusteringEnabled"/>
+        <SwitchPreference
+            android:title="Enable timestamps for captures"
+            android:key="enableCaptureTimestamps"/>
 
-    <SwitchPreference
-        android:title="Enable timestamps for captures"
-        android:key="enableCaptureTimestamps"/>
+        <SwitchPreference
+            android:title="Delete cameras without popup"
+            android:key="quickDeleteCameras"/>
+    </PreferenceCategory>
 
-    <SwitchPreference
-        android:title="Delete cameras on upload"
-        android:key="deleteOnUpload"/>
 
-    <SwitchPreference
-        android:title="Always use manual capture"
-        android:key="alwaysEnableManualCapture"/>
+    <PreferenceCategory
+        android:key="@string/map_title"
+        android:layout="@layout/preference_category_map">
 
-    <SwitchPreference
-        android:title="Delete cameras without popup"
-        android:key="quickDeleteCameras"/>
+        <SwitchPreference
+            android:title="Enable clustering of markers"
+            android:key="clusteringEnabled"/>
 
-    <ListPreference
-        android:title="synchronization interval"
-        android:key="synchronizationInterval"
-        android:entries="@array/synchronization_choices"
-        android:entryValues="@array/synchronization_values"/>
+        <ListPreference
+            android:title="Maximum simultaneous markers on the map"
+            android:key="maxMapMarkers"
+            android:entries="@array/max_marker_choices"
+            android:entryValues="@array/max_marker_values"/>
 
-    <ListPreference
-        android:title="Maximum simultaneous markers on the map"
-        android:key="maxMapMarkers"
-        android:entries="@array/max_marker_choices"
-        android:entryValues="@array/max_marker_values"/>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:key="@string/synchronization_title"
+        android:layout="@layout/preference_category_synchronization">
+
+        <ListPreference
+            android:title="synchronization interval"
+            android:key="synchronizationInterval"
+            android:entries="@array/synchronization_choices"
+            android:entryValues="@array/synchronization_values"/>
+
+        <EditTextPreference
+            android:key="synchronizationUrl"
+            android:title="Server to synchronize with"/>
+
+        <SwitchPreference
+            android:key="downloadImages"
+            android:title="Download images" />
+
+        <SwitchPreference
+            android:title="Delete cameras on upload"
+            android:key="deleteOnUpload"/>
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:key="@string/capture_title"
+        android:layout="@layout/preference_category_capture">
+
+        <SwitchPreference
+            android:key="buttonCapture"
+            android:title="Enable hold to capture" />
+
+        <SwitchPreference
+            android:title="Always use manual capture"
+            android:key="alwaysEnableManualCapture"/>
+
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

@@ -62,7 +62,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   private List<SurveillanceCamera> mSurveillanceCameras;
 
-  private String picturesPath = StorageUtils.SYNCHRONIZED_PATH;
+  private String picturesPath = StorageUtils.CAPTURES_PATH;
 
   private final CameraRepository cameraRepository;
   private final SharedPreferences sharedPreferences;
@@ -97,13 +97,13 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       final boolean currentCameraUploadComplete = current.getUploadCompleted();
 
-      File mThumbnailPicture;
+      File imageFile;
       final boolean trainingCapture = current.getTrainingCapture();
       int cameraType = current.getCameraType();
 
       if (trainingCapture){
         // camera is a training image not a capture with obj detection
-        mThumbnailPicture = new File(StorageUtils.TRAINING_IMAGES_PATH + current.getImagePath());
+        imageFile = new File(StorageUtils.TRAINING_IMAGES_PATH + current.getImagePath());
 
         //holder.detailLinearLayout.setBackgroundColor(Color.GRAY);
 
@@ -111,15 +111,15 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       } else {
 
-        mThumbnailPicture = new File(picturesPath + current.getThumbnailPath());
+        imageFile = new File(picturesPath + current.getThumbnailPath());
 
         switch (cameraType){
-          case SynchronizationUtils.STANDARD_CAMERA:
+          case StorageUtils.STANDARD_CAMERA:
             holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#ff5555"));
 
             break;
 
-          case SynchronizationUtils.DOME_CAMERA:
+          case StorageUtils.DOME_CAMERA:
             holder.cameraTypeBar.setBackgroundColor(Color.BLUE);
 
             break;
@@ -137,7 +137,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       holder.bottomTextViewInItem.setText(uploadDate);
 
 
-      Picasso.get().load(mThumbnailPicture)
+      Picasso.get().load(imageFile)
               .placeholder(R.drawable.ic_launcher)
               .into(holder.thumbnailImageView);
 

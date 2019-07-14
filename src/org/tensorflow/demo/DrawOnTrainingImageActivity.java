@@ -121,7 +121,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        cameraType = SynchronizationUtils.STANDARD_CAMERA;
+        cameraType = StorageUtils.STANDARD_CAMERA;
         drawView.setCameraType(cameraType);
 
       }
@@ -131,7 +131,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        cameraType = SynchronizationUtils.DOME_CAMERA;
+        cameraType = StorageUtils.DOME_CAMERA;
         drawView.setCameraType(cameraType);
 
       }

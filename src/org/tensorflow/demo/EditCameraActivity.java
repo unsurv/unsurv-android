@@ -169,12 +169,12 @@ public class EditCameraActivity extends AppCompatActivity {
 
     switch (cameraType){
 
-      case SynchronizationUtils.STANDARD_CAMERA:
+      case StorageUtils.STANDARD_CAMERA:
         standardCheckBox.setChecked(true);
         standardChecked = true;
         break;
 
-      case SynchronizationUtils.DOME_CAMERA:
+      case StorageUtils.DOME_CAMERA:
         domeCheckBox.setChecked(true);
         domeChecked = true;
         break;
@@ -186,7 +186,7 @@ public class EditCameraActivity extends AppCompatActivity {
       public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
         if (b){
-          cameraToEdit.setCameraType(SynchronizationUtils.STANDARD_CAMERA);
+          cameraToEdit.setCameraType(StorageUtils.STANDARD_CAMERA);
           standardChecked = true;
           domeChecked = false;
           domeCheckBox.setChecked(false);
@@ -200,7 +200,7 @@ public class EditCameraActivity extends AppCompatActivity {
       public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
         if (b){
-          cameraToEdit.setCameraType(SynchronizationUtils.DOME_CAMERA);
+          cameraToEdit.setCameraType(StorageUtils.DOME_CAMERA);
           domeChecked = true;
           standardChecked = false;
           standardCheckBox.setChecked(false);

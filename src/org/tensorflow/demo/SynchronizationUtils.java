@@ -48,9 +48,6 @@ class SynchronizationUtils {
   private static int UPLOAD_FAILED = 0;
   private static int UPLOAD_SUCCESSFUL = 1;
 
-  final static int STANDARD_CAMERA = 0;
-  final static int DOME_CAMERA = 1;
-
   private static String TAG = "SynchronizationUtils";
 
 

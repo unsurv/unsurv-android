@@ -14,12 +14,15 @@ class StorageUtils {
 
   static String TAG = "StorageUtils";
 
+  final static int STANDARD_CAMERA = 0;
+  final static int DOME_CAMERA = 1;
+
   // accessible for every app for now
   static String SYNCHRONIZED_PATH = Environment.getExternalStoragePublicDirectory(
-          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/synchronized";
+          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/synchronized/";
 
   static String CAPTURES_PATH = Environment.getExternalStoragePublicDirectory(
-          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/captures";
+          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/captures/";
 
   static String TRAINING_IMAGES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/training/";

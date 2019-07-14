@@ -88,6 +88,10 @@
 
     <!--in SettingsActivity-->
     <string name="storage_title">Storage</string>
+    <string name="general_title">General</string>
+    <string name="synchronization_title">Synchronization</string>
+    <string name="map_title">Map</string>
+    <string name="capture_title">Capture</string>
 
 
     <string name="synchronized_cameras_size">Storage used by synchronized cameras:</string>
