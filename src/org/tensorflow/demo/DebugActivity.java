@@ -77,7 +77,7 @@ import java.util.Random;
 import java.util.TimeZone;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
-import static org.tensorflow.demo.StorageUtils.PICTURES_PATH;
+import static org.tensorflow.demo.StorageUtils.SYNCHRONIZED_PATH;
 
 
 public class DebugActivity extends AppCompatActivity {
@@ -109,7 +109,7 @@ public class DebugActivity extends AppCompatActivity {
 
   private WifiManager wifiManager;
 
-  private String picturesPath = PICTURES_PATH;
+  private String picturesPath = SYNCHRONIZED_PATH;
 
   private int randomCamerasAdded;
   private List<SurveillanceCamera> allCameras = new ArrayList<>();
@@ -1045,7 +1045,7 @@ public class DebugActivity extends AppCompatActivity {
 
                     byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
 
-                    SynchronizationUtils.saveBytesToFile(imageAsBytes, id + ".jpg", PICTURES_PATH);
+                    StorageUtils.saveBytesToFile(imageAsBytes, id + ".jpg", SYNCHRONIZED_PATH);
 
                   }
 

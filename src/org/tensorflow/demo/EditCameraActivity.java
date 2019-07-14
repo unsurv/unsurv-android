@@ -76,7 +76,7 @@ public class EditCameraActivity extends AppCompatActivity {
   boolean standardChecked = false;
   boolean domeChecked = false;
 
-  private static String picturesPath = StorageUtils.PICTURES_PATH;
+  private static String picturesPath = StorageUtils.SYNCHRONIZED_PATH;
   private static String trainingPath = StorageUtils.TRAINING_IMAGES_PATH;
 
 

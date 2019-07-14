@@ -62,7 +62,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   private List<SurveillanceCamera> mSurveillanceCameras;
 
-  private String picturesPath = StorageUtils.PICTURES_PATH;
+  private String picturesPath = StorageUtils.SYNCHRONIZED_PATH;
 
   private final CameraRepository cameraRepository;
   private final SharedPreferences sharedPreferences;

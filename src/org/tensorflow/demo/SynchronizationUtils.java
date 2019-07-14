@@ -30,9 +30,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -274,7 +271,7 @@ class SynchronizationUtils {
 
                     byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
 
-                    saveBytesToFile(imageAsBytes, id + ".jpg", StorageUtils.PICTURES_PATH);
+                    StorageUtils.saveBytesToFile(imageAsBytes, id + ".jpg", StorageUtils.SYNCHRONIZED_PATH);
 
                   }
 
@@ -599,14 +596,14 @@ class SynchronizationUtils {
       if (currentCamera.getTrainingCapture()){
         imageFile = new File(StorageUtils.TRAINING_IMAGES_PATH+ currentCamera.getImagePath());
       } else {
-        imageFile = new File(StorageUtils.PICTURES_PATH + currentCamera.getThumbnailPath());
+        imageFile = new File(StorageUtils.SYNCHRONIZED_PATH + currentCamera.getThumbnailPath());
       }
       JSONObject singleCamera = new JSONObject();
 
       // create a map with tmpUuidFromServer: imageAsBase64
       try {
 
-        imageAsBytes = readFileToBytes(imageFile);
+        imageAsBytes = StorageUtils.readFileToBytes(imageFile);
 
         imageAsBase64 =  Base64.encodeToString(imageAsBytes, Base64.DEFAULT);
 
@@ -791,52 +788,6 @@ class SynchronizationUtils {
   }
 
 
-
-  static byte[] readFileToBytes(File f) throws IOException {
-    int size = (int) f.length();
-    byte[] bytes = new byte[size];
-    byte[] tmpBuff = new byte[size];
-    FileInputStream fis = new FileInputStream(f);
-
-    try {
-
-      // tries to read file in one go
-      int read = fis.read(bytes, 0, size);
-
-      // if file is too big
-      if (read < size) {
-        int remain = size - read;
-        // reads and appends to read from tmpBuff until file is read
-        while (remain > 0) {
-          read = fis.read(tmpBuff, 0, remain);
-          System.arraycopy(tmpBuff, 0, bytes, size - remain, read);
-          remain -= read;
-        }
-      }
-    }  catch (IOException e){
-      throw e;
-    } finally {
-      fis.close();
-    }
-
-    return bytes;
-  }
-
-  static void saveBytesToFile(byte[] bytes, String filename, String path) throws IOException {
-
-    File directoryCheck = new File(path);
-    if (!directoryCheck.exists()){
-      directoryCheck.mkdirs();
-    }
-
-    File file = new File(path + filename);
-
-    FileOutputStream fileOutputStream = new FileOutputStream(file.getPath());
-
-    fileOutputStream.write(bytes);
-    fileOutputStream.close();
-  }
-
   /**
    * returns a YYYY-MM-DD string with random delay in range minUploadDelay < x < maxUploadDelay
    * @param currentTime
@@ -861,62 +812,5 @@ class SynchronizationUtils {
 
   }
 
-
-  static int deleteImagesForCamera(SurveillanceCamera camera){
-
-    File imageFile;
-    File thumbnailFile;
-    File multipleCaptureFile;
-    String[] multipleCapturesFilenames;
-
-    int deletedFiles = 0;
-
-
-    try {
-      if (camera.getTrainingCapture()){
-        imageFile = new File(StorageUtils.TRAINING_IMAGES_PATH + camera.getImagePath());
-        if (imageFile.delete()){
-          deletedFiles++;
-        }
-      } else {
-        imageFile = new File(StorageUtils.PICTURES_PATH + camera.getImagePath());
-        if (imageFile.delete()){
-          deletedFiles++;
-        }
-      }
-    } catch (Exception e){
-      Log.i(TAG, "deleteImages:" + e);
-    }
-
-
-    try {
-      thumbnailFile = new File(StorageUtils.PICTURES_PATH + camera.getThumbnailPath());
-      if (thumbnailFile.delete()){
-        deletedFiles++;
-      }
-    } catch (Exception e){
-      Log.i(TAG, "deleteImages:" + e);
-    }
-
-    try {
-      multipleCapturesFilenames = camera.getCaptureFilenames()
-              .replace("\"", "")
-              .replace("[", "")
-              .replace("]", "")
-              .split(",");
-
-      for (String path : multipleCapturesFilenames){
-        multipleCaptureFile = new File(StorageUtils.PICTURES_PATH + path);
-        if (multipleCaptureFile.delete()){
-          deletedFiles++;
-        }
-      }
-
-    } catch (Exception e){
-      Log.i(TAG, "deleteImages:" + e);
-    }
-
-    return deletedFiles;
-  }
 
 }

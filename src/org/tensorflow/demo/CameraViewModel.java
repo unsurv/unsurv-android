@@ -26,7 +26,7 @@ public class CameraViewModel extends AndroidViewModel {
   public void update(SurveillanceCamera surveillanceCamera) {mRepository.updateCameras(surveillanceCamera);}
 
   public void delete(SurveillanceCamera surveillanceCamera) {
-    SynchronizationUtils.deleteImagesForCamera(surveillanceCamera);
+    StorageUtils.deleteImagesForCamera(surveillanceCamera);
     mRepository.deleteCamera(surveillanceCamera);
   }
 

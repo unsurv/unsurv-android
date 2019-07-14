@@ -162,7 +162,7 @@ public class CameraRepository {
     @Override
     protected Void doInBackground(final SurveillanceCamera... params) {
 
-      int deletedFiles = SynchronizationUtils.deleteImagesForCamera(params[0]);
+      int deletedFiles = StorageUtils.deleteImagesForCamera(params[0]);
       Log.i("deleteCameraAsync", "deleted " + deletedFiles + " files");
 
       mAsyncTaskDao.deleteCameras(params);

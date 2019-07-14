@@ -158,7 +158,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private BorderedText borderedText;
 
-  private String picturesPath = StorageUtils.PICTURES_PATH;
+  private String picturesPath = StorageUtils.CAPTURES_PATH;
   private static long timeLastPictureTaken = 0;
   private static final int DELAY_BETWEEN_CAPTURES = 500;
 
@@ -630,7 +630,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 if (!pooledCameraCaptures.isEmpty()) {
 
                   /*
-                  // TODO add "unsurv" to every PICTURES_PATH
+                  // TODO add "unsurv" to every SYNCHRONIZED_PATH
                   CameraCapture cameraCapture1 = new CameraCapture(99.9f,
                           "190754878_thumbnail.jpg", "190754878.jpg",
                           10, 120, 50, 140,

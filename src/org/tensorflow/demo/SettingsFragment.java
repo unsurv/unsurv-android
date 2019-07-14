@@ -17,9 +17,12 @@ public class SettingsFragment extends PreferenceFragment {
 
     Preference clearSynchronizedImages = findPreference("clear_synchronized");
 
-    long synchronizedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.PICTURES_PATH));
+    long synchronizedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.SYNCHRONIZED_PATH));
 
-    clearSynchronizedImages.setTitle("size: " + StorageUtils.convertByteSizeToMB(synchronizedImagesSize) + " MB");
+    clearSynchronizedImages.setTitle("Delete synchronized camera images: " + StorageUtils.convertByteSizeToMB(synchronizedImagesSize) + " MB");
+
+
+
 
     // TODO add popup before clearing
 
