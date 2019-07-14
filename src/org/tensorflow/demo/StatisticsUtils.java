@@ -11,7 +11,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 
-public class StatisticsUtils {
+class StatisticsUtils {
+
   final static String TAG = "StatisticsUtils";
 
   static List<StatisticsMap> getCamerasPerDayFromDb(double latMin, double latMax, double lonMin, double lonMax, Date startDate, Date endDate, SynchronizedCameraRepository synchronizedCameraRepository){

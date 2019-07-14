@@ -26,7 +26,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
   }
 
   private static String TAG = "choose Image adapter:";
-  private static String picturesPath = SynchronizationUtils.PICTURES_PATH;
+  private static String picturesPath = StorageUtils.PICTURES_PATH;
 
 
   private Context ctx;

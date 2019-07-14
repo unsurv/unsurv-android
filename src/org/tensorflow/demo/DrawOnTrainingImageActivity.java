@@ -1,6 +1,5 @@
 package org.tensorflow.demo;
 
-import android.app.Application;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +20,6 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import com.squareup.picasso.Picasso;
 import java.io.File;
-import java.util.List;
 
 public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
@@ -70,7 +68,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     cameraType = DrawView.REGULAR_CAMERA;
 
-    pathToImage = SynchronizationUtils.TRAINING_IMAGES_PATH + currentTrainingCamera.getImagePath();
+    pathToImage = StorageUtils.TRAINING_IMAGES_PATH + currentTrainingCamera.getImagePath();
 
     imageFile = new File(pathToImage);
 

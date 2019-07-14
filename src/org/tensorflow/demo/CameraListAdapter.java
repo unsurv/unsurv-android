@@ -62,7 +62,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   private List<SurveillanceCamera> mSurveillanceCameras;
 
-  private String picturesPath = SynchronizationUtils.PICTURES_PATH;
+  private String picturesPath = StorageUtils.PICTURES_PATH;
 
   private final CameraRepository cameraRepository;
   private final SharedPreferences sharedPreferences;
@@ -103,7 +103,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       if (trainingCapture){
         // camera is a training image not a capture with obj detection
-        mThumbnailPicture = new File(SynchronizationUtils.TRAINING_IMAGES_PATH + current.getImagePath());
+        mThumbnailPicture = new File(StorageUtils.TRAINING_IMAGES_PATH + current.getImagePath());
 
         //holder.detailLinearLayout.setBackgroundColor(Color.GRAY);
 

@@ -2,6 +2,7 @@ package org.tensorflow.demo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -29,8 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     bottomNavigationView = findViewById(R.id.navigation);
 
-    // bottomNavigationView.getMenu().setGroupCheckable(0, false, true);
-
+    // deselect all options in bottom navigation
     int size = bottomNavigationView.getMenu().size();
     for (int i = 0; i < size; i++) {
       bottomNavigationView.getMenu().getItem(i).setCheckable(false);

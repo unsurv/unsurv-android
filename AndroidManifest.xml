@@ -55,7 +55,6 @@
             android:label="@string/detector_label"
             android:parentActivityName=".DebugActivity">
 
-
         </activity>
 
         <activity
@@ -77,7 +76,7 @@
         <activity
             android:name=".ManualCaptureActivity"
             android:label="@string/manual_capture_label"
-            android:parentActivityName=".DebugActivity" >
+            android:parentActivityName=".DetectorActivity" >
 
 
         </activity>
@@ -85,19 +84,19 @@
         <activity
             android:name=".CaptureTrainingImageActivity"
             android:label="@string/training_capture_label"
-            android:parentActivityName=".DebugActivity">
+            android:parentActivityName=".DetectorActivity">
 
         </activity>
 
         <activity
             android:name=".DrawOnTrainingImageActivity"
             android:label="@string/draw_on_training_image_label"
-            android:parentActivityName=".DebugActivity" />
+            android:parentActivityName=".HistoryActivity" />
 
         <activity
             android:name=".EditCameraActivity"
             android:label="@string/edit_camera_label"
-            android:parentActivityName=".DebugActivity" />
+            android:parentActivityName=".HistoryActivity" />
 
         <service
             android:name=".SyncIntervalSchedulerJobService"

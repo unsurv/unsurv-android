@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SynchronizedCameraRepository {
@@ -125,7 +124,7 @@ public class SynchronizedCameraRepository {
 
   public void delete(SynchronizedCamera synchronizedCamera) {
 
-    String current_path = SynchronizationUtils.PICTURES_PATH + synchronizedCamera.getImagePath();
+    String current_path = StorageUtils.PICTURES_PATH + synchronizedCamera.getImagePath();
 
     File file = new File(current_path);
     boolean deleted = file.delete();
@@ -139,7 +138,7 @@ public class SynchronizedCameraRepository {
 
 
     for (SynchronizedCamera camera : allCameras) {
-      String current_path = SynchronizationUtils.PICTURES_PATH + camera.getImagePath();
+      String current_path = StorageUtils.PICTURES_PATH + camera.getImagePath();
 
       File file = new File(current_path);
       boolean deleted = file.delete();

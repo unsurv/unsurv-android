@@ -2,14 +2,10 @@ package org.tensorflow.demo;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
-import android.graphics.Camera;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.File;
 import java.util.List;
-
-import static org.tensorflow.demo.SynchronizationUtils.PICTURES_PATH;
 
 public class CameraRepository {
 

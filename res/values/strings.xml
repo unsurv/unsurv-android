@@ -86,6 +86,14 @@
     <string name="edit_button">EDIT LOCATION</string>
     <string name="save_button">SAVE</string>
 
+    <!--in SettingsActivity-->
+    <string name="storage_title">Storage</string>
+
+
+    <string name="synchronized_cameras_size">Storage used by synchronized cameras:</string>
+    <string name="captured_cameras_size">Storage used by captured cameras:</string>
+    <string name="training_cameras_size">Storage used by training cameras:</string>
+
 
 
 

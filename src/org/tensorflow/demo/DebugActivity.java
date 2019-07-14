@@ -77,7 +77,7 @@ import java.util.Random;
 import java.util.TimeZone;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
-import static org.tensorflow.demo.SynchronizationUtils.PICTURES_PATH;
+import static org.tensorflow.demo.StorageUtils.PICTURES_PATH;
 
 
 public class DebugActivity extends AppCompatActivity {

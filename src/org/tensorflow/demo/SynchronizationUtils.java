@@ -6,7 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Environment;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -48,18 +47,12 @@ import java.util.TimeZone;
 
 
 class SynchronizationUtils {
-  // accessible for every app for now
-  public  static String PICTURES_PATH = Environment.getExternalStoragePublicDirectory(
-          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/";
-
-  public static String TRAINING_IMAGES_PATH = Environment.getExternalStoragePublicDirectory(
-          Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/training/";
 
   private static int UPLOAD_FAILED = 0;
   private static int UPLOAD_SUCCESSFUL = 1;
 
-  public final static int STANDARD_CAMERA = 0;
-  public final static int DOME_CAMERA = 1;
+  final static int STANDARD_CAMERA = 0;
+  final static int DOME_CAMERA = 1;
 
   private static String TAG = "SynchronizationUtils";
 
@@ -281,7 +274,7 @@ class SynchronizationUtils {
 
                     byte[] imageAsBytes = Base64.decode(base64Image, Base64.DEFAULT);
 
-                    saveBytesToFile(imageAsBytes, id + ".jpg", PICTURES_PATH);
+                    saveBytesToFile(imageAsBytes, id + ".jpg", StorageUtils.PICTURES_PATH);
 
                   }
 
@@ -604,9 +597,9 @@ class SynchronizationUtils {
 
       // if camera is a training image
       if (currentCamera.getTrainingCapture()){
-        imageFile = new File(TRAINING_IMAGES_PATH+ currentCamera.getImagePath());
+        imageFile = new File(StorageUtils.TRAINING_IMAGES_PATH+ currentCamera.getImagePath());
       } else {
-        imageFile = new File(PICTURES_PATH + currentCamera.getThumbnailPath());
+        imageFile = new File(StorageUtils.PICTURES_PATH + currentCamera.getThumbnailPath());
       }
       JSONObject singleCamera = new JSONObject();
 
@@ -881,12 +874,12 @@ class SynchronizationUtils {
 
     try {
       if (camera.getTrainingCapture()){
-        imageFile = new File(TRAINING_IMAGES_PATH + camera.getImagePath());
+        imageFile = new File(StorageUtils.TRAINING_IMAGES_PATH + camera.getImagePath());
         if (imageFile.delete()){
           deletedFiles++;
         }
       } else {
-        imageFile = new File(PICTURES_PATH + camera.getImagePath());
+        imageFile = new File(StorageUtils.PICTURES_PATH + camera.getImagePath());
         if (imageFile.delete()){
           deletedFiles++;
         }
@@ -897,7 +890,7 @@ class SynchronizationUtils {
 
 
     try {
-      thumbnailFile = new File(PICTURES_PATH + camera.getThumbnailPath());
+      thumbnailFile = new File(StorageUtils.PICTURES_PATH + camera.getThumbnailPath());
       if (thumbnailFile.delete()){
         deletedFiles++;
       }
@@ -913,7 +906,7 @@ class SynchronizationUtils {
               .split(",");
 
       for (String path : multipleCapturesFilenames){
-        multipleCaptureFile = new File(PICTURES_PATH + path);
+        multipleCaptureFile = new File(StorageUtils.PICTURES_PATH + path);
         if (multipleCaptureFile.delete()){
           deletedFiles++;
         }

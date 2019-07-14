@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,6 +14,18 @@
     <Preference
         app:title="Send feedback"
         android:summary="Report technical issues or suggest new features"/>
+
+    <Preference
+        android:key="clear_synchronized"
+        android:title="Clear images for synchronized cameras"/>
+
+    <Preference
+        android:key="clear_captures"
+        android:title="Clear your captures"/>
+
+    <Preference
+        android:key="clear_training"
+        android:title="Clear your training images"/>
 
     <EditTextPreference
         android:key="synchronizationUrl"

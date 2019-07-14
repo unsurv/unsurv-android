@@ -448,7 +448,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
     List<SurveillanceCamera> asd = cameraRepository.getAllCameras();
     Log.i(TAG, String.valueOf(asd.size()));
 
-    mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, "asd.jpg");
+    mFile = new File(StorageUtils.TRAINING_IMAGES_PATH, "asd.jpg");
 
   }
 
@@ -996,7 +996,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
         }
 
         String trainingImageUuid = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
-        mFile = new File(SynchronizationUtils.TRAINING_IMAGES_PATH, trainingImageUuid +".jpg");
+        mFile = new File(StorageUtils.TRAINING_IMAGES_PATH, trainingImageUuid +".jpg");
 
         SurveillanceCamera trainingCamera = new SurveillanceCamera(
                 0,

@@ -175,7 +175,7 @@ public class MapActivity extends AppCompatActivity {
 
   private AreaOfflineAvailable mostRecentArea;
 
-  private String picturesPath = SynchronizationUtils.PICTURES_PATH;
+  private String picturesPath = StorageUtils.PICTURES_PATH;
 
   private TextView amountOnMapTextView;
   private TextView infoTextView;

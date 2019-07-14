@@ -48,12 +48,9 @@ import android.util.Size;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -161,7 +158,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private BorderedText borderedText;
 
-  private String picturesPath = SynchronizationUtils.PICTURES_PATH;
+  private String picturesPath = StorageUtils.PICTURES_PATH;
   private static long timeLastPictureTaken = 0;
   private static final int DELAY_BETWEEN_CAPTURES = 500;
 
