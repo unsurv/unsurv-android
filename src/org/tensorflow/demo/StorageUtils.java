@@ -18,13 +18,13 @@ class StorageUtils {
   final static int DOME_CAMERA = 1;
 
   // accessible for every app for now
-  static String SYNCHRONIZED_PATH = Environment.getExternalStoragePublicDirectory(
+  final static String SYNCHRONIZED_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/synchronized/";
 
-  static String CAPTURES_PATH = Environment.getExternalStoragePublicDirectory(
+  final static String CAPTURES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/captures/";
 
-  static String TRAINING_IMAGES_PATH = Environment.getExternalStoragePublicDirectory(
+  final static String TRAINING_IMAGES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/training/";
 
   // TODO add 3rd option  sync, captures, training
@@ -198,6 +198,8 @@ class StorageUtils {
   }
 
   static long deleteAllFilesInDirectory(String directory){
+
+    // recursive delete a good idea? TODO visit again
     File directoryFile = new File(directory);
 
     final List<File> dirs = new LinkedList<>();
@@ -217,6 +219,10 @@ class StorageUtils {
           dirs.add(child);
       }
     }
+
+    File recreateDir = new File(directory);
+    recreateDir.mkdirs();
+
     return result;
   }
 
