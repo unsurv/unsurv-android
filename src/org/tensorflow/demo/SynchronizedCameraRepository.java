@@ -23,8 +23,24 @@ public class SynchronizedCameraRepository {
   }
 
 
-  List<SynchronizedCamera> getAllSynchronizedCameras() {
-    return mSynchronizedCameraDao.getAllCameras();
+  List<SynchronizedCamera> getAllSynchronizedCameras(boolean useAsyncTask) {
+
+    if (useAsyncTask){
+
+      try {
+        List<SynchronizedCamera> cameras = new getAllAsyncTask(mSynchronizedCameraDao).execute().get();
+        return cameras;
+
+      } catch (Exception e) {
+        Log.i("Background findByID Error: " , e.toString());
+      }
+
+    } else {
+      return mSynchronizedCameraDao.getAllCameras();
+    }
+
+    return null;
+
   }
 
 
@@ -146,6 +162,26 @@ public class SynchronizedCameraRepository {
     }
 
     mSynchronizedCameraDao.deleteAll();
+  }
+
+
+
+  private static class getAllAsyncTask extends AsyncTask<Void, Void, List<SynchronizedCamera>> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+
+    getAllAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected List<SynchronizedCamera> doInBackground(Void... voids) {
+
+      return mAsyncTaskDao.getAllCameras();
+
+
+    }
   }
 
 

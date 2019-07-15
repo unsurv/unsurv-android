@@ -54,7 +54,7 @@ class StorageUtils {
   }
 
 
-  static String convertByteSizeToMB(long byteSize){
+  static String convertByteSizeToMBTwoDecimals(long byteSize){
 
     String tmp = String.valueOf(byteSize / 10000);
 
@@ -66,7 +66,12 @@ class StorageUtils {
     String MbInByteSize = tmp.substring(0, tmp.length() - 2);
     String twoDecimals = tmp.substring(tmp.length() - 2);
 
-    return MbInByteSize + "," + twoDecimals;
+    if (MbInByteSize.isEmpty()){
+      return "0," + twoDecimals;
+    } else {
+      return MbInByteSize + "," + twoDecimals;
+    }
+
   }
 
   static byte[] readFileToBytes(File f) throws IOException {
@@ -131,7 +136,7 @@ class StorageUtils {
           deletedFiles++;
         }
       } else {
-        imageFile = new File(SYNCHRONIZED_PATH + camera.getImagePath());
+        imageFile = new File(CAPTURES_PATH + camera.getImagePath());
         if (imageFile.delete()){
           deletedFiles++;
         }
@@ -142,7 +147,7 @@ class StorageUtils {
 
 
     try {
-      thumbnailFile = new File(SYNCHRONIZED_PATH + camera.getThumbnailPath());
+      thumbnailFile = new File(CAPTURES_PATH + camera.getThumbnailPath());
       if (thumbnailFile.delete()){
         deletedFiles++;
       }
@@ -158,7 +163,7 @@ class StorageUtils {
               .split(",");
 
       for (String path : multipleCapturesFilenames){
-        multipleCaptureFile = new File(SYNCHRONIZED_PATH + path);
+        multipleCaptureFile = new File(CAPTURES_PATH + path);
         if (multipleCaptureFile.delete()){
           deletedFiles++;
         }
@@ -170,4 +175,49 @@ class StorageUtils {
 
     return deletedFiles;
   }
+
+
+  static int deleteImagesForSynchronizedCamera(SynchronizedCamera camera){
+
+    File imageFile;
+    int deletedFiles = 0;
+
+    try {
+
+      imageFile = new File(SYNCHRONIZED_PATH + camera.getImagePath());
+      if (imageFile.delete()){
+        deletedFiles++;
+      }
+    } catch (Exception e){
+      Log.i(TAG, "deleteImages:" + e);
+    }
+
+    Log.i(TAG, "deleted " + deletedFiles + "images");
+
+    return deletedFiles;
+  }
+
+  static long deleteAllFilesInDirectory(String directory){
+    File directoryFile = new File(directory);
+
+    final List<File> dirs = new LinkedList<>();
+    dirs.add(directoryFile);
+    long result = 0;
+    while (!dirs.isEmpty()) {
+      final File dir = dirs.remove(0);
+      if (!dir.exists())
+        continue;
+      final File[] listFiles = dir.listFiles();
+      if (listFiles == null || listFiles.length == 0)
+        continue;
+      for (final File child : listFiles) {
+        child.delete();
+        result++;
+        if (child.isDirectory())
+          dirs.add(child);
+      }
+    }
+    return result;
+  }
+
 }

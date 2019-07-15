@@ -377,7 +377,7 @@ public class DrawView extends ImageView {
     // update and save to db
     drawnCameras = rectArray.toString();
     mCamera.setDrawnRectsAsString(drawnCameras);
-    mCameraViewModel.update(mCamera);
+    // mCameraViewModel.update(mCamera);
 
     refresh();
 

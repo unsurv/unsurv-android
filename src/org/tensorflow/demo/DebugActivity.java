@@ -683,8 +683,8 @@ public class DebugActivity extends AppCompatActivity {
       //synchronizedCameraRepository.deleteAll();
 
       if (MODE == CHECK_DB_SIZE) {
-        dbSize = synchronizedCameraRepository.getAllSynchronizedCameras().size();
-        Log.i(TAG, "doInBackground: " + String.valueOf(synchronizedCameraRepository.getAllSynchronizedCameras().size()));
+        dbSize = synchronizedCameraRepository.getAllSynchronizedCameras(false).size();
+        Log.i(TAG, "doInBackground: " + dbSize);
         runOnUiThread(new Runnable() {
           @Override
           public void run() {

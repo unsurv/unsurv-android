@@ -747,7 +747,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       LOGGER.i("TOOK PICTURE -------------------------------------- ");
 
       FileOutputStream out = null;
-      FileOutputStream thumbnailOut;
+      FileOutputStream thumbnailOut = null;
 
       try {
         Matrix turnMatrix = new Matrix();
@@ -763,6 +763,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         File thumbnailFile = new File(pictureDirectory, thumbnailFilename);
 
         out = new FileOutputStream(outputFile);
+        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+        thumbnailOut = new FileOutputStream(thumbnailFile);
 
         // Get detection edges in px values.
         int xThumbnail = Math.round(location.left);
@@ -770,9 +773,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         int widthThumbnail = Math.round(location.width());
         int heightThumbnail = Math.round(location.height());
 
-        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-
-        thumbnailOut = new FileOutputStream(thumbnailFile);
         Bitmap thumbnail = Bitmap.createBitmap(croppedBitmap, xThumbnail, yThumbnail, widthThumbnail, heightThumbnail);
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, thumbnailOut);
 
@@ -811,8 +811,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
         pooledCameraCaptures.add(currentCamera);
 
-        //cameraRoomDatabase.surveillanceCameraDao().insert(currentCamera);
-
 
         if (gpsLocation.getStatus() != AsyncTask.Status.RUNNING){
           AsyncLocationGetter gpsLocation = new AsyncLocationGetter(DetectorActivity.this);
@@ -827,6 +825,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         try {
           if (out != null) {
             out.close();
+          }
+
+          if (thumbnailOut != null) {
+            thumbnailOut.close();
           }
         } catch (IOException e) {
           e.printStackTrace();
@@ -856,6 +858,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     // Get Capture with biggest confidence for thumbnail/picture.
     for (int k=0; k < cameraPool.size(); k++) {
       allCaptureFilenames.put(cameraPool.get(k).getThumbnailPath());
+      allCaptureFilenames.put(cameraPool.get(k).getImagePath());
 
       if (cameraPool.get(k).getConfidence() > biggestConfidence.getConfidence()) {
         biggestConfidence = cameraPool.get(k);
