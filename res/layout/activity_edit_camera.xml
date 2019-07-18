@@ -33,7 +33,7 @@
                 android:scaleType="fitCenter"
                 />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/edit_camera_choose_recyclerview"
                 android:scrollbars="vertical"
                 android:layout_width="0sp"
@@ -239,7 +239,7 @@
     </LinearLayout>
 
 
-    <android.support.design.widget.BottomNavigationView
+    <com.google.android.material.bottomnavigation.BottomNavigationView
 
         android:id="@+id/navigation"
         android:layout_width="match_parent"

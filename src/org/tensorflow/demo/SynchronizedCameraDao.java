@@ -1,14 +1,13 @@
 package org.tensorflow.demo;
 
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.room.ColumnInfo;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.Query;
+import androidx.room.Update;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Dao

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.tensorflow.demo">
 
     <uses-sdk
@@ -32,6 +33,7 @@
         android:theme="@style/EditedThemeAppCompatNoActionBar"
         android:usesCleartextTraffic="true">
         <!-- CLEARTEXT JUST HERE FOR DEBUGGING REMOVE LATER!!!!-->
+
 
         <activity
             android:name=".DebugActivity"

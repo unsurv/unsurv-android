@@ -1,15 +1,15 @@
 package org.tensorflow.demo;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -150,7 +150,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       }
     });
 
-    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
+    androidx.appcompat.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
 
     bottomNavigationView = findViewById(R.id.navigation);

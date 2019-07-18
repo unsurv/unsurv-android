@@ -4,13 +4,15 @@ package org.tensorflow.demo;
         import android.content.SharedPreferences;
         import android.os.Bundle;
         import android.preference.PreferenceManager;
-        import android.support.annotation.Nullable;
+        import androidx.annotation.Nullable;
         import android.view.LayoutInflater;
         import android.view.MotionEvent;
         import android.view.View;
         import android.view.ViewGroup;
         import android.widget.Button;
         import android.widget.TextView;
+
+        import androidx.fragment.app.Fragment;
 
         import org.osmdroid.api.IMapController;
         import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -19,7 +21,7 @@ package org.tensorflow.demo;
         import org.osmdroid.views.MapView;
 
 
-public class MapTutorialFragment extends android.support.v4.app.Fragment {
+public class MapTutorialFragment extends Fragment {
 
   private SharedPreferences sharedPreferences;
   private Boolean mapScrollingEnabled = true;

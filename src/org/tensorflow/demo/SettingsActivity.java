@@ -2,11 +2,11 @@ package org.tensorflow.demo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -25,7 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
             .replace(R.id.settings_container, new SettingsFragment())
             .commit();
 
-    android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
+    androidx.appcompat.widget.Toolbar myToolbar = findViewById(R.id.my_toolbar);
     setSupportActionBar(myToolbar);
 
     bottomNavigationView = findViewById(R.id.navigation);

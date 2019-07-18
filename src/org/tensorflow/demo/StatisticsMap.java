@@ -1,6 +1,6 @@
 package org.tensorflow.demo;
 
-import android.arch.persistence.room.ColumnInfo;
+import androidx.room.ColumnInfo;
 
 public class StatisticsMap {
   @ColumnInfo(name = "uploadedAt")

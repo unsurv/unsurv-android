@@ -3,15 +3,16 @@ package org.tensorflow.demo;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 
-public class RecordingTutorialFragment extends android.support.v4.app.Fragment {
+import androidx.fragment.app.Fragment;
+
+public class RecordingTutorialFragment extends Fragment {
 
   private SharedPreferences sharedPreferences;
 

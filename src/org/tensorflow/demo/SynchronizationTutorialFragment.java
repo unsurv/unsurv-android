@@ -3,7 +3,7 @@ package org.tensorflow.demo;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +14,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
 
-public class SynchronizationTutorialFragment extends android.support.v4.app.Fragment {
+import androidx.fragment.app.Fragment;
+
+public class SynchronizationTutorialFragment extends Fragment {
 
   private SharedPreferences sharedPreferences;
   private LinearLayout intervalChoice;

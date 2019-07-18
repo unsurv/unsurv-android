@@ -40,8 +40,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
@@ -206,7 +206,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private Long currentTime;
 
-  private Boolean isTimeToCapture = false;
+  private Boolean isCapturing = false;
 
   Button manualCameraCapture;
   Button trainingCameraCapture;
@@ -630,7 +630,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 if (!pooledCameraCaptures.isEmpty()) {
 
                   /*
-                  // TODO add "unsurv" to every SYNCHRONIZED_PATH
                   CameraCapture cameraCapture1 = new CameraCapture(99.9f,
                           "190754878_thumbnail.jpg", "190754878.jpg",
                           10, 120, 50, 140,
@@ -674,14 +673,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 } else
                   //time in
                   if (timePoolCaptureStarted + poolDurationInMillis > currentTime) {
-                    isTimeToCapture = true;
+                    isCapturing = true;
 
-                  }
+              }
 
 
             } else {
               // If Button is held, enable pooling
-              captureButtonIsBeingHeld = isTimeToCapture;
+              captureButtonIsBeingHeld = isCapturing;
             }
 
 
@@ -698,14 +697,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 runOnUiThread(new Runnable(){
                   @Override
                   public void run(){
-                    if (System.currentTimeMillis() - timeLastPictureTaken > DELAY_BETWEEN_CAPTURES
-                            && photoStatus != STATUS_GREEN) {
+                    if (!isCapturing) {
                       photoStatusView.setImageResource(R.drawable.ic_camera_alt_green_24dp);
                       photoStatus = STATUS_GREEN;
                     }
 
-                    if (result.getConfidence() > 0.95 && System.currentTimeMillis() -
-                            timeLastPictureTaken > DELAY_BETWEEN_CAPTURES) {
+                    if (isCapturing) {
                       photoStatusView.setImageResource(R.drawable.ic_camera_alt_red_24dp);
                       photoStatus = STATUS_RED;
 
@@ -713,7 +710,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                   }
                 });
 
-                if (isTimeToCapture) {
+                if (isCapturing) {
                   processSurveillanceCameraCapture(result, location, pictureDirectory);
                 }
 
@@ -1073,7 +1070,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                             locationStatusView.setImageResource(R.drawable.ic_my_location_red_24dp);
                           } else if (locationAccuracy < 15 && locationAccuracy > 3 ) {
                             locationStatusView.setImageResource(R.drawable.ic_my_location_orange_24dp);
-                          } else if (locationAccuracy < 3) {
+                          } else if (locationAccuracy < 5) {
                             locationStatusView.setImageResource(R.drawable.ic_my_location_green_24dp);
                           }
 
