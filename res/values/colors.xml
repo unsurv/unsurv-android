@@ -30,7 +30,9 @@
 
     <!-- general stuff -->
     <color name="standardBackground">#2d2d2d</color>
-    <color name="recyclerview_item_background">#383838</color>
-    <color name="text_white">#FFFFFF</color>
+    <color name="recyclerviewItemBackground">#383838</color>
+    <color name="textWhite">#FFFFFF</color>
+
+    <color name="lightGrey">#5e5e5d</color>
 
 </resources>

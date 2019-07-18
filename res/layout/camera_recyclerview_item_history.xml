@@ -20,7 +20,7 @@
     android:layout_height="wrap_content"
 
     android:orientation="horizontal"
-    android:background="@color/recyclerview_item_background"
+    android:background="@color/recyclerviewItemBackground"
     android:layout_marginTop="1dp"
     android:layout_marginBottom="1dp"
     >
@@ -80,7 +80,7 @@
             android:id="@+id/history_item_delete_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@color/recyclerview_item_background"
+            android:background="@color/recyclerviewItemBackground"
             android:padding="4dp"
             android:src="@drawable/ic_close_red_24dp"
             android:layout_gravity="center"
@@ -90,7 +90,7 @@
             android:id="@+id/history_item_upload_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@color/recyclerview_item_background"
+            android:background="@color/recyclerviewItemBackground"
             android:src="@drawable/ic_file_upload_grey_24dp"
             android:padding="4dp"
             android:layout_gravity="center"

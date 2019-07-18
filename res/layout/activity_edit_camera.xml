@@ -214,7 +214,7 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/camera_edit_edit_button"
                 android:text="@string/edit_button"
                 android:layout_width="0sp"
@@ -222,7 +222,7 @@
                 android:layout_weight="5"
                 android:layout_margin="5dp"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/camera_edit_save_button"
                 android:text="@string/save_button"
                 android:layout_width="0sp"

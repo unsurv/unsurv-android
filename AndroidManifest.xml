@@ -30,7 +30,7 @@
         android:debuggable="true"
         android:icon="@drawable/unsurv_logo"
         android:label="@string/app_label"
-        android:theme="@style/EditedThemeAppCompatNoActionBar"
+        android:theme="@style/EditedMaterialNoActionBar"
         android:usesCleartextTraffic="true">
         <!-- CLEARTEXT JUST HERE FOR DEBUGGING REMOVE LATER!!!!-->
 

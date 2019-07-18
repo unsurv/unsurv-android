@@ -14,12 +14,12 @@
  limitations under the License.
 -->
 <resources>
-    <style name="MaterialTheme" parent="android:Theme.Material.Light.NoActionBar.Fullscreen" />
 
-    <style name="EditedThemeAppCompatNoActionBar" parent="Theme.AppCompat.NoActionBar">
+    <style name="EditedMaterialNoActionBar" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
     </style>
 
 

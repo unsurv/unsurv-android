@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:textSize="18sp"
         android:text="@string/map_title"
-        android:textColor="@color/text_white"
+        android:textColor="@color/textWhite"
         android:layout_margin="4dp"
         />
 

@@ -653,6 +653,8 @@ public class DebugActivity extends AppCompatActivity {
       }
     });
 
+    bottomNavigationView.showBadge(0).setNumber(1);
+
   }
 
 

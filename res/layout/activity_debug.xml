@@ -33,25 +33,25 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/sync_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SYNC"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/check_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SIZE"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/delete_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="DELETE"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/alarm_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -67,25 +67,25 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/start_tutorial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TUTORIAL"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/check_jobs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="CHECK JOBS"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/show_preferences"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SHOW PREFS"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/add_surveilllance_camera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -101,25 +101,26 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/upload_cameras"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="UPLOAD"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Widget.AppCompat.Button"
             android:id="@+id/get_key"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="KEY"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/abort_job"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ABORT JOB"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/draw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
