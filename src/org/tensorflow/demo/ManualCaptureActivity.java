@@ -1,5 +1,6 @@
 package org.tensorflow.demo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -33,12 +34,23 @@ public class ManualCaptureActivity extends AppCompatActivity {
 
   private CameraRepository cameraRepository;
 
+  Context context;
 
+
+  @Override
+  protected void onResume() {
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
+    super.onResume();
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_manual_capture);
+
+    context = this;
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     cameraRepository = new CameraRepository(getApplication());

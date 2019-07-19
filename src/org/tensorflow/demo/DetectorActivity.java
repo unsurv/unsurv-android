@@ -217,12 +217,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private MyLocationListener locationListener;
   private Location currentLocation;
 
+  BottomNavigationView bottomNavigationView;
+  Context context;
+
 
 
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(null);
+
+    context = this;
 
     locationListener = new MyLocationListener();
 
@@ -260,7 +265,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
 
-    BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
+    bottomNavigationView = findViewById(R.id.navigation);
 
     // Handle bottom navigation bar clicks
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -359,6 +364,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     }
 
     gpsLocation.execute();
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
 
     super.onResume();
 

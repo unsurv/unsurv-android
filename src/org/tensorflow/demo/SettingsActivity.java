@@ -1,5 +1,6 @@
 package org.tensorflow.demo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -13,12 +14,23 @@ public class SettingsActivity extends AppCompatActivity {
 
   BottomNavigationView bottomNavigationView;
 
+  Context context;
 
+
+  @Override
+  protected void onResume() {
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
+    super.onResume();
+  }
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_settings);
+
+    context = this;
 
     getSupportFragmentManager().beginTransaction()
             .replace(R.id.settings_container, new SettingsFragment())

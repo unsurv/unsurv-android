@@ -191,6 +191,8 @@ public class MapActivity extends AppCompatActivity {
   int writeStoragePermission;
   int fineLocationPermission;
 
+  Context context;
+
 
   // TODO set max amount visible
 
@@ -198,6 +200,9 @@ public class MapActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map);
+
+    context = this;
+
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
     areaOfflineAvailableRepository = new AreaOfflineAvailableRepository(getApplication());
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -592,7 +597,6 @@ public class MapActivity extends AppCompatActivity {
 
   @Override
   protected void onResume() {
-    super.onResume();
 
     br = new BroadcastReceiver() {
       @Override
@@ -637,6 +641,10 @@ public class MapActivity extends AppCompatActivity {
     if (!permissionList.isEmpty()) {
       ActivityCompat.requestPermissions(MapActivity.this, neededPermissions, 2);
     }
+
+    BottomNavigationBadgeHelper.clearMenuItemBadge(bottomNavigationView, R.id.bottom_navigation_map, context);
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
     super.onResume();
 

@@ -126,6 +126,8 @@ public class DebugActivity extends AppCompatActivity {
 
   private CameraViewModel cameraViewModel;
 
+  private Context context;
+
 
 
 
@@ -165,10 +167,19 @@ public class DebugActivity extends AppCompatActivity {
   //TODO ADD REFRESH BUTTON
 
   @Override
+  protected void onResume() {
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
+    super.onResume();
+  }
+
+  @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.activity_debug);
+    context = this;
+
     final String TAG = "DebugActivity";
     final TextView debugTextView = findViewById(R.id.debug_textview);
     final Button debugDbSync = findViewById(R.id.sync_db);
@@ -213,8 +224,8 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
     sharedPreferences.edit().putBoolean("downloadImages", true).apply();
     sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", false).apply();
-    sharedPreferences.edit().putInt("bottomNavigationHistoryBadgeCount", 0).apply();
-    sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 0).apply();
+    sharedPreferences.edit().putInt("bottomNavigationHistoryBadgeCount", 10).apply();
+    sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 12).apply();
 
 
 
@@ -468,7 +479,7 @@ public class DebugActivity extends AppCompatActivity {
 
         cameraRepository.insert(randomCamera);
         cameraRepository.insert(randomCamera2);
-        BottomNavigationNotificationHelper.incrementBadge(bottomNavigationView, R.id.bottom_navigation_history, 2);
+        BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 2);
 
         // cameraRepository.insert(notRandomCamera);
 
@@ -658,6 +669,8 @@ public class DebugActivity extends AppCompatActivity {
       }
     });
 
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, this);
 
   }
 

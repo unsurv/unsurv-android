@@ -97,12 +97,16 @@ public class StatisticsActivity extends AppCompatActivity {
   private String baseURL;
   private String today;
 
+  Context context;
+
 
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_statistics);
+
+    context = this;
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
@@ -184,7 +188,6 @@ public class StatisticsActivity extends AppCompatActivity {
 
   @Override
   protected void onResume() {
-    super.onResume();
 
     long currentTime = System.currentTimeMillis();
     today = timestampIso8601.format(new Date(currentTime));
@@ -227,6 +230,8 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     updateLocalTextViews();
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
     super.onResume();
   }

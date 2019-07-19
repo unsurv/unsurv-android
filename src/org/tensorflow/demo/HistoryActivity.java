@@ -34,6 +34,7 @@ public class HistoryActivity extends AppCompatActivity {
   private BottomNavigationView bottomNavigationView;
   private RecyclerView recyclerView;
   private CameraListAdapter adapter;
+  private Context context;
 
 
 
@@ -64,6 +65,11 @@ public class HistoryActivity extends AppCompatActivity {
       ActivityCompat.requestPermissions(HistoryActivity.this, neededPermissions, 0);
     }
 
+    // clear badges for HistoryActivity when accessed
+    BottomNavigationBadgeHelper.clearMenuItemBadge(bottomNavigationView, R.id.bottom_navigation_history, context);
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
     super.onResume();
   }
 
@@ -71,6 +77,8 @@ public class HistoryActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_history);
+
+    context = this;
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 

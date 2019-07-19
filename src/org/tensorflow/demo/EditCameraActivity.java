@@ -1,6 +1,8 @@
 package org.tensorflow.demo;
 
 import androidx.lifecycle.ViewModelProviders;
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -76,14 +78,26 @@ public class EditCameraActivity extends AppCompatActivity {
   boolean standardChecked = false;
   boolean domeChecked = false;
 
+  Context context;
+
   private static String picturesPath = StorageUtils.CAPTURES_PATH;
 
+
+  @Override
+  protected void onResume() {
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
+    super.onResume();
+  }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_edit_camera);
+
+    context = this;
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 

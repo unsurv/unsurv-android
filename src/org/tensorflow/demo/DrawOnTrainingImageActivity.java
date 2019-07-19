@@ -42,10 +42,18 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
   private SharedPreferences sharedPreferences;
 
 
-  private BottomNavigationView bottomNavigationView;
+  BottomNavigationView bottomNavigationView;
 
 
   private  DrawView drawView;
+
+  @Override
+  protected void onResume() {
+
+    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
+    super.onResume();
+  }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
