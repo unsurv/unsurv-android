@@ -4,38 +4,44 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import androidx.annotation.Nullable;
+import androidx.preference.EditTextPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
 
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragmentCompat {
 
-  LayoutInflater mLayoutInflater;
   Context context;
 
-  Preference clearSynchronizedImages;
-  Preference clearCapturedImages;
-  Preference clearTrainingImages;
+  private Preference clearSynchronizedImages;
+  private Preference clearCapturedImages;
+  private Preference clearTrainingImages;
+
 
   @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 
     final CameraRepository cameraRepository = new CameraRepository(getActivity().getApplication());
     final SynchronizedCameraRepository synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
 
-    mLayoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
     context = getContext();
 
 
+
     // Load the preferences from an XML resource
-    addPreferencesFromResource(R.xml.preferences);
+    setPreferencesFromResource(R.xml.preferences, rootKey);
+
+    EditTextPreference asd = findPreference("synchronizationUrl");
+
+
+
 
     // clears storage for sychronized camera images
     clearSynchronizedImages = findPreference("clear_synchronized");
@@ -133,6 +139,14 @@ public class SettingsFragment extends PreferenceFragment {
 
     // TODO add popup before clearing,
     // TODO grey out synchronitaion category if offline mode selected
+
+  }
+
+  @Override
+  public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+
 
 
   }

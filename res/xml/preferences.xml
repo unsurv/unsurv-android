@@ -6,17 +6,22 @@
     android:summary="Settings for unsurv">
 
 
+
     <PreferenceCategory
+
         android:key="@string/storage_title"
         android:layout="@layout/preference_category_storage">
 
         <Preference
             android:key="clear_synchronized"
-            android:title="Clear images for synchronized cameras"/>
+            android:title="Clear images for synchronized cameras"
+            />
 
         <Preference
             android:key="clear_captures"
             android:title="Clear your captures"/>
+
+
         <Preference
             android:key="clear_training"
             android:title="Clear your training images"/>
@@ -35,7 +40,6 @@
         <SwitchPreference
             android:key="notifications"
             android:title="Enable message notifications" />
-
 
         <SwitchPreference
             android:title="Enable timestamps for captures"

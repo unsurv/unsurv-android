@@ -85,14 +85,14 @@ project.ext.TMP_DIR = project.buildDir.toString() + '/downloads'
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     if (nativeBuildSystem == 'cmake') {
         defaultConfig {
             applicationId = 'org.unsurv'
             minSdkVersion 24
-            targetSdkVersion 28
+            targetSdkVersion 29
             ndk {
                 abiFilters "${cpuType}"
             }
@@ -241,5 +241,8 @@ dependencies {
 
     // bottom navigation with badges
     implementation 'com.google.android.material:material:1.1.0-alpha06'
+
+    // preferences
+    implementation 'androidx.preference:preference:1.1.0-rc01'
 }
 

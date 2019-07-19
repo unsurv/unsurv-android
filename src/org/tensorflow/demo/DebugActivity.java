@@ -199,7 +199,7 @@ public class DebugActivity extends AppCompatActivity {
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*15)).apply();
-    sharedPreferences.edit().putString("synchronizationURL", "http://192.168.178.137:5000/").apply();
+    sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.178.137:5000/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
@@ -213,6 +213,9 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
     sharedPreferences.edit().putBoolean("downloadImages", true).apply();
     sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", false).apply();
+    sharedPreferences.edit().putInt("bottomNavigationHistoryBadgeCount", 0).apply();
+    sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 0).apply();
+
 
 
 
@@ -465,6 +468,8 @@ public class DebugActivity extends AppCompatActivity {
 
         cameraRepository.insert(randomCamera);
         cameraRepository.insert(randomCamera2);
+        BottomNavigationNotificationHelper.incrementBadge(bottomNavigationView, R.id.bottom_navigation_history, 2);
+
         // cameraRepository.insert(notRandomCamera);
 
 
@@ -653,7 +658,6 @@ public class DebugActivity extends AppCompatActivity {
       }
     });
 
-    bottomNavigationView.showBadge(0).setNumber(1);
 
   }
 
@@ -673,7 +677,7 @@ public class DebugActivity extends AppCompatActivity {
     private String TAG = "checkDbAsync";
 
 
-    public DbAsyncTask(Application application, int DbMode) {
+    DbAsyncTask(Application application, int DbMode) {
       synchronizedCameraRepository = new SynchronizedCameraRepository(application);
       MODE = DbMode;
     }
