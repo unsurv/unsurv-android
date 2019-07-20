@@ -76,7 +76,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     cameraType = DrawView.REGULAR_CAMERA;
 
-    pathToImage = StorageUtils.TRAINING_IMAGES_PATH + currentTrainingCamera.getImagePath();
+    pathToImage = StorageUtils.TRAINING_CAPTURES_PATH + currentTrainingCamera.getImagePath();
 
     imageFile = new File(pathToImage);
 
@@ -92,7 +92,6 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
         // force drawView to be 4:3
         int parentLayoutWidth = parentRelativeLayout.getWidth();
-
         int drawViewHeight = (int) Math.ceil(4/3.0 * parentLayoutWidth);
 
         // effectively "match parent" for layout_width and 1.33 * width for height for a total 4:3 format

@@ -591,7 +591,7 @@ class SynchronizationUtils {
 
       // if camera is a training image
       if (currentCamera.getTrainingCapture()){
-        imageFile = new File(StorageUtils.TRAINING_IMAGES_PATH+ currentCamera.getImagePath());
+        imageFile = new File(StorageUtils.TRAINING_CAPTURES_PATH + currentCamera.getImagePath());
       } else {
         imageFile = new File(StorageUtils.SYNCHRONIZED_PATH + currentCamera.getThumbnailPath());
       }

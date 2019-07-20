@@ -9,8 +9,6 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
@@ -78,7 +76,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     clearCapturedImages = findPreference("clear_captures");
 
-    final long capturedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.CAPTURES_PATH));
+    final long capturedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.CAMERA_CAPTURES_PATH));
 
     final String capturedMbTwoDecimals = StorageUtils.convertByteSizeToMBTwoDecimals(capturedImagesSize);
 
@@ -100,7 +98,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
           }
         }
 
-        displayPopUpBeforeDeleting("Do you want to delete all captured images?", capturedMbTwoDecimals , StorageUtils.CAPTURES_PATH, context);
+        displayPopUpBeforeDeleting("Do you want to delete all captured images?", capturedMbTwoDecimals , StorageUtils.CAMERA_CAPTURES_PATH, context);
 
         return true;
 
@@ -111,7 +109,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     clearTrainingImages = findPreference("clear_training");
 
-    final long trainingImagesSize = StorageUtils.getFileSize(new File(StorageUtils.TRAINING_IMAGES_PATH));
+    final long trainingImagesSize = StorageUtils.getFileSize(new File(StorageUtils.TRAINING_CAPTURES_PATH));
 
     final String trainingMbTwoDecimals = StorageUtils.convertByteSizeToMBTwoDecimals(trainingImagesSize);
     clearTrainingImages.setTitle("Delete training images: " + trainingMbTwoDecimals + " MB");
@@ -130,7 +128,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
           }
         }
 
-        displayPopUpBeforeDeleting("Do you want to delete all training images?\nThis will remove all training data without uploading.", trainingMbTwoDecimals , StorageUtils.TRAINING_IMAGES_PATH, context);
+        displayPopUpBeforeDeleting("Do you want to delete all training images?\nThis will remove all training data without uploading.", trainingMbTwoDecimals , StorageUtils.TRAINING_CAPTURES_PATH, context);
 
         return true;
 
@@ -180,10 +178,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     long synchronizedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.SYNCHRONIZED_PATH));
     clearSynchronizedImages.setTitle("Delete downloaded images: " + StorageUtils.convertByteSizeToMBTwoDecimals(synchronizedImagesSize) + " MB");
 
-    long capturedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.CAPTURES_PATH));
+    long capturedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.CAMERA_CAPTURES_PATH));
     clearCapturedImages.setTitle("Delete capture images: " + StorageUtils.convertByteSizeToMBTwoDecimals(capturedImagesSize) + " MB");
 
-    long trainingImagesSize = StorageUtils.getFileSize(new File(StorageUtils.TRAINING_IMAGES_PATH));
+    long trainingImagesSize = StorageUtils.getFileSize(new File(StorageUtils.TRAINING_CAPTURES_PATH));
     clearTrainingImages.setTitle("Delete training images: " + StorageUtils.convertByteSizeToMBTwoDecimals(trainingImagesSize) + " MB");
 
   }

@@ -28,18 +28,25 @@ import java.util.Collections;
 import java.util.List;
 
 
-// TODO differentiate between training captures and cameracaptures. diff color, no map, draw button
+/**
+ * Used in HistoryActivity to display captures made by users.
+ */
 
 public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.CameraViewHolder> {
 
 
   class CameraViewHolder extends RecyclerView.ViewHolder {
+
+    // small bar on lefthand side of view for each item in recyclerview
     private final View cameraTypeBar;
+
     private final ImageView thumbnailImageView;
     private final TextView topTextViewInItem;
     private final TextView bottomTextViewInItem;
+
     private final ImageButton deleteButton;
     private final ImageButton uploadButton;
+
     private final LinearLayout detailLinearLayout;
 
 
@@ -61,8 +68,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
   private final LayoutInflater mInflater;
 
   private List<SurveillanceCamera> mSurveillanceCameras;
-
-  private String picturesPath = StorageUtils.CAPTURES_PATH;
 
   private final CameraRepository cameraRepository;
   private final SharedPreferences sharedPreferences;
@@ -103,7 +108,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       if (trainingCapture){
         // camera is a training image not a capture with obj detection
-        imageFile = new File(StorageUtils.TRAINING_IMAGES_PATH + current.getImagePath());
+        imageFile = new File(StorageUtils.TRAINING_CAPTURES_PATH + current.getImagePath());
 
         //holder.detailLinearLayout.setBackgroundColor(Color.GRAY);
 
@@ -111,11 +116,12 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       } else {
 
-        imageFile = new File(picturesPath + current.getThumbnailPath());
+        // not a training capture, use correct storage path
+        imageFile = new File(StorageUtils.CAMERA_CAPTURES_PATH + current.getThumbnailPath());
 
         switch (cameraType){
           case StorageUtils.STANDARD_CAMERA:
-            holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#ff5555"));
+            holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#ff5555")); // red
 
             break;
 
@@ -153,8 +159,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         @Override
         public void onClick(View view) {
 
+          // TODO move to AlertDialog
           // create popupView to ask user if he wants to delete camera
-          // saves preference if checkbox ticked
+          // saves to SharedPreference if "don't ask again" checkbox ticked
 
           boolean quickDeleteCameras = sharedPreferences.getBoolean("quickDeleteCameras", false);
 
@@ -234,7 +241,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         @Override
         public void onClick(View view) {
 
-
+          //opens EditCameraActivity if regular capture, DrawOnTrainingImageActivity if item is a training capture.
 
           Log.i("holder onClick:", "clicked position: " + holder.getAdapterPosition());
 

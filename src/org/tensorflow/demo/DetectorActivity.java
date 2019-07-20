@@ -158,7 +158,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private BorderedText borderedText;
 
-  private String picturesPath = StorageUtils.CAPTURES_PATH;
+  private String picturesPath = StorageUtils.CAMERA_CAPTURES_PATH;
   private static long timeLastPictureTaken = 0;
   private static final int DELAY_BETWEEN_CAPTURES = 500;
 

@@ -109,7 +109,7 @@ public class DrawView extends ImageView {
     mDomePaint.setStrokeWidth(10);
     mDomePaint.setStyle(Paint.Style.STROKE);
 
-    mPathToImage = StorageUtils.TRAINING_IMAGES_PATH + camera.getImagePath();
+    mPathToImage = StorageUtils.TRAINING_CAPTURES_PATH + camera.getImagePath();
     mCameraViewModel = cameraViewModel;
 
     mCamera = camera;

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class AreaOfflineAvailableRepository {
+class AreaOfflineAvailableRepository {
 
   private AreaOfflineAvailableDao areaOfflineAvailableDao;
 

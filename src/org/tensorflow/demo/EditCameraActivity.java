@@ -80,7 +80,7 @@ public class EditCameraActivity extends AppCompatActivity {
 
   Context context;
 
-  private static String picturesPath = StorageUtils.CAPTURES_PATH;
+  private static String picturesPath = StorageUtils.CAMERA_CAPTURES_PATH;
 
 
   @Override

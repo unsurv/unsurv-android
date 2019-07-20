@@ -17,6 +17,11 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import java.io.File;
 import java.util.Collections;
 
+/**
+ * Used when clustering in MapActivity is used.
+ * If user clicks on a marker this window is used to show additional data.
+ */
+
 public class CustomInfoWindow extends MarkerInfoWindow {
 
   private ImageView infoImage;
@@ -62,6 +67,7 @@ public class CustomInfoWindow extends MarkerInfoWindow {
     infoImage.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
+
         String baseUrl = sharedPreferences.getString("synchronizationURL", null);
         SynchronizationUtils.downloadImagesFromServer(
                 baseUrl,

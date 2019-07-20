@@ -448,7 +448,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
     List<SurveillanceCamera> asd = cameraRepository.getAllCameras();
     Log.i(TAG, String.valueOf(asd.size()));
 
-    mFile = new File(StorageUtils.TRAINING_IMAGES_PATH, "asd.jpg");
+    mFile = new File(StorageUtils.TRAINING_CAPTURES_PATH, "asd.jpg");
 
   }
 
@@ -475,6 +475,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
           Activity activity = CaptureTrainingImageActivity.this;
           CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
           CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraId);
+          // -20 to maxzoom to fix crashes when
           float maxZoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
 
           Rect m = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
@@ -996,7 +997,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
         }
 
         String trainingImageUuid = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
-        mFile = new File(StorageUtils.TRAINING_IMAGES_PATH, trainingImageUuid +".jpg");
+        mFile = new File(StorageUtils.TRAINING_CAPTURES_PATH, trainingImageUuid +".jpg");
 
         SurveillanceCamera trainingCamera = new SurveillanceCamera(
                 0,

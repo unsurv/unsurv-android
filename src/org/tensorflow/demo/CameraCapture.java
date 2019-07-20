@@ -3,6 +3,14 @@ package org.tensorflow.demo;
 import android.location.Location;
 
 
+/**
+ * Used for temporarily storing individual captures. These get pooled per camera and are used to
+ * calculate the true position of a surveillance camera.
+ *
+ * The device bearing is stored for each capture to find intersects of captures to compute camera
+ * position.
+ */
+
 public class CameraCapture {
 
   private int id;

@@ -23,14 +23,14 @@ class LocationUtils {
 
   }
 
-  static double longitudeDegreeToMetersRatio(double latitude) {
+  private static double longitudeDegreeToMetersRatio(double latitude) {
     // in m
     int earthRadius = 6371000;
 
     return Math.PI/180*earthRadius*Math.cos(Math.toRadians(latitude));
   }
 
-  static int latitudeDegreeToMetersRatio() {
+  private static int latitudeDegreeToMetersRatio() {
     // Changes a small amount because earth is not a perfect sphere. Disregarded here
     return 110574;
   }
@@ -64,7 +64,7 @@ class LocationUtils {
 
   }
 
-  static double sumOfDistancesIn2d(double xValue, double yValue, List<Pair<Double, Double>> points){
+  private static double sumOfDistancesIn2d(double xValue, double yValue, List<Pair<Double, Double>> points){
     double sumOfDistances = 0;
     double xDiff;
     double yDiff;
@@ -96,7 +96,7 @@ class LocationUtils {
     movementVectors2d.add(new Pair<>(-1, 0)); // W
 
 
-    // Value to move around at first step.
+    // Value in meters to move around at first step.
     double stepSize = 3;
 
     // find center of gravity as starting point

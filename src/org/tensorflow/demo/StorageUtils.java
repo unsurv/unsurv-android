@@ -21,10 +21,10 @@ class StorageUtils {
   final static String SYNCHRONIZED_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/synchronized/";
 
-  final static String CAPTURES_PATH = Environment.getExternalStoragePublicDirectory(
+  final static String CAMERA_CAPTURES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/cameras/captures/";
 
-  final static String TRAINING_IMAGES_PATH = Environment.getExternalStoragePublicDirectory(
+  final static String TRAINING_CAPTURES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/training/";
 
   // TODO add 3rd option  sync, captures, training
@@ -131,12 +131,12 @@ class StorageUtils {
 
     try {
       if (camera.getTrainingCapture()){
-        imageFile = new File(TRAINING_IMAGES_PATH + camera.getImagePath());
+        imageFile = new File(TRAINING_CAPTURES_PATH + camera.getImagePath());
         if (imageFile.delete()){
           deletedFiles++;
         }
       } else {
-        imageFile = new File(CAPTURES_PATH + camera.getImagePath());
+        imageFile = new File(CAMERA_CAPTURES_PATH + camera.getImagePath());
         if (imageFile.delete()){
           deletedFiles++;
         }
@@ -147,7 +147,7 @@ class StorageUtils {
 
 
     try {
-      thumbnailFile = new File(CAPTURES_PATH + camera.getThumbnailPath());
+      thumbnailFile = new File(CAMERA_CAPTURES_PATH + camera.getThumbnailPath());
       if (thumbnailFile.delete()){
         deletedFiles++;
       }
@@ -163,7 +163,7 @@ class StorageUtils {
               .split(",");
 
       for (String path : multipleCapturesFilenames){
-        multipleCaptureFile = new File(CAPTURES_PATH + path);
+        multipleCaptureFile = new File(CAMERA_CAPTURES_PATH + path);
         if (multipleCaptureFile.delete()){
           deletedFiles++;
         }

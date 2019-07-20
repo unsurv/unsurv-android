@@ -4,6 +4,14 @@ package org.tensorflow.demo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+/**
+ * Database class to store areas that have been visited outside the users "home zone". It is meant
+ * ease load on the server.
+ *
+ * - saves areas where server has been queried for and cameras have been downloaded
+ * - when user moves map to same area x mins after last query, dont query server again
+ */
+
 @Entity(tableName = "offline_areas")
 public class AreaOfflineAvailable {
 
@@ -17,7 +25,7 @@ public class AreaOfflineAvailable {
 
   private String lastUpdated;
 
-  public AreaOfflineAvailable (double latMin,
+  AreaOfflineAvailable (double latMin,
                                double latMax,
                                double lonMin,
                                double lonMax,

@@ -6,6 +6,12 @@ import android.preference.PreferenceManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * Helper for setting and removing badges from BottomNavigationView.
+ * Badges function as a notification if new cameras are available.
+ * They get removed once the corresponding activity is launched.
+ */
+
 class BottomNavigationBadgeHelper {
 
 
@@ -115,7 +121,9 @@ class BottomNavigationBadgeHelper {
 
     bottomNavigationView.removeBadge(menuItemId);
 
-    bottomNavigationView.showBadge(menuItemId).setNumber(badgeCount);
+    if (badgeCount != 0){
+      bottomNavigationView.showBadge(menuItemId).setNumber(badgeCount);
+    }
 
   }
 

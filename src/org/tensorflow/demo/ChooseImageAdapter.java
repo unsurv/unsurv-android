@@ -12,7 +12,9 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import java.io.File;
 
-
+/**
+ * Lets the user pick a specific image for his captured surveillance camera.
+ */
 public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.ChooseViewHolder> {
 
   class ChooseViewHolder extends RecyclerView.ViewHolder {
@@ -25,11 +27,11 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
 
   }
 
-  private static String TAG = "choose Image adapter:";
-  private static String imagesPath = StorageUtils.CAPTURES_PATH;
+  String TAG = "choose Image adapter:";
+  private static String cameraCapturesPath = StorageUtils.CAMERA_CAPTURES_PATH;
 
 
-  private Context ctx;
+  Context context;
   private String[] mFilenames;
   private LayoutInflater layoutInflater;
   private ImageView mChosenCameraImageView;
@@ -42,8 +44,8 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
                      ImageView chosenCameraImageView,
                      SurveillanceCamera currentCamera,
                      CameraRepository cameraRepository){
-    ctx = context;
-    layoutInflater = LayoutInflater.from(ctx);
+    this.context = context;
+    layoutInflater = LayoutInflater.from(this.context);
     mFilenames = filenames;
     mChosenCameraImageView = chosenCameraImageView;
     mCurrentSurveillanceCamera = currentCamera;
@@ -53,10 +55,9 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
 
 
 
-  @Override
+  @Override @NonNull
   public ChooseImageAdapter.ChooseViewHolder onCreateViewHolder(ViewGroup parent,
                                                                 int viewType) {
-    // TODO display only one checkmark, need to pass big imageview in constructor
 
     View itemView = layoutInflater.inflate(R.layout.camera_recyclerview_item_edit_camera, parent, false);
 
@@ -76,12 +77,13 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
     try {
 
       filePath = mFilenames[i];
-      File imgFile = new File(imagesPath + filePath);
+      File imgFile = new File(cameraCapturesPath + filePath);
 
       Picasso.get().load(imgFile)
               .placeholder(R.drawable.ic_launcher)
               .into(imgView);
 
+      // display little checkmark when reaching currently used image
       if (filePath.equals(mCurrentSurveillanceCamera.getThumbnailPath())){
         checkmarkView.setVisibility(View.VISIBLE);
       }
@@ -94,13 +96,16 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
       @Override
       public void onClick(View view) {
 
+        // change main ImageView to show chosen image
         String chosenImageFilePath = mFilenames[holder.getAdapterPosition()];
-        File imgFile = new File(imagesPath + chosenImageFilePath);
+        File imgFile = new File(cameraCapturesPath + chosenImageFilePath);
 
         Picasso.get().load(imgFile)
                 .placeholder(R.drawable.ic_launcher)
                 .into(mChosenCameraImageView);
 
+        // change camera obj to reflect choice
+        // this will be saved when the save button is pressed in the parent EditCameraActivity
         mCurrentSurveillanceCamera.setThumbnailPath(chosenImageFilePath);
 
       }

@@ -32,6 +32,8 @@ public class CustomEditTextPreference extends EditTextPreference {
   public void onBindViewHolder(PreferenceViewHolder holder) {
 
 
+    // TODO maybe set style here, global style for AlertDialog doesn't affect EditTextPreference / ListPreference although they're a subclassed as AlertDialog
+
     super.onBindViewHolder(holder);
   }
 

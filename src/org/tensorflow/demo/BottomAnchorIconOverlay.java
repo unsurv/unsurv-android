@@ -16,13 +16,15 @@ public class BottomAnchorIconOverlay extends org.osmdroid.views.overlay.IconOver
   }
 
   /** save to be called in non-gui-thread */
-  public BottomAnchorIconOverlay(IGeoPoint position, Drawable icon) {
+  BottomAnchorIconOverlay(IGeoPoint position, Drawable icon) {
     set(position, icon);
   }
 
 
   /**
    * Draw the icon.
+   *
+   * Adapted so bottom edge of icon aligns with position (Markers with a bottom shape like "V" point on the exact postion)
    */
   @Override
   public void draw(Canvas canvas, Projection pj) {
