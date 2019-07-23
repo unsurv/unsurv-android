@@ -34,11 +34,13 @@
         <item name="editTextColor">@color/textWhite</item>
         <item name="colorPrimaryDark">#FF00FF</item>
         <item name="android:background">#555</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/customButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/customButtonStyle</item>
 
     </style>
 
     <style name="customButtonStyle" parent="Widget.AppCompat.Button">
-
+        <item name="android:textColor">@color/textWhite</item>
     </style>
 
 
