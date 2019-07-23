@@ -26,7 +26,8 @@
         android:layout_weight="9">
 
 
-        <org.osmdroid.views.MapView android:id="@+id/map"
+        <org.osmdroid.views.MapView
+            android:id="@+id/tutorial_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />

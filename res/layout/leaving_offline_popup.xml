@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="4dp"
         android:text="You are leaving your offline area."
+        android:textColor="@color/textWhite"
         />
 
     <TextView
@@ -19,34 +20,38 @@
         android:layout_height="wrap_content"
         android:padding="4dp"
         android:text="Start downloading from the server?"
+        android:textColor="@color/textWhite"
         />
 
     <CheckBox
         android:id="@+id/map_popup_dont_show_again_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
         android:padding="4dp"
         android:text="Don't ask again"
+        android:textAlignment="center"
+        android:textColor="@color/textWhite"
         />
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/map_popup_no_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NO"/>
+            android:text="NO"
+            android:textColor="@color/textWhite"/>
 
         <Button
             android:id="@+id/map_popup_yes_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="YES"/>
+            android:text="YES"
+            android:textColor="@color/textWhite"/>
 
     </LinearLayout>
 

@@ -56,6 +56,10 @@
         android:layout="@layout/preference_category_map">
 
         <SwitchPreference
+            android:title="Query server when leaving home zone"
+            android:key="allowServerQueries"/>
+
+        <SwitchPreference
             android:title="Enable clustering of markers"
             android:key="clusteringEnabled"/>
 
@@ -71,6 +75,8 @@
     <PreferenceCategory
         android:key="@string/synchronization_title"
         android:layout="@layout/preference_category_synchronization">
+
+
 
         <ListPreference
             android:title="synchronization interval"

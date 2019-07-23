@@ -1,8 +1,10 @@
 package org.tensorflow.demo;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -211,7 +213,7 @@ public class MapActivity extends AppCompatActivity {
 
     areaOfflineAvailableRepository.deleteAll();
 
-    mapView = findViewById(R.id.map);
+    mapView = findViewById(R.id.tutorial_map);
     mapScrollingEnabled = true;
     isInitialSpinnerSelection = true;
 
@@ -887,62 +889,69 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-              // create popupView to ask user if he wants to connect to a server to get data
-              // saves preference if checkbox ticked
-              LayoutInflater layoutInflater = (LayoutInflater) MapActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-              View popupView = layoutInflater.inflate(R.layout.leaving_offline_popup, null);
+              boolean allowServerQueries = sharedPreferences.getBoolean("allowServerQueries", true);
 
-              final CheckBox dontAskAgainACheckBox = popupView.findViewById(R.id.map_popup_dont_show_again_checkbox);
+              if (!allowServerQueries) {
 
-              Button yesButton = popupView.findViewById(R.id.map_popup_yes_button);
-              Button noButton = popupView.findViewById(R.id.map_popup_no_button);
+                LayoutInflater layoutInflater = (LayoutInflater) MapActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-              final PopupWindow popupWindow =
-                      new PopupWindow(popupView,
-                      MapView.LayoutParams.WRAP_CONTENT,
-                      MapView.LayoutParams.WRAP_CONTENT);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
-              boolean askForConnection = sharedPreferences.getBoolean("askForConnections", true);
+                View dontAskAgainLinearLayout = layoutInflater.inflate(R.layout.alert_dialog_dont_ask_again, null);
+                final CheckBox dontAskAgainCheckBox = dontAskAgainLinearLayout.findViewById(R.id.delete_popup_dont_show_again_checkbox);
+                alertDialogBuilder.setView(dontAskAgainLinearLayout);
 
-              if (!popupWindow.isShowing() && !allowServerQueries && askForConnection) {
-                // freeze map while popupWindow is showing
-                mapScrollingEnabled = false;
+                alertDialogBuilder.setTitle("You are leaving your offline area.");
 
-                popupWindow.showAtLocation(mapView, Gravity.CENTER, 0, 0);
-                yesButton.setOnClickListener(new View.OnClickListener() {
+                alertDialogBuilder.setMessage("Start downloading from the server?");
+
+                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                   @Override
-                  public void onClick(View view) {
-
-
-                    if (dontAskAgainACheckBox.isChecked()) {
+                  public void onClick(DialogInterface dialogInterface, int i) {
+                    if (dontAskAgainCheckBox.isChecked()) {
                       sharedPreferences.edit().putBoolean("allowServerQueries", true).apply();
-                      sharedPreferences.edit().putBoolean("askForConnections", false).apply();
 
                     }
 
                     allowOneServerQuery = true;
-                    popupWindow.dismiss();
                     reloadMarker();
-                    mapScrollingEnabled = true;
+
 
                   }
                 });
 
-                noButton.setOnClickListener(new View.OnClickListener() {
+                alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                   @Override
-                  public void onClick(View view) {
+                  public void onClick(DialogInterface dialogInterface, int i) {
 
-                    if (dontAskAgainACheckBox.isChecked()) {
+                    if (dontAskAgainCheckBox.isChecked()) {
                       sharedPreferences.edit().putBoolean("allowServerQueries", false).apply();
-                      sharedPreferences.edit().putBoolean("askForConnections", false).apply();
 
                     }
-                    popupWindow.dismiss();
-                    mapScrollingEnabled = true;
 
                   }
                 });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                  @Override
+                  public void onShow(DialogInterface dialogInterface) {
+                    mapScrollingEnabled = false;
+                  }
+                });
+
+                alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                  @Override
+                  public void onDismiss(DialogInterface dialogInterface) {
+                    mapScrollingEnabled = true;
+                  }
+                });
+                alertDialog.show();
+
+
               }
+
             }
           });
 
