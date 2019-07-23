@@ -19,7 +19,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:alertDialogTheme">@style/customPreferenceStyle</item>
+        <item name="android:alertDialogTheme">@style/customAlertDialogStyle</item>
         <item name="buttonStyle">@style/Widget.AppCompat.Button</item>
 
 
@@ -27,7 +27,7 @@
 
 
 
-    <style name="customPreferenceStyle" parent="Theme.AppCompat.Dialog">
+    <style name="customAlertDialogStyle" parent="Theme.AppCompat.Dialog">
         <item name="android:buttonStyle">@style/customButtonStyle</item>
 
         <item name="colorPrimary">#3f3f3f</item>

@@ -1,23 +1,22 @@
 package org.tensorflow.demo;
 
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -172,49 +171,31 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
           } else {
 
-            View popupView = layoutInflater.inflate(R.layout.delete_camera_popup, null);
 
-            final CheckBox dontAskAgainACheckBox = popupView.findViewById(R.id.delete_popup_dont_show_again_checkbox);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
 
-            Button yesButton = popupView.findViewById(R.id.delete_popup_yes_button);
-            Button noButton = popupView.findViewById(R.id.delete_popup_no_button);
+            View dontAskAgainLinearLayout = layoutInflater.inflate(R.layout.alert_dialog_dont_ask_again, null);
+            final CheckBox dontAskAgainCheckBox = dontAskAgainLinearLayout.findViewById(R.id.delete_popup_dont_show_again_checkbox);
+            alertDialogBuilder.setView(dontAskAgainLinearLayout);
 
-            final PopupWindow popupWindow =
-                    new PopupWindow(popupView,
-                            RecyclerView.LayoutParams.WRAP_CONTENT,
-                            RecyclerView.LayoutParams.WRAP_CONTENT);
+            alertDialogBuilder.setTitle("Do you want to permanently delete this camera?");
 
-            if (!popupWindow.isShowing()) {
+            alertDialogBuilder.setMessage(null);
 
-              popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-              yesButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                  holder.thumbnailImageView.setVisibility(View.INVISIBLE);
-
-                  if (dontAskAgainACheckBox.isChecked()) {
-                    sharedPreferences.edit().putBoolean("quickDeleteCameras", true).apply();
-                  }
-                  cameraRepository.deleteCamera(current);
-                  popupWindow.dismiss();
-                  notifyItemRemoved(holder.getAdapterPosition());
-
-
+            alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialogInterface, int i) {
+                if (dontAskAgainCheckBox.isChecked()) {
+                  sharedPreferences.edit().putBoolean("quickDeleteCameras", true).apply();
                 }
-              });
 
+                cameraRepository.deleteCamera(current);
+                notifyItemRemoved(holder.getAdapterPosition());
+              }
+            });
 
-              noButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                  popupWindow.dismiss();
-
-                }
-              });
-            }
+            alertDialogBuilder.setNegativeButton("No", null);
+            alertDialogBuilder.show();
 
           }
 
@@ -296,6 +277,24 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     if (mSurveillanceCameras != null)
       return mSurveillanceCameras.size();
     else return 0;
+  }
+
+  private void displayPopUpBeforeDeleting(String message, final String deleteSizeInBytes, final String pathToClear, final Context context){
+
+    new AlertDialog.Builder(context)
+            .setTitle("Are you sure?")
+            .setMessage(message)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialogInterface, int i) {
+                StorageUtils.deleteAllFilesInDirectory(pathToClear);
+                Toast.makeText(context, "Freed up " + deleteSizeInBytes + " MB of storage.", Toast.LENGTH_SHORT).show();
+
+              }
+            })
+            .setNegativeButton("No", null)
+            .show();
+
   }
 
 

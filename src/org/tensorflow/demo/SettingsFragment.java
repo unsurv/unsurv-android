@@ -150,7 +150,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   }
 
 
-  void displayPopUpBeforeDeleting(String message, final String deleteSizeInBytes, final String pathToClear, final Context context){
+  private void displayPopUpBeforeDeleting(String message, final String deleteSizeInBytes, final String pathToClear, final Context context){
 
     new AlertDialog.Builder(context)
             .setTitle("Are you sure?")
