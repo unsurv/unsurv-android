@@ -48,6 +48,12 @@
         <SwitchPreference
             android:title="Delete cameras without popup"
             android:key="quickDeleteCameras"/>
+
+        <Preference
+            android:key="show_licences"
+            android:title="Licences"
+            />
+
     </PreferenceCategory>
 
 
@@ -113,6 +119,8 @@
 
 
     </PreferenceCategory>
+
+
 
 
 </PreferenceScreen>

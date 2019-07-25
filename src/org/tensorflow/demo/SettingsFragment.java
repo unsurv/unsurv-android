@@ -3,6 +3,7 @@ package org.tensorflow.demo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.preference.EditTextPreference;
@@ -21,7 +22,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   private Preference clearSynchronizedImages;
   private Preference clearCapturedImages;
   private Preference clearTrainingImages;
+  private Preference showLicences;
 
+  // TODO grey out synchronitaion category if offline mode selected
 
   @Override
   public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -32,13 +35,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     context = getContext();
 
 
-
     // Load the preferences from an XML resource
     setPreferencesFromResource(R.xml.preferences, rootKey);
 
     EditTextPreference asd = findPreference("synchronizationUrl");
-
-
 
 
     // clears storage for sychronized camera images
@@ -135,8 +135,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
-    // TODO add popup before clearing,
-    // TODO grey out synchronitaion category if offline mode selected
+    showLicences = findPreference("show_licences");
+
+    showLicences.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+
+        Intent licencesIntent = new Intent(context, LicencesActivity.class);
+        startActivity(licencesIntent);
+
+        return true;
+      }
+    });
+
 
   }
 
