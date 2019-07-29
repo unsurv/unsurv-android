@@ -41,7 +41,7 @@
     <string name="draw_on_training_image_label">Draw Cameras</string>
     <string name="training_capture_label">Training</string>
     <string name="edit_camera_label">Edit Camera</string>
-
+    <string name="licences_label">Licences</string>
 
     <!--in HistoryActivity-->
     <string name="dont_ask_again">Don\'t ask again</string>
@@ -98,6 +98,8 @@
     <string name="captured_cameras_size">Storage used by captured cameras:</string>
     <string name="training_cameras_size">Storage used by training cameras:</string>
 
+
+    <!--in LicencesActivity-->
 
 
 
