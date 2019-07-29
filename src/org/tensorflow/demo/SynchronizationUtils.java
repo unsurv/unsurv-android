@@ -70,7 +70,7 @@ class SynchronizationUtils {
     PersistableBundle syncJobExtras = new PersistableBundle();
 
     // server URL
-    syncJobExtras.putString("baseUrl", sharedPreferences.getString("synchronizationURL", null));
+    syncJobExtras.putString("baseUrl", sharedPreferences.getString("synchronizationUrl", null));
     // area to keep updated, set in tutorial
     syncJobExtras.putString("area", sharedPreferences.getString("area", null));
     // last sync time
@@ -333,7 +333,7 @@ class SynchronizationUtils {
     // Start the queue
     mRequestQueue.start();
 
-    String baseURL = sharedPreferences.getString("synchronizationURL", null);
+    String baseURL = sharedPreferences.getString("synchronizationUrl", null);
 
     String completeURL = baseURL + "getKey";
 

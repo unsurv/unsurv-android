@@ -163,9 +163,6 @@ public class DebugActivity extends AppCompatActivity {
   }
 
 
-
-  //TODO ADD REFRESH BUTTON
-
   @Override
   protected void onResume() {
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
@@ -210,7 +207,7 @@ public class DebugActivity extends AppCompatActivity {
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*15)).apply();
-    sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.178.137:5000/").apply();
+    sharedPreferences.edit().putString("synchronizationUrl", "https://api.unsurv.org/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
@@ -310,10 +307,10 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
+        String baseURL = sharedPreferences.getString("synchronizationUrl", null);
         String homeArea = sharedPreferences.getString("area", null);
 
-        /*
+
         SynchronizationUtils.downloadCamerasFromServer(
                 baseURL,
                 "area=" + homeArea,
@@ -321,9 +318,10 @@ public class DebugActivity extends AppCompatActivity {
                 true,
                 null,
                 synchronizedCameraRepository);
-         */
 
 
+
+        /*
         downloadCamerasFromServerWithProgressBar(
                 baseURL,
                 "area=" + homeArea,
@@ -331,7 +329,7 @@ public class DebugActivity extends AppCompatActivity {
                 true,
                 null,
                 synchronizedCameraRepository);
-
+        */
       }
     });
 
@@ -397,7 +395,7 @@ public class DebugActivity extends AppCompatActivity {
         debugTextView.setText(
                 sharedPreferences.getString("lastUpdated", "2018-01-01") + "\n" +
                 sharedPreferences.getString("synchronizationInterval", String.valueOf(15*60*1000)) + "\n" +
-                sharedPreferences.getString("synchronizationURL", "http://192.168.2.159:5000/cameras/?") + "\n" +
+                sharedPreferences.getString("synchronizationUrl", "http://192.168.2.159:5000/cameras/?") + "\n" +
                 sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888") + "\n" +
                 sharedPreferences.getBoolean("buttonCapture", false) + "\n" +
                 sharedPreferences.getString("timemachineValueInDays", "0") + "\n" +
@@ -494,7 +492,7 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         allCameras = cameraRepository.getAllCameras();
-        String url = sharedPreferences.getString("synchronizationURL", null);
+        String url = sharedPreferences.getString("synchronizationUrl", null);
         SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences, cameraViewModel, null, false);
 
         List<String> externalIds = new ArrayList<>();
@@ -1138,7 +1136,7 @@ public class DebugActivity extends AppCompatActivity {
 
   void startImageDownloadWithProgressBar(){
 
-    String baseURL = sharedPreferences.getString("synchronizationURL", "http://192.168.2.137:5000/");
+    String baseURL = sharedPreferences.getString("synchronizationUrl", "http://192.168.2.137:5000/");
 
     imagesDownloaded = 0;
 
