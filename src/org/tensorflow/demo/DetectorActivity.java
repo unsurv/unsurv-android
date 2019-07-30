@@ -634,6 +634,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
               if (timePoolCaptureStarted + delayBetweenPoolsInMillis > currentTime &&
                       timePoolCaptureStarted + poolDurationInMillis < currentTime) {
 
+                isCapturing = false;
                 // End pooling, analyze pool and clear list.
                 if (!pooledCameraCaptures.isEmpty()) {
 
@@ -672,17 +673,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                   pooledCameraCaptures.clear();
                 }
 
-              } else
+              }
+
+              else if (timePoolCaptureStarted + delayBetweenPoolsInMillis < currentTime) {
                 // Set new startpoint if old startpoint is longer than delayBetweenPoolsinMillis ago.
                 // This starts a new pool.
-                if (timePoolCaptureStarted + delayBetweenPoolsInMillis < currentTime) {
-                  timePoolCaptureStarted = currentTime;
+                timePoolCaptureStarted = currentTime;
+              }
 
-                } else
-                  //time in
-                  if (timePoolCaptureStarted + poolDurationInMillis > currentTime) {
-                    isCapturing = true;
-
+              else if (timePoolCaptureStarted + poolDurationInMillis > currentTime) {
+                // after pool started but before pool ended
+                isCapturing = true;
               }
 
 
@@ -705,12 +706,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 runOnUiThread(new Runnable(){
                   @Override
                   public void run(){
-                    if (!isCapturing) {
+                    if (isCapturing) {
                       photoStatusView.setImageResource(R.drawable.ic_camera_alt_green_24dp);
                       photoStatus = STATUS_GREEN;
                     }
 
-                    if (isCapturing) {
+                    if (!isCapturing) {
                       photoStatusView.setImageResource(R.drawable.ic_camera_alt_red_24dp);
                       photoStatus = STATUS_RED;
 
@@ -746,7 +747,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
 
     if (result.getConfidence() > 0.95 && currentTime -
-            timeLastPictureTaken > DELAY_BETWEEN_CAPTURES) {
+            timeLastPictureTaken > DELAY_BETWEEN_CAPTURES && isCapturing) {
 
 
       LOGGER.i("TOOK PICTURE -------------------------------------- ");

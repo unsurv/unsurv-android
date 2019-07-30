@@ -38,10 +38,6 @@
             android:key="offlineMode"/>
 
         <SwitchPreference
-            android:key="notifications"
-            android:title="Enable message notifications" />
-
-        <SwitchPreference
             android:title="Enable timestamps for captures"
             android:key="enableCaptureTimestamps"/>
 
