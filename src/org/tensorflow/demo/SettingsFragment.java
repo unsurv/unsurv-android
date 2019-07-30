@@ -24,13 +24,23 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   private Preference clearTrainingImages;
   private Preference showLicences;
 
+  private final static int DELETE_SYNCHRONIZED_CAMERAS = 0;
+  private final static int DELETE_SURVEILLANCE_CAMERAS = 1;
+  private final static int DELETE_TRAINING_CAMERAS = 2;
+
+  private List<SynchronizedCamera> synchronizedCameras;
+  private List<SurveillanceCamera> surveillanceCameras;
+
+  private CameraRepository cameraRepository;
+  private SynchronizedCameraRepository synchronizedCameraRepository;
+
   // TODO grey out synchronitaion category if offline mode selected
 
   @Override
   public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 
-    final CameraRepository cameraRepository = new CameraRepository(getActivity().getApplication());
-    final SynchronizedCameraRepository synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
+    cameraRepository = new CameraRepository(getActivity().getApplication());
+    synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
 
     context = getContext();
 
@@ -57,15 +67,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
       @Override
       public boolean onPreferenceClick(Preference preference) {
 
-        List<SynchronizedCamera> allSynchronizedCameras = synchronizedCameraRepository.getAllSynchronizedCameras(true);
+        synchronizedCameras = synchronizedCameraRepository.getAllSynchronizedCameras(true);
 
-        // update cameras
-        for (SynchronizedCamera camera : allSynchronizedCameras){
-          camera.setImagePath(null);
-          synchronizedCameraRepository.update(camera);
-        }
-
-        displayPopUpBeforeDeleting("Do you want to delete all downloaded images?", synchronizedMbTwoDecimals , StorageUtils.SYNCHRONIZED_PATH, context);
+        displayPopUpBeforeDeleting("Do you want to delete all downloaded images?", synchronizedMbTwoDecimals , DELETE_SYNCHRONIZED_CAMERAS, context);
 
 
         return true;
@@ -87,18 +91,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
       @Override
       public boolean onPreferenceClick(Preference preference) {
 
-        List<SurveillanceCamera> cameras = cameraRepository.getAllCameras();
+        surveillanceCameras = cameraRepository.getAllCameras();
 
-        for (SurveillanceCamera camera : cameras){
-          // camera is a "normal" capture
-          if (!camera.getTrainingCapture()){
-            camera.setThumbnailPath(null);
-            camera.setImagePath(null);
-            cameraRepository.updateCameras(camera);
-          }
-        }
-
-        displayPopUpBeforeDeleting("Do you want to delete all captured images?", capturedMbTwoDecimals , StorageUtils.CAMERA_CAPTURES_PATH, context);
+        displayPopUpBeforeDeleting("Do you want to delete all captured images?", capturedMbTwoDecimals , DELETE_SURVEILLANCE_CAMERAS, context);
 
         return true;
 
@@ -117,18 +112,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     clearTrainingImages.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override
       public boolean onPreferenceClick(Preference preference) {
-        List<SurveillanceCamera> cameras = cameraRepository.getAllCameras();
+         surveillanceCameras = cameraRepository.getAllCameras();
 
-
-        for (SurveillanceCamera camera : cameras){
-          // camera is a training capture
-          if (camera.getTrainingCapture()){
-            // training capture without an image is useless, delete
-            cameraRepository.deleteCamera(camera);
-          }
-        }
-
-        displayPopUpBeforeDeleting("Do you want to delete all training images?\nThis will remove all training data without uploading.", trainingMbTwoDecimals , StorageUtils.TRAINING_CAPTURES_PATH, context);
+        displayPopUpBeforeDeleting("Do you want to delete all training images?\nThis will remove all training data without uploading.", trainingMbTwoDecimals , DELETE_TRAINING_CAMERAS, context);
 
         return true;
 
@@ -161,7 +147,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   }
 
 
-  private void displayPopUpBeforeDeleting(String message, final String deleteSizeInBytes, final String pathToClear, final Context context){
+  private void displayPopUpBeforeDeleting(String message, final String deleteSizeInBytes, final int mode, final Context context){
 
     new AlertDialog.Builder(context)
             .setTitle("Are you sure?")
@@ -169,7 +155,56 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
               @Override
               public void onClick(DialogInterface dialogInterface, int i) {
-                StorageUtils.deleteAllFilesInDirectory(pathToClear);
+                // StorageUtils.deleteAllFilesInDirectory(pathToClear);
+
+                switch (mode){
+
+                  case (DELETE_SYNCHRONIZED_CAMERAS):
+
+                    // update cameras
+                    for (SynchronizedCamera camera : synchronizedCameras){
+                      StorageUtils.deleteImagesForSynchronizedCamera(camera);
+                      camera.setImagePath(null);
+                      synchronizedCameraRepository.update(camera);
+                    }
+                    break;
+
+
+                  case(DELETE_SURVEILLANCE_CAMERAS):
+
+                    for (SurveillanceCamera camera : surveillanceCameras){
+                      // camera is a "normal" capture
+                      // regular captures without images are still useful for position data
+                      // user can always delete complete captures in HistoryActivity
+                      if (!camera.getTrainingCapture()){
+
+                        StorageUtils.deleteImagesForCamera(camera);
+                        camera.setThumbnailPath(null);
+                        camera.setImagePath(null);
+                        cameraRepository.updateCameras(camera);
+                      }
+                    }
+                    break;
+
+
+
+                  case(DELETE_TRAINING_CAMERAS):
+
+                    for (SurveillanceCamera camera : surveillanceCameras){
+                      // camera is a training capture
+                      if (camera.getTrainingCapture()){
+                        // training capture without an image is useless, therefore delete
+                        cameraRepository.deleteCamera(camera);
+                      }
+                    }
+
+                    break;
+                }
+
+
+
+
+
                 Toast.makeText(context, "Freed up " + deleteSizeInBytes + " MB of storage.", Toast.LENGTH_SHORT).show();
                 refreshSizes();
 
