@@ -61,6 +61,7 @@
     </plurals>
 
     <string name="timemachine_text">All cameras until: %s</string>
+    <string name="window_upload_text">Camera uploaded on: \n%s</string>
 
     <!--in StatisticsActivity-->
 

@@ -146,6 +146,7 @@
             android:layout_width="match_parent"
             android:layout_height="0sp"
             android:layout_weight="3"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -173,7 +174,8 @@
                     android:layout_height="36dp"
                     android:text="@string/comment_text"
                     android:layout_marginEnd="4dp"
-                    android:gravity="end|center_vertical"/>
+                    android:gravity="end|center_vertical"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -202,7 +204,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="36dp"
                     android:layout_marginStart="4dp"
-                    android:gravity="start|center_vertical"/>
+                    android:gravity="start|center_vertical"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 

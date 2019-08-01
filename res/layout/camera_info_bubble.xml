@@ -21,16 +21,15 @@
         android:padding="4dp"
         />
 
+    <!-- disabled comments for now -->
     <TextView
         android:id="@+id/bubble_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:padding="4dp"
+        android:visibility="gone"
         />
-
-
-
 
     <TextView
         android:id="@+id/bubble_subdescription"
@@ -49,8 +48,5 @@
         android:padding="4dp"
         android:visibility="gone"
         />
-
-
-
 
 </LinearLayout>

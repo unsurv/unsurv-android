@@ -7,41 +7,38 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
-
+        android:layout_gravity="center"
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/info_image"
             android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            />
-
+            android:scaleType="fitCenter" />
 
     </LinearLayout>
 
 
-
-
     <TextView
         android:id="@+id/info_latest_timestamp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
+        android:gravity="center"
         android:padding="4dp"
-        />
+        android:textAlignment="center" />
 
+    <!-- disabled comments for now -->
     <TextView
         android:id="@+id/info_comment"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
+        android:gravity="center"
         android:padding="4dp"
-        />
+        android:textAlignment="center"
+        android:visibility="gone" />
 
 
 </LinearLayout>

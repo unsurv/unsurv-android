@@ -1189,8 +1189,8 @@ public class MapActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
               @Override
               public void run() {
-                Toast.makeText(getApplicationContext(), String.valueOf(maxMarkersOnMap)
-                                + " Markers reached, please zoom in or increase amount in settings",
+                Toast.makeText(getApplicationContext(), maxMarkersOnMap
+                                + " markers reached, please zoom in or increase amount in settings.",
                         Toast.LENGTH_SHORT).show();
               }
             });
@@ -1268,8 +1268,9 @@ public class MapActivity extends AppCompatActivity {
                       });
 
 
-                      infoLatestTimestamp.setText(highlightedCamera.getLastUpdated());
-                      infoComment.setText(highlightedCamera.getComments());
+                      //infoLatestTimestamp.setText(highlightedCamera.getLastUpdated());
+                      infoLatestTimestamp.setText(getString(R.string.window_upload_text, highlightedCamera.getLastUpdated()));
+                      //infoComment.setText(highlightedCamera.getComments());
 
                     }
 

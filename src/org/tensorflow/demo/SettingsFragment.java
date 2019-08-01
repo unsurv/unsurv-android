@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
-import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -22,7 +21,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   private Preference clearSynchronizedImages;
   private Preference clearCapturedImages;
   private Preference clearTrainingImages;
-  private Preference showLicences;
+
 
   private final static int DELETE_SYNCHRONIZED_CAMERAS = 0;
   private final static int DELETE_SURVEILLANCE_CAMERAS = 1;
@@ -39,6 +38,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   @Override
   public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 
+    Preference showLicences;
+
     cameraRepository = new CameraRepository(getActivity().getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
 
@@ -47,9 +48,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     // Load the preferences from an XML resource
     setPreferencesFromResource(R.xml.preferences, rootKey);
-
-    EditTextPreference asd = findPreference("synchronizationUrl");
-
 
     // clears storage for sychronized camera images
     clearSynchronizedImages = findPreference("clear_synchronized");
@@ -220,7 +218,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   /**
    * refreshes sizes displayed to user
    */
-  void refreshSizes(){
+  private void refreshSizes(){
 
     long synchronizedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.SYNCHRONIZED_PATH));
     clearSynchronizedImages.setTitle("Delete downloaded images: " + StorageUtils.convertByteSizeToMBTwoDecimals(synchronizedImagesSize) + " MB");
