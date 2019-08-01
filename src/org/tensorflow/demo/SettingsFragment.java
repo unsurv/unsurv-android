@@ -175,12 +175,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     for (SurveillanceCamera camera : surveillanceCameras){
                       // camera is a "normal" capture
                       // regular captures without images are still useful for position data
-                      // user can always delete complete captures in HistoryActivity
+                      // user can always delete captures completely in HistoryActivity
                       if (!camera.getTrainingCapture()){
 
                         StorageUtils.deleteImagesForCamera(camera);
                         camera.setThumbnailPath(null);
                         camera.setImagePath(null);
+                        camera.setManualCapture(true);
                         cameraRepository.updateCameras(camera);
                       }
                     }
