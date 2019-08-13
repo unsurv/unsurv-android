@@ -82,7 +82,7 @@ public class HistoryActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-    recyclerView = (RecyclerView) findViewById(R.id.camera_recyclerview);
+    recyclerView = findViewById(R.id.camera_recyclerview);
     mCameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
 
     // needed in adapter to show PopupWindows

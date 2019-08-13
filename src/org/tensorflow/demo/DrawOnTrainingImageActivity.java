@@ -21,6 +21,11 @@ import android.widget.RelativeLayout;
 import com.squareup.picasso.Picasso;
 import java.io.File;
 
+/**
+ * Used to draw rectangles on TrainingImages to train the Tensorflow mobilenet ssd model.
+ * Drawn rectangles will be converted to corresponding xml files suitable for imglabel on the server.
+ */
+
 public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
   private static String TAG = "DrawOnTrainingImage";
@@ -66,15 +71,17 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
     context = this;
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
+    // activity is launched with intent and TrainingImage dbId in IntentExtra
     Intent intent = getIntent();
     int dbId = intent.getIntExtra("surveillanceCameraId", 0);
+
 
     cameraRepository = new CameraRepository(getApplication());
     cameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
 
     currentTrainingCamera = cameraRepository.findByDbId(dbId);
 
-    cameraType = DrawView.REGULAR_CAMERA;
+    cameraType = StorageUtils.STANDARD_CAMERA;
 
     pathToImage = StorageUtils.TRAINING_CAPTURES_PATH + currentTrainingCamera.getImagePath();
 
@@ -84,6 +91,8 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     final ViewTreeObserver viewTreeObserver = parentRelativeLayout.getViewTreeObserver();
 
+    // when view visibility changes i.e. when view gets drawn.
+    // create custom DrawView with correct image
     viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
       @Override
       public void onGlobalLayout() {
@@ -94,7 +103,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
         int parentLayoutWidth = parentRelativeLayout.getWidth();
         int drawViewHeight = (int) Math.ceil(4/3.0 * parentLayoutWidth);
 
-        // effectively "match parent" for layout_width and 1.33 * width for height for a total 4:3 format
+        // effectively "match parent" for layout_width and 1.33 * width for layout_height for a total 4:3 format
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(parentLayoutWidth, drawViewHeight);
 
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -104,7 +113,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
         Picasso.get().load(imageFile).into(drawView);
 
 
-        // start drawing activity 0.5 sec after capture to give db some time to save data
+        // start drawing 0.5 sec after capture to give db some time to save data
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
           @Override
@@ -113,6 +122,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
           }
         }, 500);
 
+        // just do this once
         parentRelativeLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
       }

@@ -21,6 +21,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+/**
+ * Google tink crypto
+ * Adapted from Google tink tutorial
+ */
+
 public class EncryptionUtils {
 
   private static String MASTER_KEY_URI = "android-keystore://unsurv_masterKey";
@@ -29,7 +34,6 @@ public class EncryptionUtils {
 
 
   static void generateMasterKey() throws GeneralSecurityException, IOException {
-
 
       // uses internal Android keystore system
       AndroidKeystoreKmsClient.getOrGenerateNewAeadKey(MASTER_KEY_URI); // AES256-GCM

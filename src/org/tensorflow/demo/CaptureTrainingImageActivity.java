@@ -78,6 +78,11 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Camera2Api implementation from google with added support for zooming and restriction of max
+ * resolution of 1024 px x 768 px
+ */
+
 public class CaptureTrainingImageActivity extends AppCompatActivity
         implements View.OnClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback{

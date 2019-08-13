@@ -36,7 +36,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
   private LayoutInflater layoutInflater;
   private ImageView mChosenCameraImageView;
   private SurveillanceCamera mCurrentSurveillanceCamera;
-  private CameraRepository mCameraRepository;
+  CameraRepository mCameraRepository;
 
 
   ChooseImageAdapter(Context context,
@@ -71,6 +71,8 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
 
     ImageView imgView = holder.itemView.findViewById(R.id.choose_image_edit_camera);
     ImageView checkmarkView = holder.itemView.findViewById(R.id.choose_image_checkmark);
+
+    // start with small check mark invisible, currently chosen image will get a check mark later
     checkmarkView.setVisibility(View.INVISIBLE);
     String filePath;
 
@@ -83,7 +85,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
               .placeholder(R.drawable.ic_launcher)
               .into(imgView);
 
-      // display little checkmark when reaching currently used image
+      // display little check mark when reaching currently used image
       if (filePath.equals(mCurrentSurveillanceCamera.getThumbnailPath())){
         checkmarkView.setVisibility(View.VISIBLE);
       }

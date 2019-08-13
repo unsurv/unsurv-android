@@ -8,7 +8,14 @@ import java.util.List;
 
 class LocationUtils {
 
-
+  /**
+   * compute a new Location with a latitude / longitude given + distance in meters north / east
+   * @param latitude latitude
+   * @param longitude longitude
+   * @param metersNorth distance north from latitude in meters, can be negative
+   * @param metersEast distance east from longitude in meters, can be negative
+   * @return Location object with the newly computed location
+   */
   static Location getNewLocation(double latitude, double longitude, double metersNorth, double metersEast) {
 
     double latDiff = metersNorth / 110574;
@@ -23,6 +30,11 @@ class LocationUtils {
 
   }
 
+  /**
+   * Computes distance in meters from degree difference in longitude
+   * @param latitude factor is dependant on current latitude
+   * @return factor meters per degree difference at given latitude
+   */
   private static double longitudeDegreeToMetersRatio(double latitude) {
     // in m
     int earthRadius = 6371000;
@@ -30,11 +42,20 @@ class LocationUtils {
     return Math.PI/180*earthRadius*Math.cos(Math.toRadians(latitude));
   }
 
+  /**
+   * @return static factor of meters per degree difference in latitude
+   */
   private static int latitudeDegreeToMetersRatio() {
     // Changes a small amount because earth is not a perfect sphere. Disregarded here
     return 110574;
   }
 
+  /**
+   * Translates Locations into a 2D generated coordinate system. System is in meters.
+   * First location is used as base and is located at (0|0)
+   * @param locations List of locations
+   * @return List of Pair<Double, Double> with coordinate points of all objects
+   */
   static List<Pair<Double, Double>> transferLocationsTo2dCoordinates(List<Location> locations) {
     // Approximates list of Location to 2d coords in relation to first camera. All distances in m.
 
@@ -57,13 +78,19 @@ class LocationUtils {
               );
 
       coordinates.add(point);
-
     }
 
     return coordinates;
-
   }
 
+  /**
+   * Calculates the distances from the point (xValue|yValue) to all other points defined in points
+   * and builds the sum of these distances. A 2D coordinate system is
+   * @param xValue x of point to calculate distances from
+   * @param yValue y of point to calculate distances from
+   * @param points List<Pair<Double, Double>> defining x, y pairs of all points
+   * @return sum of distances
+   */
   private static double sumOfDistancesIn2d(double xValue, double yValue, List<Pair<Double, Double>> points){
     double sumOfDistances = 0;
     double xDiff;
@@ -81,8 +108,14 @@ class LocationUtils {
   }
 
 
+  /**
+   * Finds a point where distances to every other point is minimal.
+   * Returns a Location created with a reference Location.
+   * @param points points as List<Pair<Double, Double>>, interpreted as a 2D space
+   * @param reference equals first element of points
+   * @return Location with minimal distance set by precision
+   */
   static Location approximateCameraPosition(List<Pair<Double, Double>> points, Location reference) {
-    // Finds a point where distances to every other point is minimal. Returns a Location created with a reference Location.
 
     double sumOfDistances;
     double newSumOfDistances;
@@ -97,7 +130,7 @@ class LocationUtils {
 
 
     // Value in meters to move around at first step.
-    double stepSize = 3;
+    double stepSize = 2;
 
     // find center of gravity as starting point
     double xTest = 0;
@@ -120,8 +153,8 @@ class LocationUtils {
       for (int j = 0; j < movementVectors2d.size(); j++) {
 
         // Move point and calc new sum of distances.
-        int xMovement = movementVectors2d.get(j).first;
-        int yMovement = movementVectors2d.get(j).second;
+        double xMovement = movementVectors2d.get(j).first * stepSize;
+        double yMovement = movementVectors2d.get(j).second * stepSize;
 
         double newX = xTest + xMovement;
         double newY = yTest + yMovement;
@@ -136,7 +169,6 @@ class LocationUtils {
           break;
 
         } else {
-
           // try smaller movements
           stepSize = stepSize / 2;
 

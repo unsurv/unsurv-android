@@ -6,6 +6,11 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
+/**
+ * Used as a layer above a database repository. Used in RecyclerView in HistoryActivity with
+ * LiveData objects. Adapted from Google RoomDataBase tutorial.
+ */
+
 public class CameraViewModel extends AndroidViewModel {
 
   private CameraRepository mRepository;

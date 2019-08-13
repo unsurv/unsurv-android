@@ -20,6 +20,7 @@ import java.util.Collections;
 /**
  * Used when clustering in MapActivity is used.
  * If user clicks on a marker this window is used to show additional data.
+ * Currently clustering is disabled
  */
 
 public class CustomInfoWindow extends MarkerInfoWindow {
@@ -42,8 +43,7 @@ public class CustomInfoWindow extends MarkerInfoWindow {
     infoLatestTimestamp = mView.findViewById(R.id.bubble_title);
     infoComment = mView.findViewById(R.id.bubble_description);
 
-    picturesPath = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/";
+    picturesPath = StorageUtils.SYNCHRONIZED_PATH;
 
   }
 

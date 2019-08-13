@@ -7,6 +7,11 @@ import android.util.Log;
 
 import java.util.List;
 
+/**
+ * Used for SurveillanceCamera database access with mostly with Lists.
+ * I put db access in AsyncTasks to allow access in ui threads.
+ */
+
 public class CameraRepository {
 
   private CameraDao mCameraDao;

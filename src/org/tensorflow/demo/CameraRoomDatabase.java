@@ -15,6 +15,13 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 
+
+/**
+ * Database for SurveillanceCameras captured by the user. After CameraCaptures get processed a
+ * SurveillanceCamera object is created and saved here. Other ways are in ManualCaptureActivity and
+ * CaptureTrainingImageActivity
+ */
+
 @Database(entities = {SurveillanceCamera.class}, version = 1)
 public abstract class CameraRoomDatabase extends RoomDatabase {
 

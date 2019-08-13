@@ -456,7 +456,6 @@ public class DebugActivity extends AppCompatActivity {
                 "",
                 "\"[test_pixel_2.jpg,1562076737965_thumbnail.jpg,1562076726264_thumbnail.jpg]\"");
 
-
         SurveillanceCamera notRandomCamera = new SurveillanceCamera(
                 0,
                 "test_pixel_2.jpg",

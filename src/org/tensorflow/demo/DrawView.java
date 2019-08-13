@@ -17,13 +17,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Custom ImageView that allows drawing rectangles
+ */
 
 @SuppressLint("AppCompatCustomView")
 public class DrawView extends ImageView {
-
-  // camera types
-  public static int REGULAR_CAMERA = 0;
-  public static int DOME_CAMERA = 1;
 
   static String TAG = "DrawView";
 
@@ -179,17 +178,6 @@ public class DrawView extends ImageView {
         if (firstTimeLaunched) {
           // cant draw from touch when first launched, just draw rects already present
           firstTimeLaunched = false;
-          drawnCameras = mCamera.getDrawnRectsAsString();
-
-          // draw cameras from db by populating rectarray
-          if (!drawnCameras.isEmpty()){
-            try{
-              rectArray = new JSONArray(drawnCameras);
-
-            } catch (JSONException e){
-              Log.i(TAG, "no drawn cameras present");
-            }
-          }
 
         } else {
           // touch event finished
@@ -291,7 +279,7 @@ public class DrawView extends ImageView {
   }
 
   /**
-   * translates back from image pixels to percent of img axis size touched
+   * translates back from image pixels to percent of img axis
    * @param imagePixel
    * @param imageAxisSize
    * @return
@@ -303,13 +291,17 @@ public class DrawView extends ImageView {
     return percentInImage;
   }
 
+  /**
+   *
+   * @param cameraType type of camera, static int in in StorageUtils
+   */
   public void setCameraType(int cameraType) {
     this.cameraType = cameraType;
     invalidate();
   }
 
   /**
-   * Called from button in DrawOnTrainingImageActivity. Saves one drawn rect to db.
+   * Called from button in DrawOnTrainingImageActivity. Saves one drawn rectangle to db.
    */
   public void saveCamera(){
 
@@ -374,10 +366,8 @@ public class DrawView extends ImageView {
 
     rectArray.remove(rectArray.length() - 1);
 
-    // update and save to db
     drawnCameras = rectArray.toString();
     mCamera.setDrawnRectsAsString(drawnCameras);
-    // mCameraViewModel.update(mCamera);
 
     refresh();
 
@@ -401,7 +391,7 @@ public class DrawView extends ImageView {
 
   public void refresh(){
     // Redraw as if just launched. Since updated SurveillanceCameraObject is queried again for drawing,
-    // removed camera will not be shown.
+    // removed cameras will not be shown.
     firstTimeLaunched = true;
 
     stopDrawing = false;
@@ -417,8 +407,8 @@ public class DrawView extends ImageView {
       try {
         JSONObject tmpObj = (JSONObject) rectArray.get(i);
 
-        // key sets type of camera, see static ints for types
-        if (tmpObj.keys().next().equals(String.valueOf(REGULAR_CAMERA))){
+        // key sets type of camera, see static ints in StorageUtils for types
+        if (tmpObj.keys().next().equals(String.valueOf(StorageUtils.STANDARD_CAMERA))){
           mPaint = mRegularPaint;
         } else {
           mPaint = mDomePaint;

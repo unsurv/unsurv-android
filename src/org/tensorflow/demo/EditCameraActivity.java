@@ -36,20 +36,22 @@ import org.osmdroid.views.overlay.IconOverlay;
 
 import java.io.File;
 
+/**
+ * Allows the user to review and edit SurveillanceCamera captures, launched if user clicks on a
+ * non training SurveillanceCamera in HistoryActivity
+ */
 
 public class EditCameraActivity extends AppCompatActivity {
 
   BottomNavigationView bottomNavigationView;
 
   CameraRepository cameraRepository;
-  CameraViewModel cameraViewModel;
 
   SurveillanceCamera cameraToEdit;
   SharedPreferences sharedPreferences;
 
   Drawable cameraMarkerIcon;
 
-  LinearLayout parentLayout;
   ImageView cameraImageView;
   MapView map;
   CheckBox standardCheckBox;
@@ -71,7 +73,6 @@ public class EditCameraActivity extends AppCompatActivity {
   IconOverlay iconOverlay;
 
   int cameraType;
-  boolean cameraIsTrainingImage;
 
   boolean isBeingEdited = false;
 
@@ -101,12 +102,14 @@ public class EditCameraActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-    parentLayout = findViewById(R.id.edit_camera_container);
     cameraImageView = findViewById(R.id.edit_camera_detail_image);
     recyclerView = findViewById(R.id.edit_camera_choose_recyclerview);
     map = findViewById(R.id.edit_camera_map);
+
+    // check boxes for camera types
     standardCheckBox = findViewById(R.id.edit_camera_checkbox_standard);
     domeCheckBox = findViewById(R.id.edit_camera_checkbox_dome);
+
     timestampTextView = findViewById(R.id.edit_camera_timestamp_text);
     uploadTextView = findViewById(R.id.edit_camera_upload_text);
     commentsTextView = findViewById(R.id.edit_camera_comments_text);
@@ -115,21 +118,18 @@ public class EditCameraActivity extends AppCompatActivity {
     resetMapButton = findViewById(R.id.edit_camera_reset_map_position);
     editLocationMarker = findViewById(R.id.edit_camera_center_marker);
 
+    // Activity gets startet with db id in IntentExtra
     Intent startIntent = getIntent();
-
     int dbId = startIntent.getIntExtra("surveillanceCameraId", 0);
 
     cameraRepository = new CameraRepository(getApplication());
-    cameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
+
 
     cameraToEdit = cameraRepository.findByDbId(dbId);
-
     cameraType = cameraToEdit.getCameraType();
-    cameraIsTrainingImage = cameraToEdit.getTrainingCapture();
-
-
     String thumbnailPath = cameraToEdit.getThumbnailPath();
     cameraImage = new File(picturesPath + thumbnailPath);
+
 
     Picasso.get().load(cameraImage)
               .placeholder(R.drawable.ic_launcher)
@@ -138,6 +138,7 @@ public class EditCameraActivity extends AppCompatActivity {
     recyclerView.setHasFixedSize(true);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+    //example data: ""[asd.jpg, bsd.jpg]""
     String[] filenames = cameraToEdit.getCaptureFilenames()
             .replace("\"", "")
             .replace("[", "")
