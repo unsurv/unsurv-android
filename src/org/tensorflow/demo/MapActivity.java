@@ -1063,6 +1063,7 @@ public class MapActivity extends AppCompatActivity {
 
     timemachineView = findViewById(R.id.map_timemachine_seekbar);
 
+    // TODO different markers for different types
     Drawable cameraMarkerIcon = getDrawable(R.drawable.standard_camera_marker_5_dpi);
     //Drawable clusterCameraMarkerIcon = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 400, null);
     Drawable clusterCameraMarkerIcon = getDrawable(R.drawable.standard_camera_marker_15dpi);

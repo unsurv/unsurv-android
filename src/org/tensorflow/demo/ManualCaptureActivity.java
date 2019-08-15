@@ -30,9 +30,13 @@ public class ManualCaptureActivity extends AppCompatActivity {
 
   private MapView mapView;
 
-  private ImageButton manualSaveButton;
+  ImageButton manualSaveButton;
+  ImageButton addStandardCameraButton;
+  ImageButton addDomeCameraButton;
 
   private CameraRepository cameraRepository;
+
+  int cameraType;
 
   Context context;
 
@@ -55,10 +59,13 @@ public class ManualCaptureActivity extends AppCompatActivity {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     cameraRepository = new CameraRepository(getApplication());
 
+    cameraType = 0;
 
     mapView = findViewById(R.id.manual_capture_map);
 
     manualSaveButton = findViewById(R.id.manual_save_button);
+    addStandardCameraButton = findViewById(R.id.manual_capture_add_standard_camera_button);
+    addDomeCameraButton = findViewById(R.id.manual_capture_add_dome_camera_button);
 
     mapView.setTilesScaledToDpi(true);
     mapView.setClickable(true);
@@ -94,6 +101,22 @@ public class ManualCaptureActivity extends AppCompatActivity {
     mapController.setCenter(startPoint);
 
 
+    // TODO change markers here
+    addStandardCameraButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        cameraType = StorageUtils.STANDARD_CAMERA;
+      }
+    });
+
+    addDomeCameraButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        cameraType = StorageUtils.DOME_CAMERA;
+      }
+    });
+
+
     manualSaveButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -112,7 +135,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
         }
 
         SurveillanceCamera manualCamera = new SurveillanceCamera(
-                0,
+                cameraType,
                 null,
                 null,
                 null,
@@ -131,6 +154,8 @@ public class ManualCaptureActivity extends AppCompatActivity {
         );
 
         cameraRepository.insert(manualCamera);
+
+        BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 1);
 
 
       }
