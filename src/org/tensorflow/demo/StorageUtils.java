@@ -16,6 +16,7 @@ class StorageUtils {
 
   final static int STANDARD_CAMERA = 0;
   final static int DOME_CAMERA = 1;
+  final static int UNKNOWN_CAMERA = 2;
 
   // accessible for every app for now
   final static String SYNCHRONIZED_PATH = Environment.getExternalStoragePublicDirectory(

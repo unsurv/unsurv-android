@@ -76,6 +76,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
         SynchronizedCamera synchronizedCamera = new SynchronizedCamera(
                 "test_pixel_2.jpg",
                 "asjdnjasdqwdmqwlo",
+                0,
                 50.0005 + randomLat, 8.2832 + randomLong,
                 "no comments",
                 timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),

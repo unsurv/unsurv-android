@@ -274,6 +274,7 @@ public class DebugActivity extends AppCompatActivity {
     SynchronizedCamera debugCamera = new SynchronizedCamera(
             "test_pixel_2.jpg",
             "asd",
+            2,
             49.99819,
             8.25949,
             "no comments",
@@ -471,6 +472,51 @@ public class DebugActivity extends AppCompatActivity {
                 true,
                 "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]",
                 "");
+
+        SynchronizedCamera debugCamera1 = new SynchronizedCamera(
+                "test_pixel_2.jpg",
+                "asdf",
+                0,
+                49.99827,
+                8.28407,
+                "no comments",
+                "2019-05-30",
+                "2019-05-30",
+                false
+
+        );
+
+        SynchronizedCamera debugCamera2 = new SynchronizedCamera(
+                "test_pixel_2.jpg",
+                "asdfg",
+                1,
+                49.9976,
+                8.28489,
+                "no comments",
+                "2019-05-30",
+                "2019-05-30",
+                false
+
+        );
+
+        SynchronizedCamera debugCamera3 = new SynchronizedCamera(
+                "test_pixel_2.jpg",
+                "asdfgh",
+                2,
+                49.9969,
+                8.28570,
+                "no comments",
+                "2019-05-30",
+                "2019-05-30",
+                false
+
+        );
+
+        // synchronizedCameraRepository.deleteAll();
+
+        synchronizedCameraRepository.insert(Collections.singletonList(debugCamera1));
+        synchronizedCameraRepository.insert(Collections.singletonList(debugCamera2));
+        synchronizedCameraRepository.insert(Collections.singletonList(debugCamera3));
 
 
         cameraRepository.insert(randomCamera);
@@ -950,6 +996,7 @@ public class DebugActivity extends AppCompatActivity {
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
                             null,
                             JSONToSynchronize.getString("id"),
+                            JSONToSynchronize.getInt("type"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),

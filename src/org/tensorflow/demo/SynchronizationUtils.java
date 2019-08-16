@@ -149,6 +149,7 @@ class SynchronizationUtils {
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
                             null,
                             JSONToSynchronize.getString("id"),
+                            JSONToSynchronize.getInt("type"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),

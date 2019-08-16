@@ -1064,7 +1064,7 @@ public class MapActivity extends AppCompatActivity {
     timemachineView = findViewById(R.id.map_timemachine_seekbar);
 
     // TODO different markers for different types
-    Drawable cameraMarkerIcon = getDrawable(R.drawable.standard_camera_marker_5_dpi);
+    Drawable cameraMarkerIcon = getDrawable(R.drawable.simple_marker_5dpi);
     //Drawable clusterCameraMarkerIcon = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 400, null);
     Drawable clusterCameraMarkerIcon = getDrawable(R.drawable.standard_camera_marker_15dpi);
 
@@ -1366,6 +1366,7 @@ public class MapActivity extends AppCompatActivity {
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
                             JSONToSynchronize.getString("id") + ".jpg",
                             JSONToSynchronize.getString("id"),
+                            JSONToSynchronize.getInt("type"),
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),

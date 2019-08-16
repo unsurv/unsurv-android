@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -23,6 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Allows the user to manually create a SurveillanceCamera without having to use the camera and
+ * expose his/her actions
+ */
 public class ManualCaptureActivity extends AppCompatActivity {
 
   private BottomNavigationView bottomNavigationView;
@@ -33,6 +38,9 @@ public class ManualCaptureActivity extends AppCompatActivity {
   ImageButton manualSaveButton;
   ImageButton addStandardCameraButton;
   ImageButton addDomeCameraButton;
+  ImageButton addUnknownCameraButton;
+
+  ImageView marker;
 
   private CameraRepository cameraRepository;
 
@@ -59,21 +67,23 @@ public class ManualCaptureActivity extends AppCompatActivity {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     cameraRepository = new CameraRepository(getApplication());
 
-    cameraType = 0;
+    // choose standard as default
+    cameraType = StorageUtils.STANDARD_CAMERA;
 
     mapView = findViewById(R.id.manual_capture_map);
+
+    marker = findViewById(R.id.manual_capture_marker);
 
     manualSaveButton = findViewById(R.id.manual_save_button);
     addStandardCameraButton = findViewById(R.id.manual_capture_add_standard_camera_button);
     addDomeCameraButton = findViewById(R.id.manual_capture_add_dome_camera_button);
+    addUnknownCameraButton = findViewById(R.id.manual_capture_add_unknown_camera_button);
 
     mapView.setTilesScaledToDpi(true);
     mapView.setClickable(true);
 
     //enable pinch to zoom
     mapView.setMultiTouchControls(true);
-
-
 
     // MAPNIK fix
     // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
@@ -95,7 +105,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
     double centerLat = (latMin + latMax) / 2;
     double centerLon = (lonMin + lonMax) / 2;
 
-    // Setting starting position and zoom level.
+    // Setting starting position and zoom level. Use center of homezone for now
     GeoPoint startPoint = new GeoPoint(centerLat, centerLon);
     mapController.setZoom(10.0);
     mapController.setCenter(startPoint);
@@ -106,6 +116,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         cameraType = StorageUtils.STANDARD_CAMERA;
+        marker.setImageDrawable(getDrawable(R.drawable.standard_camera_marker_5_dpi));
       }
     });
 
@@ -113,6 +124,17 @@ public class ManualCaptureActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         cameraType = StorageUtils.DOME_CAMERA;
+        marker.setImageDrawable(getDrawable(R.drawable.dome_camera_marker_5_dpi));
+
+      }
+    });
+
+    addUnknownCameraButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        cameraType = StorageUtils.UNKNOWN_CAMERA;
+        marker.setImageDrawable(getDrawable(R.drawable.unknown_camera_marker_5dpi));
+
       }
     });
 

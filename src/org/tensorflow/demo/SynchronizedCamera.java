@@ -13,6 +13,8 @@ public class SynchronizedCamera {
 
   private String externalID;
 
+  private int type;
+
   private String imagePath;
 
   private double latitude;
@@ -28,6 +30,7 @@ public class SynchronizedCamera {
 
   public SynchronizedCamera (@Nullable String imagePath,
                              String externalID,
+                             int type,
                              double latitude,
                              double longitude,
                              String comments,
@@ -37,6 +40,7 @@ public class SynchronizedCamera {
 
     this.imagePath = imagePath;
     this.externalID = externalID;
+    this.type = type;
     this.latitude = latitude;
     this.longitude = longitude;
     this.comments = comments;
@@ -51,6 +55,10 @@ public class SynchronizedCamera {
 
   public String getExternalID() {
     return externalID;
+  }
+
+  public int getType() {
+    return type;
   }
 
   public String getImagePath() {
@@ -85,6 +93,10 @@ public class SynchronizedCamera {
 
   public void setExternalID(String externalID) {
     this.externalID = externalID;
+  }
+
+  public void setType(int type) {
+    this.type = type;
   }
 
   public void setImagePath(String imagePath) {
