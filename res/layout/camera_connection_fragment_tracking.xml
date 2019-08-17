@@ -17,17 +17,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-      <org.tensorflow.demo.AutoFitTextureView
+      <org.unsurv.AutoFitTextureView
           android:id="@+id/texture"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"/>
 
-      <org.tensorflow.demo.OverlayView
+      <org.unsurv.OverlayView
           android:id="@+id/tracking_overlay"
           android:layout_width="match_parent"
           android:layout_height="match_parent"/>
 
-      <org.tensorflow.demo.OverlayView
+      <org.unsurv.OverlayView
           android:id="@+id/debug_overlay"
           android:layout_width="match_parent"
           android:layout_height="match_parent"/>

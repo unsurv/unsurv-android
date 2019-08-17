@@ -73,7 +73,7 @@ android_binary(
         ":external_assets",
     ],
     assets_dir = "",
-    custom_package = "org.tensorflow.demo",
+    custom_package = "org.unsurv.demo",
     inline_constants = 1,
     manifest = "AndroidManifest.xml",
     resource_files = glob(["res/**"]),

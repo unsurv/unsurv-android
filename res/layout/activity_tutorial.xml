@@ -11,12 +11,12 @@
 
 
 
-    <org.tensorflow.demo.TutorialViewPager
+    <org.unsurv.TutorialViewPager
         android:id="@+id/tutorial_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </org.tensorflow.demo.TutorialViewPager>
+    </org.unsurv.TutorialViewPager>
 
 </LinearLayout>
 
