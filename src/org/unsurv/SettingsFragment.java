@@ -119,7 +119,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
-    showLicences = findPreference("show_licences");
+    showLicences = findPreference("showLicences");
 
     showLicences.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override
@@ -138,9 +138,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-
-
 
   }
 

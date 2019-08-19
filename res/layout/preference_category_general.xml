@@ -10,8 +10,9 @@
         android:textSize="18sp"
         android:text="@string/general_title"
         android:textColor="@color/textWhite"
-        android:layout_margin="4dp"
-
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         />
 
 </LinearLayout>

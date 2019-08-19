@@ -43,7 +43,7 @@
             android:title="Delete cameras without popup" />
 
         <Preference
-            android:key="show_licences"
+            android:key="showLicences"
             android:title="Licences" />
 
     </PreferenceCategory>
@@ -75,7 +75,7 @@
             android:entries="@array/synchronization_choices"
             android:entryValues="@array/synchronization_values"
             android:key="synchronizationInterval"
-            android:title="synchronization interval" />
+            android:title="Synchronization interval" />
 
         <EditTextPreference
             android:key="synchronizationUrl"
