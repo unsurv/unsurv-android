@@ -285,7 +285,7 @@ public class MapActivity extends AppCompatActivity {
     mapController.setCenter(startPoint);
 
     amountOnMapTextView = findViewById(R.id.map_count_textview);
-    infoTextView = findViewById(R.id.map_cameras_in_frame_text);
+    infoTextView = findViewById(R.id.map_info_text);
 
     amountOnMapTextView.setVisibility(View.GONE);
     infoTextView.setVisibility(View.GONE);
@@ -1124,7 +1124,7 @@ public class MapActivity extends AppCompatActivity {
       mapView.getOverlays().remove(cameraCluster);
       mapView.getOverlays().remove(cameraOverlay);
 
-      if (clusteringEnabled) {
+      if (timemachineView != null) {
 
         try{
           // display only cameras between seekbar max amount in the past and current seekbardate chosen by user

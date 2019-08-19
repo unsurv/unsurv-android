@@ -70,13 +70,13 @@
             android:textSize="18sp"
             android:textColor="#FFF"
             android:background="@color/standardBackground"
-            android:layout_toStartOf="@id/map_cameras_in_frame_text"
+            android:layout_toStartOf="@id/map_info_text"
             android:layout_marginTop="10dp"
             />
 
 
         <TextView
-            android:id="@+id/map_cameras_in_frame_text"
+            android:id="@+id/map_info_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
