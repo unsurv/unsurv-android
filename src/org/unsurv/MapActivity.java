@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -180,6 +181,14 @@ public class MapActivity extends AppCompatActivity {
   private TextView infoTextView;
   boolean infoIsShown = false;
 
+  private ImageButton showStandardCamerasButton;
+  private ImageButton showDomeCamerasButton;
+  private ImageButton showUnknownCamerasButton;
+
+  boolean showStandardCameras = true;
+  boolean showDomeCameras = true;
+  boolean showUnknownCameras = true;
+
   private LocalBroadcastManager localBroadcastManager;
   IntentFilter intentFilter;
   private BroadcastReceiver br;
@@ -298,13 +307,77 @@ public class MapActivity extends AppCompatActivity {
         if (!infoIsShown){
           amountOnMapTextView.setVisibility(View.VISIBLE);
           infoTextView.setVisibility(View.VISIBLE);
+          showStandardCamerasButton.setVisibility(View.VISIBLE);
+          showDomeCamerasButton.setVisibility(View.VISIBLE);
+          showUnknownCamerasButton.setVisibility(View.VISIBLE);
+
           infoIsShown = true;
 
         } else {
           amountOnMapTextView.setVisibility(View.GONE);
           infoTextView.setVisibility(View.GONE);
+          showStandardCamerasButton.setVisibility(View.GONE);
+          showDomeCamerasButton.setVisibility(View.GONE);
+          showUnknownCamerasButton.setVisibility(View.GONE);
+
+          showStandardCameras = true;
+          showDomeCameras = true;
+          showUnknownCameras = true;
+
           infoIsShown = false;
         }
+      }
+    });
+
+    showStandardCamerasButton = findViewById(R.id.map_show_standard_cameras_button);
+    showDomeCamerasButton = findViewById(R.id.map_show_dome_cameras_button);
+    showUnknownCamerasButton = findViewById(R.id.map_show_unknown_cameras_button);
+
+    showStandardCamerasButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        if (showStandardCameras) {
+          showStandardCameras = false;
+          showStandardCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterDisabled, null));
+
+        } else {
+          showStandardCameras = true;
+          showStandardCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
+        }
+
+
+      }
+    });
+
+    showDomeCamerasButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        if (showDomeCameras) {
+          showDomeCameras = false;
+          showDomeCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterDisabled, null));
+
+        } else {
+          showDomeCameras = true;
+          showDomeCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
+        }
+
+
+      }
+    });
+
+    showUnknownCamerasButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        if (showUnknownCameras) {
+          showUnknownCameras = false;
+          showUnknownCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterDisabled, null));
+
+        } else {
+          showUnknownCameras = true;
+          showUnknownCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
+        }
+
+
       }
     });
 
