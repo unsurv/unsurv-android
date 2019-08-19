@@ -320,17 +320,6 @@ public class DebugActivity extends AppCompatActivity {
                 null,
                 synchronizedCameraRepository);
 
-
-
-        /*
-        downloadCamerasFromServerWithProgressBar(
-                baseURL,
-                "area=" + homeArea,
-                sharedPreferences,
-                true,
-                null,
-                synchronizedCameraRepository);
-        */
       }
     });
 

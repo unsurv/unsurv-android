@@ -321,8 +321,6 @@ class SynchronizationUtils {
 
   static void getAPIkey(final Context context, final SharedPreferences sharedPreferences) {
 
-    final boolean errorInQuery;
-
     RequestQueue mRequestQueue;
 
     // Set up the network to use HttpURLConnection as the HTTP client.
@@ -384,7 +382,6 @@ class SynchronizationUtils {
 
       @Override
       public void onRequestFinished(Request<Object> request) {
-
 
         if (request.hasHadResponseDelivered()){
           Intent intent = new Intent();
@@ -740,6 +737,33 @@ class SynchronizationUtils {
   }
 
 
+  static boolean isApiKeyExpired(SharedPreferences sharedPreferences, Context context){
+    SimpleDateFormat timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+
+    Date apiKeyExpiration;
+    Date currentDate = new Date(System.currentTimeMillis());
+
+    try {
+      String expiration = sharedPreferences.getString("apiKeyExpiration", null);
+      apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(expiration);
+
+      if (apiKeyExpiration.before(currentDate)){
+
+        getAPIkey(context, sharedPreferences);
+        return true;
+
+      } else {
+        return false;
+      }
+
+    } catch (ParseException pse) {
+      Log.i(TAG, "apiKeyParse: " + pse.toString());
+    }
+
+    return true;
+  }
+
+
   static boolean refreshApiKeyIfExpired(SharedPreferences sharedPreferences, Context context){
 
     SimpleDateFormat timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
@@ -764,7 +788,7 @@ class SynchronizationUtils {
       Log.i(TAG, "apiKeyParse: " + pse.toString());
     }
 
-    return false;
+    return true;
 
   }
 

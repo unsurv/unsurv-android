@@ -1,14 +1,20 @@
 package org.unsurv;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import java.io.File;
@@ -22,6 +28,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   private Preference clearCapturedImages;
   private Preference clearTrainingImages;
 
+  private SharedPreferences sharedPreferences;
 
   private final static int DELETE_SYNCHRONIZED_CAMERAS = 0;
   private final static int DELETE_SURVEILLANCE_CAMERAS = 1;
@@ -33,17 +40,24 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   private CameraRepository cameraRepository;
   private SynchronizedCameraRepository synchronizedCameraRepository;
 
+  private BroadcastReceiver br;
+  private IntentFilter intentFilter;
+  private LocalBroadcastManager localBroadcastManager;
+
   // TODO grey out synchronitaion category if offline mode selected
 
   @Override
   public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 
     Preference showLicences;
+    Preference synchronizeNow;
 
     cameraRepository = new CameraRepository(getActivity().getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
 
     context = getContext();
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    localBroadcastManager = LocalBroadcastManager.getInstance(context);
 
 
     // Load the preferences from an XML resource
@@ -121,16 +135,74 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     showLicences = findPreference("showLicences");
 
-    showLicences.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-      @Override
-      public boolean onPreferenceClick(Preference preference) {
+    if (showLicences != null) {
+      showLicences.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
 
-        Intent licencesIntent = new Intent(context, LicencesActivity.class);
-        startActivity(licencesIntent);
+          Intent licencesIntent = new Intent(context, LicencesActivity.class);
+          startActivity(licencesIntent);
 
-        return true;
-      }
-    });
+          return true;
+        }
+      });
+    }
+
+
+    synchronizeNow = findPreference("synchronizeNow");
+
+    if (synchronizeNow != null) {
+      synchronizeNow.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+
+          final String baseURL = sharedPreferences.getString("synchronizationUrl", null);
+          final String homeArea = sharedPreferences.getString("area", null);
+
+          // If api key is expired set up a LocalBroadCastReceiver to start the synchronization
+          // as soon as a new api key has been acquired. Then start getting a new API key.
+
+          if (SynchronizationUtils.isApiKeyExpired(sharedPreferences, context)) {
+
+            br = new BroadcastReceiver() {
+              @Override
+              public void onReceive(Context context, Intent intent) {
+                SynchronizationUtils.downloadCamerasFromServer(
+                        baseURL,
+                        "area=" + homeArea,
+                        sharedPreferences,
+                        true,
+                        null,
+                        synchronizedCameraRepository);
+
+                localBroadcastManager.unregisterReceiver(br);
+              }
+            };
+
+            intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
+
+            localBroadcastManager.registerReceiver(br, intentFilter);
+
+            SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, context);
+
+
+          } else {
+
+
+            SynchronizationUtils.downloadCamerasFromServer(
+                    baseURL,
+                    "area=" + homeArea,
+                    sharedPreferences,
+                    true,
+                    null,
+                    synchronizedCameraRepository);
+          }
+
+          return true;
+        }
+      });
+    }
+
 
 
   }
@@ -183,7 +255,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     break;
 
 
-
                   case(DELETE_TRAINING_CAMERAS):
 
                     for (SurveillanceCamera camera : surveillanceCameras){
@@ -196,10 +267,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
                     break;
                 }
-
-
-
-
 
                 Toast.makeText(context, "Freed up " + deleteSizeInBytes + " MB of storage.", Toast.LENGTH_SHORT).show();
                 refreshSizes();
