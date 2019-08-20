@@ -33,6 +33,10 @@ import org.osmdroid.views.overlay.IconOverlay;
 
 import java.io.File;
 
+
+// TODO check if cameratype is correctly parsed from detector
+// TODO change markers for map depending on type
+
 /**
  * Allows the user to review and edit SurveillanceCamera captures, launched if user clicks on a
  * non training SurveillanceCamera in HistoryActivity
@@ -53,6 +57,8 @@ public class EditCameraActivity extends AppCompatActivity {
   MapView map;
   CheckBox standardCheckBox;
   CheckBox domeCheckBox;
+  CheckBox unknownCheckBox;
+
   TextView timestampTextView;
   TextView uploadTextView;
   TextView commentsTextView;
@@ -72,9 +78,6 @@ public class EditCameraActivity extends AppCompatActivity {
   int cameraType;
 
   boolean isBeingEdited = false;
-
-  boolean standardChecked = false;
-  boolean domeChecked = false;
 
   Context context;
 
@@ -106,6 +109,7 @@ public class EditCameraActivity extends AppCompatActivity {
     // check boxes for camera types
     standardCheckBox = findViewById(R.id.edit_camera_checkbox_standard);
     domeCheckBox = findViewById(R.id.edit_camera_checkbox_dome);
+    unknownCheckBox = findViewById(R.id.edit_camera_checkbox_unknown);
 
     timestampTextView = findViewById(R.id.edit_camera_timestamp_text);
     uploadTextView = findViewById(R.id.edit_camera_upload_text);
@@ -182,13 +186,16 @@ public class EditCameraActivity extends AppCompatActivity {
 
       case StorageUtils.STANDARD_CAMERA:
         standardCheckBox.setChecked(true);
-        standardChecked = true;
         break;
 
       case StorageUtils.DOME_CAMERA:
         domeCheckBox.setChecked(true);
-        domeChecked = true;
         break;
+
+      case StorageUtils.UNKNOWN_CAMERA:
+        unknownCheckBox.setChecked(true);
+        break;
+
 
     }
 
@@ -198,9 +205,9 @@ public class EditCameraActivity extends AppCompatActivity {
 
         if (b){
           cameraToEdit.setCameraType(StorageUtils.STANDARD_CAMERA);
-          standardChecked = true;
-          domeChecked = false;
+
           domeCheckBox.setChecked(false);
+          unknownCheckBox.setChecked(false);
         }
 
       }
@@ -212,10 +219,22 @@ public class EditCameraActivity extends AppCompatActivity {
 
         if (b){
           cameraToEdit.setCameraType(StorageUtils.DOME_CAMERA);
-          domeChecked = true;
-          standardChecked = false;
           standardCheckBox.setChecked(false);
+          unknownCheckBox.setChecked(false);
         }
+      }
+    });
+
+    unknownCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+        if (b){
+          cameraToEdit.setCameraType(StorageUtils.UNKNOWN_CAMERA);
+          standardCheckBox.setChecked(false);
+          domeCheckBox.setChecked(false);
+        }
+
       }
     });
 

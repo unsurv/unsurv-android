@@ -128,6 +128,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
             holder.cameraTypeBar.setBackgroundColor(Color.BLUE);
 
             break;
+
+          case StorageUtils.UNKNOWN_CAMERA:
+            holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#9101b5")); // purple
         }
 
       }

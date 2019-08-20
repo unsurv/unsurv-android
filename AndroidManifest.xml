@@ -37,14 +37,9 @@
 
         <activity
             android:name=".DebugActivity"
-            android:label="unsurv"
+            android:label="@string/app_label"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
         </activity>
 
         <activity
@@ -54,8 +49,15 @@
 
         <activity
             android:name=".DetectorActivity"
-            android:label="@string/detector_label"
+            android:label="@string/app_label"
             android:parentActivityName=".DebugActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
 
         </activity>
 

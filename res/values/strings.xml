@@ -23,7 +23,7 @@
 
 
     <!--general-->
-    <string name="timestamp_not_available">not displayed</string>
+    <string name="timestamp_not_available">not available</string>
     <string name="no_comment">no comments available</string>
     <string name="timestamp_text">Camera captured on:</string>
     <string name="upload_text">Camera upload on:</string>

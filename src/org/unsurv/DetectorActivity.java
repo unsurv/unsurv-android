@@ -45,6 +45,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
+import android.util.SparseIntArray;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,10 +58,14 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -745,6 +750,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   void processSurveillanceCameraCapture(Classifier.Recognition result, RectF location, File pictureDirectory) {
 
+    HashMap<String, Integer> typeMap = new HashMap<>();
+    typeMap.put("surveillance camera", 0);
+    typeMap.put("dome camera", 1);
 
     if (result.getConfidence() > 0.95 && currentTime -
             timeLastPictureTaken > DELAY_BETWEEN_CAPTURES && isCapturing) {
@@ -803,7 +811,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         CameraCapture currentCamera = new CameraCapture(
-                Integer.valueOf(result.getId()),
+                typeMap.get(result.getTitle()),
                 result.getConfidence(),
                 thumbnailFilename,
                 imageFilename,
@@ -813,7 +821,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
         );
 
-        Log.d(TAG, "datetimestamp: " + timestampIso8601.format(new Date(currentTime)));
+        Log.d(TAG, "datetimestamp: " + timestampIso8601.format(new Date(currentTime)) + " cameraTitle: " + result.getTitle());
 
         pooledCameraCaptures.add(currentCamera);
 
@@ -858,15 +866,57 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     CameraCapture biggestConfidence = cameraPool.get(0); // is sorted
 
-
     JSONArray allCaptureFilenames = new JSONArray();
+
+    // filter for one type
+
+    SparseIntArray occurencesPerType = new SparseIntArray(3);
+
+    int standardCount = 0;
+    int domeCount = 0;
+    int unknownCount = 0;
+    occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
+    occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
+    occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
+
+    List<CameraCapture> filteredCameraPool = new ArrayList<>();
+
+
+
+    for (CameraCapture capture : cameraPool){
+
+      switch (capture.getCameraType()){
+
+        case StorageUtils.STANDARD_CAMERA:
+          standardCount++;
+          occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
+          break;
+
+        case StorageUtils.DOME_CAMERA:
+          domeCount++;
+          occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
+          break;
+
+        case StorageUtils.UNKNOWN_CAMERA:
+          unknownCount++;
+          occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
+          break;
+
+      }
+
+    }
+
+    int maxCount = Collections.max(Arrays.asList(standardCount, domeCount, unknownCount));
+
+    int mostCommonTypeInPool = occurencesPerType.indexOfValue(maxCount); // index in Map = type of camera
+
 
     // Get Capture with biggest confidence for thumbnail/picture.
     for (int k=0; k < cameraPool.size(); k++) {
       allCaptureFilenames.put(cameraPool.get(k).getThumbnailPath());
       allCaptureFilenames.put(cameraPool.get(k).getImagePath());
 
-      if (cameraPool.get(k).getConfidence() > biggestConfidence.getConfidence()) {
+      if (cameraPool.get(k).getConfidence() > biggestConfidence.getConfidence() && cameraPool.get(k).getCameraType() == mostCommonTypeInPool) {
         biggestConfidence = cameraPool.get(k);
       }
     }
@@ -914,7 +964,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       if (useTimestamp) {
 
         cameraRepository.insert(new SurveillanceCamera(
-                biggestConfidence.getId(),
+                mostCommonTypeInPool,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,
@@ -933,11 +983,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         ));
 
         Toast.makeText(this, "successfully captured camera", Toast.LENGTH_SHORT).show();
+        BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 1);
 
       } else {
 
         cameraRepository.insert(new SurveillanceCamera(
-                biggestConfidence.getId(),
+                mostCommonTypeInPool,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,
@@ -956,6 +1007,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         ));
 
         Toast.makeText(this, "successfully captured camera", Toast.LENGTH_SHORT).show();
+        BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 1);
 
       }
 

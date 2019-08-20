@@ -220,8 +220,8 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
     sharedPreferences.edit().putBoolean("downloadImages", true).apply();
     sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", false).apply();
-    sharedPreferences.edit().putInt("bottomNavigationHistoryBadgeCount", 10).apply();
-    sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 12).apply();
+    sharedPreferences.edit().putInt("bottomNavigationHistoryBadgeCount", 0).apply();
+    sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 0).apply();
 
 
 

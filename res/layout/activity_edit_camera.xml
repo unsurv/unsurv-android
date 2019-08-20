@@ -93,30 +93,7 @@
 
             <RelativeLayout
                 android:layout_width="0sp"
-                android:layout_weight="5"
-                android:layout_height="match_parent">
-
-                <CheckBox
-                    android:id="@+id/edit_camera_checkbox_dome"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/edit_camera_type_dome"
-                    android:layout_centerVertical="true"
-                    android:padding="5dp"/>
-
-                <ImageView
-                    android:id="@+id/edit_camera_type_dome"
-                    android:layout_centerHorizontal="true"
-                    android:src="@drawable/dome_type"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="0sp"
-                android:layout_weight="5"
+                android:layout_weight="3"
                 android:layout_height="match_parent">
 
                 <CheckBox
@@ -131,9 +108,55 @@
                 <ImageView
                     android:id="@+id/edit_camera_type_standard"
                     android:layout_centerHorizontal="true"
-                    android:src="@drawable/standard_type"
+                    android:src="@drawable/standard_type_mdpi"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0sp"
+                android:layout_weight="3"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/edit_camera_checkbox_dome"
+                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/edit_camera_type_dome"
+                    android:layout_centerVertical="true"
+                    android:padding="5dp"/>
+
+                <ImageView
+                    android:id="@+id/edit_camera_type_dome"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/dome_type_mdpi"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0sp"
+                android:layout_weight="3"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/edit_camera_checkbox_unknown"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/edit_camera_type_unknown"
+                    android:layout_centerVertical="true"
+                    />
+
+                <ImageView
+                    android:id="@+id/edit_camera_type_unknown"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/unknown_type_mdpi"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent" />
 
             </RelativeLayout>
 
