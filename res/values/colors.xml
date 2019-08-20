@@ -35,7 +35,7 @@
 
     <color name="lightGrey">#5e5e5d</color>
 
-    <color name="cameraFilterDisabled">#930301</color>
-    <color name="cameraFilterEnabled">#187701</color>
+    <color name="cameraFilterDisabled">#ce0407</color>
+    <color name="cameraFilterEnabled">#03aa0e</color>
 
 </resources>

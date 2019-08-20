@@ -42,6 +42,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -311,6 +312,10 @@ public class MapActivity extends AppCompatActivity {
           showDomeCamerasButton.setVisibility(View.VISIBLE);
           showUnknownCamerasButton.setVisibility(View.VISIBLE);
 
+          showStandardCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
+          showDomeCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
+          showUnknownCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
+
           infoIsShown = true;
 
         } else {
@@ -325,6 +330,8 @@ public class MapActivity extends AppCompatActivity {
           showUnknownCameras = true;
 
           infoIsShown = false;
+
+          redrawMarkers(allCamerasInArea);
         }
       }
     });
@@ -345,6 +352,7 @@ public class MapActivity extends AppCompatActivity {
           showStandardCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
         }
 
+        redrawMarkers(allCamerasInArea);
 
       }
     });
@@ -361,6 +369,7 @@ public class MapActivity extends AppCompatActivity {
           showDomeCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
         }
 
+        redrawMarkers(allCamerasInArea);
 
       }
     });
@@ -377,6 +386,7 @@ public class MapActivity extends AppCompatActivity {
           showUnknownCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
         }
 
+        redrawMarkers(allCamerasInArea);
 
       }
     });
@@ -1247,13 +1257,48 @@ public class MapActivity extends AppCompatActivity {
         int counter = 0;
 
         for (SynchronizedCamera camera : camerasToDisplay) {
-          overlayItemsToDisplay.add(new OverlayItem(
-                  camera.getExternalID(),
-                  "test_camera",
-                  camera.getComments(),
-                  new GeoPoint(camera.getLatitude(), camera.getLongitude()
-                  )));
-          counter++;
+
+          int cameraType = camera.getType();
+
+          if (showStandardCameras && cameraType == StorageUtils.STANDARD_CAMERA){
+
+            overlayItemsToDisplay.add(new OverlayItem(
+                    camera.getExternalID(),
+                    "test_camera",
+                    camera.getComments(),
+                    new GeoPoint(camera.getLatitude(), camera.getLongitude()
+                    )));
+
+            counter++;
+          }
+
+          if (showDomeCameras && cameraType == StorageUtils.DOME_CAMERA){
+
+            overlayItemsToDisplay.add(new OverlayItem(
+                    camera.getExternalID(),
+                    "test_camera",
+                    camera.getComments(),
+                    new GeoPoint(camera.getLatitude(), camera.getLongitude()
+                    )));
+
+            counter++;
+          }
+
+          if (showUnknownCameras && cameraType == StorageUtils.UNKNOWN_CAMERA){
+
+            overlayItemsToDisplay.add(new OverlayItem(
+                    camera.getExternalID(),
+                    "test_camera",
+                    camera.getComments(),
+                    new GeoPoint(camera.getLatitude(), camera.getLongitude()
+                    )));
+
+            counter++;
+          }
+
+
+
+
 
 
           if (counter > maxMarkersOnMap) {
