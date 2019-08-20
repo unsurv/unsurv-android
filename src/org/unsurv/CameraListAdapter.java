@@ -210,8 +210,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         public void onClick(View view) {
 
           if (!currentCameraUploadComplete) {
+            String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
 
-            SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), "http://192.168.178.137:5000/", sharedPreferences, cameraViewModel, null, false);
+            SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), baseUrl, sharedPreferences, cameraViewModel, null, false);
           } else {
             Toast.makeText(ctx, "Camera has already been uploaded.", Toast.LENGTH_SHORT).show();
           }
