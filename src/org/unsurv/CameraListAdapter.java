@@ -2,12 +2,16 @@ package org.unsurv;
 
 import android.app.AlertDialog;
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,9 +50,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     private final ImageButton deleteButton;
     private final ImageButton uploadButton;
 
-    private final LinearLayout detailLinearLayout;
-
-
 
     private CameraViewHolder(View itemView) {
       super(itemView);
@@ -58,7 +59,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       bottomTextViewInItem = itemView.findViewById(R.id.history_item_text_view_bottom);
       deleteButton = itemView.findViewById(R.id.history_item_delete_button);
       uploadButton = itemView.findViewById(R.id.history_item_upload_button);
-      detailLinearLayout = itemView.findViewById(R.id.history_item_linear_layout);
 
     }
 
@@ -74,6 +74,10 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
   private final Context ctx;
   private CameraViewModel cameraViewModel;
 
+  private BroadcastReceiver br;
+  private IntentFilter intentFilter;
+  private LocalBroadcastManager localBroadcastManager;
+
 
   CameraListAdapter(Context context, Application application, LayoutInflater layoutInflater, CameraViewModel cameraViewModel) {
     mInflater = LayoutInflater.from(context);
@@ -82,6 +86,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     this.layoutInflater = layoutInflater;
     ctx = context;
+
+    localBroadcastManager = LocalBroadcastManager.getInstance(ctx);
+
 
   }
 
@@ -210,9 +217,32 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         public void onClick(View view) {
 
           if (!currentCameraUploadComplete) {
-            String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
 
-            SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), baseUrl, sharedPreferences, cameraViewModel, null, false);
+            final String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
+
+            // If api key is expired set up a LocalBroadCastReceiver to start the upload
+            // as soon as a new api key has been acquired. Then start getting a new API key.
+            if (SynchronizationUtils.isApiKeyExpired(sharedPreferences, ctx)){
+
+              br = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                  SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), baseUrl, sharedPreferences, cameraViewModel, null, false);
+
+                  localBroadcastManager.unregisterReceiver(br);
+                }
+              };
+
+              intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
+
+              localBroadcastManager.registerReceiver(br, intentFilter);
+            } else {
+              // API key is not expired, just upload
+              SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), baseUrl, sharedPreferences, cameraViewModel, null, false);
+
+            }
+
+
           } else {
             Toast.makeText(ctx, "Camera has already been uploaded.", Toast.LENGTH_SHORT).show();
           }
