@@ -151,7 +151,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
 
       Picasso.get().load(imageFile)
-              .placeholder(R.drawable.ic_launcher)
+              .placeholder(R.drawable.ic_camera_alt_grey_50dp)
               .into(holder.thumbnailImageView);
 
 

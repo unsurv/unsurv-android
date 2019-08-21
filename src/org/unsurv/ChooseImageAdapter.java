@@ -82,7 +82,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
       File imgFile = new File(cameraCapturesPath + filePath);
 
       Picasso.get().load(imgFile)
-              .placeholder(R.drawable.ic_launcher)
+              .placeholder(R.drawable.ic_camera_alt_grey_50dp)
               .into(imgView);
 
       // display little check mark when reaching currently used image
@@ -103,7 +103,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
         File imgFile = new File(cameraCapturesPath + chosenImageFilePath);
 
         Picasso.get().load(imgFile)
-                .placeholder(R.drawable.ic_launcher)
+                .placeholder(R.drawable.ic_camera_alt_grey_50dp)
                 .into(mChosenCameraImageView);
 
         // change camera obj to reflect choice

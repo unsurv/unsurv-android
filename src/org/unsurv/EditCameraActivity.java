@@ -134,7 +134,7 @@ public class EditCameraActivity extends AppCompatActivity {
 
 
     Picasso.get().load(cameraImage)
-              .placeholder(R.drawable.ic_launcher)
+              .placeholder(R.drawable.ic_camera_alt_grey_50dp)
               .into(cameraImageView);
 
     recyclerView.setHasFixedSize(true);
