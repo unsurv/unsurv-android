@@ -428,6 +428,7 @@ class SynchronizationUtils {
 
         tmpJsonObject.put("training_capture", currentCamera.getTrainingCapture());
         tmpJsonObject.put("drawn_cameras", drawn_cameras);
+        tmpJsonObject.put("type", currentCamera.getCameraType());
 
 
         tmpJsonObject.put("lat", currentCamera.getLatitude());
@@ -636,7 +637,10 @@ class SynchronizationUtils {
     mRequestQueue = new RequestQueue(new NoCache(), network);
 
     // Start the queue
-    mRequestQueue.start();
+    if (postArray.length() != 0){
+      mRequestQueue.start();
+
+    }
 
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.POST,
