@@ -208,6 +208,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*15)).apply();
     sharedPreferences.edit().putString("synchronizationUrl", "https://api.unsurv.org/").apply();
+    // sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.178.137:5000/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();

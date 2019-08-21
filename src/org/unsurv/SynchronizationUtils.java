@@ -591,7 +591,7 @@ class SynchronizationUtils {
       if (currentCamera.getTrainingCapture()){
         imageFile = new File(StorageUtils.TRAINING_CAPTURES_PATH + currentCamera.getImagePath());
       } else {
-        imageFile = new File(StorageUtils.SYNCHRONIZED_PATH + currentCamera.getThumbnailPath());
+        imageFile = new File(StorageUtils.CAMERA_CAPTURES_PATH + currentCamera.getThumbnailPath());
       }
       JSONObject singleCamera = new JSONObject();
 
