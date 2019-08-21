@@ -147,8 +147,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       String mComment = current.getComment();
 
-      // holder.thumbnailImageView.
-
       holder.bottomTextViewInItem.setText(uploadDate);
 
 

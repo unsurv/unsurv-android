@@ -74,6 +74,7 @@ public class EditCameraActivity extends AppCompatActivity {
   RecyclerView.Adapter adapter;
 
   IconOverlay iconOverlay;
+  GeoPoint cameraLocation;
 
   int cameraType;
 
@@ -169,31 +170,44 @@ public class EditCameraActivity extends AppCompatActivity {
 
 
     // Setting starting position and zoom level.
-    GeoPoint cameraLocation = new GeoPoint(lat, lon);
+    cameraLocation = new GeoPoint(lat, lon);
     mapController.setZoom(16.0);
     mapController.setCenter(cameraLocation);
 
-    cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(this.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
-
-    iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
-
-    map.getOverlays().add(iconOverlay);
-
-    //detailMap.getOverlays().add(cameraMarker);
-    map.invalidate();
 
     switch (cameraType){
 
       case StorageUtils.STANDARD_CAMERA:
         standardCheckBox.setChecked(true);
+
+        map.getOverlays().remove(iconOverlay);
+        map.invalidate();
+        cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
+        iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+        map.getOverlays().add(iconOverlay);
+        map.invalidate();
         break;
 
       case StorageUtils.DOME_CAMERA:
         domeCheckBox.setChecked(true);
+
+        map.getOverlays().remove(iconOverlay);
+        map.invalidate();
+        cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.dome_camera_marker_5_dpi, 12, null);
+        iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+        map.getOverlays().add(iconOverlay);
+        map.invalidate();
         break;
 
       case StorageUtils.UNKNOWN_CAMERA:
         unknownCheckBox.setChecked(true);
+
+        map.getOverlays().remove(iconOverlay);
+        map.invalidate();
+        cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.unknown_camera_marker_5dpi, 12, null);
+        iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+        map.getOverlays().add(iconOverlay);
+        map.invalidate();
         break;
 
 
@@ -208,6 +222,16 @@ public class EditCameraActivity extends AppCompatActivity {
 
           domeCheckBox.setChecked(false);
           unknownCheckBox.setChecked(false);
+
+          map.getOverlays().remove(iconOverlay);
+          map.invalidate();
+
+          cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
+          iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+          map.getOverlays().add(iconOverlay);
+          map.invalidate();
+
         }
 
       }
@@ -221,6 +245,15 @@ public class EditCameraActivity extends AppCompatActivity {
           cameraToEdit.setCameraType(StorageUtils.DOME_CAMERA);
           standardCheckBox.setChecked(false);
           unknownCheckBox.setChecked(false);
+
+          map.getOverlays().remove(iconOverlay);
+          map.invalidate();
+
+          cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.dome_camera_marker_5_dpi, 12, null);
+          iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+          map.getOverlays().add(iconOverlay);
+          map.invalidate();
         }
       }
     });
@@ -233,6 +266,14 @@ public class EditCameraActivity extends AppCompatActivity {
           cameraToEdit.setCameraType(StorageUtils.UNKNOWN_CAMERA);
           standardCheckBox.setChecked(false);
           domeCheckBox.setChecked(false);
+
+          map.getOverlays().remove(iconOverlay);
+          map.invalidate();
+
+          cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.unknown_camera_marker_5dpi, 12, null);
+          iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+          map.getOverlays().add(iconOverlay);
+          map.invalidate();
         }
 
       }

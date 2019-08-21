@@ -111,7 +111,6 @@ public class ManualCaptureActivity extends AppCompatActivity {
     mapController.setCenter(startPoint);
 
 
-    // TODO change markers here
     addStandardCameraButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
