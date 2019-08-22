@@ -67,7 +67,7 @@ public class CustomInfoWindow extends MarkerInfoWindow {
       @Override
       public void onClick(View view) {
 
-        String baseUrl = sharedPreferences.getString("synchronizationURL", null);
+        String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
         SynchronizationUtils.downloadImagesFromServer(
                 baseUrl,
                 Collections.singletonList(selectedCamera),
