@@ -1188,7 +1188,7 @@ public class MapActivity extends AppCompatActivity {
         cameraMarker.setIcon(clusterCameraMarkerIcon);
 
         cameraMarker.setRelatedObject(currentCamera);
-        cameraMarker.setInfoWindow(new CustomInfoWindow(mapView, sharedPreferences));
+        cameraMarker.setInfoWindow(new CustomInfoWindow(mapView, sharedPreferences, synchronizedCameraRepository));
         cameraMarker.setPanToView(false);
         //cameraMarker.setTitle(camerasToDisplay.get(i).getComments());
 
@@ -1358,11 +1358,13 @@ public class MapActivity extends AppCompatActivity {
                       infoImage.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                          String baseUrl = sharedPreferences.getString("synchronizationURL", null);
+                          String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
                           SynchronizationUtils.downloadImagesFromServer(
                                   baseUrl,
                                   Collections.singletonList(highlightedCamera),
                                   sharedPreferences);
+                          highlightedCamera.setImagePath(highlightedCamera.getExternalID() + ".jpg");
+                          synchronizedCameraRepository.update(highlightedCamera);
 
                           Handler handler = new Handler();
                           handler.postDelayed(new Runnable() {
@@ -1371,13 +1373,12 @@ public class MapActivity extends AppCompatActivity {
 
                               File updatedThumbnail = new File(picturesPath + highlightedCamera.getImagePath());
 
-                              infoImage.setImageDrawable(null);
                               Picasso.get().load(updatedThumbnail)
                                       .placeholder(R.drawable.ic_file_download_grey_48dp)
                                       .into(infoImage);
 
                             }
-                          }, 500);
+                          }, 1000);
 
 
                         }

@@ -32,9 +32,10 @@ public class CustomInfoWindow extends MarkerInfoWindow {
   private String picturesPath;
 
   private SharedPreferences sharedPreferences;
+  private SynchronizedCameraRepository mSynchronizedCameraRepository;
 
 
-  public CustomInfoWindow(final MapView mapView, SharedPreferences sharedPreferences) {
+  CustomInfoWindow(final MapView mapView, SharedPreferences sharedPreferences, SynchronizedCameraRepository synchronizedCameraRepository) {
     super(R.layout.camera_info_bubble, mapView);
 
     this.sharedPreferences = sharedPreferences;
@@ -43,6 +44,7 @@ public class CustomInfoWindow extends MarkerInfoWindow {
     infoComment = mView.findViewById(R.id.bubble_description);
 
     picturesPath = StorageUtils.SYNCHRONIZED_PATH;
+    mSynchronizedCameraRepository = synchronizedCameraRepository;
 
   }
 
@@ -73,6 +75,9 @@ public class CustomInfoWindow extends MarkerInfoWindow {
                 Collections.singletonList(selectedCamera),
                 sharedPreferences);
 
+        selectedCamera.setImagePath(selectedCamera.getExternalID() + ".jpg");
+        mSynchronizedCameraRepository.update(selectedCamera);
+
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
           @Override
@@ -86,7 +91,7 @@ public class CustomInfoWindow extends MarkerInfoWindow {
                     .into(infoImage);
 
           }
-        }, 500);
+        }, 1000);
 
 
       }
