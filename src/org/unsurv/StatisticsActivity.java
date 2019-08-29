@@ -134,7 +134,7 @@ public class StatisticsActivity extends AppCompatActivity {
     localBroadcastManager = LocalBroadcastManager.getInstance(StatisticsActivity.this);
 
     refreshSharedPreferencesObject();
-    baseURL = sharedPreferences.getString("synchronizationURL", null);
+    baseURL = sharedPreferences.getString("synchronizationUrl", null);
     today = timestampIso8601.format(new Date(currentTime));
 
     queryServerForStatistics(baseURL, "global", "2018-01-01", today);
@@ -196,7 +196,7 @@ public class StatisticsActivity extends AppCompatActivity {
       @Override
       public void onReceive(Context context, Intent intent) {
         refreshSharedPreferencesObject();
-        String baseURL = sharedPreferences.getString("synchronizationURL", null);
+        String baseURL = sharedPreferences.getString("synchronizationUrl", null);
         queryServerForStatistics(baseURL, "global", "2018-01-01", "2019-01-01");
       }
     };
