@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
- * LicenceActivity to show when user clicks on licence settings
+ * LicenceActivity to show when user clicks on "Show licences" settings
  */
 
 public class LicencesActivity extends AppCompatActivity {

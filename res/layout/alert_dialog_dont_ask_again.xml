@@ -10,7 +10,7 @@
 
     <CheckBox
         android:layout_marginStart="20dp"
-        android:id="@+id/delete_popup_dont_show_again_checkbox"
+        android:id="@+id/dismiss_popup_dont_show_again_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"

@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -183,7 +182,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
 
             View dontAskAgainLinearLayout = layoutInflater.inflate(R.layout.alert_dialog_dont_ask_again, null);
-            final CheckBox dontAskAgainCheckBox = dontAskAgainLinearLayout.findViewById(R.id.delete_popup_dont_show_again_checkbox);
+            final CheckBox dontAskAgainCheckBox = dontAskAgainLinearLayout.findViewById(R.id.dismiss_popup_dont_show_again_checkbox);
             alertDialogBuilder.setView(dontAskAgainLinearLayout);
 
             alertDialogBuilder.setTitle("Do you want to permanently delete this camera?");

@@ -25,6 +25,10 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is one of the 4 main activities. It shows captures the user has taken and offers
+ * options on what to do with them
+ */
 public class HistoryActivity extends AppCompatActivity {
 
   private CameraViewModel mCameraViewModel;
@@ -67,7 +71,6 @@ public class HistoryActivity extends AppCompatActivity {
 
     // clear badges for HistoryActivity when accessed
     BottomNavigationBadgeHelper.clearMenuItemBadge(bottomNavigationView, R.id.bottom_navigation_history, context);
-
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
     super.onResume();
@@ -82,7 +85,10 @@ public class HistoryActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+    // main view for captures
     recyclerView = findViewById(R.id.camera_recyclerview);
+
+    // enables access to db
     mCameraViewModel = ViewModelProviders.of(this).get(CameraViewModel.class);
 
     // needed in adapter to show PopupWindows
@@ -93,7 +99,7 @@ public class HistoryActivity extends AppCompatActivity {
     recyclerView.setAdapter(adapter);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-    // LiveData
+    // LiveData to immediately include new data in recyclerview
     mCameraViewModel.getAllCameras().observe(this, new Observer<List<SurveillanceCamera>>() {
       @Override
       public void onChanged(@Nullable List<SurveillanceCamera> surveillanceCameras) {
@@ -148,15 +154,15 @@ public class HistoryActivity extends AppCompatActivity {
 
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_history).setChecked(true);
 
-
   }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-      //return super.onCreateOptionsMenu(menu);
+
+      //top actionbar with settings icon
       getMenuInflater().inflate(R.menu.actionbar, menu);
 
-      // Removes refreshButton in ActionBar. Not needed since LiveData is used for the List.
+      // Removes refreshButton in ActionBar. Not needed since LiveData is used for the list.
       MenuItem item = menu.findItem(R.id.action_refresh);
       item.setVisible(false);
 

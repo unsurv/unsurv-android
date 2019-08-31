@@ -67,7 +67,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     cameraRepository = new CameraRepository(getApplication());
 
-    // choose standard as default
+    // choose standard type as default
     cameraType = StorageUtils.STANDARD_CAMERA;
 
     mapView = findViewById(R.id.manual_capture_map);
@@ -111,6 +111,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
     mapController.setCenter(startPoint);
 
 
+    // add different types depending on user choice
     addStandardCameraButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -155,6 +156,8 @@ public class ManualCaptureActivity extends AppCompatActivity {
           currentDateOrNull = null;
         }
 
+        // when editing camera location, a new marker is created in the center of the map
+        // get center coordinates when save button is pressed
         SurveillanceCamera manualCamera = new SurveillanceCamera(
                 cameraType,
                 null,
@@ -176,6 +179,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
 
         cameraRepository.insert(manualCamera);
 
+        // create small notification for history activity
         BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 1);
 
 

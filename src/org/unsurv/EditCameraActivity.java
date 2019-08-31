@@ -120,7 +120,7 @@ public class EditCameraActivity extends AppCompatActivity {
     resetMapButton = findViewById(R.id.edit_camera_reset_map_position);
     editLocationMarker = findViewById(R.id.edit_camera_center_marker);
 
-    // Activity gets startet with db id in IntentExtra
+    // Activity gets startet with db id in IntentExtra, get id
     Intent startIntent = getIntent();
     int dbId = startIntent.getIntExtra("surveillanceCameraId", 0);
 
@@ -160,6 +160,7 @@ public class EditCameraActivity extends AppCompatActivity {
     // TODO add choice + backup strategy here
     map.setTileSource(TileSourceFactory.OpenTopo);
 
+    // remove big + nad - buttons at the bottom of the map
     final CustomZoomButtonsController zoomController = map.getZoomController();
     zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 
@@ -175,6 +176,7 @@ public class EditCameraActivity extends AppCompatActivity {
     mapController.setCenter(cameraLocation);
 
 
+    // set marker according to type on the map
     switch (cameraType){
 
       case StorageUtils.STANDARD_CAMERA:

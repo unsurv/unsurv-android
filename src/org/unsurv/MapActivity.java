@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -31,7 +30,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -42,7 +40,6 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -96,6 +93,10 @@ import java.util.TimeZone;
 
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
 
+/**
+ * This is one of the 4 main activities. It displays cameras on a adjustable
+ * osmdroid map.
+ */
 
 public class MapActivity extends AppCompatActivity {
   public static final String TAG = "MapActivity";
@@ -203,8 +204,6 @@ public class MapActivity extends AppCompatActivity {
   Context context;
 
 
-  // TODO set max amount visible
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -212,8 +211,10 @@ public class MapActivity extends AppCompatActivity {
 
     context = this;
 
+    // db access
     synchronizedCameraRepository = new SynchronizedCameraRepository(getApplication());
     areaOfflineAvailableRepository = new AreaOfflineAvailableRepository(getApplication());
+
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
     localBroadcastManager = LocalBroadcastManager.getInstance(MapActivity.this);
@@ -222,6 +223,8 @@ public class MapActivity extends AppCompatActivity {
 
     mapView = findViewById(R.id.tutorial_map);
     mapScrollingEnabled = true;
+
+    // sets timemachine spinner to default value
     isInitialSpinnerSelection = true;
 
     timestampIso8601DaysAccuracy = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
@@ -229,10 +232,10 @@ public class MapActivity extends AppCompatActivity {
 
     timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
-    lastZoomLevel = 1000; // start high to always refresh on first redraw
+    // later used to only refresh map when zooming in, start high to always refresh on first redraw
+    lastZoomLevel = 1000;
 
-    //TODO find solution to do the same at the beginning of a gesture.
-    // Reloads markers in visible area after scrolling. Closes infowindow if open.
+    // refresh map and close infowindows when scrolling
     mapView.addMapListener(new DelayedMapListener(new MapListener() {
       @Override
       public boolean onScroll(ScrollEvent event) {
@@ -241,6 +244,7 @@ public class MapActivity extends AppCompatActivity {
         return false;
       }
 
+      // refresh if zooming out
       @Override
       public boolean onZoom(ZoomEvent event) {
 
@@ -248,7 +252,6 @@ public class MapActivity extends AppCompatActivity {
 
         if (isZoomingOut) {
           reloadMarker();
-
         }
 
         closeAllInfoWindowsOn(mapView);
@@ -258,7 +261,7 @@ public class MapActivity extends AppCompatActivity {
       }
     }, 150)); // delay for updating in ms after zooming/scrolling
 
-
+    // blocks zooming and moving when needed
     mapView.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -286,6 +289,7 @@ public class MapActivity extends AppCompatActivity {
 
     final IMapController mapController = mapView.getController();
 
+    // remove big + nad - buttons at the bottom of the map
     final CustomZoomButtonsController zoomController = mapView.getZoomController();
     zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 
@@ -294,17 +298,23 @@ public class MapActivity extends AppCompatActivity {
     mapController.setZoom(7.0);
     mapController.setCenter(startPoint);
 
+    showStandardCamerasButton = findViewById(R.id.map_show_standard_cameras_button);
+    showDomeCamerasButton = findViewById(R.id.map_show_dome_cameras_button);
+    showUnknownCamerasButton = findViewById(R.id.map_show_unknown_cameras_button);
+
     amountOnMapTextView = findViewById(R.id.map_count_textview);
     infoTextView = findViewById(R.id.map_info_text);
 
     amountOnMapTextView.setVisibility(View.GONE);
     infoTextView.setVisibility(View.GONE);
 
+    // info button
     infoButton = findViewById(R.id.map_info_button);
     infoButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
 
+        // activates info overlay if not already present, deactivates it if present
         if (!infoIsShown){
           amountOnMapTextView.setVisibility(View.VISIBLE);
           infoTextView.setVisibility(View.VISIBLE);
@@ -312,6 +322,7 @@ public class MapActivity extends AppCompatActivity {
           showDomeCamerasButton.setVisibility(View.VISIBLE);
           showUnknownCamerasButton.setVisibility(View.VISIBLE);
 
+          // start with green background meaning all cameras are shown
           showStandardCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
           showDomeCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
           showUnknownCamerasButton.setBackgroundColor(getResources().getColor(R.color.cameraFilterEnabled, null));
@@ -336,10 +347,8 @@ public class MapActivity extends AppCompatActivity {
       }
     });
 
-    showStandardCamerasButton = findViewById(R.id.map_show_standard_cameras_button);
-    showDomeCamerasButton = findViewById(R.id.map_show_dome_cameras_button);
-    showUnknownCamerasButton = findViewById(R.id.map_show_unknown_cameras_button);
 
+    // enable filters based on button clicks
     showStandardCamerasButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -394,6 +403,7 @@ public class MapActivity extends AppCompatActivity {
     // myLocationOverlay
     myLocationOverlay = new MyLocationNewOverlay(mapView);
     myLocationOverlay.enableMyLocation();
+
     // TODO manage following
     // myLocationOverlay.enableFollowLocation();
     myLocationOverlay.setDrawAccuracyEnabled(true);
@@ -401,7 +411,7 @@ public class MapActivity extends AppCompatActivity {
     mapController.setZoom(14.00);
     mapView.getOverlays().add(myLocationOverlay);
 
-    // Button in to find user location.
+    // Button to find user location.
     myLocationButton = findViewById(R.id.my_location_button);
     myLocationButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -412,13 +422,12 @@ public class MapActivity extends AppCompatActivity {
     });
 
     final RelativeLayout mapLayout = findViewById(R.id.map_rel_layout);
-    ViewGroup.LayoutParams layoutParams = mapLayout.getLayoutParams();
 
     offlineMode = sharedPreferences.getBoolean("offlineMode", true);
 
     timemachineButton = findViewById(R.id.map_timemachine_button);
 
-    // timemachine is a scrollable timeline to show cameras cumulatively based on their date
+    // timemachine is a scrollable bar to show cameras cumulatively based on their date
     timemachineButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -446,12 +455,10 @@ public class MapActivity extends AppCompatActivity {
           // Apply the adapter to the spinners
           timemachineSpinner.setAdapter(adapter);
 
-
-
+          // when user chooses a different timeframe
           timemachineSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
 
 
               long currentTime = System.currentTimeMillis();
@@ -460,7 +467,7 @@ public class MapActivity extends AppCompatActivity {
               Calendar cal = Calendar.getInstance();
               cal.setTime(currentDate);
 
-              // standard timeframe includes all cameras
+              // first timeframe includes all cameras
               if (isInitialSpinnerSelection) {
                 isInitialSpinnerSelection = false;
 
@@ -473,6 +480,7 @@ public class MapActivity extends AppCompatActivity {
                   timemachineMaxInterval = cal.getTime();
                   daysBetween = savedValue;
                 } else {
+                  // month starts at 0 date at 1 WTF Java
                   cal.set(2018, 0, 1);
                   timemachineMaxInterval = cal.getTime();
                   daysBetween = daysBetween(timemachineMaxInterval, currentDate);
@@ -560,6 +568,7 @@ public class MapActivity extends AppCompatActivity {
 
             }
 
+            // use 6 months back as timeframe if nothing is selected in spinner by user
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
@@ -583,6 +592,7 @@ public class MapActivity extends AppCompatActivity {
           });
 
 
+          // detects changes in timemachine
           timemachineSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -596,6 +606,7 @@ public class MapActivity extends AppCompatActivity {
               SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
               timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
               // Show current date in timemachine
+              // TODO fix "1 cameras in area"
               timeframeTextView.setText(getString(R.string.timemachine_text, timestampIso8601.format(currentSeekBarDate)));
               redrawMarkers(allCamerasInArea);
 
@@ -680,6 +691,7 @@ public class MapActivity extends AppCompatActivity {
   @Override
   protected void onResume() {
 
+    // refresh markers when api key is changed, useful if user is on an area outside of his homezone
     br = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
@@ -691,9 +703,12 @@ public class MapActivity extends AppCompatActivity {
     intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
 
     localBroadcastManager.registerReceiver(br, intentFilter);
+
+    // refresh on resume
     refreshSharedPreferencesObject();
     reloadMarker();
 
+    // get permissions if not already given
     readStoragePermission = ContextCompat.checkSelfPermission(MapActivity.this,
             Manifest.permission.READ_EXTERNAL_STORAGE);
     writeStoragePermission = ContextCompat.checkSelfPermission(MapActivity.this,
@@ -724,8 +739,8 @@ public class MapActivity extends AppCompatActivity {
       ActivityCompat.requestPermissions(MapActivity.this, neededPermissions, 2);
     }
 
+    // clear bottom navigation map badge and get badges for other items
     BottomNavigationBadgeHelper.clearMenuItemBadge(bottomNavigationView, R.id.bottom_navigation_map, context);
-
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
     super.onResume();
@@ -741,6 +756,7 @@ public class MapActivity extends AppCompatActivity {
 
   }
 
+  // ActionBar on top with settings
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     //return super.onCreateOptionsMenu(menu);
@@ -751,6 +767,7 @@ public class MapActivity extends AppCompatActivity {
     return true;
   }
 
+  // handles clicks in the top ActionBar
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
@@ -765,8 +782,9 @@ public class MapActivity extends AppCompatActivity {
       case R.id.action_refresh:
 
         if (!offlineMode) {
-
           queryServerForCameras("area=" + areaString);
+          updateAllCamerasInArea(true);
+          redrawMarkers(allCamerasInArea);
         } else {
           updateAllCamerasInArea(true);
           redrawMarkers(allCamerasInArea);
@@ -799,11 +817,14 @@ public class MapActivity extends AppCompatActivity {
 
   private void reloadMarker() {
 
+    // query is aborted if api key expired
+    // reloadMarker is called after api key is refreshed and server query is repeated here
     if (abortedServerQuery) {
       queryServerForCameras(lastArea);
       abortedServerQuery = false;
     }
 
+    // there is no current background task active
     if (mCurrentBackgroundMarkerLoaderTask == null) {
       // start background load
       double zoom = this.mapView.getZoomLevelDouble();
@@ -834,7 +855,7 @@ public class MapActivity extends AppCompatActivity {
   private class BackgroundMarkerLoaderTask extends AsyncTask<Double, Integer, List<SynchronizedCamera>> {
 
     /**
-     * Computation of the map itmes in the non-gui background thread. .
+     * Computation of the map items in the non-gui background thread. .
      *
      * @param params latMin, latMax, lonMin, longMax, zoom.
      * @return List of SynchronizedCamera[s] in the current Map window.
@@ -870,9 +891,10 @@ public class MapActivity extends AppCompatActivity {
           latMax = latMin;
           latMin = t;
         }
+
         if (latMax - latMin < 0.00001)
           return null;
-        //this is a problem, abort https://github.com/osmdroid/osmdroid/issues/521
+        // this is a problem, abort https://github.com/osmdroid/osmdroid/issues/521
 
         if (lonMin > lonMax) {
           double t = lonMax;
@@ -928,7 +950,9 @@ public class MapActivity extends AppCompatActivity {
 
         updateAllCamerasInArea(false);
 
-        boolean outsideOfflineArea = latMin < offlineLatMin ||
+        // detect if an area on the map is outside of the homezone
+        boolean outsideOfflineArea =
+                latMin < offlineLatMin ||
                 latMax > offlineLatMax ||
                 lonMin < offlineLonMin ||
                 lonMax > offlineLonMax;
@@ -951,10 +975,9 @@ public class MapActivity extends AppCompatActivity {
             latestUpdateForArea = new Date(0);
 
             for (AreaOfflineAvailable item : areasOfflineAvailable) {
+
               // use precise timings for areas
-
               Date itemUpdate = timestampIso8601SecondsAccuracy.parse(item.getLastUpdated());
-
 
               if (itemUpdate.after(latestUpdateForArea)) {
                 latestUpdateForArea = itemUpdate;
@@ -965,6 +988,8 @@ public class MapActivity extends AppCompatActivity {
 
           // TODO query with start= if timebasedquery == true;
 
+          // shows an alert when leaving your homezone and server queries are not enabled by default
+          // asks the user if he wants to query the server
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -978,7 +1003,7 @@ public class MapActivity extends AppCompatActivity {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
                 View dontAskAgainLinearLayout = layoutInflater.inflate(R.layout.alert_dialog_dont_ask_again, null);
-                final CheckBox dontAskAgainCheckBox = dontAskAgainLinearLayout.findViewById(R.id.delete_popup_dont_show_again_checkbox);
+                final CheckBox dontAskAgainCheckBox = dontAskAgainLinearLayout.findViewById(R.id.dismiss_popup_dont_show_again_checkbox);
                 alertDialogBuilder.setView(dontAskAgainLinearLayout);
 
                 alertDialogBuilder.setTitle("You are leaving your offline area.");
@@ -995,7 +1020,6 @@ public class MapActivity extends AppCompatActivity {
 
                     allowOneServerQuery = true;
                     reloadMarker();
-
 
                   }
                 });
@@ -1045,17 +1069,16 @@ public class MapActivity extends AppCompatActivity {
 
             String currentQuery = areaQuery; // TODO add startQuery when needed
 
-
             // area not the same as last update -> query server for data
             if (!lastArea.equals(currentQuery)) {
 
               if(timeBasedQuery) {
                 // area already visited and therefore in db, only query for updates since last "visit"
 
-                // don't query if last visit less than 5 mins ago
-                Date today = new Date(System.currentTimeMillis() - 1000*60);
+                // don't query if last visit less than 1 min ago
+                Date dontQueryInTimeframe = new Date(System.currentTimeMillis() - 1000*60);
 
-                if (latestUpdateForArea.before(today)) {
+                if (latestUpdateForArea.before(dontQueryInTimeframe)) {
                   String latestUpdate = timestampIso8601DaysAccuracy.format(latestUpdateForArea);
                   currentQuery = currentQuery.concat("&start=" + latestUpdate);
                   queryServerForCameras(currentQuery);
@@ -1071,8 +1094,7 @@ public class MapActivity extends AppCompatActivity {
 
           }
 
-
-        } else if (offlineMode && outsideOfflineArea) {
+        } else if (offlineMode && outsideOfflineArea) { // not in homezone but offline mode is on
           Toast.makeText(getApplicationContext(), "Not available in Offline-Mode", Toast.LENGTH_SHORT).show();
         }
 
@@ -1125,6 +1147,10 @@ public class MapActivity extends AppCompatActivity {
     return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
   }
 
+  /**
+   * populates and updates local variables with new data
+   * @param queryDB
+   */
   private void updateAllCamerasInArea(boolean queryDB){
     allCamerasInArea.clear();
 
@@ -1136,6 +1162,10 @@ public class MapActivity extends AppCompatActivity {
     allCamerasInArea.addAll(camerasNotInDb);
   }
 
+  /**
+   * Draws camera markers on the map.
+   * @param camerasToDisplay list of SynchronizedCameras to display
+   */
   private void redrawMarkers(List<SynchronizedCamera> camerasToDisplay) {
 
     itemsToDisplay.clear();
@@ -1154,6 +1184,9 @@ public class MapActivity extends AppCompatActivity {
     boolean clusteringEnabled = sharedPreferences.getBoolean("clusteringEnabled", true);
 
     // normal behaviour if timemachine not active. clusters cameras
+    // clustering is disabled and the setting for it removed since there is a bug in the library
+
+    // TODO fix conditions
     if (timemachineView == null && clusteringEnabled) {
 
       mapView.getOverlays().remove(cameraCluster);
@@ -1199,8 +1232,9 @@ public class MapActivity extends AppCompatActivity {
       mapView.invalidate();
 
 
+    // timemachine != null || !clusteringEnabled
+    } else {
 
-    } else { // clustering slows down timemachine immensely, use itemized overlay instead
 
       final int maxMarkersOnMap = Integer.parseInt(sharedPreferences.getString("maxMapMarkers", "400"));
 
@@ -1208,7 +1242,7 @@ public class MapActivity extends AppCompatActivity {
       mapView.getOverlays().remove(cameraOverlay);
 
       if (timemachineView != null) {
-
+        // clustering slows down timemachine immensely, use itemized overlay instead
         try{
           // display only cameras between seekbar max amount in the past and current seekbardate chosen by user
           // if seekbar is set to last week, only cameras added less than a week ago will be shown
@@ -1260,6 +1294,9 @@ public class MapActivity extends AppCompatActivity {
 
           int cameraType = camera.getType();
 
+          // TODO switch case here
+
+          // if filters are active only add corresponding cameras to items to display
           if (showStandardCameras && cameraType == StorageUtils.STANDARD_CAMERA){
 
             overlayItemsToDisplay.add(new OverlayItem(
@@ -1296,11 +1333,6 @@ public class MapActivity extends AppCompatActivity {
             counter++;
           }
 
-
-
-
-
-
           if (counter > maxMarkersOnMap) {
             runOnUiThread(new Runnable() {
               @Override
@@ -1326,6 +1358,7 @@ public class MapActivity extends AppCompatActivity {
       cameraOverlay = new ItemizedIconOverlay<>(overlayItemsToDisplay, cameraMarkerIcon,
               new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 
+                // marker gets touch
                 @Override
                 public boolean onItemSingleTapUp(final int index, final OverlayItem cameraItem) {
                   GeoPoint markerLocation = new GeoPoint(cameraItem.getPoint().getLatitude(), cameraItem.getPoint().getLongitude());
@@ -1347,14 +1380,14 @@ public class MapActivity extends AppCompatActivity {
                       infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
                       infoComment = infoWindow.getView().findViewById(R.id.info_comment);
 
-                      // TODO add logic for querying the server for individual pictures if not in offline area etc
-
                       File thumbnail = new File(picturesPath + highlightedCamera.getImagePath());
 
                       Picasso.get().load(thumbnail)
                               .placeholder(R.drawable.ic_file_download_grey_48dp)
                               .into(infoImage);
 
+                      // TODO disable if image already present
+                      // download image
                       infoImage.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -1398,22 +1431,11 @@ public class MapActivity extends AppCompatActivity {
                   };
 
                   infoWindow.open(cameraItem, markerLocation, 0, 0);
-
-                    /*
-                    Toast.makeText(
-                            MapActivity.this,
-                            "Item '" + cameraItem.getTitle() + "' (index=" + index
-                                    + ") got single tapped up", Toast.LENGTH_LONG).show();
-                    */
                   return true; // We 'handled' this event.
                 }
 
                 @Override
                 public boolean onItemLongPress(final int index, final OverlayItem cameraItem) {
-                  Toast.makeText(
-                          MapActivity.this,
-                          "Item '" + cameraItem.getTitle() + "' (index=" + index
-                                  + ") got long pressed", Toast.LENGTH_LONG).show();
                   return false;
                 }
               }, getApplicationContext());
@@ -1460,7 +1482,7 @@ public class MapActivity extends AppCompatActivity {
 
     // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
     refreshSharedPreferencesObject();
-    String baseURL = sharedPreferences.getString("synchronizationURL", null) + "cameras/?";
+    String baseURL = sharedPreferences.getString("synchronizationUrl", null) + "cameras/?";
 
     String url = baseURL + queryString;
 
