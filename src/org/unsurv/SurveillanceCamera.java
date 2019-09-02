@@ -4,6 +4,10 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Object representing a local camera capture by the user. Either manual, via object detection or
  * a training capture
@@ -147,6 +151,29 @@ public class SurveillanceCamera {
   public String getCaptureFilenames() {
     return captureFilenames;
   }
+
+
+  public String[] getThumbnailFiles(){
+
+    String[] allCaptureFilenames = captureFilenames
+            .replace("\"", "")
+            .replace("[", "")
+            .replace("]", "")
+            .split(",");
+
+    List<String> filteredFilenames = new ArrayList<>();
+
+    for (String filename: allCaptureFilenames) {
+
+      if (filename.contains("thumbnail")) {
+        filteredFilenames.add(filename);
+
+      }
+    }
+
+    return filteredFilenames.toArray(new String[0]);
+  }
+
 
   public void setId(int id) {
     this.id = id;

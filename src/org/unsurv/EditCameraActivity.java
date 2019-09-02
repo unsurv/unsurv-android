@@ -141,11 +141,7 @@ public class EditCameraActivity extends AppCompatActivity {
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     //example data: ""[asd.jpg, bsd.jpg]""
-    String[] filenames = cameraToEdit.getCaptureFilenames()
-            .replace("\"", "")
-            .replace("[", "")
-            .replace("]", "")
-            .split(",");
+    String[] filenames = cameraToEdit.getThumbnailFiles();
 
     adapter = new ChooseImageAdapter(this, filenames, cameraImageView, cameraToEdit, cameraRepository);
     recyclerView.setAdapter(adapter);
