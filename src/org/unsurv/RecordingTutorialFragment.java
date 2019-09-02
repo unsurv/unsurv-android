@@ -12,6 +12,11 @@ import android.widget.CompoundButton;
 
 import androidx.fragment.app.Fragment;
 
+
+/**
+ * This Fragment is part of the tutorial the user sees when first launching the app.
+ * It shows the different methods that Surveillance cameras can be captured with this app
+ */
 public class RecordingTutorialFragment extends Fragment {
 
   private SharedPreferences sharedPreferences;

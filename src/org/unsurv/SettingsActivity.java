@@ -10,6 +10,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
+/**
+ * Settings for unsurv
+ */
 public class SettingsActivity extends AppCompatActivity {
 
   BottomNavigationView bottomNavigationView;

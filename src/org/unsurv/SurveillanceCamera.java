@@ -4,6 +4,10 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.annotation.Nullable;
 
+/**
+ * Object representing a local camera capture by the user. Either manual, via object detection or
+ * a training capture
+ */
 
 @Entity(tableName = "local_surveillance_cameras")
 public class SurveillanceCamera {
@@ -26,17 +30,18 @@ public class SurveillanceCamera {
 
   private String comment;
 
-  private String timestamp;
+  private String timestamp; // can be disabled in settings
   private String timeToSync; // time where photo was taken + random delay for privacy reasons
 
+  // status
   private boolean locationUploaded;
-
   private boolean uploadCompleted;
   private boolean manualCapture;
   private boolean trainingCapture;
 
-  // rectangles drawn in DrawOnTrainingImageActivities
+  // rectangles drawn in DrawOnTrainingImageActivities, only used when object is a training capture
   private String drawnRectsAsString;
+  // all images associated with the object
   private String captureFilenames;
 
 

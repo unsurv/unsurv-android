@@ -13,13 +13,16 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
 
+
+/**
+ * SettingsFragment containing the actual PreferenceObjects
+ */
 public class SettingsFragment extends PreferenceFragmentCompat {
 
   Context context;
@@ -75,6 +78,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     // set size as preference title for user to see
     clearSynchronizedImages.setTitle("Delete downloaded images: " + StorageUtils.convertByteSizeToMBTwoDecimals(synchronizedImagesSize) + " MB");
 
+    // delete files but not db entries of chosen type
+    // db entries are still useful without an image
     clearSynchronizedImages.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override
       public boolean onPreferenceClick(Preference preference) {
@@ -133,6 +138,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
+    // starts an activity that displays all the licences of used libraries / codebase
     showLicences = findPreference("showLicences");
 
     if (showLicences != null) {
@@ -149,6 +155,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
 
+    // starts a manual synchronization
     synchronizeNow = findPreference("synchronizeNow");
 
     if (synchronizeNow != null) {

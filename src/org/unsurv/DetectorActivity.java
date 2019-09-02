@@ -914,6 +914,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     // Get Capture with biggest confidence for thumbnail/picture.
     for (int k=0; k < cameraPool.size(); k++) {
       allCaptureFilenames.put(cameraPool.get(k).getThumbnailPath());
+      // TODO fix ChooseImageAdapter to only show thumbnail images while all images are added here
       // allCaptureFilenames.put(cameraPool.get(k).getImagePath());
 
       if (cameraPool.get(k).getConfidence() > biggestConfidence.getConfidence() && cameraPool.get(k).getCameraType() == mostCommonTypeInPool) {

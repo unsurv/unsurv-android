@@ -15,6 +15,8 @@ import java.io.File;
 /**
  * Lets the user pick a specific image for his captured surveillance camera.
  */
+
+// TODO fix showing all images instead of only thumbnail images
 public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.ChooseViewHolder> {
 
   class ChooseViewHolder extends RecyclerView.ViewHolder {

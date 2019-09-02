@@ -45,6 +45,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+
+/**
+ * This is one of the 4 main activities. It displays statistics from your homezone as well as
+ * global stats.
+ */
 public class StatisticsActivity extends AppCompatActivity {
 
   private BottomNavigationView bottomNavigationView;
@@ -127,13 +132,13 @@ public class StatisticsActivity extends AppCompatActivity {
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
     refreshSharedPreferencesObject();
+    updateLocalTextViews();
 
     long currentTime = System.currentTimeMillis();
-    updateLocalTextViews();
 
     localBroadcastManager = LocalBroadcastManager.getInstance(StatisticsActivity.this);
 
-    refreshSharedPreferencesObject();
+
     baseURL = sharedPreferences.getString("synchronizationUrl", null);
     today = timestampIso8601.format(new Date(currentTime));
 
@@ -285,6 +290,13 @@ public class StatisticsActivity extends AppCompatActivity {
   }
 
 
+  /**
+   * Queries server fpr statistics
+   * @param baseURL base url https://api.unsurv.org/
+   * @param area area string "global" or "latmin,latmax,lonmin,lonmax"
+   * @param startDate yyyy-mm-dd if needed
+   * @param endDate yyyy-mm-dd if needed
+   */
   void queryServerForStatistics(String baseURL, String area, @Nullable String startDate,@Nullable String endDate){
 
     final String TAG = "StatisticsUtils, queryServer";
@@ -378,7 +390,7 @@ public class StatisticsActivity extends AppCompatActivity {
   }
 
   /**
-   * Query for data before updating TextViews. Updates all TextViews which rely on outside data.
+   * Updates all TextViews which rely on outside data. Outside data should already be queried
    */
 
   void updateGlobalTextViews(){
@@ -403,6 +415,9 @@ public class StatisticsActivity extends AppCompatActivity {
 
   }
 
+  /**
+   * updates TextViews that represent local data from the device only
+   */
   void updateLocalTextViews(){
 
     long currentTime = System.currentTimeMillis();
@@ -411,7 +426,6 @@ public class StatisticsActivity extends AppCompatActivity {
     Calendar cal = Calendar.getInstance();
     cal.setTime(currentDate);
 
-    // cal.add(Calendar.MONTH, -12);
 
     cal.add(Calendar.DATE, -7);
     Date sevenDaysBeforeToday = cal.getTime();
@@ -438,11 +452,9 @@ public class StatisticsActivity extends AppCompatActivity {
       totalInAreaInfoTextView.setText(infoText);
     }
 
-
       String infoText = getResources().getQuantityString(R.plurals.captures_by_user, totalByUser);
 
       totalByUserInfoTextView.setText(infoText);
-
 
 
     totalInAreaTextView.setText(String.valueOf(totalLocal));

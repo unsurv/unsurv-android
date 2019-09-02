@@ -10,11 +10,25 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-
+/**
+ * Helper class for statistics functions
+ */
 class StatisticsUtils {
 
   final static String TAG = "StatisticsUtils";
 
+  /**
+   * Method to get datapoints per day from db
+   *
+   * @param latMin
+   * @param latMax
+   * @param lonMin
+   * @param lonMax
+   * @param startDate yyyy-mm-dd
+   * @param endDate yyyy-mm-dd
+   * @param synchronizedCameraRepository
+   * @return
+   */
   static List<StatisticsMap> getCamerasPerDayFromDb(double latMin, double latMax, double lonMin, double lonMax, Date startDate, Date endDate, SynchronizedCameraRepository synchronizedCameraRepository){
     String TAG = "StatisticsUtils";
     List<StatisticsMap> camerasAddedByDaysFromDb;
@@ -25,7 +39,7 @@ class StatisticsUtils {
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-    // format does add time(HH:mm:ss) and timezone in string. account for that shit
+    // format does add time(HH:mm:ss) and timezone in string. account for that craziness
     String dbStartString = timestampIso8601.format(startDate).split(" ")[0];
     String dbEndString = timestampIso8601.format(endDate).split(" ")[0];
 
@@ -60,6 +74,13 @@ class StatisticsUtils {
     return filteredStatsByDays;
   }
 
+  /**
+   * returns amount of cameras in timeframe
+   * @param startDate
+   * @param endDate
+   * @param synchronizedCameraRepository
+   * @return
+   */
   static int getTotalCamerasInTimeframeFromDb(Date startDate, Date endDate, SynchronizedCameraRepository synchronizedCameraRepository){
 
     try {

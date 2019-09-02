@@ -20,7 +20,11 @@ package org.unsurv;
         import org.osmdroid.util.GeoPoint;
         import org.osmdroid.views.MapView;
 
-
+/**
+ * This Fragment is part of the tutorial the user sees when first launching the app.
+ * The user is shown a big map and chooses a homezone for which data will then be downloaded and
+ * synchronized.
+ */
 public class MapTutorialFragment extends Fragment {
 
   private SharedPreferences sharedPreferences;
@@ -44,6 +48,7 @@ public class MapTutorialFragment extends Fragment {
 
     homeZoneIsSet = sharedPreferences.getString("area", null) != null;
 
+    // disable fragment scrolling while map scrolling is needed
     if (!homeZoneIsSet  || !setHomeButtonUsed){
       tutorialViewPager.setFragmentScrollingEnabled(false);
     }
@@ -84,6 +89,9 @@ public class MapTutorialFragment extends Fragment {
     });
 
 
+
+    // saves current map borders as homezone if user clicks button
+    // reenables fragment scrolling button is clicked
     setHomeButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -97,11 +105,12 @@ public class MapTutorialFragment extends Fragment {
 
 
         // I DON'T KNOW WTF IS GOING ON, VOLLEY REQUEST LIB DOESN'T LIKE PRECISE BORDERS
+        // borders are shortened to 4 decimals
         String areaString =
-                southBorder.substring(0, southBorder.length() - 11)
-                + "," + northBorder.substring(0, northBorder.length() - 11)
-                + "," + westBorder.substring(0, westBorder.length() - 11)
-                + "," + eastBorder.substring(0, eastBorder.length() - 11);
+                southBorder.substring(0, southBorder.length() - 10)
+                + "," + northBorder.substring(0, northBorder.length() - 10)
+                + "," + westBorder.substring(0, westBorder.length() - 10)
+                + "," + eastBorder.substring(0, eastBorder.length() - 10);
 
         // areaString = southBorder + "," + northBorder + "," + westBorder + "," + eastBorder;
 

@@ -17,6 +17,11 @@ import android.widget.Switch;
 
 import androidx.fragment.app.Fragment;
 
+/**
+ * This Fragment is part of the tutorial the user sees when first launching the app.
+ * It shows how and when the app synchronizes with the database server. The user can choose
+ * different intervals or no interval depending on their preference.
+ */
 public class SynchronizationTutorialFragment extends Fragment {
 
   private SharedPreferences sharedPreferences;

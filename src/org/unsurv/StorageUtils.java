@@ -28,8 +28,12 @@ class StorageUtils {
   final static String TRAINING_CAPTURES_PATH = Environment.getExternalStoragePublicDirectory(
           Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/unsurv/training/";
 
-  // TODO add 3rd option  sync, captures, training
 
+  /**
+   * return filesize as bytes
+   * @param file
+   * @return
+   */
   static long getFileSize(final File file) {
     if (file == null || !file.exists())
       return 0;
@@ -55,6 +59,11 @@ class StorageUtils {
   }
 
 
+  /**
+   * returns a byteSize as a String representing the size in MB with 2 decimals
+   * @param byteSize
+   * @return
+   */
   static String convertByteSizeToMBTwoDecimals(long byteSize){
 
     String tmp = String.valueOf(byteSize / 10000);
@@ -75,6 +84,12 @@ class StorageUtils {
 
   }
 
+  /**
+   * returns a bytearray from file, used for encryption
+   * @param f
+   * @return
+   * @throws IOException
+   */
   static byte[] readFileToBytes(File f) throws IOException {
     int size = (int) f.length();
     byte[] bytes = new byte[size];
@@ -105,6 +120,13 @@ class StorageUtils {
     return bytes;
   }
 
+  /**
+   * save bytearray to file
+   * @param bytes
+   * @param filename
+   * @param path
+   * @throws IOException
+   */
   static void saveBytesToFile(byte[] bytes, String filename, String path) throws IOException {
 
     File directoryCheck = new File(path);
@@ -120,6 +142,11 @@ class StorageUtils {
     fileOutputStream.close();
   }
 
+  /**
+   * Deletes saved files for a single SurveillanceCamera
+   * @param camera SurveillanceCamera object
+   * @return
+   */
   static int deleteImagesForCamera(SurveillanceCamera camera){
 
     File imageFile;
@@ -129,7 +156,7 @@ class StorageUtils {
 
     int deletedFiles = 0;
 
-
+    // gets type of camera and deletes corresponding files
     try {
       if (camera.getTrainingCapture()){
         imageFile = new File(TRAINING_CAPTURES_PATH + camera.getImagePath());
@@ -156,6 +183,7 @@ class StorageUtils {
       Log.i(TAG, "deleteImages:" + e);
     }
 
+    // gets all captures and deletes files
     try {
       multipleCapturesFilenames = camera.getCaptureFilenames()
               .replace("\"", "")
@@ -178,6 +206,11 @@ class StorageUtils {
   }
 
 
+  /**
+   * Deletes saved files for a single SynchronizedCamera
+   * @param camera
+   * @return
+   */
   static int deleteImagesForSynchronizedCamera(SynchronizedCamera camera){
 
     File imageFile;
@@ -198,6 +231,11 @@ class StorageUtils {
     return deletedFiles;
   }
 
+  /**
+   * recursive deletion of directory, should not use
+   * @param directory
+   * @return
+   */
   static long deleteAllFilesInDirectory(String directory){
 
     // recursive delete a good idea? TODO visit again

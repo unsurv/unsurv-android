@@ -42,7 +42,9 @@ import java.util.Random;
 import java.util.TimeZone;
 
 
-
+/**
+ * Helper class for synchronization methods
+ */
 class SynchronizationUtils {
 
   private static int UPLOAD_FAILED = 0;
@@ -51,10 +53,13 @@ class SynchronizationUtils {
   private static String TAG = "SynchronizationUtils";
 
 
-
+  /**
+   * Starts a recurring job to synchronize data from a db server. Interval and URL are
+   * @param context context of starting the job
+   * @param jobExtras not used for now
+   * @return
+   */
   static Boolean scheduleSyncIntervalJob (Context context, @Nullable PersistableBundle jobExtras) {
-
-    //TODO Do I need jobExtras here? yes for location boundingbox
 
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -99,9 +104,8 @@ class SynchronizationUtils {
     if (scheduleResult == JobScheduler.RESULT_SUCCESS) {
       return true;
     } else {
-      return false;  // TODO CHECK FOR RETURN VALUE WHEN SYNC STARTED AND LET USER KNOW IF IT FAILED
+      return false;  // TODO CHECK FOR RETURN VALUE WHEN SYNC JOB STARTED AND LET USER KNOW IF IT FAILED
     }
-
 
   }
 

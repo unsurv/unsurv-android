@@ -3,8 +3,7 @@ package org.unsurv;
 import androidx.room.ColumnInfo;
 
 /**
- * Will be used in the future to minimize network usage when querying server for info
- * outside of homezone.
+ * Will be used in the future to minimize network usage when querying server for info.
  */
 
 public class SlimSynchronizedCamera {
