@@ -4,7 +4,9 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.annotation.Nullable;
 
-
+/**
+ * Object representing a camera that has been downloaded from the database server.
+ */
 @Entity (tableName = "synchronized_cameras")
 public class SynchronizedCamera {
 

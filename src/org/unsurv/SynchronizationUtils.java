@@ -47,6 +47,10 @@ import java.util.TimeZone;
  */
 class SynchronizationUtils {
 
+  // TODO common naming scheme baseUrl, area/areaString/areaQuery etc.
+  // TODO Localbroadcast with info on when sync etc was successful
+  // TODO should then be used to create toast or similar alert in an activity
+
   private static int UPLOAD_FAILED = 0;
   private static int UPLOAD_SUCCESSFUL = 1;
 
@@ -80,6 +84,7 @@ class SynchronizationUtils {
     syncJobExtras.putString("area", sharedPreferences.getString("area", null));
     // last sync time
     syncJobExtras.putString("start", sharedPreferences.getString("lastUpdated", null));
+    // download images or not
     syncJobExtras.putBoolean("downloadImages", sharedPreferences.getBoolean("downloadImages", false));
 
     ComponentName componentName = new ComponentName(context, SyncIntervalSchedulerJobService.class);
@@ -87,9 +92,9 @@ class SynchronizationUtils {
     JobInfo.Builder jobBuilder  = new JobInfo.Builder(0, componentName); // Job ID
 
     jobBuilder.setExtras(syncJobExtras);
-    // interval
+
+    // interval min is 15 mins in Android
     jobBuilder.setPeriodic(30*1000, 5*1000);
-    //jobBuilder.setPeriodic(syncIntervalInMillis);
 
     //jobBuilder.setOverrideDeadline(15*1000); // force after 15 s for debug
 
@@ -110,6 +115,15 @@ class SynchronizationUtils {
   }
 
 
+  /**
+   * Downloads cameras from a database server specified by the parameters
+   * @param baseUrl https://api.unsurv.org/
+   * @param areaQuery "area=latmin,latmax,lonmin,lonmax"
+   * @param sharedPreferences sharedPreference object
+   * @param insertIntoDb boolean should result be inserted in local db
+   * @param startQuery "start=latmin,latmax,lonmin,lonmax"
+   * @param synchronizedCameraRepository synchronizedCameraRepository object
+   */
   static void downloadCamerasFromServer(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
 
     //TODO check api for negative values in left right top bottom see if still correct
@@ -217,6 +231,12 @@ class SynchronizationUtils {
   }
 
 
+  /**
+   * Downloads images for a given list of SynchronizedCameras
+   * @param baseUrl https://api.unsurv.org/
+   * @param cameras List of SynchronizedCameras
+   * @param sharedPreferences SharePreferences object
+   */
   static void downloadImagesFromServer(String baseUrl, final List<SynchronizedCamera> cameras, final SharedPreferences sharedPreferences) {
 
     final List<String> idsFromCameras = new ArrayList<>();
@@ -225,7 +245,7 @@ class SynchronizationUtils {
       idsFromCameras.add(camera.getExternalID());
     }
 
-    // object to add ids of images
+    // object to add external ids of cameras to be downloaded
     JSONObject postObject = new JSONObject();
 
     JSONArray ids = new JSONArray();
@@ -323,6 +343,12 @@ class SynchronizationUtils {
   }
 
 
+  /**
+   * Requests a new api key and saves it to SharedPreferences. Uses LocalBroadCastManager from
+   * context given to broadcast that a new API key has been successfully acquired.
+   * @param context Used to get an Instance of LocalBroadCastManager.
+   * @param sharedPreferences SharedPreferences object
+   */
   static void getAPIkey(final Context context, final SharedPreferences sharedPreferences) {
 
     RequestQueue mRequestQueue;
@@ -402,19 +428,22 @@ class SynchronizationUtils {
   }
 
   /**
-   * repository as fallback if viewmodel not available (here in Jobservice)
+   * Uploads cameras specified in parameters to the server.
+   * Uses repository as fallback if viewmodel not available (here in Jobservice).
+   * Starts image upload after uploading locations first.
    *
-   * @param camerasToUpload
-   * @param baseUrl
-   * @param sharedPreferences
-   * @param cameraViewModel
-   * @param cameraRepository
+   * @param camerasToUpload List of SurveillanceCameras to upload
+   * @param baseUrl https://api.unsurv.org/
+   * @param sharedPreferences SharedPreferences object
+   * @param cameraViewModel db access via ViewModel
+   * @param cameraRepository db access via ViewModel
+   * @param useRepository boolean specifying which db access should be used
    */
-  static void uploadSurveillanceCamera(final List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, @Nullable  final CameraViewModel cameraViewModel, @Nullable final CameraRepository cameraRepository, final boolean useRepository) {
+  static void uploadSurveillanceCamera(final List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, @Nullable final CameraViewModel cameraViewModel, @Nullable final CameraRepository cameraRepository, final boolean useRepository) {
 
     JSONArray postArray = new JSONArray();
 
-    // local map to prevent camera mixups if list order not the same.
+    // local map (id, SurveillanceCamera) to not be dependant on list order.
     // id is just an int incremented from 0.
     final HashMap<Integer, SurveillanceCamera> cameraMap = new HashMap<>();
 
@@ -434,13 +463,12 @@ class SynchronizationUtils {
         tmpJsonObject.put("drawn_cameras", drawn_cameras);
         tmpJsonObject.put("type", currentCamera.getCameraType());
 
-
         tmpJsonObject.put("lat", currentCamera.getLatitude());
         tmpJsonObject.put("lon", currentCamera.getLongitude());
         tmpJsonObject.put("manual_capture", currentCamera.getManualCapture());
+
         // here so we don't have to rely on list order
         tmpJsonObject.put("tmp_id", i);
-
         // tmp_id : SurveillanceCamera mapping to query in response
         cameraMap.put(i, camerasToUpload.get(i));
 
@@ -513,7 +541,6 @@ class SynchronizationUtils {
                       cameraViewModel.update(currentCamera);
                     }
 
-
                   }
 
                   String imageUploadUrl = baseUrl + "cameras/upload/image";
@@ -570,6 +597,17 @@ class SynchronizationUtils {
   }
 
 
+  /**
+   * Uploads images for a given list to the server. base64 encodes images and sends them as a string
+   *
+   * @param camerasForImageUpload List of SurveillanceCamera objects
+   * @param url "api.unsurv.org/cameras/upload/image"
+   * @param sharedPreferences SharedPreferences object
+   * @param cameraViewModel db access via ViewModel
+   * @param cameraRepository db access via ViewModel
+   * @param useRepository boolean specifying which db access should be used
+   */
+
   static void uploadImages(final List<SurveillanceCamera> camerasForImageUpload, String url, final SharedPreferences sharedPreferences, @Nullable final CameraViewModel cameraViewModel, @Nullable final CameraRepository cameraRepository, final boolean useRepository) {
 
 
@@ -592,7 +630,7 @@ class SynchronizationUtils {
 
       File imageFile;
 
-      // if camera is a training image
+      // check if camera is a training image
       if (currentCamera.getTrainingCapture()){
         imageFile = new File(StorageUtils.TRAINING_CAPTURES_PATH + currentCamera.getImagePath());
       } else {
@@ -745,7 +783,12 @@ class SynchronizationUtils {
   }
 
 
-  static boolean isApiKeyExpired(SharedPreferences sharedPreferences, Context context){
+  /**
+   * Checks if local API key is expired. Compares only to local expiration date saved.
+   * @param sharedPreferences SharedPreferences object
+   * @return boolean isApiKeyExpired
+   */
+  static boolean isApiKeyExpired(SharedPreferences sharedPreferences){
     SimpleDateFormat timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
     Date apiKeyExpiration;
@@ -755,14 +798,8 @@ class SynchronizationUtils {
       String expiration = sharedPreferences.getString("apiKeyExpiration", null);
       apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(expiration);
 
-      if (apiKeyExpiration.before(currentDate)){
 
-        getAPIkey(context, sharedPreferences);
-        return true;
-
-      } else {
-        return false;
-      }
+      return apiKeyExpiration.before(currentDate);
 
     } catch (ParseException pse) {
       Log.i(TAG, "apiKeyParse: " + pse.toString());
@@ -772,34 +809,34 @@ class SynchronizationUtils {
   }
 
 
+  /**
+   * Checks if local API key is expired. Compares only to local expiration date saved.
+   * If key is expired queries a new one and uses a LocalBroadCastManager to
+   * @param sharedPreferences
+   * @param context
+   * @return
+   */
   static boolean refreshApiKeyIfExpired(SharedPreferences sharedPreferences, Context context){
 
-    SimpleDateFormat timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    if (isApiKeyExpired(sharedPreferences)){
 
-    Date apiKeyExpiration;
-    Date currentDate = new Date(System.currentTimeMillis());
+      getAPIkey(context, sharedPreferences);
+      return true;
 
-    try {
-      String expiration = sharedPreferences.getString("apiKeyExpiration", null);
-      apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(expiration);
-
-      if (apiKeyExpiration.before(currentDate)){
-
-        getAPIkey(context, sharedPreferences);
-        return true;
-
-      } else {
-        return false;
-      }
-
-    } catch (ParseException pse) {
-      Log.i(TAG, "apiKeyParse: " + pse.toString());
+    } else {
+      return false;
     }
-
-    return true;
 
   }
 
+  /**
+   * Deletes cameras from db using the specified method of db access.
+   * Images will get deleted too this way.
+   * @param cameras list of SurveillanceCameras
+   * @param cameraViewModel db access via ViewModel
+   * @param cameraRepository db access via ViewModel
+   * @param useRepository boolean specifying which db access should be used
+   */
   static void cleanupUploadedCameras(List<SurveillanceCamera> cameras, @Nullable CameraViewModel cameraViewModel, @Nullable CameraRepository cameraRepository, boolean useRepository){
 
     if (useRepository){

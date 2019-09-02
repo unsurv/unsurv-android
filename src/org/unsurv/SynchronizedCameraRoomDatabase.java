@@ -15,6 +15,9 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 
+/**
+ * Room Database for downloaded cameras
+ */
 @Database(entities = {SynchronizedCamera.class}, version = 1)
 public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
 
@@ -52,6 +55,9 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
           };
 
 
+  /**
+   * Here for artificially populating the database
+   */
   private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
     private final SynchronizedCameraDao mDao;

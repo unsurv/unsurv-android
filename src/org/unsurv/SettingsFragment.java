@@ -169,7 +169,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
           // If api key is expired set up a LocalBroadCastReceiver to start the synchronization
           // as soon as a new api key has been acquired. Then start getting a new API key.
 
-          if (SynchronizationUtils.isApiKeyExpired(sharedPreferences, context)) {
+          if (SynchronizationUtils.isApiKeyExpired(sharedPreferences)) {
 
             br = new BroadcastReceiver() {
               @Override

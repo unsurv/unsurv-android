@@ -7,6 +7,10 @@ import android.util.Log;
 import java.io.File;
 import java.util.List;
 
+/**
+ * Database access class.
+ * All access spawns a seperate AsyncTask to enable easy db access in gui threads.
+ */
 public class SynchronizedCameraRepository {
 
   private SynchronizedCameraDao mSynchronizedCameraDao;

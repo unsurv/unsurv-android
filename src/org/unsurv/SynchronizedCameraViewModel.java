@@ -5,6 +5,9 @@ import androidx.lifecycle.AndroidViewModel;
 
 import java.util.List;
 
+/**
+ * ViewModel can be used t access LiveData objects
+ */
 public class SynchronizedCameraViewModel extends AndroidViewModel {
 
   private SynchronizedCameraRepository mSynchronizedCameraRepository;

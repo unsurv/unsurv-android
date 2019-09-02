@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+/**
+ * This class handles the recurring synchronization jobs that synchronize the local db with the
+ * server.
+ */
 public class SyncIntervalSchedulerJobService extends JobService {
 
   private String baseUrl;
@@ -38,7 +42,6 @@ public class SyncIntervalSchedulerJobService extends JobService {
     cameraRepository = new CameraRepository(getApplication());
 
     PersistableBundle intervalSchedulerExtras = jobParameters.getExtras();
-
 
     baseUrl = intervalSchedulerExtras.getString("baseUrl");
     areaQuery = "area=" + intervalSchedulerExtras.getString("area");
@@ -135,6 +138,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
     @Override
     protected void onPostExecute(Void nothingness) {
 
+      // download images after acquiring a new API key
       Handler handler = new Handler();
       handler.postDelayed(new Runnable() {
         @Override

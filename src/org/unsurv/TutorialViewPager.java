@@ -5,6 +5,9 @@ import androidx.viewpager.widget.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+/**
+ * Custom viewpager to disable scrolling between fragments if needed.
+ */
 public class TutorialViewPager extends ViewPager {
 
   private boolean fragmentScrollingEnabled;

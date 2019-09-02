@@ -4,6 +4,9 @@ import android.os.Bundle;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * Activity that holds the tutorial fragments
+ */
 public class TutorialActivity extends AppCompatActivity {
 
   @Override
