@@ -18,7 +18,7 @@ import java.util.TimeZone;
 /**
  * Room Database for downloaded cameras
  */
-@Database(entities = {SynchronizedCamera.class}, version = 1)
+@Database(entities = {SynchronizedCamera.class}, version = 1, exportSchema = false)
 public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
 
   public abstract SynchronizedCameraDao synchronizedCameraDao();

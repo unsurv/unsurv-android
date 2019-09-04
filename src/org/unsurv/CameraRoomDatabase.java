@@ -22,7 +22,7 @@ import java.util.TimeZone;
  * CaptureTrainingImageActivity
  */
 
-@Database(entities = {SurveillanceCamera.class}, version = 1)
+@Database(entities = {SurveillanceCamera.class}, version = 1, exportSchema = false)
 public abstract class CameraRoomDatabase extends RoomDatabase {
 
   public abstract CameraDao surveillanceCameraDao();

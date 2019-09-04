@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 
-@Database(entities = {AreaOfflineAvailable.class}, version = 1)
+@Database(entities = {AreaOfflineAvailable.class}, version = 1, exportSchema = false)
 public abstract class AreaOfflineAvailableRoomDatabase extends RoomDatabase {
 
   public abstract AreaOfflineAvailableDao areaOfflineAvailableDao();
