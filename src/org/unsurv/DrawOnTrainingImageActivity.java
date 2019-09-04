@@ -30,15 +30,16 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
   private static String TAG = "DrawOnTrainingImage";
 
-  private ImageButton addRegularCameraButton;
-  private ImageButton addDomeCameraButton;
-  private ImageButton saveButton;
-  private ImageButton undoButton;
+  ImageButton addRegularCameraButton;
+  ImageButton addDomeCameraButton;
+  ImageButton saveButton;
+  ImageButton undoButton;
+
+  String pathToImage;
+  CameraRepository cameraRepository;
 
   private int cameraType;
-  private String pathToImage;
   private File imageFile;
-  private CameraRepository cameraRepository;
   private CameraViewModel cameraViewModel;
   private SurveillanceCamera currentTrainingCamera;
 
@@ -225,7 +226,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     // Removes refreshButton in ActionBar. Not needed since LiveData is used for the List.
     MenuItem item = menu.findItem(R.id.action_refresh);
-
+    menu.removeItem(item.getItemId());
 
     return true;
   }

@@ -31,12 +31,13 @@ import java.util.List;
  */
 public class HistoryActivity extends AppCompatActivity {
 
-  private CameraViewModel mCameraViewModel;
-  private int readStoragePermission;
-  private int writeStoragePermission;
+  CameraViewModel mCameraViewModel;
+  int readStoragePermission;
+  int writeStoragePermission;
+  RecyclerView recyclerView;
+
   private SharedPreferences sharedPreferences;
   private BottomNavigationView bottomNavigationView;
-  private RecyclerView recyclerView;
   private CameraListAdapter adapter;
   private Context context;
 

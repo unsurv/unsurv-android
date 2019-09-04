@@ -60,7 +60,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
    */
   private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
-    private final SynchronizedCameraDao mDao;
+    final SynchronizedCameraDao mDao;
 
     PopulateDbAsync(SynchronizedCameraRoomDatabase db) {
       mDao = db.synchronizedCameraDao();
@@ -89,7 +89,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
                 timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),
                 false
                 );
-        //mDao.insert(synchronizedCamera);
+        // mDao.insert(synchronizedCamera);
 
       }
 

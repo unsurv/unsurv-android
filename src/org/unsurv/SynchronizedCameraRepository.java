@@ -11,6 +11,8 @@ import java.util.List;
  * Database access class.
  * All access spawns a seperate AsyncTask to enable easy db access in gui threads.
  */
+
+// TODO create insert/delete single camera
 public class SynchronizedCameraRepository {
 
   private SynchronizedCameraDao mSynchronizedCameraDao;
@@ -61,8 +63,8 @@ public class SynchronizedCameraRepository {
 
   List<SlimSynchronizedCamera> getSlimCamerasInArea(double latMin, double latMax, double lonMin, double lonMax) {
     try {
-      List<SlimSynchronizedCamera> cameras = new findSlimCamerasInArea(mSynchronizedCameraDao).execute(latMin, latMax, lonMin, lonMax).get();
-      return cameras;
+
+      return new findSlimCamerasInArea(mSynchronizedCameraDao).execute(latMin, latMax, lonMin, lonMax).get();
 
     } catch (Exception e) {
       Log.i("Background findByID Error: " , e.toString());
@@ -74,8 +76,8 @@ public class SynchronizedCameraRepository {
 
   SynchronizedCamera findByID(String uuid) {
     try {
-      SynchronizedCamera camera = new findByIDAsyncTask(mSynchronizedCameraDao).execute(uuid).get();
-      return camera;
+
+      return new findByIDAsyncTask(mSynchronizedCameraDao).execute(uuid).get();
 
     } catch (Exception e) {
       Log.i("Background findByID Error: " , e.toString());
@@ -173,7 +175,6 @@ public class SynchronizedCameraRepository {
   private static class getAllAsyncTask extends AsyncTask<Void, Void, List<SynchronizedCamera>> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
 
     getAllAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -193,7 +194,7 @@ public class SynchronizedCameraRepository {
   private static class insertAsyncTask extends AsyncTask<List<SynchronizedCamera>, Void, Void> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
+    String TAG = "SynchronizedCameraRepository insertAsyncTask";
 
     insertAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -218,7 +219,6 @@ public class SynchronizedCameraRepository {
   private static class findByIDAsyncTask extends AsyncTask<String, Void, SynchronizedCamera> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository findByIdAsyncTask";
 
     findByIDAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -227,9 +227,7 @@ public class SynchronizedCameraRepository {
     @Override
     protected SynchronizedCamera doInBackground(final String... params) {
 
-      SynchronizedCamera queriedCamera = mAsyncTaskDao.findByID(params[0]);
-
-      return queriedCamera;
+      return mAsyncTaskDao.findByID(params[0]);
     }
 
   }
@@ -237,7 +235,6 @@ public class SynchronizedCameraRepository {
   private static class updateAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository updateAsyncTask";
 
     updateAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -256,7 +253,6 @@ public class SynchronizedCameraRepository {
   private static class deleteAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository updateAsyncTask";
 
     deleteAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -276,7 +272,6 @@ public class SynchronizedCameraRepository {
   private static class getStatisticsAsyncTask extends AsyncTask<Double, Void, List<StatisticsMap>> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository getStatsAsyncTask";
 
     getStatisticsAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -285,9 +280,8 @@ public class SynchronizedCameraRepository {
     @Override
     protected List<StatisticsMap> doInBackground(final Double... params) {
 
-      List<StatisticsMap> statistics = mAsyncTaskDao.getStatistics(params[0], params[1], params[2], params[3]);
+      return mAsyncTaskDao.getStatistics(params[0], params[1], params[2], params[3]);
 
-      return statistics;
     }
 
   }
@@ -296,7 +290,6 @@ public class SynchronizedCameraRepository {
   private static class camerasInTimeframeAsyncTask extends AsyncTask<String, Void, Integer> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository inTimeframeAsyncTask";
 
     camerasInTimeframeAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -305,9 +298,8 @@ public class SynchronizedCameraRepository {
     @Override
     protected Integer doInBackground(final String... params) {
 
-      int camerasInTimeframe = mAsyncTaskDao.getCamerasAddedInTimeframeAmount(params[0], params[1]);
+      return mAsyncTaskDao.getCamerasAddedInTimeframeAmount(params[0], params[1]);
 
-      return camerasInTimeframe;
     }
 
   }
@@ -316,7 +308,6 @@ public class SynchronizedCameraRepository {
   private static class camerasInLastTwoMinutesAsyncTask extends AsyncTask<Void, Void, List<SynchronizedCamera>> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository inLastTwoMinutesAsyncTask";
 
     camerasInLastTwoMinutesAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -325,9 +316,8 @@ public class SynchronizedCameraRepository {
     @Override
     protected List<SynchronizedCamera> doInBackground(final Void... params) {
 
-      List<SynchronizedCamera> camerasInLastTwoMInutes = mAsyncTaskDao.getRecentlyUpdatedCameras();
+      return mAsyncTaskDao.getRecentlyUpdatedCameras();
 
-      return camerasInLastTwoMInutes;
     }
 
   }
@@ -336,7 +326,6 @@ public class SynchronizedCameraRepository {
   private static class camerasTotalAsyncTask extends AsyncTask<Void, Void, Integer> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository camerasTotalCountAsyncTask";
 
     camerasTotalAsyncTask(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -345,9 +334,8 @@ public class SynchronizedCameraRepository {
     @Override
     protected Integer doInBackground(final Void... params) {
 
-      int camerasInTimeframe = mAsyncTaskDao.getNumberOfCameras();
+      return mAsyncTaskDao.getNumberOfCameras();
 
-      return camerasInTimeframe;
     }
 
   }
@@ -356,7 +344,6 @@ public class SynchronizedCameraRepository {
   private static class findSlimCamerasInArea extends AsyncTask<Double, Void, List<SlimSynchronizedCamera>> {
 
     private SynchronizedCameraDao mAsyncTaskDao;
-    private String TAG = "SynchronizedCameraRepository finSlimCamerasAsyncTask";
 
     findSlimCamerasInArea(SynchronizedCameraDao dao) {
       mAsyncTaskDao = dao;
@@ -365,9 +352,8 @@ public class SynchronizedCameraRepository {
     @Override
     protected List<SlimSynchronizedCamera> doInBackground(final Double... params) {
 
-      List<SlimSynchronizedCamera> slimCamerasInArea = mAsyncTaskDao.getSlimCamerasInArea(params[0], params[1], params[2], params[3]);
+      return mAsyncTaskDao.getSlimCamerasInArea(params[0], params[1], params[2], params[3]);
 
-      return slimCamerasInArea;
     }
 
   }

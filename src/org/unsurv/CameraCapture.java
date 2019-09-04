@@ -117,7 +117,6 @@ public class CameraCapture {
 
     c1 = 0;
 
-
     // distance to another capture in m
     float distanceToSecondCapture = camera1Location.distanceTo(camera2Location);
 

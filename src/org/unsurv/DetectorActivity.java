@@ -82,16 +82,13 @@ import java.io.FileOutputStream;
 
 import static android.content.ContentValues.TAG;
 
-//TODO ASK for location permission, do in tutorial
+// TODO ASK for location permission, do in tutorial
+// TODO remove bboxes when confidence moves below min confidence
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect objects.
  */
 public class DetectorActivity extends CameraActivity implements OnImageAvailableListener, SensorEventListener  {
-
-
-  private CameraRoomDatabase cameraRoomDatabase;
-
 
   private static final Logger LOGGER = new Logger();
   // Configuration values for the prepackaged multibox model.
@@ -130,6 +127,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   // Minimum detection confidence to track a detection.
   private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.6f;
+
   private static final float MINIMUM_CONFIDENCE_MULTIBOX = 0.1f;
   private static final float MINIMUM_CONFIDENCE_YOLO = 0.25f;
 
@@ -262,8 +260,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         startActivity(trainingCaptureIntent);
       }
     });
-
-    cameraRoomDatabase = CameraRoomDatabase.getDatabase(this);
 
     mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -487,7 +483,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     cropToFrameTransform = new Matrix();
     frameToCropTransform.invert(cropToFrameTransform);
 
-    trackingOverlay = (OverlayView) findViewById(R.id.tracking_overlay);
+    trackingOverlay = findViewById(R.id.tracking_overlay);
     trackingOverlay.addCallback(
         new DrawCallback() {
           @Override
@@ -522,13 +518,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 canvas.getHeight() - copy.getHeight() * scaleFactor);
             canvas.drawBitmap(copy, matrix, new Paint());
 
-            final Vector<String> lines = new Vector<String>();
+            final Vector<String> lines = new Vector<>();
             if (detector != null) {
               final String statString = detector.getStatString();
               final String[] statLines = statString.split("\n");
-              for (final String line : statLines) {
-                lines.add(line);
-              }
+              lines.addAll(Arrays.asList(statLines));
+
             }
             lines.add("");
 
@@ -625,7 +620,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             }
 
             final List<Classifier.Recognition> mappedRecognitions =
-                new LinkedList<Classifier.Recognition>();
+                new LinkedList<>();
 
 
             currentTime = System.currentTimeMillis();
@@ -807,7 +802,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         //pitch = mOrientationAngles[1]*(180/Math.PI);
         //roll = mOrientationAngles[2]*(180/Math.PI);
 
-        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         CameraCapture currentCamera = new CameraCapture(
@@ -878,10 +873,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
     occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
     occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
-
-    List<CameraCapture> filteredCameraPool = new ArrayList<>();
-
-
 
     for (CameraCapture capture : cameraPool){
 
@@ -1022,14 +1013,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   }
 
 
-
-  // TODO delete method in capture to delete picture + thumbnail
-
-
-
-
-
-
   @Override
   protected int getLayoutId() {
     return R.layout.camera_connection_fragment_tracking;
@@ -1064,7 +1047,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     private final Context mContext;
 
 
-    private String locationProvider = LocationManager.GPS_PROVIDER;
+    String locationProvider = LocationManager.GPS_PROVIDER;
 
     @Override
     protected void onPreExecute() {

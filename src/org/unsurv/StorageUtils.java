@@ -31,8 +31,8 @@ class StorageUtils {
 
   /**
    * return filesize as bytes
-   * @param file
-   * @return
+   * @param file File object representing a file on the device
+   * @return size in bytes
    */
   static long getFileSize(final File file) {
     if (file == null || !file.exists())
@@ -59,10 +59,11 @@ class StorageUtils {
   }
 
 
+  // TODO test this
   /**
    * returns a byteSize as a String representing the size in MB with 2 decimals
-   * @param byteSize
-   * @return
+   * @param byteSize number of bytes
+   * @return readable String representing the size "1,78 MB" for example
    */
   static String convertByteSizeToMBTwoDecimals(long byteSize){
 
@@ -86,9 +87,9 @@ class StorageUtils {
 
   /**
    * returns a bytearray from file, used for encryption
-   * @param f
-   * @return
-   * @throws IOException
+   * @param f File
+   * @return ByteArray representing the File
+   * @throws IOException can't access
    */
   static byte[] readFileToBytes(File f) throws IOException {
     int size = (int) f.length();
@@ -122,10 +123,10 @@ class StorageUtils {
 
   /**
    * save bytearray to file
-   * @param bytes
-   * @param filename
-   * @param path
-   * @throws IOException
+   * @param bytes ByteArray
+   * @param filename filename
+   * @param path directory to save file
+   * @throws IOException can't be saved
    */
   static void saveBytesToFile(byte[] bytes, String filename, String path) throws IOException {
 
@@ -145,7 +146,7 @@ class StorageUtils {
   /**
    * Deletes saved files for a single SurveillanceCamera
    * @param camera SurveillanceCamera object
-   * @return
+   * @return number of deleted files
    */
   static int deleteImagesForCamera(SurveillanceCamera camera){
 
@@ -208,8 +209,8 @@ class StorageUtils {
 
   /**
    * Deletes saved files for a single SynchronizedCamera
-   * @param camera
-   * @return
+   * @param camera SynchronizedCamera object
+   * @return number of deleted files
    */
   static int deleteImagesForSynchronizedCamera(SynchronizedCamera camera){
 
@@ -232,9 +233,9 @@ class StorageUtils {
   }
 
   /**
-   * recursive deletion of directory, should not use
-   * @param directory
-   * @return
+   * recursive deletion of directory, should not be used, recreates top directory afterwards
+   * @param directory directory to be deleted
+   * @return number of deleted files
    */
   static long deleteAllFilesInDirectory(String directory){
 

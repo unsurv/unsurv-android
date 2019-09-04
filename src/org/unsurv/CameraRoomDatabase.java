@@ -29,7 +29,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
 
   private static CameraRoomDatabase INSTANCE;
 
-  public static CameraRoomDatabase getDatabase(final Context context) {
+  static CameraRoomDatabase getDatabase(final Context context) {
     if (INSTANCE == null) {
       synchronized (CameraRoomDatabase.class) {
         if (INSTANCE == null) {
@@ -57,6 +57,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
           };
 
 
+  // populates the database for debugging purposes
   private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
     private final CameraDao mDao;

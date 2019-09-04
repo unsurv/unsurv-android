@@ -1,6 +1,8 @@
 package org.unsurv;
 
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -17,6 +19,7 @@ public class TutorialFragmentAdapter extends FragmentPagerAdapter {
     mContext = context;
   }
 
+  @NonNull
   @Override
   public Fragment getItem(int position) {
 
@@ -30,7 +33,7 @@ public class TutorialFragmentAdapter extends FragmentPagerAdapter {
 
     }
 
-    return null;
+    return new MapTutorialFragment();
 
   }
 

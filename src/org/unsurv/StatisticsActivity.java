@@ -53,7 +53,6 @@ import java.util.TimeZone;
 public class StatisticsActivity extends AppCompatActivity {
 
   private BottomNavigationView bottomNavigationView;
-  private CameraRoomDatabase cameraDb;
 
   private TextView totalInAreaTextView;
   private TextView totalInAreaInfoTextView;
@@ -65,15 +64,7 @@ public class StatisticsActivity extends AppCompatActivity {
   private TextView global28DaysTextView;
   private TextView globalTotalTextView;
 
-  private List<HashMap<Date, Integer>> localCamerasPerDays;
-  private List<HashMap<Date, Integer>> globalCamerasPerDays;
-
   private SharedPreferences sharedPreferences;
-
-  private double latMin;
-  private double latMax;
-  private double lonMin;
-  private double lonMax;
 
   private SynchronizedCameraRepository synchronizedCameraRepository;
   private CameraRepository cameraRepository;
@@ -82,20 +73,17 @@ public class StatisticsActivity extends AppCompatActivity {
   private int global28DaysAmount;
   private int globalTotalAmount;
 
-  private int local7DaysAmount;
-  private int totalLocal28Days;
-  private int totalLocal;
-  private int totalByUser;
-
-  private SimpleDateFormat timestampIso8601SecondsAccuracy;
-
+  int local7DaysAmount;
+  int totalLocal28Days;
+  int totalLocal;
+  int totalByUser;
 
   private LocalBroadcastManager localBroadcastManager;
-  private IntentFilter intentFilter;
+  IntentFilter intentFilter;
   private BroadcastReceiver br;
 
-  private int readStoragePermission;
-  private int writeStoragePermission;
+  int readStoragePermission;
+  int writeStoragePermission;
 
   private SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
@@ -367,7 +355,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         return headers;
       }
-    };;
+    };
 
     jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
             30000,
@@ -431,13 +419,13 @@ public class StatisticsActivity extends AppCompatActivity {
     Date sevenDaysBeforeToday = cal.getTime();
 
     // data from -7 days until today
-    local7DaysAmount = StatisticsUtils.getTotalCamerasInTimeframeFromDb(sevenDaysBeforeToday, currentDate, synchronizedCameraRepository);
+    local7DaysAmount = StatisticsUtils.getTotalCamerasAddedInTimeframeFromDb(sevenDaysBeforeToday, currentDate, synchronizedCameraRepository);
 
     // only subtract 21 here because we've subtracted 7 earlier
     cal.add(Calendar.DATE, -21);
     Date twentyEightDaysBeforeToday = cal.getTime();
 
-    totalLocal28Days = StatisticsUtils.getTotalCamerasInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
+    totalLocal28Days = StatisticsUtils.getTotalCamerasAddedInTimeframeFromDb(twentyEightDaysBeforeToday, currentDate, synchronizedCameraRepository);
     totalLocal = StatisticsUtils.totalCamerasInDb(synchronizedCameraRepository);
     totalByUser = StatisticsUtils.totalCamerasCapturedOnDevice(cameraRepository);
 
@@ -472,8 +460,8 @@ public class StatisticsActivity extends AppCompatActivity {
 
   /**
    * Returns a abbreviated version of large numbers. 18324 => 18.3 k
-   * @param number
-   * @return
+   * @param number integer number to shorten
+   * @return a shortened easier readable String representing the number
    */
   private String abbreviateLargeNumber(int number){
     int thousandsInNumber = Math.floorDiv(number,  1000);

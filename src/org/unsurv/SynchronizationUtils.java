@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Base64;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -61,7 +62,7 @@ class SynchronizationUtils {
    * Starts a recurring job to synchronize data from a db server. Interval and URL are
    * @param context context of starting the job
    * @param jobExtras not used for now
-   * @return
+   * @return whether job has been queued successfully
    */
   static Boolean scheduleSyncIntervalJob (Context context, @Nullable PersistableBundle jobExtras) {
 
@@ -106,11 +107,8 @@ class SynchronizationUtils {
     // .schedule overrides previous Jobs with same ID.
     int scheduleResult = jobScheduler.schedule(jobBuilder.build());
 
-    if (scheduleResult == JobScheduler.RESULT_SUCCESS) {
-      return true;
-    } else {
-      return false;  // TODO CHECK FOR RETURN VALUE WHEN SYNC JOB STARTED AND LET USER KNOW IF IT FAILED
-    }
+    // TODO CHECK FOR RETURN VALUE WHEN SYNC JOB STARTED AND LET USER KNOW IF IT FAILED
+    return scheduleResult == JobScheduler.RESULT_SUCCESS;
 
   }
 
@@ -374,8 +372,7 @@ class SynchronizationUtils {
               @Override
               public void onResponse(JSONObject response) {
 
-                List<SynchronizedCamera> camerasToSync = new ArrayList<>();
-
+                // List<SynchronizedCamera> camerasToSync = new ArrayList<>();
 
                 try {
 
@@ -446,6 +443,9 @@ class SynchronizationUtils {
     // local map (id, SurveillanceCamera) to not be dependant on list order.
     // id is just an int incremented from 0.
     final HashMap<Integer, SurveillanceCamera> cameraMap = new HashMap<>();
+
+    // TODO check this
+    // final SparseArray<SurveillanceCamera> cameraMap = new SparseArray<>();
 
     for (int i=0; i < camerasToUpload.size(); i++) {
 
@@ -610,8 +610,7 @@ class SynchronizationUtils {
 
   static void uploadImages(final List<SurveillanceCamera> camerasForImageUpload, String url, final SharedPreferences sharedPreferences, @Nullable final CameraViewModel cameraViewModel, @Nullable final CameraRepository cameraRepository, final boolean useRepository) {
 
-
-    HashMap<String, String> idToEncodedImageMap = new HashMap<>();
+    // HashMap<String, String> idToEncodedImageMap = new HashMap<>();
     final HashMap<String, SurveillanceCamera> cameraMap = new HashMap<>();
 
     JSONArray postArray = new JSONArray();
@@ -645,7 +644,7 @@ class SynchronizationUtils {
 
         imageAsBase64 =  Base64.encodeToString(imageAsBytes, Base64.DEFAULT);
 
-        idToEncodedImageMap.put(currentCamera.getExternalId(), imageAsBase64);
+        // idToEncodedImageMap.put(currentCamera.getExternalId(), imageAsBase64);
         cameraMap.put(currentCamera.getExternalId(), camerasForImageUpload.get(i));
 
         singleCamera.put(currentCamera.getExternalId(), imageAsBase64);
@@ -857,9 +856,9 @@ class SynchronizationUtils {
 
   /**
    * returns a YYYY-MM-DD string with random delay in range minUploadDelay < x < maxUploadDelay
-   * @param currentTime
-   * @param sharedPreferences
-   * @return
+   * @param currentTime in millis since 1970
+   * @param sharedPreferences SharedPreferences object
+   * @return YYYY-MM-DD string with random delay in range minUploadDelay < x < maxUploadDelay
    */
   static String getSynchronizationDateWithRandomDelay(long currentTime, SharedPreferences sharedPreferences){
 

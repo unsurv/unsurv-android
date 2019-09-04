@@ -21,7 +21,7 @@ public class RecordingTutorialFragment extends Fragment {
 
   private SharedPreferences sharedPreferences;
 
-  private TutorialViewPager tutorialViewPager;
+  // private TutorialViewPager tutorialViewPager;
 
   private CheckBox automaticCaptureCheckbox;
   private CheckBox buttonCaptureCheckbox;

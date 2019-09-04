@@ -108,13 +108,11 @@ public class MapActivity extends AppCompatActivity {
 
   private BottomNavigationView bottomNavigationView;
 
-  private CameraViewModel cameraViewModel;
-
   private List<SynchronizedCamera> itemsToDisplay = new ArrayList<>();
   private List<OverlayItem> overlayItemsToDisplay = new ArrayList<>();
   private ItemizedOverlay<OverlayItem> cameraOverlay;
 
-  private ImageButton myLocationButton;
+  ImageButton myLocationButton;
 
 
   private SynchronizedCameraRepository synchronizedCameraRepository;
@@ -125,8 +123,8 @@ public class MapActivity extends AppCompatActivity {
   private InfoWindow infoWindow;
   private ImageView infoImage;
   private TextView infoLatestTimestamp;
-  private TextView infoComment;
-  private ImageButton infoEscape;
+  // private TextView infoComment;
+  // private ImageButton infoEscape;
 
   private boolean allowOneServerQuery;
   private boolean mapScrollingEnabled;
@@ -135,8 +133,8 @@ public class MapActivity extends AppCompatActivity {
   private List<SynchronizedCamera> camerasFromLastUpdate = new ArrayList<>();
   private String lastArea = "";
 
-  private ImageButton timemachineButton;
-  private ImageButton infoButton;
+  ImageButton timemachineButton;
+  ImageButton infoButton;
   private View timemachineView;
   private View timeframeView;
 
@@ -1063,9 +1061,8 @@ public class MapActivity extends AppCompatActivity {
           // permanent permisson or onetime permission for outside area
           if (allowServerQueries || allowOneServerQuery) {
 
-            String areaQuery = "area=" + areaString;
-
             // TODO add start value to only update not download all everytime. need per area lastUpdated in own db
+            String areaQuery = "area=" + areaString;
 
             String currentQuery = areaQuery; // TODO add startQuery when needed
 
@@ -1139,17 +1136,19 @@ public class MapActivity extends AppCompatActivity {
 
   /**
    * calculates days inbetween 2 Date[s]
-   * @param d1
-   * @param d2
-   * @return
+   * @param d1 day 1
+   * @param d2 day 2
+   * @return interval between d1 and d2 in days
    */
+
+  // TODO test this
   public int daysBetween(Date d1, Date d2){
     return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
   }
 
   /**
    * populates and updates local variables with new data
-   * @param queryDB
+   * @param queryDB should the local database be queried
    */
   private void updateAllCamerasInArea(boolean queryDB){
     allCamerasInArea.clear();
@@ -1199,7 +1198,7 @@ public class MapActivity extends AppCompatActivity {
       itemsToDisplay.addAll(camerasToDisplay);
 
 
-      Drawable clusterIconDrawable = getDrawable(R.drawable.ic_brightness_1_red_24dp);
+      // Drawable clusterIconDrawable = getDrawable(R.drawable.ic_brightness_1_red_24dp);
       // Bitmap clusterIcon = ((BitmapDrawable)clusterIconDrawable).getBitmap();
       Bitmap clusterIcon = BitmapFactory.decodeResource(getResources(), R.drawable.marker_cluster);
 
@@ -1378,7 +1377,7 @@ public class MapActivity extends AppCompatActivity {
                       // Setting content for infoWindow.
                       infoImage = infoWindow.getView().findViewById(R.id.info_image);
                       infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
-                      infoComment = infoWindow.getView().findViewById(R.id.info_comment);
+                      // infoComment = infoWindow.getView().findViewById(R.id.info_comment);
 
                       File thumbnail = new File(picturesPath + highlightedCamera.getImagePath());
 
@@ -1455,10 +1454,6 @@ public class MapActivity extends AppCompatActivity {
 
     // aborts current query if API key expired. starts same query after a new API key is aquired
     refreshSharedPreferencesObject();
-
-    String apiKey = sharedPreferences.getString("apiKey", null);
-    String apiKeyExp = sharedPreferences.getString("apiKeyExpiration", null);
-
 
     if (SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, getApplicationContext())){
       abortedServerQuery = true;
@@ -1545,7 +1540,6 @@ public class MapActivity extends AppCompatActivity {
         String apiKey = sharedPreferences.getString("apiKey", null);
         headers.put("Authorization", apiKey);
         headers.put("Content-Type", "application/json");
-
 
         return headers;
       }

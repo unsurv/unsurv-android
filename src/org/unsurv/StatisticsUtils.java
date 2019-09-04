@@ -20,21 +20,21 @@ class StatisticsUtils {
   /**
    * Method to get datapoints per day from db
    *
-   * @param latMin
-   * @param latMax
-   * @param lonMin
-   * @param lonMax
+   * @param latMin latmin
+   * @param latMax latmax
+   * @param lonMin lonmin
+   * @param lonMax lonmax
    * @param startDate yyyy-mm-dd
    * @param endDate yyyy-mm-dd
-   * @param synchronizedCameraRepository
-   * @return
+   * @param synchronizedCameraRepository synchronizedCameraRepository object
+   * @return List<StatisticsMap> with per day statistics from db
    */
   static List<StatisticsMap> getCamerasPerDayFromDb(double latMin, double latMax, double lonMin, double lonMax, Date startDate, Date endDate, SynchronizedCameraRepository synchronizedCameraRepository){
     String TAG = "StatisticsUtils";
     List<StatisticsMap> camerasAddedByDaysFromDb;
     List<StatisticsMap> filteredStatsByDays =  new ArrayList<>();
 
-    List<HashMap<Date, Integer>> convertedStatsList = new ArrayList<>();
+    // List<HashMap<Date, Integer>> convertedStatsList = new ArrayList<>();
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -76,12 +76,12 @@ class StatisticsUtils {
 
   /**
    * returns amount of cameras in timeframe
-   * @param startDate
-   * @param endDate
-   * @param synchronizedCameraRepository
-   * @return
+   * @param startDate yyyy-MM-dd start
+   * @param endDate yyyy-MM-dd end
+   * @param synchronizedCameraRepository synchronizedCameraRepository object
+   * @return int: how many cameras have been added in the given timeframe
    */
-  static int getTotalCamerasInTimeframeFromDb(Date startDate, Date endDate, SynchronizedCameraRepository synchronizedCameraRepository){
+  static int getTotalCamerasAddedInTimeframeFromDb(Date startDate, Date endDate, SynchronizedCameraRepository synchronizedCameraRepository){
 
     try {
       SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);

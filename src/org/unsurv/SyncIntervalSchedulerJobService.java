@@ -27,10 +27,10 @@ public class SyncIntervalSchedulerJobService extends JobService {
   private String startQuery;
   private boolean downloadImages;
   private SynchronizedCameraRepository synchronizedCameraRepository;
-  private CameraRepository cameraRepository;
+  CameraRepository cameraRepository;
   private SharedPreferences sharedPreferences;
-  private static String TAG = "SyncIntervalSchedulerJobService";
-  private SimpleDateFormat timestampIso8601SecondsAccuracy;
+  static String TAG = "SyncIntervalSchedulerJobService";
+  SimpleDateFormat timestampIso8601SecondsAccuracy;
 
 
   @Override
@@ -53,7 +53,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
     // aborts current query if API key expired. starts same query after a new API key is aquired in refreshApiKeyAsyncTask
     try {
 
-      Date apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(sharedPreferences.getString("apiKeyExpiration", null));
+      Date apiKeyExpiration = timestampIso8601SecondsAccuracy.parse(sharedPreferences.getString("apiKeyExpiration", ""));
 
       Date currentDate = new Date(System.currentTimeMillis());
 
@@ -122,9 +122,6 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
   // gets a new API key if it's expired. requeues original server query afterwards.
   private class refreshApiKeyAsyncTask extends AsyncTask<Void, Void, Void> {
-
-    private String TAG = "SynchronizedCameraRepository insertAsyncTask";
-
 
     refreshApiKeyAsyncTask(){}
 

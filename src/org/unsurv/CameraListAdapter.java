@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 
+import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
@@ -43,7 +44,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     private final View cameraTypeBar;
 
     private final ImageView thumbnailImageView;
-    private final TextView topTextViewInItem;
+    // private final TextView topTextViewInItem;
     private final TextView bottomTextViewInItem;
 
     private final ImageButton deleteButton;
@@ -54,7 +55,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       super(itemView);
       cameraTypeBar = itemView.findViewById(R.id.type_bar);
       thumbnailImageView = itemView.findViewById(R.id.thumbnail_image);
-      topTextViewInItem = itemView.findViewById(R.id.history_item_text_view_top);
+      // topTextViewInItem = itemView.findViewById(R.id.history_item_text_view_top);
       bottomTextViewInItem = itemView.findViewById(R.id.history_item_text_view_bottom);
       deleteButton = itemView.findViewById(R.id.history_item_delete_button);
       uploadButton = itemView.findViewById(R.id.history_item_upload_button);
@@ -91,8 +92,9 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
   }
 
+  @NonNull
   @Override
-  public CameraViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  public CameraViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     final View itemView = mInflater.inflate(R.layout.camera_recyclerview_item_history, parent, false);
 
     return new CameraViewHolder(itemView);
@@ -100,7 +102,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
 
   @Override
-  public void onBindViewHolder(final CameraViewHolder holder, int position) {
+  public void onBindViewHolder(@NonNull final CameraViewHolder holder, int position) {
 
     if (mSurveillanceCameras != null) {
       final SurveillanceCamera current = mSurveillanceCameras.get(position);
@@ -144,7 +146,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
       String uploadDate = current.getTimeToSync();
 
-      String mComment = current.getComment();
+      // String mComment = current.getComment();
 
       holder.bottomTextViewInItem.setText(uploadDate);
 
@@ -293,6 +295,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
     } else {
       // Covers the case of data not being ready yet.
+      Toast.makeText(ctx, "Data not available, please try again later.", Toast.LENGTH_SHORT).show();
 
     }
   }
@@ -310,23 +313,6 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     else return 0;
   }
 
-  private void displayPopUpBeforeDeleting(String message, final String deleteSizeInBytes, final String pathToClear, final Context context){
-
-    new AlertDialog.Builder(context)
-            .setTitle("Are you sure?")
-            .setMessage(message)
-            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-              @Override
-              public void onClick(DialogInterface dialogInterface, int i) {
-                StorageUtils.deleteAllFilesInDirectory(pathToClear);
-                Toast.makeText(context, "Freed up " + deleteSizeInBytes + " MB of storage.", Toast.LENGTH_SHORT).show();
-
-              }
-            })
-            .setNegativeButton("No", null)
-            .show();
-
-  }
 
 
 }

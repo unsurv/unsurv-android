@@ -54,7 +54,8 @@ public class MapTutorialFragment extends Fragment {
     }
 
     final TextView mapTutorialTextView = rootView.findViewById(R.id.map_tutorial_textview);
-    mapTutorialTextView.setText("Please select an area for offline availability");
+
+    mapTutorialTextView.setText(getResources().getString(R.string.tutorial_map_message));
 
     final Button setHomeButton = rootView.findViewById(R.id.tutorial_set_home_button);
     final Button redrawButton = rootView.findViewById(R.id.tutorial_redraw_button);

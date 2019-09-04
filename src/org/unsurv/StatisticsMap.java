@@ -8,12 +8,12 @@ import androidx.room.ColumnInfo;
  * 2019-01-01 13
  *
  */
-public class StatisticsMap {
+class StatisticsMap {
   @ColumnInfo(name = "uploadedAt")
-  public String uploadedDate;
+  String uploadedDate;
 
   @ColumnInfo(name = "COUNT(uploadedAt)")
-  public Integer camerasOnSpecificDay;
+  Integer camerasOnSpecificDay;
 
 
   // TODO add toString method

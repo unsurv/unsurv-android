@@ -264,9 +264,9 @@ public class DrawView extends ImageView {
 
   /**
    * given a percentage position of touch event, return img pixel equivalent
-   * @param touchInPercent
-   * @param imageAxisSize
-   * @return
+   * @param touchInPercent TouchEvent location in relation to axis size
+   * @param imageAxisSize axis size in pixels
+   * @return pixel value of TouchEvent
    */
   public int translateTouchPointsToImagePixel(float touchInPercent, int imageAxisSize){
     int pixelValue = (int) Math.floor(touchInPercent * imageAxisSize);
@@ -280,15 +280,13 @@ public class DrawView extends ImageView {
 
   /**
    * translates back from image pixels to percent of img axis
-   * @param imagePixel
-   * @param imageAxisSize
-   * @return
+   * @param imagePixel pixel value of TouchEvent
+   * @param imageAxisSize in pixel
+   * @return TouchEvent location as a percentage value of axis size 0 <= x <= 1
    */
   public float translateImagePixelToPercent(int imagePixel, int imageAxisSize){
 
-    float percentInImage = (float) imagePixel / imageAxisSize;
-
-    return percentInImage;
+    return (float) imagePixel / imageAxisSize;
   }
 
   /**

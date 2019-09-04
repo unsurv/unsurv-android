@@ -102,6 +102,9 @@
 
     <!--in LicencesActivity-->
 
+    <!--in Tutorials-->
+    <string name="tutorial_map_message">Please select an area for offline availability</string>
+
 
 
 

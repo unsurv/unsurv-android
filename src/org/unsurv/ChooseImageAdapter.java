@@ -38,7 +38,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
   private LayoutInflater layoutInflater;
   private ImageView mChosenCameraImageView;
   private SurveillanceCamera mCurrentSurveillanceCamera;
-  CameraRepository mCameraRepository;
+  private CameraRepository mCameraRepository;
 
 
   ChooseImageAdapter(Context context,
@@ -58,7 +58,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
 
 
   @Override @NonNull
-  public ChooseImageAdapter.ChooseViewHolder onCreateViewHolder(ViewGroup parent,
+  public ChooseImageAdapter.ChooseViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                                 int viewType) {
 
     View itemView = layoutInflater.inflate(R.layout.camera_recyclerview_item_edit_camera, parent, false);
@@ -111,6 +111,7 @@ public class ChooseImageAdapter extends RecyclerView.Adapter<ChooseImageAdapter.
         // change camera obj to reflect choice
         // this will be saved when the save button is pressed in the parent EditCameraActivity
         mCurrentSurveillanceCamera.setThumbnailPath(chosenImageFilePath);
+        mCameraRepository.updateCameras(mCurrentSurveillanceCamera);
 
       }
 

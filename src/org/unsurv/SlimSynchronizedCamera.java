@@ -8,13 +8,13 @@ import androidx.room.ColumnInfo;
 
 public class SlimSynchronizedCamera {
   @ColumnInfo(name = "latitude")
-  public double latitude;
+  private double latitude;
 
   @ColumnInfo(name = "longitude")
-  public double longitude;
+  private double longitude;
 
   @ColumnInfo(name = "externalID")
-  public String externalID;
+  private String externalID;
 
 
   public double getLatitude() {
