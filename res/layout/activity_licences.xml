@@ -23,11 +23,78 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0sp"
+        android:orientation="vertical"
         android:layout_weight="9">
 
         <TextView
-            android:text="LICENCES"
-            android:textSize="40sp"
+            android:layout_margin="5dp"
+            android:text="@string/licennce_title"
+            android:textSize="30sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+        <TextView
+            android:id="@+id/licences_tensorflow"
+            android:text="@string/tensorflow_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_margin="5dp"
+            />
+
+        <TextView
+            android:id="@+id/licences_osmdroid"
+            android:text="@string/osmdroid_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_margin="5dp"
+            />
+
+        <TextView
+            android:id="@+id/licences_osmdroid_bonus"
+            android:text="@string/osmdroidbonus_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_margin="5dp"
+            />
+
+        <TextView
+            android:id="@+id/licences_picasso"
+            android:text="@string/picasso_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_margin="5dp"
+            />
+
+        <TextView
+            android:id="@+id/licences_tink"
+            android:text="@string/google_tink_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_margin="5dp"
+            />
+
+        <TextView
+            android:id="@+id/licences_volley"
+            android:text="@string/google_volley_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_margin="5dp"
+            />
+
+
+        <TextView
+            android:scrollbars="vertical"
+            android:id="@+id/licence_text"
+            android:text="@string/tensorflow_licence"
+            android:layout_margin="10dp"
+            android:textSize="15sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
