@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Base64;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -179,9 +178,9 @@ class SynchronizationUtils {
 
                   }
 
-                  // local db insert
+                  // local db insertAll
                   if (insertIntoDb) {
-                    crep.insert(camerasToSync);
+                    crep.insertAll(camerasToSync);
                   }
 
                 } catch (Exception e) {

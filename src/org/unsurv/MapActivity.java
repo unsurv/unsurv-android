@@ -1573,7 +1573,7 @@ public class MapActivity extends AppCompatActivity {
         }
 
         // update local db with new data
-        synchronizedCameraRepository.insert(camerasNotInDb);
+        synchronizedCameraRepository.insertAll(camerasNotInDb);
 
         if(timeBasedQuery) {
           areaOfflineAvailableRepository.update(mostRecentArea);

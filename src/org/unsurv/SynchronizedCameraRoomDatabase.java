@@ -89,7 +89,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
                 timestampIso8601.format(new Date(System.currentTimeMillis() - rng.nextInt(1000*60*60*24*24))),
                 false
                 );
-        // mDao.insert(synchronizedCamera);
+        // mDao.insertAll(synchronizedCamera);
 
       }
 

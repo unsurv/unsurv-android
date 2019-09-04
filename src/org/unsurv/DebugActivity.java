@@ -326,7 +326,7 @@ public class DebugActivity extends AppCompatActivity {
 
     );
 
-    synchronizedCameraRepository.insert(Collections.singletonList(debugCamera));
+    synchronizedCameraRepository.insert(debugCamera);
 
 
     mapView.addMapListener(new DelayedMapListener(new MapListener() {
@@ -545,16 +545,16 @@ public class DebugActivity extends AppCompatActivity {
 
         // synchronizedCameraRepository.deleteAll();
 
-        synchronizedCameraRepository.insert(Collections.singletonList(debugCamera1));
-        synchronizedCameraRepository.insert(Collections.singletonList(debugCamera2));
-        synchronizedCameraRepository.insert(Collections.singletonList(debugCamera3));
+        synchronizedCameraRepository.insert(debugCamera1);
+        synchronizedCameraRepository.insert(debugCamera2);
+        synchronizedCameraRepository.insert(debugCamera3);
 
 
         cameraRepository.insert(randomCamera);
         cameraRepository.insert(randomCamera2);
         BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 2);
 
-        // cameraRepository.insert(notRandomCamera);
+        // cameraRepository.insertAll(notRandomCamera);
 
 
         randomCamerasAdded += 1;
@@ -1037,7 +1037,7 @@ public class DebugActivity extends AppCompatActivity {
                   }
 
                   if (insertIntoDb) {
-                    crep.insert(camerasToSync);
+                    crep.insertAll(camerasToSync);
                   }
 
                 } catch (Exception e) {

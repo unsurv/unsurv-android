@@ -12,7 +12,7 @@ import java.util.List;
  * All access spawns a seperate AsyncTask to enable easy db access in gui threads.
  */
 
-// TODO create insert/delete single camera
+// TODO create insertAll/delete single camera
 public class SynchronizedCameraRepository {
 
   private SynchronizedCameraDao mSynchronizedCameraDao;
@@ -136,8 +136,16 @@ public class SynchronizedCameraRepository {
 
 
 
-  public void insert(List<SynchronizedCamera> synchronizedCamera) {
-    new insertAsyncTask(mSynchronizedCameraDao).execute((List)synchronizedCamera);
+  void insertAll(List<SynchronizedCamera> synchronizedCameras) {
+
+      for (SynchronizedCamera camera : synchronizedCameras) {
+          new insertSingleAsyncTask(mSynchronizedCameraDao).execute(camera);
+      }
+
+  }
+
+  void insert(SynchronizedCamera synchronizedCamera){
+      new insertSingleAsyncTask(mSynchronizedCameraDao).execute(synchronizedCamera);
   }
 
   public void update(SynchronizedCamera synchronizedCamera) {
@@ -190,31 +198,28 @@ public class SynchronizedCameraRepository {
   }
 
 
+    private static class insertSingleAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
 
-  private static class insertAsyncTask extends AsyncTask<List<SynchronizedCamera>, Void, Void> {
+        private SynchronizedCameraDao mAsyncTaskDao;
+        String TAG = "SynchronizedCameraRepository insertAsyncTask";
 
-    private SynchronizedCameraDao mAsyncTaskDao;
-    String TAG = "SynchronizedCameraRepository insertAsyncTask";
-
-    insertAsyncTask(SynchronizedCameraDao dao) {
-      mAsyncTaskDao = dao;
-    }
-
-    @Override
-    protected Void doInBackground(final List<SynchronizedCamera>... params) {
-      for (int i = 0; i < params[0].size(); i++) {
-
-        if (mAsyncTaskDao.findID(params[0].get(i).getExternalID()) != null) {
-
-          Log.i(TAG, "id " + params[0].get(i).getExternalID() + " already in db" );
-        } else {
-          mAsyncTaskDao.insert(params[0].get(i));
+        insertSingleAsyncTask(SynchronizedCameraDao dao) {
+            mAsyncTaskDao = dao;
         }
-      }
 
-      return null;
+
+        @Override
+        protected Void doInBackground(final SynchronizedCamera... params) {
+
+            if (mAsyncTaskDao.findID(params[0].getExternalID()) != null) {
+                Log.i(TAG, "id " + params[0].getExternalID() + " already in db" );
+            } else {
+                mAsyncTaskDao.insert(params[0]);
+            }
+
+            return null;
+        }
     }
-  }
 
   private static class findByIDAsyncTask extends AsyncTask<String, Void, SynchronizedCamera> {
 
