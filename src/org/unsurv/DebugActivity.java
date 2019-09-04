@@ -1,12 +1,17 @@
 package org.unsurv;
 
+import android.Manifest;
 import android.app.Application;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -26,7 +31,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -92,7 +96,7 @@ public class DebugActivity extends AppCompatActivity {
   private int DELETE_DB = 1;
 
   private SharedPreferences sharedPreferences;
-  private Boolean notificationPreference;
+  Boolean notificationPreference;
 
   private MapView mapView;
   private ItemizedOverlay<OverlayItem> cameraOverlay;
@@ -102,12 +106,12 @@ public class DebugActivity extends AppCompatActivity {
   private ImageView infoImage;
   private TextView infoLatestTimestamp;
   private TextView infoComment;
-  private ImageButton infoEscape;
+  // private ImageButton infoEscape;
 
   private List<CameraCapture> allCamerasInArea;
   private List<SynchronizedCamera> camerasToSync = new ArrayList<>();
 
-  private WifiManager wifiManager;
+  WifiManager wifiManager;
 
   private String picturesPath = SYNCHRONIZED_PATH;
 
@@ -128,7 +132,9 @@ public class DebugActivity extends AppCompatActivity {
 
   private Context context;
 
-
+  int readStoragePermission;
+  int writeStoragePermission;
+  int fineLocationPermission;
 
 
   @Override
@@ -167,6 +173,8 @@ public class DebugActivity extends AppCompatActivity {
   protected void onResume() {
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
+
+
     super.onResume();
   }
 
@@ -174,10 +182,43 @@ public class DebugActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+
+    // get permissions if not already given
+    readStoragePermission = ContextCompat.checkSelfPermission(DebugActivity.this,
+            Manifest.permission.READ_EXTERNAL_STORAGE);
+    writeStoragePermission = ContextCompat.checkSelfPermission(DebugActivity.this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    fineLocationPermission = ContextCompat.checkSelfPermission(DebugActivity.this,
+            Manifest.permission.ACCESS_FINE_LOCATION);
+
+
+    List<String> permissionList = new ArrayList<>();
+
+    if (readStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+    }
+
+    if (writeStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+
+    if (fineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+      permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+
+    String[] neededPermissions = permissionList.toArray(new String[0]);
+
+    if (!permissionList.isEmpty()) {
+      ActivityCompat.requestPermissions(DebugActivity.this, neededPermissions, 2);
+    }
+
+
     setContentView(R.layout.activity_debug);
     context = this;
 
-    final String TAG = "DebugActivity";
+    // final String TAG = "DebugActivity";
     final TextView debugTextView = findViewById(R.id.debug_textview);
     final Button debugDbSync = findViewById(R.id.sync_db);
     final Button debugDbCheck = findViewById(R.id.check_db);
@@ -348,9 +389,9 @@ public class DebugActivity extends AppCompatActivity {
 
         SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
 
-        JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
+        // JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
-        List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
+        // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
 
         SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -530,11 +571,6 @@ public class DebugActivity extends AppCompatActivity {
         String url = sharedPreferences.getString("synchronizationUrl", null);
         SynchronizationUtils.uploadSurveillanceCamera(allCameras, url, sharedPreferences, cameraViewModel, null, false);
 
-        List<String> externalIds = new ArrayList<>();
-        String externalId = "145432e0e9c54d0d";
-        //externalIds.add(externalId);
-        //SynchronizationUtils.downloadImages(url + "images/", externalIds, sharedPreferences);
-
       }
     });
 
@@ -551,7 +587,7 @@ public class DebugActivity extends AppCompatActivity {
 
         JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
-        List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
+        // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
 
         jobScheduler.cancel(0);
 
@@ -716,10 +752,10 @@ public class DebugActivity extends AppCompatActivity {
     private int dbSize;
     private int MODE;
 
-    private int CHECK_DB_SIZE = 0;
-    private int DELETE_DB = 1;
+    int CHECK_DB_SIZE = 0;
+    int DELETE_DB = 1;
 
-    private String TAG = "checkDbAsync";
+    String TAG = "checkDbAsync";
 
 
     DbAsyncTask(Application application, int DbMode) {
