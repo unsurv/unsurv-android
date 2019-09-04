@@ -360,7 +360,8 @@ public class DebugActivity extends AppCompatActivity {
                 sharedPreferences,
                 true,
                 null,
-                synchronizedCameraRepository);
+                synchronizedCameraRepository,
+                context);
 
       }
     });
@@ -666,7 +667,7 @@ public class DebugActivity extends AppCompatActivity {
     /*
     final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
       @Override
-      public void onReceive(Context context, Intent intent) {
+      public void onReceive(Context ctx, Intent intent) {
         if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
           Boolean scanComplete = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
           List<ScanResult> mScanResult = wifiManager.getScanResults();

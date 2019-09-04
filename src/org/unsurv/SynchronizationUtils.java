@@ -59,7 +59,7 @@ class SynchronizationUtils {
 
   /**
    * Starts a recurring job to synchronize data from a db server. Interval and URL are
-   * @param context context of starting the job
+   * @param context ctx of starting the job
    * @param jobExtras not used for now
    * @return whether job has been queued successfully
    */
@@ -121,7 +121,7 @@ class SynchronizationUtils {
    * @param startQuery "start=latmin,latmax,lonmin,lonmax"
    * @param synchronizedCameraRepository synchronizedCameraRepository object
    */
-  static void downloadCamerasFromServer(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
+  static void downloadCamerasFromServer(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository, final Context context){
 
     //TODO check api for negative values in left right top bottom see if still correct
 
@@ -219,6 +219,13 @@ class SynchronizationUtils {
 
       @Override
       public void onRequestFinished(Request<Object> request) {
+        if (request.hasHadResponseDelivered()){
+          Intent intent = new Intent();
+          intent.setAction("org.unsurv.SYNCHRONIZATION_SUCCESSFUL");
+          LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
+          localBroadcastManager.sendBroadcast(intent);
+        }
+
 
       }
     });
@@ -342,7 +349,7 @@ class SynchronizationUtils {
 
   /**
    * Requests a new api key and saves it to SharedPreferences. Uses LocalBroadCastManager from
-   * context given to broadcast that a new API key has been successfully acquired.
+   * ctx given to broadcast that a new API key has been successfully acquired.
    * @param context Used to get an Instance of LocalBroadCastManager.
    * @param sharedPreferences SharedPreferences object
    */

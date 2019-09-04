@@ -25,11 +25,12 @@ import java.util.List;
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-  Context context;
+  Context ctx;
 
   private Preference clearSynchronizedImages;
   private Preference clearCapturedImages;
   private Preference clearTrainingImages;
+  private Preference databaseSize;
 
   private SharedPreferences sharedPreferences;
 
@@ -43,8 +44,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   private CameraRepository cameraRepository;
   private SynchronizedCameraRepository synchronizedCameraRepository;
 
-  private BroadcastReceiver br;
+  private BroadcastReceiver apiKeyBroadcastListener;
+  private BroadcastReceiver synchronizationBroadcastListener;
   private IntentFilter intentFilter;
+  private IntentFilter synchronizationIntentFilter;
   private LocalBroadcastManager localBroadcastManager;
 
   // TODO grey out synchronitaion category if offline mode selected
@@ -58,10 +61,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     cameraRepository = new CameraRepository(getActivity().getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
 
-    context = getContext();
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-    localBroadcastManager = LocalBroadcastManager.getInstance(context);
+    ctx = getContext();
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
 
+    localBroadcastManager = LocalBroadcastManager.getInstance(ctx);
 
     // Load the preferences from an XML resource
     setPreferencesFromResource(R.xml.preferences, rootKey);
@@ -86,7 +89,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         synchronizedCameras = synchronizedCameraRepository.getAllSynchronizedCameras(true);
 
-        displayPopUpBeforeDeleting("Do you want to delete all downloaded images?", synchronizedMbTwoDecimals , DELETE_SYNCHRONIZED_CAMERAS, context);
+        displayPopUpBeforeDeleting("Do you want to delete all downloaded images?", synchronizedMbTwoDecimals , DELETE_SYNCHRONIZED_CAMERAS, ctx);
 
 
         return true;
@@ -110,7 +113,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         surveillanceCameras = cameraRepository.getAllCameras();
 
-        displayPopUpBeforeDeleting("Do you want to delete all captured images?", capturedMbTwoDecimals , DELETE_SURVEILLANCE_CAMERAS, context);
+        displayPopUpBeforeDeleting("Do you want to delete all captured images?", capturedMbTwoDecimals , DELETE_SURVEILLANCE_CAMERAS, ctx);
 
         return true;
 
@@ -131,7 +134,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
       public boolean onPreferenceClick(Preference preference) {
          surveillanceCameras = cameraRepository.getAllCameras();
 
-        displayPopUpBeforeDeleting("Do you want to delete all training images?\nThis will remove all training data without uploading.", trainingMbTwoDecimals , DELETE_TRAINING_CAMERAS, context);
+        displayPopUpBeforeDeleting("Do you want to delete all training images?\nThis will remove all training data without uploading.", trainingMbTwoDecimals , DELETE_TRAINING_CAMERAS, ctx);
 
         return true;
 
@@ -146,13 +149,32 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         @Override
         public boolean onPreferenceClick(Preference preference) {
 
-          Intent licencesIntent = new Intent(context, LicencesActivity.class);
+          Intent licencesIntent = new Intent(ctx, LicencesActivity.class);
           startActivity(licencesIntent);
 
           return true;
         }
       });
     }
+
+    // displays current db size
+
+    databaseSize = findPreference("databaseSize");
+    int dbSize = synchronizedCameraRepository.getTotalAmountInDb();
+
+    databaseSize.setTitle(getResources().getQuantityString(R.plurals.cameras_in_database, dbSize, dbSize));
+
+    // listen for synchronization events and update title when a synchronization has taken place
+    synchronizationBroadcastListener = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        refreshDbSize();
+      }
+    };
+
+    synchronizationIntentFilter = new IntentFilter("org.unsurv.SYNCHRONIZATION_SUCCESSFUL");
+
+    localBroadcastManager.registerReceiver(synchronizationBroadcastListener, synchronizationIntentFilter);
 
 
     // starts a manual synchronization
@@ -171,7 +193,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
           if (SynchronizationUtils.isApiKeyExpired(sharedPreferences)) {
 
-            br = new BroadcastReceiver() {
+            apiKeyBroadcastListener = new BroadcastReceiver() {
               @Override
               public void onReceive(Context context, Intent intent) {
                 SynchronizationUtils.downloadCamerasFromServer(
@@ -180,17 +202,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         sharedPreferences,
                         true,
                         null,
-                        synchronizedCameraRepository);
+                        synchronizedCameraRepository,
+                        ctx);
 
-                localBroadcastManager.unregisterReceiver(br);
+                localBroadcastManager.unregisterReceiver(apiKeyBroadcastListener);
               }
             };
 
             intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
 
-            localBroadcastManager.registerReceiver(br, intentFilter);
+            localBroadcastManager.registerReceiver(apiKeyBroadcastListener, intentFilter);
 
-            SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, context);
+            SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, ctx);
 
 
           } else {
@@ -202,15 +225,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     sharedPreferences,
                     true,
                     null,
-                    synchronizedCameraRepository);
+                    synchronizedCameraRepository,
+                    ctx);
           }
 
           return true;
         }
       });
     }
-
-
 
   }
 
@@ -276,7 +298,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 }
 
                 Toast.makeText(context, "Freed up " + deleteSizeInBytes + " MB of storage.", Toast.LENGTH_SHORT).show();
-                refreshSizes();
+                refreshStorageSizes();
 
               }
             })
@@ -289,7 +311,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   /**
    * refreshes sizes displayed to user
    */
-  private void refreshSizes(){
+  private void refreshStorageSizes(){
 
     long synchronizedImagesSize = StorageUtils.getFileSize(new File(StorageUtils.SYNCHRONIZED_PATH));
     clearSynchronizedImages.setTitle("Delete downloaded images: " + StorageUtils.convertByteSizeToMBTwoDecimals(synchronizedImagesSize) + " MB");
@@ -300,6 +322,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     long trainingImagesSize = StorageUtils.getFileSize(new File(StorageUtils.TRAINING_CAPTURES_PATH));
     clearTrainingImages.setTitle("Delete training images: " + StorageUtils.convertByteSizeToMBTwoDecimals(trainingImagesSize) + " MB");
 
+  }
+
+  private void refreshDbSize(){
+
+    databaseSize = findPreference("databaseSize");
+    int dbSize = synchronizedCameraRepository.getTotalAmountInDb();
+
+    databaseSize.setTitle(getResources().getQuantityString(R.plurals.cameras_in_database, dbSize, dbSize));
+    Toast.makeText(ctx, "Successfully synchronized " + dbSize + " cameras." , Toast.LENGTH_LONG).show();
   }
 
 }

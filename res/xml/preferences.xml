@@ -71,6 +71,9 @@
         android:layout="@layout/preference_category_synchronization">
 
         <Preference
+            android:key="databaseSize"
+            android:title="" />
+        <Preference
             android:key="synchronizeNow"
             android:title="Synchronize database now" />
 

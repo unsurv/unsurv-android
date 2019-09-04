@@ -99,6 +99,11 @@
     <string name="captured_cameras_size">Storage used by captured cameras:</string>
     <string name="training_cameras_size">Storage used by training cameras:</string>
 
+    <plurals name="cameras_in_database">
+        <item quantity="one">%d camera in local database</item>
+        <item quantity="other">%d cameras in local database</item>
+    </plurals>
+
 
     <!--in LicencesActivity-->
 

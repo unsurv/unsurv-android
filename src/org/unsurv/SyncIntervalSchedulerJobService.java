@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+// TODO maybe replace asynctask with LocalBroadcastmanager for API_KEY_CHANGED
+
 /**
  * This class handles the recurring synchronization jobs that synchronize the local db with the
  * server.
@@ -76,7 +78,8 @@ public class SyncIntervalSchedulerJobService extends JobService {
             sharedPreferences,
             true,
             startQuery,
-            synchronizedCameraRepository
+            synchronizedCameraRepository,
+            this
             );
 
     if (downloadImages) {
@@ -147,7 +150,8 @@ public class SyncIntervalSchedulerJobService extends JobService {
                   sharedPreferences,
                   true,
                   startQuery,
-                  synchronizedCameraRepository
+                  synchronizedCameraRepository,
+                  getBaseContext()
           );
         }
       }, 10000);
