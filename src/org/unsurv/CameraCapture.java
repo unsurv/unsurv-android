@@ -110,6 +110,9 @@ public class CameraCapture {
     m1 = Math.cos(azimuth) / Math.sin(azimuth);
     m2 = Math.cos(secondCapture.getAzimuth()) / Math.sin(secondCapture.getAzimuth());
 
+    if (m1 == m2) {
+      return null;
+    }
 
     // camera1 in approximation is positioned at (0|0)
     x1 = 0;

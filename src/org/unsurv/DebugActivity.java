@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,6 +26,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Pair;
+import android.util.SparseIntArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,10 +72,12 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -80,6 +85,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
+import static android.content.ContentValues.TAG;
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
 import static org.unsurv.StorageUtils.SYNCHRONIZED_PATH;
 
@@ -109,6 +115,7 @@ public class DebugActivity extends AppCompatActivity {
   // private ImageButton infoEscape;
 
   private List<CameraCapture> allCamerasInArea;
+  private List<SurveillanceCamera> computedCamerasInArea = new ArrayList<>();
   private List<SynchronizedCamera> camerasToSync = new ArrayList<>();
 
   WifiManager wifiManager;
@@ -135,6 +142,8 @@ public class DebugActivity extends AppCompatActivity {
   int readStoragePermission;
   int writeStoragePermission;
   int fineLocationPermission;
+
+  long currentTime;
 
 
   @Override
@@ -614,13 +623,13 @@ public class DebugActivity extends AppCompatActivity {
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99452, 8.24688,
-            10.3345, 3.1414 - 3.14/10, 12.3313, 170.3332);
+            10.3345, 3.1414 - 3.14/9, 12.3313, 170.3332);
 
     CameraCapture cameraCapture2 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99455, 8.24705,
-            10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
+            10.3345, -3.1414 + 3.14/9, 12.3313, 170.3332);
 
     CameraCapture cameraCapture3 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
@@ -635,6 +644,9 @@ public class DebugActivity extends AppCompatActivity {
             10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
 
     List<CameraCapture> captureListTest = Arrays.asList(cameraCapture1, cameraCapture2, cameraCapture3, cameraCapture4);
+
+    SurveillanceCamera computedCamera = processCapturePool(captureListTest);
+    computedCamerasInArea.add(computedCamera);
 
     SurveillanceCamera testCamera = new SurveillanceCamera(
             0,
@@ -654,14 +666,12 @@ public class DebugActivity extends AppCompatActivity {
             "");
 
     CameraRepository cameraRepository = new CameraRepository(getApplication());
-    cameraRepository.insert(testCamera);
+    // cameraRepository.insert(testCamera);
 
     allCamerasInArea = captureListTest;
 
     reloadMarker();
 
-
-    // reoccuring task
 
 
     /*
@@ -876,10 +886,6 @@ public class DebugActivity extends AppCompatActivity {
 
 
         itemsToDisplay.clear();
-        for (int i = 0; i < allCamerasInArea.size(); i++) {
-          itemsToDisplay.add(new OverlayItem(String.valueOf(i), "test_camera", "no comment", new GeoPoint(allCamerasInArea.get(i).getLatitude(), allCamerasInArea.get(i).getLongitude())));
-
-        }
 
       } catch (Exception ex) {
         // TODO more specific error handling
@@ -904,6 +910,10 @@ public class DebugActivity extends AppCompatActivity {
 
         for (int i = 0; i < camerasToDisplay.size(); i++) {
           itemsToDisplay.add(new OverlayItem("test_camera", "no comment", new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
+        }
+
+        for (int j = 0; j < computedCamerasInArea.size(); j++) {
+          itemsToDisplay.add(new OverlayItem(String.valueOf(j), "test_camera", "no comment", new GeoPoint(computedCamerasInArea.get(j).getLatitude(), computedCamerasInArea.get(j).getLongitude())));
         }
 
         Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
@@ -1300,8 +1310,170 @@ public class DebugActivity extends AppCompatActivity {
               sharedPreferences);
     }
 
+  }
+
+  SurveillanceCamera processCapturePool(List<CameraCapture> cameraPool){
+    // Intersects all capture headings to find true position of a surveillance camera.
+    // Adds a new SurveillanceCamera to database when done processing.
+
+    // repository to get db access
+    CameraRepository cameraRepository = new CameraRepository(getApplication());
+
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+    List<Location> allIntersectsfromCaptures = new ArrayList<>();
+    List<Location> filteredIntersectsfromCaptures = new ArrayList<>();
+
+    CameraCapture biggestConfidence = cameraPool.get(0); // is sorted
+
+    JSONArray allCaptureFilenames = new JSONArray();
+
+    // filter for one type
+
+    SparseIntArray occurencesPerType = new SparseIntArray(3);
+
+    int standardCount = 0;
+    int domeCount = 0;
+    int unknownCount = 0;
+    occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
+    occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
+    occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
+
+    for (CameraCapture capture : cameraPool){
+
+      switch (capture.getCameraType()){
+
+        case StorageUtils.STANDARD_CAMERA:
+          standardCount++;
+          occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
+          break;
+
+        case StorageUtils.DOME_CAMERA:
+          domeCount++;
+          occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
+          break;
+
+        case StorageUtils.UNKNOWN_CAMERA:
+          unknownCount++;
+          occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
+          break;
+
+      }
+
+    }
+
+    int maxCount = Collections.max(Arrays.asList(standardCount, domeCount, unknownCount));
+
+    int mostCommonTypeInPool = occurencesPerType.indexOfValue(maxCount); // index in Map = type of camera
 
 
+    // Get Capture with biggest confidence for thumbnail/picture.
+    for (int k=0; k < cameraPool.size(); k++) {
+      allCaptureFilenames.put(cameraPool.get(k).getThumbnailPath());
+      allCaptureFilenames.put(cameraPool.get(k).getImagePath());
+
+      if (cameraPool.get(k).getConfidence() > biggestConfidence.getConfidence() && cameraPool.get(k).getCameraType() == mostCommonTypeInPool) {
+        biggestConfidence = cameraPool.get(k);
+      }
+    }
+
+    // Get all combinations. Loop through all except last.
+    for (int i=0; i < cameraPool.size() - 1; i++) {
+
+      CameraCapture firstCaptureToIntersect = cameraPool.get(i);
+
+
+      // Combine every ith element with remaining ones.
+      for (int j=i+1; j < cameraPool.size(); j++){
+
+        CameraCapture secondCaptureToIntersect = cameraPool.get(j);
+
+        Location intersect = firstCaptureToIntersect.intersectWith(secondCaptureToIntersect);
+
+        if (intersect != null) {
+          allIntersectsfromCaptures.add(intersect);
+        }
+      }
+    }
+
+
+    try{
+
+      Location intersectReference = allIntersectsfromCaptures.get(0);
+      List<Pair<Double, Double>> intersectsInCoordinates = LocationUtils.transferLocationsTo2dCoordinates(allIntersectsfromCaptures);
+
+      Location cameraEstimate = LocationUtils.approximateCameraPosition(intersectsInCoordinates, intersectReference);
+
+
+      SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+      timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+      Random random = new Random();
+
+      long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*2) * 1000; // 2 d
+      long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
+
+      long timeframe = maxDelay - minDelay;
+
+      long randomDelay = Math.round(timeframe * random.nextDouble()); // minDelay < x < maxDelay
+
+      currentTime = System.currentTimeMillis();
+
+      boolean useTimestamp = sharedPreferences.getBoolean("enableCaptureTimestamps", false);
+      String captureFilenames = allCaptureFilenames.toString();
+
+      if (useTimestamp) {
+
+        return new SurveillanceCamera(
+                mostCommonTypeInPool,
+                biggestConfidence.getThumbnailPath(),
+                biggestConfidence.getImagePath(),
+                null,
+                cameraEstimate.getLatitude(),
+                cameraEstimate.getLongitude(),
+                sharedPreferences.getString("comment", ""),
+                timestampIso8601.format(new Date(currentTime)),
+                timestampIso8601.format(new Date(currentTime + randomDelay)),
+                false,
+                false,
+                false,
+                false,
+                "",
+                captureFilenames
+
+        );
+
+      } else {
+
+        return new SurveillanceCamera(
+                mostCommonTypeInPool,
+                biggestConfidence.getThumbnailPath(),
+                biggestConfidence.getImagePath(),
+                null,
+                cameraEstimate.getLatitude(),
+                cameraEstimate.getLongitude(),
+                sharedPreferences.getString("comment", ""),
+                null,
+                timestampIso8601.format(new Date(currentTime + randomDelay)),
+                false,
+                false,
+                false,
+                false,
+                "",
+                captureFilenames
+
+        );
+
+      }
+
+    } catch (Exception e){
+      Log.i(TAG, "failed to create a capture pool");
+    }
+
+
+
+
+    return null;
   }
 
 }

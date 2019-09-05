@@ -542,18 +542,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   @Override
   protected void processImage() {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
 
-        updateOrientationAngles();
+    updateOrientationAngles();
 
-        azimuth = mOrientationAngles[0];
-        pitch = mOrientationAngles[1];
-        roll = mOrientationAngles[2];
-
-      }
-    });
+    azimuth = mOrientationAngles[0];
+    pitch = mOrientationAngles[1];
+    roll = mOrientationAngles[2];
 
     ++timestamp;
     final long currTimestamp = timestamp;
@@ -924,7 +918,11 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
         CameraCapture secondCaptureToIntersect = cameraPool.get(j);
 
-        allIntersectsfromCaptures.add(firstCaptureToIntersect.intersectWith(secondCaptureToIntersect));
+        Location intersect = firstCaptureToIntersect.intersectWith(secondCaptureToIntersect);
+
+        if (intersect != null) {
+          allIntersectsfromCaptures.add(intersect);
+        }
       }
     }
 
@@ -1006,9 +1004,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     } catch (Exception e){
       Log.i(TAG, "failed to create a capture pool");
     }
-
-
-
 
   }
 
