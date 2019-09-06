@@ -616,32 +616,31 @@ public class DebugActivity extends AppCompatActivity {
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-
-
+    // azimuth is between N = 0, E = pi/2, S = -pi or + pi, W = -pi/2
 
     CameraCapture cameraCapture1 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99452, 8.24688,
-            10.3345, 3.1414 - 3.14/9, 12.3313, 170.3332);
+            10.3345, 0 + 3.14/5, 12.3313, 170.3332);
 
     CameraCapture cameraCapture2 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99455, 8.24705,
-            10.3345, -3.1414 + 3.14/9, 12.3313, 170.3332);
+            10.3345, 0 + 3.14/7, 12.3313, 170.3332);
 
     CameraCapture cameraCapture3 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99458, 8.24725,
-            10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
+            10.3345, 0 - 3.14/7, 12.3313, 170.3332);
 
     CameraCapture cameraCapture4 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99455, 8.24740,
-            10.3345, -3.1414 + 3.14/10, 12.3313, 170.3332);
+            10.3345, 0 - 3.14/5, 12.3313, 170.3332);
 
     List<CameraCapture> captureListTest = Arrays.asList(cameraCapture1, cameraCapture2, cameraCapture3, cameraCapture4);
 

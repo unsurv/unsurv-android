@@ -33,8 +33,10 @@
 
         android:debuggable="true"
         android:allowBackup="false"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
         <!-- CLEARTEXT JUST HERE FOR DEBUGGING REMOVE LATER!!!!-->
+
 
 
         <activity
