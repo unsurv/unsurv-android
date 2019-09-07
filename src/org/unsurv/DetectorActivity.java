@@ -84,6 +84,7 @@ import static android.content.ContentValues.TAG;
 
 // TODO ASK for location permission, do in tutorial
 // TODO remove bboxes when confidence moves below min confidence
+// TODO abortcurrent capture method
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect objects.
@@ -939,8 +940,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
       Random random = new Random();
 
-      long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*2) * 1000; // 2 d
-      long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
+      long minDelay = Long.parseLong(sharedPreferences.getString("minUploadDelay", "21600000")); // 6 h
+      long maxDelay = Long.parseLong(sharedPreferences.getString("maxUploadDelay", "259200000")); // 3 d
 
       long timeframe = maxDelay - minDelay;
 

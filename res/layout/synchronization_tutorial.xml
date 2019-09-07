@@ -10,12 +10,11 @@
     android:orientation="vertical">
 
 
-    <ImageView
-        android:src="@drawable/ic_router_grey_24dp"
-        android:id="@+id/sync_tutorial_image"
+    <TextView
+        android:id="@+id/sync_tutorial_synchronization_text"
         android:layout_width="match_parent"
         android:layout_height="0sp"
-        android:layout_weight="8"/>
+        android:layout_weight="7"/>
 
 
     <LinearLayout
@@ -27,7 +26,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Enable Offline Mode:"
+            android:text="@string/tutorial_sync_offline_mode_text"
             android:textSize="20sp"
             android:gravity="center"
             android:padding="12dp"/>
@@ -41,6 +40,7 @@
 
     </LinearLayout>
 
+
     <LinearLayout
         android:id="@+id/sync_tutorial_interval_view"
         android:orientation="horizontal"
@@ -49,16 +49,16 @@
         android:layout_weight="1">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="match_parent"
-            android:text="Synchronization Interval:"
+            android:text="@string/tutorial_sync_interval_text"
             android:gravity="center"
             android:textSize="20sp"
             android:padding="12dp"/>
 
         <EditText
             android:id="@+id/sync_tutorial_user_interval"
-            android:layout_width="80dp"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:textSize="20sp"
             android:gravity="center"
@@ -69,16 +69,97 @@
 
 
         <Spinner
-            android:id="@+id/sync_tutorial_spinner"
+            android:id="@+id/sync_tutorial_interval_spinner"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            >
-
-        </Spinner>
+            />
 
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sync_tutorial_min_delay_view"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:text="@string/tutorial_sync_min_delay_text"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:padding="12dp"/>
+
+        <EditText
+            android:id="@+id/sync_tutorial_user_min_delay"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:inputType="number"
+            android:maxLength="3"
+            android:text="@string/tutorial_sync_default_min_delay"/>
+
+
+
+        <Spinner
+            android:id="@+id/sync_tutorial_min_delay_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sync_tutorial_max_delay_view"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:text="@string/tutorial_sync_max_delay_text"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:padding="12dp"/>
+
+        <EditText
+            android:id="@+id/sync_tutorial_user_max_delay"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:inputType="number"
+            android:maxLength="3"
+            android:text="@string/tutorial_sync_default_max_delay"/>
+
+
+
+        <Spinner
+            android:id="@+id/sync_tutorial_max_delay_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            />
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/sync_tutorial_save_button"
+        style="@style/customButtonStyle"
+        android:layout_margin="8dp"
+        android:text="@string/save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
 
 
 

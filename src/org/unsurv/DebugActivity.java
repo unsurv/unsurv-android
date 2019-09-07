@@ -253,10 +253,12 @@ public class DebugActivity extends AppCompatActivity {
 
     sharedPreferences.edit().clear().apply();
 
+
+    // TODO pix putlong put int put string for intervals
     sharedPreferences.edit().putBoolean("notifications", false).apply();
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
-    sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*15)).apply();
+    sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*15)).apply(); // using strings because arrays in preferences can only take strings
     sharedPreferences.edit().putString("synchronizationUrl", "https://api.unsurv.org/").apply();
     // sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.178.137:5000/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
@@ -275,10 +277,8 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 0).apply();
 
 
-
-
-    sharedPreferences.edit().putInt("minUploadDelay", 86400).apply(); // multiply by 1000 when called to get real value in ms
-    sharedPreferences.edit().putInt("maxUploadDelay", 604800).apply();
+    sharedPreferences.edit().putString("minUploadDelay", "21600000").apply(); // using strings because arrays in preferences can only take strings
+    sharedPreferences.edit().putString("maxUploadDelay", "259200000").apply(); // using strings because arrays in preferences can only take strings
 
     // SynchronizationUtils.getAPIkey(DebugActivity.this, sharedPreferences);
     // set in timemachineSpinner
@@ -622,13 +622,13 @@ public class DebugActivity extends AppCompatActivity {
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99452, 8.24688,
-            10.3345, 0 + 3.14/5, 12.3313, 170.3332);
+            10.3345, 0 + 3.14/4, 12.3313, 170.3332);
 
     CameraCapture cameraCapture2 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
             10, 120, 50, 140,
             49.99455, 8.24705,
-            10.3345, 0 + 3.14/7, 12.3313, 170.3332);
+            10.3345, 0 + 3.14/8, 12.3313, 170.3332);
 
     CameraCapture cameraCapture3 = new CameraCapture(0, 99.9f,
             picturesPath + "190754878_thumbnail.jpg", picturesPath + "190754878.jpg",
@@ -911,8 +911,11 @@ public class DebugActivity extends AppCompatActivity {
           itemsToDisplay.add(new OverlayItem("test_camera", "no comment", new GeoPoint(camerasToDisplay.get(i).getLatitude(), camerasToDisplay.get(i).getLongitude())));
         }
 
-        for (int j = 0; j < computedCamerasInArea.size(); j++) {
-          itemsToDisplay.add(new OverlayItem(String.valueOf(j), "test_camera", "no comment", new GeoPoint(computedCamerasInArea.get(j).getLatitude(), computedCamerasInArea.get(j).getLongitude())));
+        if (!computedCamerasInArea.isEmpty()){
+
+          for (int j = 0; j < computedCamerasInArea.size(); j++) {
+            itemsToDisplay.add(new OverlayItem(String.valueOf(j), "test_camera", "no comment", new GeoPoint(computedCamerasInArea.get(j).getLatitude(), computedCamerasInArea.get(j).getLongitude())));
+          }
         }
 
         Drawable customMarker = ResourcesCompat.getDrawableForDensity(getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
@@ -1409,8 +1412,8 @@ public class DebugActivity extends AppCompatActivity {
 
       Random random = new Random();
 
-      long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*2) * 1000; // 2 d
-      long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
+      long minDelay = Long.parseLong(sharedPreferences.getString("minUploadDelay", "21600000")); // 6 h
+      long maxDelay = Long.parseLong(sharedPreferences.getString("maxUploadDelay", "259200000")); // 3 d
 
       long timeframe = maxDelay - minDelay;
 
@@ -1468,9 +1471,6 @@ public class DebugActivity extends AppCompatActivity {
     } catch (Exception e){
       Log.i(TAG, "failed to create a capture pool");
     }
-
-
-
 
     return null;
   }
