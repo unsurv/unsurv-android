@@ -27,7 +27,7 @@ public class TutorialFragmentAdapter extends FragmentPagerAdapter {
       case 0:
         return new PermissionTutorialFragment();
       case 1:
-        return new RecordingTutorialFragment();
+        return new CaptureTutorialFragment();
       case 2:
         return new MapTutorialFragment();
       case 3:

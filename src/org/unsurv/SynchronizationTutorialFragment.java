@@ -60,7 +60,7 @@ public class SynchronizationTutorialFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
-    final View rootView = inflater.inflate(R.layout.synchronization_tutorial, container,false);
+    final View rootView = inflater.inflate(R.layout.tutorial_synchronization, container,false);
 
     tutorialViewPager = getActivity().findViewById(R.id.tutorial_viewpager);
 

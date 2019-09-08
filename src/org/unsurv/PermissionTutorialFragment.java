@@ -1,7 +1,6 @@
 package org.unsurv;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +10,6 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
@@ -19,11 +17,6 @@ import java.util.List;
 
 
 public class PermissionTutorialFragment extends Fragment {
-
-  private Button grantStoragePermission;
-  private Button grantCameraPermission;
-  private Button grantLocationPermission;
-  private Button grantAllPermissions;
 
   public PermissionTutorialFragment(){
 
@@ -34,7 +27,12 @@ public class PermissionTutorialFragment extends Fragment {
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-    final View rootView = inflater.inflate(R.layout.permission_tutorial, container,false);
+    Button grantStoragePermission;
+    Button grantCameraPermission;
+    Button grantLocationPermission;
+    Button grantAllPermissions;
+
+    final View rootView = inflater.inflate(R.layout.tutorial_permission, container,false);
 
     grantStoragePermission = rootView.findViewById(R.id.permission_tutorial_grant_storage_button);
     grantCameraPermission = rootView.findViewById(R.id.permission_tutorial_grant_camera_button);

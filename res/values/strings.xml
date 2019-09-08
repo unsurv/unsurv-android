@@ -134,6 +134,12 @@ To access the online database an access key is generated every week. Your captur
 - Camera permission is needed to use the object detection model to automatically capture surveillance cameras.\n\n
 - Location permission is optional, but needed if you want to automatically capture surveillance cameras or center the map on your current position.</string>
 
+    <string name="tutorial_capture_info_text">This application has different methods to capture and map surveillance cameras.
+\n\n- By default it uses a self trained object detection model to detect surveillance cameras through the device\'s camera
+\n\n- You can choose to manually capture surveillance cameras. This can be set as the default method.
+\n\n- A third way is to capture training images to improve the object detection
+\n\n All these options are available via buttons from the default detection method</string>
+
 
     <!--in LicencesActivity-->
     <string name="licennce_title">Licences:</string>

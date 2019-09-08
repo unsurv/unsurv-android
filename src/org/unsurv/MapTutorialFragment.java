@@ -41,7 +41,7 @@ public class MapTutorialFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
-    View rootView = inflater.inflate(R.layout.map_tutorial, container,false);
+    View rootView = inflater.inflate(R.layout.tutorial_map, container,false);
 
     tutorialViewPager = getActivity().findViewById(R.id.tutorial_viewpager);
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getContext());
