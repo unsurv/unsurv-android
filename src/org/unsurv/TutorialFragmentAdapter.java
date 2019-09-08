@@ -25,10 +25,12 @@ public class TutorialFragmentAdapter extends FragmentPagerAdapter {
 
     switch (position) {
       case 0:
-        return new MapTutorialFragment();
+        return new PermissionTutorialFragment();
       case 1:
         return new RecordingTutorialFragment();
       case 2:
+        return new MapTutorialFragment();
+      case 3:
         return new SynchronizationTutorialFragment();
 
     }
@@ -40,6 +42,6 @@ public class TutorialFragmentAdapter extends FragmentPagerAdapter {
 
   @Override
   public int getCount() {
-    return 3;
+    return 4;
   }
 }

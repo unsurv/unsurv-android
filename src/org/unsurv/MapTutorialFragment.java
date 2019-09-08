@@ -48,11 +48,6 @@ public class MapTutorialFragment extends Fragment {
 
     homeZoneIsSet = sharedPreferences.getString("area", null) != null;
 
-    // disable fragment scrolling while map scrolling is needed
-    if (!homeZoneIsSet  || !setHomeButtonUsed){
-      tutorialViewPager.setFragmentScrollingEnabled(false);
-    }
-
     final TextView mapTutorialTextView = rootView.findViewById(R.id.map_tutorial_textview);
 
     mapTutorialTextView.setText(getResources().getString(R.string.tutorial_map_message));
@@ -80,6 +75,12 @@ public class MapTutorialFragment extends Fragment {
     tutorialMapView.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
+        // disable fragment scrolling while map scrolling is needed
+        if (!homeZoneIsSet){
+          tutorialViewPager.setFragmentScrollingEnabled(false);
+          return true;
+        }
+
         if (mapScrollingEnabled) {
           return false;
         } else {
@@ -124,7 +125,7 @@ public class MapTutorialFragment extends Fragment {
 
         setHomeButtonUsed = true;
         homeZoneIsSet = true;
-        tutorialViewPager.setCurrentItem(1);
+        tutorialViewPager.setCurrentItem(tutorialViewPager.getCurrentItem() + 1);
 
 
 

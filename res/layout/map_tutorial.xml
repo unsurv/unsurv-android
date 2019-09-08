@@ -56,14 +56,14 @@
                 android:id="@+id/tutorial_redraw_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tutorial_redraw"/>
+                android:text="@string/tutorial_map_redraw"/>
 
             <Button
                 style="@style/customButtonStyle"
                 android:id="@+id/tutorial_set_home_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tutorial_set_home"
+                android:text="@string/tutorial_map_set_home"
                 />
 
 

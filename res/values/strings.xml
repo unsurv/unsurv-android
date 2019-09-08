@@ -106,10 +106,10 @@
 
     <!--in Tutorials-->
 
-    <string name="tutorial_redraw">REDRAW</string>
-    <string name="tutorial_set_home">SET HOME</string>
-
+    <string name="tutorial_map_redraw">REDRAW</string>
+    <string name="tutorial_map_set_home">SET HOME</string>
     <string name="tutorial_map_message">Please select an area for offline availability</string>
+
     <string name="tutorial_sync_interval_text">Synchronization interval:</string>
     <string name="tutorial_sync_offline_mode_text">Enable offline mode:</string>
     <string name="tutorial_sync_min_delay_text">Min delay before upload:</string>
@@ -123,11 +123,23 @@
 - Max upload delay specifies a limit to how much time passes at the maximum between a camera capture and the upload to the database.</string>
 
 
+    <string name="tutorial_all_permissions_button">GRANT ALL</string>
+    <string name="tutorial_location_permission_button">GRANT LOCATION</string>
+    <string name="tutorial_camera_permission_button">GRANT CAMERA</string>
+    <string name="tutorial_storage_permission_button">GRANT STORAGE</string>
+    <string name="tutorial_permissions_info_text">This application needs some permissions to function properly. Absolutely no personal data is gathered.
+To access the online database an access key is generated every week. Your captures are linked to that key. No record connecting keys to devices is kept. This is done to ensure data integrity and remove malicious entries.\nYou can always check the database source code at\nhttps://github.com/unsurv/flask_api\nThe only thing uploaded will be the position, type and method of capture of the surveillance camera and optionally an image. You can always check the source code yourself to see what information is sent to the server at\nhttps://github.com/unsurv/unsurv-android.\n\n
+
+- Storage permissions are needed to save images and read map data from your phone\'s storage.\n\n
+- Camera permission is needed to use the object detection model to automatically capture surveillance cameras.\n\n
+- Location permission is optional, but needed if you want to automatically capture surveillance cameras or center the map on your current position.</string>
+
+
     <!--in LicencesActivity-->
     <string name="licennce_title">Licences:</string>
 
     <string name="tensorflow_source">Tensorflow Android Example Application</string>
-    <string name="osmdroid_source">Osmdroid OpenStreetMap</string>
+    <string name="osmdroid_source">Osmdroid / OpenStreetMap</string>
     <string name="osmdroidbonus_source">Osmdroid Bonuspack</string>
     <string name="picasso_source">Picasso</string>
     <string name="google_tink_source">Google Tink</string>
@@ -151,9 +163,18 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an \"AS IS\" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
+limitations under the License.\n\nCopyright 2017 The Android Open Source Project
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
 limitations under the License.</string>
 
-    <string name="osmdroid_licence">https://github.com/osmdroid/osmdroid\n\nApache License
+    <string name="osmdroid_licence">© OpenStreetMap contributors\nhttps://www.openstreetmap.org/copyright\n\nhttps://github.com/osmdroid/osmdroid\n\nApache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 

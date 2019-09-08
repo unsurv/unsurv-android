@@ -72,7 +72,6 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,7 +84,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
-import static android.content.ContentValues.TAG;
 import static org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn;
 import static org.unsurv.StorageUtils.SYNCHRONIZED_PATH;
 

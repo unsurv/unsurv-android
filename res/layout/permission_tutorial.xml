@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/permission_tutorial_info_text"
+        android:text="@string/tutorial_permissions_info_text"
+        android:textSize="16sp"
+        android:layout_width="match_parent"
+        android:layout_margin="8dp"
+        android:layout_height="wrap_content"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0sp"
+            android:layout_weight="5"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/permission_tutorial_grant_storage_button"
+                style="@style/customButtonStyle"
+                android:layout_marginBottom="5dp"
+                android:text="@string/tutorial_storage_permission_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+            <Button
+                android:id="@+id/permission_tutorial_grant_camera_button"
+                style="@style/customButtonStyle"
+                android:layout_marginBottom="5dp"
+                android:text="@string/tutorial_camera_permission_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+            <Button
+                android:id="@+id/permission_tutorial_grant_location_button"
+                style="@style/customButtonStyle"
+                android:layout_marginBottom="5dp"
+                android:text="@string/tutorial_location_permission_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/permission_tutorial_grant_all"
+            style="@style/customButtonStyle"
+            android:text="@string/tutorial_all_permissions_button"
+            android:layout_width="0sp"
+            android:layout_weight="5"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+
+    </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+</LinearLayout>
+

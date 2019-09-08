@@ -47,9 +47,9 @@ public class SynchronizationTutorialFragment extends Fragment {
   private EditText userMinDelayChoice;
   private EditText userMaxDelayChoice;
 
-  Spinner userDurationChoiceSpinner;
-  Spinner minDelaySpinner;
-  Spinner maxDelaySpinner;
+  private Spinner userDurationChoiceSpinner;
+  private Spinner minDelaySpinner;
+  private Spinner maxDelaySpinner;
 
 
   public SynchronizationTutorialFragment() {
