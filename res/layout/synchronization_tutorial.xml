@@ -12,7 +12,10 @@
 
     <TextView
         android:id="@+id/sync_tutorial_synchronization_text"
+        android:text="@string/tutorial_sync_info_text"
+        android:textSize="16sp"
         android:layout_width="match_parent"
+        android:layout_margin="8dp"
         android:layout_height="0sp"
         android:layout_weight="7"/>
 
@@ -64,7 +67,7 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="3"
-            android:text="3"/>
+            android:text="@string/tutorial_sync_default_interval"/>
 
 
 

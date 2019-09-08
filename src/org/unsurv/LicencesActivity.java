@@ -17,6 +17,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * LicenceActivity to show when user clicks on "Show licences" settings
  */
 
+// TODO add Openstreetmap contributors
+
 public class LicencesActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;

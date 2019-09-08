@@ -114,9 +114,13 @@
     <string name="tutorial_sync_offline_mode_text">Enable offline mode:</string>
     <string name="tutorial_sync_min_delay_text">Min delay before upload:</string>
     <string name="tutorial_sync_max_delay_text">Max delay before upload:</string>
-    <string name="tutorial_sync_default_interval">3</string>
+    <string name="tutorial_sync_default_interval">1</string>
     <string name="tutorial_sync_default_min_delay">6</string>
     <string name="tutorial_sync_default_max_delay">3</string>
+    <string name="tutorial_sync_info_text">- Offline mode disables ALL connections; the app just works with the default database\n\n
+- Synchronization interval is the time between each update from the database server. Uploads will only take place with each synchronization interval. If you choose a long interval uploads might take longer than max delay.\n\n
+- Min upload delay specifies the minimum time that has to pass after a camera is captured before the upload happens. This is to protect your privacy by giving you some time to leave the area before the camera appears in the database. You can always manually upload a camera before the time has passed.\n\n
+- Max upload delay specifies a limit to how much time passes at the maximum between a camera capture and the upload to the database.</string>
 
 
     <!--in LicencesActivity-->
