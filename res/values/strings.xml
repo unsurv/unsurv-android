@@ -87,13 +87,16 @@
     <string name="edit_button">EDIT LOCATION</string>
     <string name="save_button">SAVE</string>
 
+    <!--in CaptureTrainingImageActivity-->
+    <string name="capture">CAPTURE</string>
+    <string name="capture_training_image_info">This function allows you to capture images of surveillance cameras to improve the object detection accuracy. After taking the image you will prompted to draw rectangles around surveillance cameras.</string>
+
     <!--in SettingsActivity-->
     <string name="storage_title">Storage</string>
     <string name="general_title">General</string>
     <string name="synchronization_title">Synchronization</string>
     <string name="map_title">Map</string>
     <string name="capture_title">Capture</string>
-
 
     <string name="synchronized_cameras_size">Storage used by synchronized cameras:</string>
     <string name="captured_cameras_size">Storage used by captured cameras:</string>
@@ -135,7 +138,7 @@ To access the online database an access key is generated every week. Your captur
 - Location permission is optional, but needed if you want to automatically capture surveillance cameras or center the map on your current position.</string>
 
     <string name="tutorial_capture_info_text">This application has different methods to capture and map surveillance cameras.
-\n\n- By default it uses a self trained object detection model to detect surveillance cameras through the device\'s camera. This mode uses the device\'s orientation and location to calculate the camera position. It\'s most accurate if you move by the camera and capture it from different angles.
+\n\n- By default it uses a self trained object detection model to detect surveillance cameras through the device\'s camera. This mode uses the device\'s orientation and location to calculate the camera position. It\'s most accurate if you move by the camera and capture it from different angles. You can always edit the exact location in your local history before uploading.
 \n\n- You can choose to manually capture surveillance cameras. This can be set as the default method.
 \n\n- A third way is to capture training images to improve the object detection
 \n\n All these options are available via buttons from the default detection method</string>

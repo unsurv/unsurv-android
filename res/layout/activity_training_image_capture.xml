@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="CAPTURE" />
+            android:text="@string/capture" />
 
         <ImageButton
             android:id="@+id/info"
@@ -47,5 +47,32 @@
             android:src="@drawable/ic_action_info" />
 
     </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/training_capture_zoom_in_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_zoom_in_grey_24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/control"
+        android:layout_marginBottom="5dp"/>
+
+    <SeekBar
+        android:id="@+id/training_capture_zoom_seekbar"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/control"
+        android:layout_toStartOf="@id/training_capture_zoom_in_button"
+        android:layout_marginBottom="5dp"/>
+
+    <ImageButton
+        android:id="@+id/training_capture_zoom_out_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_zoom_out_grey_24dp"
+        android:layout_toStartOf="@id/training_capture_zoom_seekbar"
+        android:layout_above="@+id/control"
+        android:layout_marginBottom="5dp"/>
+
 
 </RelativeLayout>

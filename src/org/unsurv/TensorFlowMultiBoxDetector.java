@@ -67,7 +67,7 @@ public class TensorFlowMultiBoxDetector implements Classifier {
   /**
    * Initializes a native TensorFlow session for classifying images.
    *
-   * @param assetManager The asset manager to be used to load assets.
+   * @param assetManager The asset cameraManager to be used to load assets.
    * @param modelFilename The filepath of the model GraphDef protocol buffer.
    * @param locationFilename The filepath of label file for classes.
    * @param inputSize The input size. A square image of inputSize x inputSize is assumed.

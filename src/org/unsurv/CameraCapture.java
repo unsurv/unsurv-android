@@ -120,7 +120,7 @@ public class CameraCapture {
 
     c1 = 0;
 
-    // distance to another capture in m
+    // distance to another capture in cameraArray
     float distanceToSecondCapture = camera1Location.distanceTo(camera2Location);
 
     // bearing to another capture in degrees east from true north
@@ -129,7 +129,7 @@ public class CameraCapture {
 
     // approximate second point in 2D coordinates
 
-    // 1 degree of latitude equals 110574 m at the equator. Doesn't change much further north/south
+    // 1 degree of latitude equals 110574 cameraArray at the equator. Doesn't change much further north/south
     y2 = (secondCapture.getLatitude() - this.getLatitude())*110574;
 
     // get x2 from pythagoras with distance and y distance.

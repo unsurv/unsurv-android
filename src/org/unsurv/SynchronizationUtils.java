@@ -873,8 +873,9 @@ class SynchronizationUtils {
 
     Random random = new Random();
 
-    long minDelay = sharedPreferences.getInt("minUploadDelay", 60*60*24*2) * 1000; // 2 d
-    long maxDelay = sharedPreferences.getInt("maxUploadDelay", 60*60*24*7) * 1000; // 7 d
+    // stored as String since Preferences can't take arrays with long or int as type
+    long minDelay = Long.parseLong(sharedPreferences.getString("minUploadDelay", String.valueOf(1000*60*60*6))); // 6 h
+    long maxDelay = Long.parseLong(sharedPreferences.getString("maxUploadDelay", String.valueOf(1000*60*60*24*3))); // 3 d
 
     long timeframe = maxDelay - minDelay;
 

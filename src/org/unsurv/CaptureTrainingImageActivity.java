@@ -61,7 +61,10 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -103,6 +106,17 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
   private Rect zoomedImage;
 
   private int insertDbId;
+
+  private ImageButton zoomInButton;
+  private ImageButton zoomOutButton;
+  private SeekBar zoomBar;
+
+  private float maxZoom;
+
+  Activity activity = CaptureTrainingImageActivity.this;
+  CameraManager cameraManager;
+  CameraCharacteristics cameraCharacteristics;
+  Rect cameraArray;
 
   static {
     ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -447,6 +461,9 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
     findViewById(R.id.info).setOnClickListener(this);
     mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
 
+    zoomInButton = findViewById(R.id.training_capture_zoom_in_button);
+    zoomOutButton = findViewById(R.id.training_capture_zoom_out_button);
+    zoomBar = findViewById(R.id.training_capture_zoom_seekbar);
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     cameraRepository = new CameraRepository(getApplication());
@@ -472,18 +489,25 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
       mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
     }
 
+
+
+
     mTextureView.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View view, MotionEvent motionEvent) {
 
         try {
-          Activity activity = CaptureTrainingImageActivity.this;
-          CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
-          CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraId);
-          // -20 to maxzoom to fix crashes when
-          float maxZoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
+          activity = CaptureTrainingImageActivity.this;
+          cameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+          cameraCharacteristics = cameraManager.getCameraCharacteristics(mCameraId);
+          // -20 to maxzoom to fix crashes when maxZoom is reached
+          maxZoom = (cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
 
-          Rect m = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+          zoomBar.setMax(Math.round(maxZoom));
+
+          cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+          cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+
           int action = motionEvent.getAction();
           float current_finger_spacing;
 
@@ -494,22 +518,24 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
               if(current_finger_spacing  > fingerSpacing + 10 && maxZoom > zoomLevel){
                 // don't zoom if already at max zoom
                 zoomLevel++;
+                zoomBar.setProgress(zoomLevel);
 
               } else if (current_finger_spacing < fingerSpacing + 10 && zoomLevel > 1){
                 zoomLevel--;
+                zoomBar.setProgress(zoomLevel);
               }
 
               Log.i(TAG, "zoom:" + zoomLevel);
-              Log.i(TAG, "maxZoom:" + zoomLevel);
-              int minW = (int) (m.width() / maxZoom);
-              int minH = (int) (m.height() / maxZoom);
-              int difW = m.width() - minW;
-              int difH = m.height() - minH;
+              Log.i(TAG, "maxZoom:" + maxZoom);
+              int minW = (int) (cameraArray.width() / maxZoom);
+              int minH = (int) (cameraArray.height() / maxZoom);
+              int difW = cameraArray.width() - minW;
+              int difH = cameraArray.height() - minH;
               int cropW = difW / 100 * zoomLevel;
               int cropH = difH / 100 * zoomLevel;
               cropW -= cropW & 3;
               cropH -= cropH & 3;
-              zoomedImage = new Rect(cropW, cropH, m.width() - cropW, m.height() - cropH);
+              zoomedImage = new Rect(cropW, cropH, cameraArray.width() - cropW, cameraArray.height() - cropH);
               mPreviewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
             }
             fingerSpacing = current_finger_spacing;
@@ -524,16 +550,99 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
                     .setRepeatingRequest(mPreviewRequestBuilder.build(), mCaptureCallback, null);
           } catch (CameraAccessException e) {
             e.printStackTrace();
-          } catch (NullPointerException ex) {
-            ex.printStackTrace();
           }
+
+          return true;
+
         } catch (CameraAccessException e) {
-          throw new RuntimeException("can not access camera.", e);
+        throw new RuntimeException("can not access camera.", e);
+
         }
-        return true;
 
       }
     });
+
+    zoomInButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        // use seekbar onchangelistener to actually change zoom level
+        if (zoomLevel < maxZoom){
+          zoomLevel += 5;
+          zoomBar.setProgress(zoomLevel);
+        }
+      }
+    });
+
+    zoomOutButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        // use seekbar onchangelistener to actually change zoom level
+        if (zoomLevel > 1){
+          zoomLevel -= 5;
+          zoomBar.setProgress(zoomLevel);
+        }
+      }
+    });
+
+
+
+    zoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+      @Override
+      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+        try {
+          activity = CaptureTrainingImageActivity.this;
+          cameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+          cameraCharacteristics = cameraManager.getCameraCharacteristics(mCameraId);
+          // -20 to maxzoom to fix crashes when maxZoom is reached
+          maxZoom = (cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
+
+          zoomBar.setMax(Math.round(maxZoom));
+
+          cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+          cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+
+          zoomLevel = i;
+
+          int minW = (int) (cameraArray.width() / maxZoom);
+          int minH = (int) (cameraArray.height() / maxZoom);
+          int difW = cameraArray.width() - minW;
+          int difH = cameraArray.height() - minH;
+          int cropW = difW / 100 * zoomLevel;
+          int cropH = difH / 100 * zoomLevel;
+          cropW -= cropW & 3;
+          cropH -= cropH & 3;
+          zoomedImage = new Rect(cropW, cropH, cameraArray.width() - cropW, cameraArray.height() - cropH);
+          mPreviewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
+
+          try {
+            mCaptureSession
+                    .setRepeatingRequest(mPreviewRequestBuilder.build(), mCaptureCallback, null);
+
+          } catch (NullPointerException ex) {
+            ex.printStackTrace();
+          }
+
+        } catch (CameraAccessException cae) {
+          Log.i(TAG, "camera access onCreate:" + cae.toString());
+        }
+      }
+
+
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
+
+      }
+
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
+
+      }
+    });
+
+
 
   }
 
@@ -1029,8 +1138,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
         Activity activity = CaptureTrainingImageActivity.this;
         if (null != activity) {
           new AlertDialog.Builder(activity)
-                  .setMessage("This sample demonstrates the basic use of Camera2 API. Check the source code to see how\n" +
-                          "you can display camera preview and take pictures.")
+                  .setMessage(getResources().getString(R.string.capture_training_image_info))
                   .setPositiveButton(android.R.string.ok, null)
                   .show();
         }

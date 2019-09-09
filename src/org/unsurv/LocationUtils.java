@@ -36,7 +36,7 @@ class LocationUtils {
    * @return factor meters per degree difference at given latitude
    */
   private static double longitudeDegreeToMetersRatio(double latitude) {
-    // in m
+    // in cameraArray
     int earthRadius = 6371000;
 
     return Math.PI/180*earthRadius*Math.cos(Math.toRadians(latitude));
@@ -57,7 +57,7 @@ class LocationUtils {
    * @return List of Pair<Double, Double> with coordinate points of all objects
    */
   static List<Pair<Double, Double>> transferLocationsTo2dCoordinates(List<Location> locations) {
-    // Approximates list of Location to 2d coords in relation to first camera. All distances in m.
+    // Approximates list of Location to 2d coords in relation to first camera. All distances in cameraArray.
 
     // X, Y Values
     List<Pair<Double, Double>> coordinates = new ArrayList<>();
