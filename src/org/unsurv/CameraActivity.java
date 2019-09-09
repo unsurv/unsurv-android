@@ -38,6 +38,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Size;
 import android.view.KeyEvent;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 import java.nio.ByteBuffer;
@@ -69,6 +70,8 @@ public abstract class CameraActivity extends AppCompatActivity
   private Runnable postInferenceCallback;
   private Runnable imageConverter;
 
+  View completelayout;
+
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     LOGGER.d("onCreate " + this);
@@ -76,7 +79,7 @@ public abstract class CameraActivity extends AppCompatActivity
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     setContentView(R.layout.activity_detector);
-
+    completelayout = findViewById(R.id.detector_complete_layout);
 
 
     if (hasPermission()) {
@@ -372,6 +375,7 @@ public abstract class CameraActivity extends AppCompatActivity
               },
               this,
               getLayoutId(),
+                  completelayout,
               getDesiredPreviewFrameSize());
 
       camera2Fragment.setCamera(cameraId);

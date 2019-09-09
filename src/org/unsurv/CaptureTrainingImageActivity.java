@@ -506,7 +506,6 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
           zoomBar.setMax(Math.round(maxZoom));
 
           cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
-          cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
 
           int action = motionEvent.getAction();
           float current_finger_spacing;
@@ -525,31 +524,12 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
                 zoomBar.setProgress(zoomLevel);
               }
 
-              Log.i(TAG, "zoom:" + zoomLevel);
-              Log.i(TAG, "maxZoom:" + maxZoom);
-              int minW = (int) (cameraArray.width() / maxZoom);
-              int minH = (int) (cameraArray.height() / maxZoom);
-              int difW = cameraArray.width() - minW;
-              int difH = cameraArray.height() - minH;
-              int cropW = difW / 100 * zoomLevel;
-              int cropH = difH / 100 * zoomLevel;
-              cropW -= cropW & 3;
-              cropH -= cropH & 3;
-              zoomedImage = new Rect(cropW, cropH, cameraArray.width() - cropW, cameraArray.height() - cropH);
-              mPreviewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
             }
             fingerSpacing = current_finger_spacing;
           } else{
             if (action == MotionEvent.ACTION_UP) {
               //single touch logic
             }
-          }
-
-          try {
-            mCaptureSession
-                    .setRepeatingRequest(mPreviewRequestBuilder.build(), mCaptureCallback, null);
-          } catch (CameraAccessException e) {
-            e.printStackTrace();
           }
 
           return true;
@@ -601,7 +581,6 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
 
           zoomBar.setMax(Math.round(maxZoom));
 
-          cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
           cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
 
           zoomLevel = i;
@@ -799,6 +778,22 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
         throw new RuntimeException("Time out waiting to lock camera opening.");
       }
       manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
+
+      try {
+        activity = CaptureTrainingImageActivity.this;
+        cameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+        cameraCharacteristics = cameraManager.getCameraCharacteristics(mCameraId);
+        // -20 to maxzoom to fix crashes when maxZoom is reached
+        maxZoom = (cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM)) * 10 - 20;
+
+        zoomBar.setMax(Math.round(maxZoom));
+
+        cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+      } catch (CameraAccessException cae){
+        Log.i(TAG, "onViewCreated " + cae.toString());
+      }
+
+
     } catch (CameraAccessException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {

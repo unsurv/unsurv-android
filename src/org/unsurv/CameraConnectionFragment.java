@@ -44,6 +44,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -52,6 +53,9 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,6 +73,20 @@ public class CameraConnectionFragment extends Fragment {
   private float fingerSpacing = 0;
   private int zoomLevel = 1;
   private Rect zoomedImage;
+
+  private ImageButton zoomInButton;
+  private ImageButton zoomOutButton;
+  private SeekBar zoomBar;
+
+  View completeLayout;
+
+  float maxZoom;
+
+  CameraManager cameraManager;
+  CameraCharacteristics cameraCharacteristics;
+  Rect cameraArray;
+
+  private static String TAG = "DetectorActivity CameraConnectionFragment";
 
   /**
    * The camera preview size will be chosen to be the smallest frame by pixel size capable of
@@ -237,11 +255,13 @@ public class CameraConnectionFragment extends Fragment {
       final ConnectionCallback connectionCallback,
       final OnImageAvailableListener imageListener,
       final int layout,
-      final Size inputSize) {
+      final Size inputSize,
+      final View completeLayout) {
     this.cameraConnectionCallback = connectionCallback;
     this.imageListener = imageListener;
     this.layout = layout;
     this.inputSize = inputSize;
+    this.completeLayout = completeLayout;
   }
 
   /**
@@ -313,23 +333,33 @@ public class CameraConnectionFragment extends Fragment {
   }
 
   public static CameraConnectionFragment newInstance(
-      final ConnectionCallback callback,
-      final OnImageAvailableListener imageListener,
-      final int layout,
+          final ConnectionCallback callback,
+          final OnImageAvailableListener imageListener,
+          final int layout,
+          final View completelayout,
       final Size inputSize) {
-    return new CameraConnectionFragment(callback, imageListener, layout, inputSize);
+    return new CameraConnectionFragment(callback, imageListener, layout, inputSize, completelayout);
   }
 
   @Override
   public View onCreateView(
       final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-    return inflater.inflate(layout, container, false);
+    View rootView = inflater.inflate(layout, container, false);
+
+
+
+    return rootView;
+
   }
 
   @Override
   public void onViewCreated(final View view, final Bundle savedInstanceState) {
     textureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-  }
+    zoomInButton = completeLayout.findViewById(R.id.detector_capture_zoom_in_button);
+    zoomOutButton = completeLayout.findViewById(R.id.detector_capture_zoom_out_button);
+    zoomBar = completeLayout.findViewById(R.id.detector_capture_zoom_seekbar);
+
+    }
 
   @Override
   public void onActivityCreated(final Bundle savedInstanceState) {
@@ -349,6 +379,19 @@ public class CameraConnectionFragment extends Fragment {
       openCamera(textureView.getWidth(), textureView.getHeight());
     } else {
       textureView.setSurfaceTextureListener(surfaceTextureListener);
+    }
+
+    try {
+      cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
+      cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
+      // -20 to maxzoom to fix crashes when maxZoom is reached
+      maxZoom = (cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM)) * 10 - 20;
+
+      zoomBar.setMax(Math.round(maxZoom));
+
+      cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+    } catch (CameraAccessException cae){
+      Log.i(TAG, "onViewCreated " + cae.toString());
     }
   }
 
@@ -507,14 +550,16 @@ public class CameraConnectionFragment extends Fragment {
       textureView.setOnTouchListener(new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-          // trying zoom
-          CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
-
           try {
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-            float maxZoom = (characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
+            cameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+            cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
+            // -20 to maxzoom to fix crashes when maxZoom is reached
+            maxZoom = (cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
 
-            Rect m = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+            zoomBar.setMax(Math.round(maxZoom));
+
+            cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+
             int action = motionEvent.getAction();
             float current_finger_spacing;
 
@@ -523,20 +568,15 @@ public class CameraConnectionFragment extends Fragment {
               current_finger_spacing = getFingerSpacing(motionEvent);
               if(fingerSpacing != 0){
                 if(current_finger_spacing  > fingerSpacing + 10 && maxZoom > zoomLevel){
+                  // don't zoom if already at max zoom
                   zoomLevel++;
+                  zoomBar.setProgress(zoomLevel);
+
                 } else if (current_finger_spacing < fingerSpacing + 10 && zoomLevel > 1){
                   zoomLevel--;
+                  zoomBar.setProgress(zoomLevel);
                 }
-                int minW = (int) (m.width() / maxZoom);
-                int minH = (int) (m.height() / maxZoom);
-                int difW = m.width() - minW;
-                int difH = m.height() - minH;
-                int cropW = difW / 100 * zoomLevel;
-                int cropH = difH / 100 * zoomLevel;
-                cropW -= cropW & 3;
-                cropH -= cropH & 3;
-                zoomedImage = new Rect(cropW, cropH, m.width() - cropW, m.height() - cropH);
-                previewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
+
               }
               fingerSpacing = current_finger_spacing;
             } else{
@@ -544,23 +584,91 @@ public class CameraConnectionFragment extends Fragment {
                 //single touch logic
               }
             }
+
+            return true;
+
           } catch (CameraAccessException e) {
-            e.printStackTrace();
+            throw new RuntimeException("can not access camera.", e);
+
           }
+        }
+      });
+
+      zoomInButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+          // use seekbar onchangelistener to actually change zoom level
+          if (zoomLevel < maxZoom){
+            zoomLevel += 5;
+            zoomBar.setProgress(zoomLevel);
+          }
+        }
+      });
+
+      zoomOutButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+          // use seekbar onchangelistener to actually change zoom level
+          if (zoomLevel > 1){
+            zoomLevel -= 5;
+            zoomBar.setProgress(zoomLevel);
+          }
+        }
+      });
 
 
 
+      zoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 
           try {
-            captureSession
-                    .setRepeatingRequest(previewRequestBuilder.build(), captureCallback, null);
-          } catch (CameraAccessException e) {
-            e.printStackTrace();
-          } catch (NullPointerException ex) {
-            ex.printStackTrace();
-          }
+            cameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+            cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
+            // -20 to maxzoom to fix crashes when maxZoom is reached
+            maxZoom = (cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM))*10 - 20;
 
-          return true;
+            zoomBar.setMax(Math.round(maxZoom));
+
+            cameraArray = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+
+            zoomLevel = i;
+
+            int minW = (int) (cameraArray.width() / maxZoom);
+            int minH = (int) (cameraArray.height() / maxZoom);
+            int difW = cameraArray.width() - minW;
+            int difH = cameraArray.height() - minH;
+            int cropW = difW / 100 * zoomLevel;
+            int cropH = difH / 100 * zoomLevel;
+            cropW -= cropW & 3;
+            cropH -= cropH & 3;
+            zoomedImage = new Rect(cropW, cropH, cameraArray.width() - cropW, cameraArray.height() - cropH);
+            previewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomedImage);
+
+            try {
+              captureSession
+                      .setRepeatingRequest(previewRequestBuilder.build(), captureCallback, null);
+
+            } catch (NullPointerException ex) {
+              ex.printStackTrace();
+            }
+
+          } catch (CameraAccessException cae) {
+            Log.i(TAG, "camera access onCreate:" + cae.toString());
+          }
+        }
+
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
         }
       });
 
