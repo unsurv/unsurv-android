@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 
 
@@ -64,6 +66,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     Preference synchronizeNow;
     Preference startSynchronizing;
     Preference stopSynchronizing;
+    ListPreference synchronizationInterval;
 
     cameraRepository = new CameraRepository(getActivity().getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
@@ -183,7 +186,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     localBroadcastManager.registerReceiver(synchronizationBroadcastListener, synchronizationIntentFilter);
 
-
+    // TODO rename and rework to rebuild database
     // starts a manual synchronization
     synchronizeNow = findPreference("synchronizeNow");
 
@@ -255,16 +258,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
           JobInfo syncJob = jobScheduler.getPendingJob(0);
 
           if (syncJob == null){
-            SynchronizationUtils.scheduleSyncIntervalJob(getActivity().getApplicationContext(), null);
+            SynchronizationUtils.scheduleSyncIntervalJob(getActivity().getApplicationContext(), null, 0);
+            Toast.makeText(ctx, "Successfully started recurring synchronization.", Toast.LENGTH_SHORT).show();
+
           }
 
         } catch (NullPointerException npe){
-          Log.i(TAG, "npe in stopSynchronizing " + npe.toString());
+          Log.i(TAG, "npe in startSynchronizing " + npe.toString());
         }
 
         return true;
       }
     });
+
 
     stopSynchronizing = findPreference("stopSynchronizing");
 
@@ -280,10 +286,49 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
           if (syncJob != null){
             jobScheduler.cancel(syncJob.getId());
+            Toast.makeText(ctx, "Successfully stopped recurring synchronization.", Toast.LENGTH_SHORT).show();
+
           }
 
         } catch (NullPointerException npe){
           Log.i(TAG, "npe in stopSynchronizing " + npe.toString());
+        }
+
+        return true;
+      }
+    });
+
+
+    synchronizationInterval = findPreference("synchronizationInterval");
+    synchronizationInterval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, final Object newValue) {
+
+        JobScheduler jobScheduler = getActivity().getApplicationContext().getSystemService(JobScheduler.class);
+
+        JobInfo syncJob = jobScheduler.getPendingJob(0);
+
+        if (syncJob != null){
+          jobScheduler.cancel(syncJob.getId());
+          SynchronizationUtils.scheduleSyncIntervalJob(getActivity().getApplicationContext(), null, Long.parseLong((String) newValue));
+
+          Toast.makeText(ctx, "Successfully restarted recurring synchronization with new interval.", Toast.LENGTH_LONG).show();
+
+        } else {
+
+          new AlertDialog.Builder(ctx)
+                  .setTitle("No synchronization job found")
+                  .setMessage("Do you want to start a recurring synchronization job with the chosen interval now?")
+                  .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                      SynchronizationUtils.scheduleSyncIntervalJob(getActivity().getApplicationContext(), null, Long.parseLong((String) newValue));
+                      Toast.makeText(ctx, "Successfully started recurring synchronization with new interval.", Toast.LENGTH_LONG).show();
+                    }
+                  })
+                  .setNegativeButton("No", null)
+                  .show();
+
         }
 
         return true;

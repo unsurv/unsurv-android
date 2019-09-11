@@ -394,7 +394,7 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null);
+        SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null, 0);
 
         // JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 

@@ -63,17 +63,21 @@ class SynchronizationUtils {
    * @param jobExtras not used for now
    * @return whether job has been queued successfully
    */
-  static Boolean scheduleSyncIntervalJob (Context context, @Nullable PersistableBundle jobExtras) {
+  static Boolean scheduleSyncIntervalJob (Context context, @Nullable PersistableBundle jobExtras, long syncInterval) {
 
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-    long syncIntervalInMillis = Long.parseLong(sharedPreferences.getString("synchronizationInterval", "0"));
+    long syncIntervalInMillis;
 
-    if (syncIntervalInMillis == 0) {
-      return false; // TODO don't relist job after completion? check documentation again
+    // if no specific interval given use default one in SharedPreferences
+    if (syncInterval == 0) {
+      syncIntervalInMillis = Long.parseLong(sharedPreferences.getString("synchronizationInterval", "0"));
+    } else {
+      syncIntervalInMillis = syncInterval;
     }
 
-    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+
+    SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
 
     PersistableBundle syncJobExtras = new PersistableBundle();
@@ -86,6 +90,8 @@ class SynchronizationUtils {
     syncJobExtras.putString("start", sharedPreferences.getString("lastUpdated", null));
     // download images or not
     syncJobExtras.putBoolean("downloadImages", sharedPreferences.getBoolean("downloadImages", false));
+    // sync interval
+    syncJobExtras.putLong("syncIntervalInMillis", syncIntervalInMillis);
 
     ComponentName componentName = new ComponentName(context, SyncIntervalSchedulerJobService.class);
 
@@ -94,7 +100,7 @@ class SynchronizationUtils {
     jobBuilder.setExtras(syncJobExtras);
 
     // interval min is 15 mins in Android
-    jobBuilder.setPeriodic(30*1000, 5*1000);
+    jobBuilder.setPeriodic(syncIntervalInMillis, 1000*60*60*3); // 3 h flex
 
     //jobBuilder.setOverrideDeadline(15*1000); // force after 15 s for debug
 
@@ -224,6 +230,12 @@ class SynchronizationUtils {
           intent.setAction("org.unsurv.SYNCHRONIZATION_SUCCESSFUL");
           LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
           localBroadcastManager.sendBroadcast(intent);
+
+          long currentTime = System.currentTimeMillis();
+          SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+          sharedPreferences.edit().putString("lastUpdated", timestampIso8601.format(new Date(currentTime))).apply();
+
         }
 
 
