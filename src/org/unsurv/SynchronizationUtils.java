@@ -98,7 +98,7 @@ class SynchronizationUtils {
 
     //jobBuilder.setOverrideDeadline(15*1000); // force after 15 s for debug
 
-    //jobBuilder.setPersisted(true);
+    jobBuilder.setPersisted(true);
 
     JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
 

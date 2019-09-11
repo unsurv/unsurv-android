@@ -73,9 +73,18 @@
         <Preference
             android:key="databaseSize"
             android:title="" />
+
         <Preference
             android:key="synchronizeNow"
             android:title="Synchronize database now" />
+
+        <Preference
+            android:key="startSynchronizing"
+            android:title="Start recurring synchronization" />
+
+        <Preference
+            android:key="stopSynchronizing"
+            android:title="Stop recurring synchronization" />
 
 
         <ListPreference

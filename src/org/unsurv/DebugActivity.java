@@ -230,7 +230,7 @@ public class DebugActivity extends AppCompatActivity {
     final Button debugDbSync = findViewById(R.id.sync_db);
     final Button debugDbCheck = findViewById(R.id.check_db);
     final Button debugDbDelete = findViewById(R.id.delete_db);
-    final Button debugAlarm = findViewById(R.id.alarm_test);
+    final Button debugSyncJob = findViewById(R.id.syncjob_test);
     final Button debugTutorial = findViewById(R.id.start_tutorial);
     final Button debugCheckJobs = findViewById(R.id.check_jobs);
     final Button debugShowPrefs = findViewById(R.id.show_preferences);
@@ -285,7 +285,6 @@ public class DebugActivity extends AppCompatActivity {
     progress = new ProgressBar(DebugActivity.this);
 
     layoutInflater = (LayoutInflater) DebugActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
 
 
     notificationPreference = sharedPreferences.getBoolean("notifications", false);
@@ -391,7 +390,7 @@ public class DebugActivity extends AppCompatActivity {
       }
     });
 
-    debugAlarm.setOnClickListener(new View.OnClickListener() {
+    debugSyncJob.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
 

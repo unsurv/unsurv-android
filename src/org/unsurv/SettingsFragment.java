@@ -1,6 +1,8 @@
 package org.unsurv;
 
 import android.app.AlertDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +16,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -25,7 +28,9 @@ import java.util.List;
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-  Context ctx;
+  private static String TAG = "SettingsFragment";
+
+  private Context ctx;
 
   private Preference clearSynchronizedImages;
   private Preference clearCapturedImages;
@@ -57,6 +62,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     Preference showLicences;
     Preference synchronizeNow;
+    Preference startSynchronizing;
+    Preference stopSynchronizing;
 
     cameraRepository = new CameraRepository(getActivity().getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
@@ -234,6 +241,55 @@ public class SettingsFragment extends PreferenceFragmentCompat {
       });
     }
 
+
+    startSynchronizing = findPreference("startSynchronizing");
+
+    startSynchronizing.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+
+        try {
+
+          JobScheduler jobScheduler = getActivity().getApplicationContext().getSystemService(JobScheduler.class);
+
+          JobInfo syncJob = jobScheduler.getPendingJob(0);
+
+          if (syncJob == null){
+            SynchronizationUtils.scheduleSyncIntervalJob(getActivity().getApplicationContext(), null);
+          }
+
+        } catch (NullPointerException npe){
+          Log.i(TAG, "npe in stopSynchronizing " + npe.toString());
+        }
+
+        return true;
+      }
+    });
+
+    stopSynchronizing = findPreference("stopSynchronizing");
+
+    stopSynchronizing.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+
+        try {
+
+          JobScheduler jobScheduler = getActivity().getApplicationContext().getSystemService(JobScheduler.class);
+
+          JobInfo syncJob = jobScheduler.getPendingJob(0);
+
+          if (syncJob != null){
+            jobScheduler.cancel(syncJob.getId());
+          }
+
+        } catch (NullPointerException npe){
+          Log.i(TAG, "npe in stopSynchronizing " + npe.toString());
+        }
+
+        return true;
+      }
+    });
+
   }
 
   @Override
@@ -266,7 +322,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     break;
 
 
-                  case(DELETE_SURVEILLANCE_CAMERAS):
+                  case (DELETE_SURVEILLANCE_CAMERAS):
 
                     for (SurveillanceCamera camera : surveillanceCameras){
                       // camera is a "normal" capture
@@ -284,7 +340,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     break;
 
 
-                  case(DELETE_TRAINING_CAMERAS):
+                  case (DELETE_TRAINING_CAMERAS):
 
                     for (SurveillanceCamera camera : surveillanceCameras){
                       // camera is a training capture
