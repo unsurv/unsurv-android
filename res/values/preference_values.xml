@@ -2,20 +2,24 @@
 <resources>
     <string-array name="synchronization_choices">
         <item>1 day</item>
-        <item>7 days</item>
-        <item>14 days</item>
-        <item>28 days</item>
+        <item>2 days</item>
+        <item>3 days</item>
+        <item>1 week</item>
+        <item>2 weeks</item>
+        <item>4 weeks</item>
     </string-array>
 
     <string-array name="synchronization_values">
         <item>86400000</item>
+        <item>172800000</item>
+        <item>259200000</item>
         <item>604800000</item>
         <item>1209600000</item>
         <item>2419200000</item>
     </string-array>
 
     <string name="default_synchronization_value">
-        604800000
+        259200000
     </string>
 
     <string-array name="max_marker_choices">
