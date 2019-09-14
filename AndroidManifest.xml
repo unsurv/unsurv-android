@@ -31,11 +31,13 @@
         android:label="@string/app_label"
         android:theme="@style/EditedMaterialNoActionBar"
 
-        android:debuggable="true"
         android:allowBackup="false"
-        android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config">
-        <!-- CLEARTEXT JUST HERE FOR DEBUGGING REMOVE LATER!!!!-->
+        <!-- CLEARTEXT JUST HERE FOR DEBUGGING REMOVE LATER!!!!
+
+        android:debuggable="true"
+        android:usesCleartextTraffic="true"
+        -->
 
 
 
