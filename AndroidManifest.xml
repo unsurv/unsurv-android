@@ -46,6 +46,16 @@
             android:label="@string/app_label"
             android:screenOrientation="portrait">
 
+        </activity>
+
+        <activity
+            android:name=".HistoryActivity"
+            android:label="@string/history_label" />
+
+        <activity
+            android:name=".DetectorActivity"
+            android:label="@string/app_label">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,46 +66,27 @@
         </activity>
 
         <activity
-            android:name=".HistoryActivity"
-            android:label="@string/history_label"
-            android:parentActivityName=".DebugActivity" />
-
-        <activity
-            android:name=".DetectorActivity"
-            android:label="@string/app_label"
-            android:parentActivityName=".DebugActivity">
-
-        </activity>
-
-        <activity
             android:name=".MapActivity"
-            android:label="@string/map_label"
-            android:parentActivityName=".DebugActivity" />
+            android:label="@string/map_label" />
 
         <activity
             android:name=".StatisticsActivity"
-            android:label="@string/statistics_label"
-            android:parentActivityName=".DebugActivity" />
+            android:label="@string/statistics_label" />
+
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings_label"
-            android:parentActivityName=".DebugActivity" />
+            android:label="@string/settings_label" />
 
         <activity android:name=".TutorialActivity" />
 
         <activity
             android:name=".ManualCaptureActivity"
-            android:label="@string/manual_capture_label"
-            android:parentActivityName=".DetectorActivity" >
-
-
+            android:label="@string/manual_capture_label">
         </activity>
 
         <activity
             android:name=".CaptureTrainingImageActivity"
-            android:label="@string/training_capture_label"
-            android:parentActivityName=".DetectorActivity">
-
+            android:label="@string/training_capture_label">
         </activity>
 
         <activity

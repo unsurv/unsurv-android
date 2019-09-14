@@ -256,7 +256,7 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("notifications", false).apply();
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
-    sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*15)).apply(); // using strings because arrays in preferences can only take strings
+    sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*60*24)).apply(); // 24 h,  using strings because arrays in preferences can only take strings
     sharedPreferences.edit().putString("synchronizationUrl", "https://api.unsurv.org/").apply();
     // sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.178.137:5000/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
@@ -271,9 +271,11 @@ public class DebugActivity extends AppCompatActivity {
     sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
     sharedPreferences.edit().putBoolean("downloadImages", true).apply();
     sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", false).apply();
+    sharedPreferences.edit().putBoolean("alwaysEnableTrainingCapture", false).apply();
     sharedPreferences.edit().putInt("bottomNavigationHistoryBadgeCount", 0).apply();
     sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 0).apply();
 
+    sharedPreferences.edit().putBoolean("tutorialCompleted", false).apply();
 
     sharedPreferences.edit().putString("minUploadDelay", "21600000").apply(); // using strings because arrays in preferences can only take strings
     sharedPreferences.edit().putString("maxUploadDelay", "259200000").apply(); // using strings because arrays in preferences can only take strings

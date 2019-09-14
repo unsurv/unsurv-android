@@ -120,6 +120,10 @@
             android:key="alwaysEnableManualCapture"
             android:title="Always use manual capture" />
 
+        <SwitchPreference
+            android:key="alwaysEnableTrainingCapture"
+            android:title="Always use training capture" />
+
 
     </PreferenceCategory>
 

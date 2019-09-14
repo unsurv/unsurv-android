@@ -91,6 +91,9 @@ import static android.content.ContentValues.TAG;
  */
 public class DetectorActivity extends CameraActivity implements OnImageAvailableListener, SensorEventListener  {
 
+
+  private static boolean startDebugMode = false;
+
   private static final Logger LOGGER = new Logger();
   // Configuration values for the prepackaged multibox model.
   private static final int MB_INPUT_SIZE = 224;
@@ -231,6 +234,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(null);
 
+
+    if (startDebugMode) {
+      Intent debugIntent = new Intent(DetectorActivity.this, DebugActivity.class);
+      startActivity(debugIntent);
+    }
+
     context = this;
 
     locationListener = new MyLocationListener();
@@ -238,10 +247,24 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+    // if tutorial not completed start tutorial activity
+    if (!sharedPreferences.getBoolean("tutorialCompleted", false)) {
+      Intent tutorialIntent = new Intent(DetectorActivity.this, TutorialActivity.class);
+      startActivity(tutorialIntent);
+    }
+
+
     if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
       Intent manualCaptureIntent = new Intent(DetectorActivity.this, ManualCaptureActivity.class);
       startActivity(manualCaptureIntent);
     }
+
+    if (sharedPreferences.getBoolean("alwaysEnableTrainingCapture", false)) {
+      Intent trainingCaptureIntent = new Intent(DetectorActivity.this, CaptureTrainingImageActivity.class);
+      startActivity(trainingCaptureIntent);
+    }
+
+
 
     manualCameraCapture = findViewById(R.id.manual_capture_button);
     trainingCameraCapture = findViewById(R.id.training_capture_button);

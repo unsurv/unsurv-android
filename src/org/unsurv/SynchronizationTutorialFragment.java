@@ -1,5 +1,6 @@
 package org.unsurv;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -283,6 +284,11 @@ public class SynchronizationTutorialFragment extends Fragment {
       @Override
       public void onClick(View view) {
         saveToSharedPreferences();
+        sharedPreferences.edit().putBoolean("tutorialCompleted", true).apply();
+
+        Intent tutorialFinishedIntent = new Intent(getActivity(), DetectorActivity.class);
+        startActivity(tutorialFinishedIntent);
+
       }
     });
 
