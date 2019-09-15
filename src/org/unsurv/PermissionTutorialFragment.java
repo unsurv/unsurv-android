@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +18,9 @@ import java.util.List;
 
 
 public class PermissionTutorialFragment extends Fragment {
+
+  private static int maxSwipeHints = 2;
+  private int swipeHintsShown = 0;
 
   public PermissionTutorialFragment(){
 
@@ -91,5 +95,16 @@ public class PermissionTutorialFragment extends Fragment {
     });
 
     return rootView;
+  }
+
+  @Override
+  public void onStart() {
+
+    if (swipeHintsShown < maxSwipeHints) {
+      Toast.makeText(getContext(), "Swipe to switch between tutorial steps.", Toast.LENGTH_LONG).show();
+      swipeHintsShown++;
+    }
+
+    super.onStart();
   }
 }
