@@ -234,6 +234,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(null);
 
+    startDebugMode = true;
 
     if (startDebugMode) {
       Intent debugIntent = new Intent(DetectorActivity.this, DebugActivity.class);

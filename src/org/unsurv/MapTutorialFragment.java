@@ -66,10 +66,25 @@ public class MapTutorialFragment extends Fragment {
 
     final IMapController mapController = tutorialMapView.getController();
 
-    // Setting starting position and zoom level.
-    GeoPoint startPoint = new GeoPoint(50.0027, 8.2771);
-    mapController.setZoom(10.0);
-    mapController.setCenter(startPoint);
+
+    String savedLat = sharedPreferences.getString("homezoneCenterLat", null);
+    String savedLon = sharedPreferences.getString("homezoneCenterLon", null);
+    String savedZoom = sharedPreferences.getString("homezoneZoom", null);
+
+    // if previously set here use last homezone
+    if (savedLat != null){
+
+      GeoPoint startPoint = new GeoPoint(Double.parseDouble(savedLat), Double.parseDouble(savedLon));
+      mapController.setZoom(Double.parseDouble(savedZoom));
+      mapController.setCenter(startPoint);
+
+    } else {
+
+      GeoPoint startPoint = new GeoPoint(51.481, 10.800);
+      mapController.setZoom(5.5);
+      mapController.setCenter(startPoint);
+
+    }
 
 
     tutorialMapView.setOnTouchListener(new View.OnTouchListener() {
@@ -114,11 +129,19 @@ public class MapTutorialFragment extends Fragment {
                 + "," + westBorder.substring(0, westBorder.length() - 10)
                 + "," + eastBorder.substring(0, eastBorder.length() - 10);
 
-        // areaString = southBorder + "," + northBorder + "," + westBorder + "," + eastBorder;
 
 
         mapTutorialTextView.setText(areaString);
         sharedPreferences.edit().putString("area", areaString).apply(); // W N E S
+
+        double centerLat = (mapBorders.getLatNorth() + mapBorders.getLatSouth()) / 2;
+        double centerLon = (mapBorders.getLonEast() + mapBorders.getLonWest()) / 2;
+
+        double homezoneZoom = tutorialMapView.getZoomLevelDouble();
+
+        sharedPreferences.edit().putString("homezoneCenterLat", String.valueOf(centerLat)).apply();
+        sharedPreferences.edit().putString("homezoneCenterLon", String.valueOf(centerLon)).apply();
+        sharedPreferences.edit().putString("homezoneZoom", String.valueOf(homezoneZoom)).apply();
 
         mapScrollingEnabled = false;
         tutorialViewPager.setFragmentScrollingEnabled(true);

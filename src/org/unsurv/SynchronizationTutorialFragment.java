@@ -289,6 +289,7 @@ public class SynchronizationTutorialFragment extends Fragment {
         Intent tutorialFinishedIntent = new Intent(getActivity(), DetectorActivity.class);
         startActivity(tutorialFinishedIntent);
 
+
       }
     });
 

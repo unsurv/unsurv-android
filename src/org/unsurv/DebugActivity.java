@@ -180,6 +180,37 @@ public class DebugActivity extends AppCompatActivity {
   protected void onResume() {
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+    // sharedPreferences.edit().clear().apply();
+
+    sharedPreferences.edit().putBoolean("notifications", false).apply();
+
+    sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
+    sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*60*24)).apply(); // 24 h,  using strings because arrays in preferences can only take strings
+    sharedPreferences.edit().putString("synchronizationUrl", "https://api.unsurv.org/").apply();
+    // sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.178.137:5000/").apply();
+    sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
+    sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
+    sharedPreferences.edit().putBoolean("offlineMode", false).apply();
+    sharedPreferences.edit().putBoolean("allowServerQueries", false).apply();
+    sharedPreferences.edit().putBoolean("clusteringEnabled", false).apply();
+    sharedPreferences.edit().putString("apiKey", "abc").apply();
+    sharedPreferences.edit().putString("apiKeyExpiration", "2018-01-01 00:00:00").apply();
+    sharedPreferences.edit().putBoolean("showCaptureTimestamps", false).apply();
+    sharedPreferences.edit().putBoolean("deleteOnUpload", false).apply();
+    sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
+    sharedPreferences.edit().putBoolean("downloadImages", true).apply();
+    sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", false).apply();
+    sharedPreferences.edit().putBoolean("alwaysEnableTrainingCapture", false).apply();
+    sharedPreferences.edit().putInt("bottomNavigationHistoryBadgeCount", 0).apply();
+    sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 0).apply();
+
+    // sharedPreferences.edit().putBoolean("tutorialCompleted", false).apply();
+
+    // sharedPreferences.edit().putString("minUploadDelay", "21600000").apply(); // using strings because arrays in preferences can only take strings
+    // sharedPreferences.edit().putString("maxUploadDelay", "259200000").apply(); // using strings because arrays in preferences can only take strings
+
 
 
     super.onResume();
@@ -247,38 +278,7 @@ public class DebugActivity extends AppCompatActivity {
     randomCamerasAdded = 0;
     imagesDownloaded = 0;
 
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-    sharedPreferences.edit().clear().apply();
-
-
-    // TODO pix putlong put int put string for intervals
-    sharedPreferences.edit().putBoolean("notifications", false).apply();
-
-    sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
-    sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*60*24)).apply(); // 24 h,  using strings because arrays in preferences can only take strings
-    sharedPreferences.edit().putString("synchronizationUrl", "https://api.unsurv.org/").apply();
-    // sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.178.137:5000/").apply();
-    sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
-    sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
-    sharedPreferences.edit().putBoolean("offlineMode", false).apply();
-    sharedPreferences.edit().putBoolean("allowServerQueries", false).apply();
-    sharedPreferences.edit().putBoolean("clusteringEnabled", false).apply();
-    sharedPreferences.edit().putString("apiKey", "abc").apply();
-    sharedPreferences.edit().putString("apiKeyExpiration", "2018-01-01 00:00:00").apply();
-    sharedPreferences.edit().putBoolean("showCaptureTimestamps", false).apply();
-    sharedPreferences.edit().putBoolean("deleteOnUpload", false).apply();
-    sharedPreferences.edit().putBoolean("quickDeleteCameras", false).apply();
-    sharedPreferences.edit().putBoolean("downloadImages", true).apply();
-    sharedPreferences.edit().putBoolean("alwaysEnableManualCapture", false).apply();
-    sharedPreferences.edit().putBoolean("alwaysEnableTrainingCapture", false).apply();
-    sharedPreferences.edit().putInt("bottomNavigationHistoryBadgeCount", 0).apply();
-    sharedPreferences.edit().putInt("bottomNavigationMapBadgeCount", 0).apply();
-
-    sharedPreferences.edit().putBoolean("tutorialCompleted", false).apply();
-
-    sharedPreferences.edit().putString("minUploadDelay", "21600000").apply(); // using strings because arrays in preferences can only take strings
-    sharedPreferences.edit().putString("maxUploadDelay", "259200000").apply(); // using strings because arrays in preferences can only take strings
 
     // SynchronizationUtils.getAPIkey(DebugActivity.this, sharedPreferences);
     // set in timemachineSpinner
@@ -288,8 +288,6 @@ public class DebugActivity extends AppCompatActivity {
 
     layoutInflater = (LayoutInflater) DebugActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-
-    notificationPreference = sharedPreferences.getBoolean("notifications", false);
     debugTextView.setText(String.valueOf(notificationPreference));
 
     wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -438,13 +436,14 @@ public class DebugActivity extends AppCompatActivity {
                 sharedPreferences.getString("synchronizationInterval", String.valueOf(15*60*1000)) + "\n" +
                 sharedPreferences.getString("synchronizationUrl", "http://192.168.2.159:5000/cameras/?") + "\n" +
                 sharedPreferences.getString("area", "49.6391,50.3638,7.8648,8.6888") + "\n" +
-                sharedPreferences.getBoolean("buttonCapture", false) + "\n" +
-                sharedPreferences.getString("timemachineValueInDays", "0") + "\n" +
-                sharedPreferences.getString("apiKey", "ApiKeyFailed") + "\n" +
-                sharedPreferences.getString("apiKeyExpiration", "ApiKeyFailed"));
+                sharedPreferences.getBoolean("tutorialCompleted", false) + "\n" +
+                sharedPreferences.getString("homezoneCenterLat", null) + "\n" +
+                sharedPreferences.getString("homezoneCenterLon", null) + "\n" +
+                sharedPreferences.getString("homezoneZoom", null));
 
       }
     });
+
 
     addCam.setOnClickListener(new View.OnClickListener() {
       @Override
