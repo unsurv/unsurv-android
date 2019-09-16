@@ -100,7 +100,8 @@ class SynchronizationUtils {
     jobBuilder.setExtras(syncJobExtras);
 
     // interval min is 15 mins in Android
-    jobBuilder.setPeriodic(syncIntervalInMillis, 1000*60*60*3); // 3 h flex
+    // jobBuilder.setPeriodic(syncIntervalInMillis, 1000*60*60*3); // 3 h flex
+    jobBuilder.setPeriodic(15000, 1000*10);
 
     //jobBuilder.setOverrideDeadline(15*1000); // force after 15 s for debug
 
@@ -454,7 +455,7 @@ class SynchronizationUtils {
    * @param cameraRepository db access via ViewModel
    * @param useRepository boolean specifying which db access should be used
    */
-  static void uploadSurveillanceCamera(final List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, @Nullable final CameraViewModel cameraViewModel, @Nullable final CameraRepository cameraRepository, final boolean useRepository) {
+  static void uploadSurveillanceCameras(final List<SurveillanceCamera> camerasToUpload, final String baseUrl, final SharedPreferences sharedPreferences, @Nullable final CameraViewModel cameraViewModel, @Nullable final CameraRepository cameraRepository, final boolean useRepository) {
 
     JSONArray postArray = new JSONArray();
 

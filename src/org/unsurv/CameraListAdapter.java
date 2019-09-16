@@ -226,7 +226,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
               br = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                  SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), baseUrl, sharedPreferences, cameraViewModel, null, false);
+                  SynchronizationUtils.uploadSurveillanceCameras(Collections.singletonList(current), baseUrl, sharedPreferences, cameraViewModel, null, false);
 
                   localBroadcastManager.unregisterReceiver(br);
                 }
@@ -237,7 +237,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
               localBroadcastManager.registerReceiver(br, intentFilter);
             } else {
               // API key is not expired, just upload
-              SynchronizationUtils.uploadSurveillanceCamera(Collections.singletonList(current), baseUrl, sharedPreferences, cameraViewModel, null, false);
+              SynchronizationUtils.uploadSurveillanceCameras(Collections.singletonList(current), baseUrl, sharedPreferences, cameraViewModel, null, false);
 
             }
 
@@ -304,6 +304,10 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
   void setCameras(List<SurveillanceCamera> cameras){
     mSurveillanceCameras = cameras;
     notifyDataSetChanged();
+  }
+
+  void redrawStatus() {
+
   }
 
   @Override

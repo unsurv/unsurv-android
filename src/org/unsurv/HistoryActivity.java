@@ -42,6 +42,8 @@ public class HistoryActivity extends AppCompatActivity {
   private Context context;
 
 
+  // TODO add refresh button
+  // TODO fix upload state when syncjob is complete
 
   @Override
   protected void onResume() {
@@ -73,6 +75,10 @@ public class HistoryActivity extends AppCompatActivity {
     // clear badges for HistoryActivity when accessed
     BottomNavigationBadgeHelper.clearMenuItemBadge(bottomNavigationView, R.id.bottom_navigation_history, context);
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
+    recyclerView.setAdapter(null);
+    recyclerView.setAdapter(adapter);
+
 
     super.onResume();
   }

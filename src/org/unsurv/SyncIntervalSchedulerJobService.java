@@ -9,6 +9,8 @@ import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import androidx.lifecycle.ViewModelProviders;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,6 +32,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
   private boolean downloadImages;
   private SynchronizedCameraRepository synchronizedCameraRepository;
   CameraRepository cameraRepository;
+  CameraViewModel cameraViewModel;
   private SharedPreferences sharedPreferences;
   static String TAG = "SyncIntervalSchedulerJobService";
   SimpleDateFormat timestampIso8601SecondsAccuracy;
@@ -104,7 +107,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
     List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
 
-    SynchronizationUtils.uploadSurveillanceCamera(camerasToUpload, baseUrl, sharedPreferences, null, cameraRepository, true);
+    SynchronizationUtils.uploadSurveillanceCameras(camerasToUpload, baseUrl, sharedPreferences, null, cameraRepository, true);
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -177,6 +180,10 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
 
       }
+
+      List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
+
+      SynchronizationUtils.uploadSurveillanceCameras(camerasToUpload, baseUrl, sharedPreferences, null, cameraRepository, true);
 
       SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
       timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
