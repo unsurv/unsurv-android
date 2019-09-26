@@ -1,5 +1,6 @@
 package org.unsurv;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -52,6 +53,8 @@ public class SynchronizationTutorialFragment extends Fragment {
   private Spinner minDelaySpinner;
   private Spinner maxDelaySpinner;
 
+  private Context context;
+
 
   public SynchronizationTutorialFragment() {
 
@@ -62,6 +65,8 @@ public class SynchronizationTutorialFragment extends Fragment {
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
     final View rootView = inflater.inflate(R.layout.tutorial_synchronization, container,false);
+
+    context = getContext();
 
     tutorialViewPager = getActivity().findViewById(R.id.tutorial_viewpager);
 
@@ -81,6 +86,7 @@ public class SynchronizationTutorialFragment extends Fragment {
     minDelaySpinner = rootView.findViewById(R.id.sync_tutorial_min_delay_spinner);
     maxDelaySpinner = rootView.findViewById(R.id.sync_tutorial_max_delay_spinner);
 
+    sharedPreferences.edit().putBoolean("offlineMode", false).apply();
 
     offlineModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override

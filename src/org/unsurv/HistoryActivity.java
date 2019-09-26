@@ -76,6 +76,7 @@ public class HistoryActivity extends AppCompatActivity {
     BottomNavigationBadgeHelper.clearMenuItemBadge(bottomNavigationView, R.id.bottom_navigation_history, context);
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
+    // redraw / refresh recyclerview items by resetting adapter
     recyclerView.setAdapter(null);
     recyclerView.setAdapter(adapter);
 

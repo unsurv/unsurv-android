@@ -48,6 +48,10 @@ public class MapTutorialFragment extends Fragment {
 
     homeZoneIsSet = sharedPreferences.getString("area", null) != null;
 
+    if (homeZoneIsSet) {
+      mapScrollingEnabled = false;
+    }
+
     final TextView mapTutorialTextView = rootView.findViewById(R.id.map_tutorial_textview);
 
     mapTutorialTextView.setText(getResources().getString(R.string.tutorial_map_message));

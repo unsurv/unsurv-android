@@ -67,6 +67,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     Preference startSynchronizing;
     Preference stopSynchronizing;
     ListPreference synchronizationInterval;
+    Preference restartTutorial;
 
     cameraRepository = new CameraRepository(getActivity().getApplication());
     synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
@@ -334,6 +335,23 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         return true;
       }
     });
+
+
+    restartTutorial = findPreference("restartTutorial");
+
+    restartTutorial.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+
+
+        Intent tutorialIntent = new Intent(ctx, TutorialActivity.class);
+        startActivity(tutorialIntent);
+
+
+        return true;
+      }
+    });
+
 
   }
 

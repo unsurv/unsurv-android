@@ -43,6 +43,10 @@
             android:title="Delete cameras without popup" />
 
         <Preference
+            android:key="restartTutorial"
+            android:title="Restart tutorial" />
+
+        <Preference
             android:key="showLicences"
             android:title="Licences" />
 
