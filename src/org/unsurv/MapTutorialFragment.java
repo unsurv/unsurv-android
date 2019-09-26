@@ -25,6 +25,9 @@ package org.unsurv;
  * The user is shown a big map and chooses a homezone for which data will then be downloaded and
  * synchronized.
  */
+
+// TODO set max size for homezone
+
 public class MapTutorialFragment extends Fragment {
 
   private SharedPreferences sharedPreferences;

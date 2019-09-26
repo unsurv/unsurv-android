@@ -36,6 +36,7 @@ public class SynchronizationTutorialFragment extends Fragment {
   private LinearLayout intervalChoiceLayout;
   private LinearLayout minDelayChoiceLayout;
   private LinearLayout maxDelayChoiceLayout;
+  private LinearLayout userServerChoiceLayout;
   private long intervalSpinnerFactor;
   private long minDelaySpinnerFactor;
   private long maxDelaySpinnerFactor;
@@ -45,12 +46,14 @@ public class SynchronizationTutorialFragment extends Fragment {
   private String minDelay;
   private String maxDelay;
   private String interval;
+  private String serverUrl;
 
   private TutorialViewPager tutorialViewPager;
 
   private EditText userIntervalChoice;
   private EditText userMinDelayChoice;
   private EditText userMaxDelayChoice;
+  private EditText userServerUrlChoice;
 
   private Spinner userDurationChoiceSpinner;
   private Spinner minDelaySpinner;
@@ -85,9 +88,12 @@ public class SynchronizationTutorialFragment extends Fragment {
 
     offlineModeSwitch = rootView.findViewById(R.id.sync_tutorial_offline_switch);
 
+    userServerUrlChoice = rootView.findViewById(R.id.sync_tutorial_user_server_url);
+
     intervalChoiceLayout = rootView.findViewById(R.id.sync_tutorial_interval_view);
     minDelayChoiceLayout = rootView.findViewById(R.id.sync_tutorial_min_delay_view);
     maxDelayChoiceLayout = rootView.findViewById(R.id.sync_tutorial_max_delay_view);
+    userServerChoiceLayout = rootView.findViewById(R.id.sync_tutorial_server_view);
 
     userIntervalChoice = rootView.findViewById(R.id.sync_tutorial_user_interval);
     userMinDelayChoice = rootView.findViewById(R.id.sync_tutorial_user_min_delay);
@@ -109,13 +115,17 @@ public class SynchronizationTutorialFragment extends Fragment {
           intervalChoiceLayout.setAlpha(0.5f);
           minDelayChoiceLayout.setAlpha(0.5f);
           maxDelayChoiceLayout.setAlpha(0.5f);
+          userServerChoiceLayout.setAlpha(0.5f);
 
           userIntervalChoice.setFocusable(false);
           userMinDelayChoice.setFocusable(false);
           userMaxDelayChoice.setFocusable(false);
+          userServerUrlChoice.setFocusable(false);
+
           userIntervalChoice.setCursorVisible(false);
           userMinDelayChoice.setCursorVisible(false);
           userMaxDelayChoice.setCursorVisible(false);
+          userServerUrlChoice.setCursorVisible(false);
 
           userDurationChoiceSpinner.setEnabled(false);
           minDelaySpinner.setEnabled(false);
@@ -128,13 +138,16 @@ public class SynchronizationTutorialFragment extends Fragment {
           intervalChoiceLayout.setAlpha(1);
           minDelayChoiceLayout.setAlpha(1);
           maxDelayChoiceLayout.setAlpha(1);
+          userServerChoiceLayout.setAlpha(1);
 
           userIntervalChoice.setFocusableInTouchMode(true);
           userMinDelayChoice.setFocusableInTouchMode(true);
           userMaxDelayChoice.setFocusableInTouchMode(true);
+          userServerUrlChoice.setFocusable(true);
           userIntervalChoice.setCursorVisible(true);
           userMinDelayChoice.setCursorVisible(true);
           userMaxDelayChoice.setCursorVisible(true);
+          userServerUrlChoice.setCursorVisible(true);
 
           userDurationChoiceSpinner.setEnabled(true);
           minDelaySpinner.setEnabled(true);
@@ -300,8 +313,11 @@ public class SynchronizationTutorialFragment extends Fragment {
     saveSynchronizationSettings.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        saveToSharedPreferences();
+        saveEntriesToSharedPreferences();
         sharedPreferences.edit().putBoolean("tutorialCompleted", true).apply();
+
+        // disables clustering until a bug in library has been fixed
+        sharedPreferences.edit().putBoolean("clusteringEnabled", false).apply();
 
         // check for offline mode and assume it's on
         if (!sharedPreferences.getBoolean("offlineMode", true)) {
@@ -314,7 +330,7 @@ public class SynchronizationTutorialFragment extends Fragment {
             br = new BroadcastReceiver() {
               @Override
               public void onReceive(Context context, Intent intent) {
-                String baseURL = sharedPreferences.getString("synchronizationUrl", null);
+                String baseURL = userServerUrlChoice.getText().toString();
                 String homeArea = sharedPreferences.getString("area", null);
 
 
@@ -365,7 +381,7 @@ public class SynchronizationTutorialFragment extends Fragment {
 
   }
 
-  private void saveToSharedPreferences(){
+  private void saveEntriesToSharedPreferences(){
 
     sharedPreferences.edit().putBoolean("offlineMode", offlineModeSwitch.isChecked()).apply();
 
@@ -380,5 +396,8 @@ public class SynchronizationTutorialFragment extends Fragment {
     maxDelayUserEntry = Integer.valueOf(userMaxDelayChoice.getText().toString());
     maxDelay = String.valueOf(maxDelayUserEntry * maxDelaySpinnerFactor);
     sharedPreferences.edit().putString("maxUploadDelay", maxDelay).apply();
+
+    serverUrl = userServerUrlChoice.getText().toString();
+    sharedPreferences.edit().putString("synchronizationUrl", serverUrl).apply();
   }
 }
