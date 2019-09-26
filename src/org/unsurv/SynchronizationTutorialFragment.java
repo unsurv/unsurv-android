@@ -1,7 +1,9 @@
 package org.unsurv;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -19,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * This Fragment is part of the tutorial the user sees when first launching the app.
@@ -55,6 +58,12 @@ public class SynchronizationTutorialFragment extends Fragment {
 
   private Context context;
 
+  private SynchronizedCameraRepository synchronizedCameraRepository;
+
+  private LocalBroadcastManager localBroadcastManager;
+  private IntentFilter intentFilter;
+  private BroadcastReceiver br;
+
 
   public SynchronizationTutorialFragment() {
 
@@ -69,6 +78,8 @@ public class SynchronizationTutorialFragment extends Fragment {
     context = getContext();
 
     tutorialViewPager = getActivity().findViewById(R.id.tutorial_viewpager);
+
+    localBroadcastManager = LocalBroadcastManager.getInstance(context);
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
@@ -291,6 +302,56 @@ public class SynchronizationTutorialFragment extends Fragment {
       public void onClick(View view) {
         saveToSharedPreferences();
         sharedPreferences.edit().putBoolean("tutorialCompleted", true).apply();
+
+        // check for offline mode and assume it's on
+        if (!sharedPreferences.getBoolean("offlineMode", true)) {
+
+          synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
+
+
+          if (SynchronizationUtils.isApiKeyExpiredOrMissing(sharedPreferences)){
+
+            br = new BroadcastReceiver() {
+              @Override
+              public void onReceive(Context context, Intent intent) {
+                String baseURL = sharedPreferences.getString("synchronizationUrl", null);
+                String homeArea = sharedPreferences.getString("area", null);
+
+
+                SynchronizationUtils.downloadCamerasFromServer(
+                        baseURL,
+                        "area=" + homeArea,
+                        sharedPreferences,
+                        true,
+                        null,
+                        synchronizedCameraRepository,
+                        context);
+              }
+            };
+
+            intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
+
+            localBroadcastManager.registerReceiver(br, intentFilter);
+
+            SynchronizationUtils.getAPIkey(context, sharedPreferences);
+
+          } else {
+            // api key is present and not expired
+            String baseURL = sharedPreferences.getString("synchronizationUrl", null);
+            String homeArea = sharedPreferences.getString("area", null);
+
+
+            SynchronizationUtils.downloadCamerasFromServer(
+                    baseURL,
+                    "area=" + homeArea,
+                    sharedPreferences,
+                    true,
+                    null,
+                    synchronizedCameraRepository,
+                    context);
+          }
+
+        } // TODO use local file included with app to populate db
 
         Intent tutorialFinishedIntent = new Intent(getActivity(), DetectorActivity.class);
         startActivity(tutorialFinishedIntent);

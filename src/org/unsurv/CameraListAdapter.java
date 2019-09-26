@@ -221,7 +221,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
             // If api key is expired set up a LocalBroadCastReceiver to start the upload
             // as soon as a new api key has been acquired. Then start getting a new API key.
-            if (SynchronizationUtils.isApiKeyExpired(sharedPreferences)){
+            if (SynchronizationUtils.isApiKeyExpiredOrMissing(sharedPreferences)){
 
               br = new BroadcastReceiver() {
                 @Override

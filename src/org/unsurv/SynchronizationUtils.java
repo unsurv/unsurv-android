@@ -804,9 +804,9 @@ class SynchronizationUtils {
   /**
    * Checks if local API key is expired. Compares only to local expiration date saved.
    * @param sharedPreferences SharedPreferences object
-   * @return boolean isApiKeyExpired
+   * @return boolean isApiKeyExpiredOrMissing
    */
-  static boolean isApiKeyExpired(SharedPreferences sharedPreferences){
+  static boolean isApiKeyExpiredOrMissing(SharedPreferences sharedPreferences){
     SimpleDateFormat timestampIso8601SecondsAccuracy = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
     Date apiKeyExpiration;
@@ -821,9 +821,13 @@ class SynchronizationUtils {
 
     } catch (ParseException pse) {
       Log.i(TAG, "apiKeyParse: " + pse.toString());
+      return true;
+
+    } catch (NullPointerException npe){
+      // api key is missing
+      return true;
     }
 
-    return true;
   }
 
 
@@ -836,7 +840,7 @@ class SynchronizationUtils {
    */
   static boolean refreshApiKeyIfExpired(SharedPreferences sharedPreferences, Context context){
 
-    if (isApiKeyExpired(sharedPreferences)){
+    if (isApiKeyExpiredOrMissing(sharedPreferences)){
 
       getAPIkey(context, sharedPreferences);
       return true;

@@ -97,7 +97,7 @@ public class MapTutorialFragment extends Fragment {
         // disable fragment scrolling while map scrolling is needed
         if (!homeZoneIsSet){
           tutorialViewPager.setFragmentScrollingEnabled(false);
-          return true;
+          mapScrollingEnabled = true;
         }
 
         if (mapScrollingEnabled) {
