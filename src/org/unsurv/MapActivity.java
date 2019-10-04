@@ -215,6 +215,9 @@ public class MapActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+    // disables clustering until a bug in library has been fixed
+    sharedPreferences.edit().putBoolean("clusteringEnabled", false).apply();
+
     localBroadcastManager = LocalBroadcastManager.getInstance(MapActivity.this);
 
     areaOfflineAvailableRepository.deleteAll();
