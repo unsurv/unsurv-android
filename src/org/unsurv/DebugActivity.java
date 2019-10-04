@@ -553,13 +553,13 @@ public class DebugActivity extends AppCompatActivity {
 
         // synchronizedCameraRepository.deleteAll();
 
-        synchronizedCameraRepository.insert(debugCamera1);
-        synchronizedCameraRepository.insert(debugCamera2);
-        synchronizedCameraRepository.insert(debugCamera3);
+        // synchronizedCameraRepository.insert(debugCamera1);
+        // synchronizedCameraRepository.insert(debugCamera2);
+        // synchronizedCameraRepository.insert(debugCamera3);
 
 
-        cameraRepository.insert(randomCamera);
-        cameraRepository.insert(randomCamera2);
+        // cameraRepository.insert(randomCamera);
+        // cameraRepository.insert(randomCamera2);
         BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 2);
 
         // cameraRepository.insertAll(notRandomCamera);
