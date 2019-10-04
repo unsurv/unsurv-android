@@ -295,8 +295,21 @@ public class MapActivity extends AppCompatActivity {
     zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 
     // Setting starting position and zoom level.
-    GeoPoint startPoint = new GeoPoint(50.0027, 8.2771);
-    mapController.setZoom(7.0);
+    String homeZone = sharedPreferences.getString("area", null);
+
+    String[] coordinates = homeZone.split(",");
+
+    double latMin = Double.valueOf(coordinates[0]);
+    double latMax = Double.valueOf(coordinates[1]);
+    double lonMin = Double.valueOf(coordinates[2]);
+    double lonMax = Double.valueOf(coordinates[3]);
+
+    double centerLat = (latMin + latMax) / 2;
+    double centerLon = (lonMin + lonMax) / 2;
+
+    // Setting starting position and zoom level. Use center of homezone for now
+    GeoPoint startPoint = new GeoPoint(centerLat, centerLon);
+    mapController.setZoom(10.0);
     mapController.setCenter(startPoint);
 
     showStandardCamerasButton = findViewById(R.id.map_show_standard_cameras_button);
@@ -1157,7 +1170,7 @@ public class MapActivity extends AppCompatActivity {
     allCamerasInArea.clear();
 
     if (queryDB) {
-      allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInArea(latMin, latMax, lonMin, lonMax);
+      allCamerasInAreaFromDb = synchronizedCameraRepository.getSynchronizedCamerasInAreaAsync(latMin, latMax, lonMin, lonMax);
     }
 
     allCamerasInArea.addAll(allCamerasInAreaFromDb);

@@ -54,6 +54,21 @@ public class SynchronizedCameraRepository {
     return mSynchronizedCameraDao.getCamerasInArea(latMin, latMax, lonMin, lonMax);
   }
 
+  List<SynchronizedCamera> getSynchronizedCamerasInAreaAsync(double latMin, double latMax, double lonMin, double lonMax) {
+
+    try {
+
+      return new getAllSynchronizedCamerasInAreaAsyncTask(mSynchronizedCameraDao).execute(latMin, latMax, lonMin, lonMax).get();
+
+    } catch (Exception e) {
+      Log.i("Background findByID Error: " , e.toString());
+    }
+
+    return null;
+
+
+  }
+
 
   List<String> getIDsInArea(double latMin, double latMax, double lonMin, double lonMax) {
     return mSynchronizedCameraDao.getIDsInArea(latMin, latMax, lonMin, lonMax);
@@ -198,7 +213,27 @@ public class SynchronizedCameraRepository {
   }
 
 
-    private static class insertSingleAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
+  private static class getAllSynchronizedCamerasInAreaAsyncTask extends AsyncTask<Double, Void, List<SynchronizedCamera>> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+
+    getAllSynchronizedCamerasInAreaAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected List<SynchronizedCamera> doInBackground(Double... params) {
+
+      // latMin, latMax, lonMin, lonMax
+      return mAsyncTaskDao.getCamerasInArea(params[0], params[1], params[2], params[3]);
+
+
+    }
+  }
+
+
+
+  private static class insertSingleAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
 
         private SynchronizedCameraDao mAsyncTaskDao;
         String TAG = "SynchronizedCameraRepository insertAsyncTask";
