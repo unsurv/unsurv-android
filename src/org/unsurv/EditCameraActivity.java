@@ -156,7 +156,7 @@ public class EditCameraActivity extends AppCompatActivity {
     // TODO add choice + backup strategy here
     map.setTileSource(TileSourceFactory.OpenTopo);
 
-    // remove big + nad - buttons at the bottom of the map
+    // remove big + and - buttons at the bottom of the map
     final CustomZoomButtonsController zoomController = map.getZoomController();
     zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 

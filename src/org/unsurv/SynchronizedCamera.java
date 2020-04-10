@@ -15,7 +15,11 @@ public class SynchronizedCamera {
 
   private String externalID;
 
-  private int type;
+  private int type; // fixed, dome, panning
+  private int area; // unknown, outdoor, public, indoor, traffic
+  private int mount; // unknown, pole, wall, ceiling, streetlamp
+  private int direction; // unknown, pole, wall, ceiling, streetlamp
+  private int height; // 0 = unknown, in meters editable by user
 
   private String imagePath;
 
@@ -33,6 +37,10 @@ public class SynchronizedCamera {
   public SynchronizedCamera (@Nullable String imagePath,
                              String externalID,
                              int type,
+                             int area,
+                             int mount,
+                             int direction,
+                             int height,
                              double latitude,
                              double longitude,
                              String comments,
@@ -42,7 +50,12 @@ public class SynchronizedCamera {
 
     this.imagePath = imagePath;
     this.externalID = externalID;
+
     this.type = type;
+    this.area = area;
+    this.mount = mount;
+    this.direction = direction;
+    this.height = height;
     this.latitude = latitude;
     this.longitude = longitude;
     this.comments = comments;
@@ -61,6 +74,22 @@ public class SynchronizedCamera {
 
   public int getType() {
     return type;
+  }
+
+  public int getArea() {
+    return area;
+  }
+
+  public int getMount() {
+    return mount;
+  }
+
+  public int getDirection() {
+    return direction;
+  }
+
+  public int getHeight() {
+    return height;
   }
 
   public String getImagePath() {
@@ -99,6 +128,22 @@ public class SynchronizedCamera {
 
   public void setType(int type) {
     this.type = type;
+  }
+
+  public void setArea(int area) {
+    this.area = area;
+  }
+
+  public void setMount(int mount) {
+    this.mount = mount;
+  }
+
+  public void setDirection(int direction) {
+    this.direction = direction;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
   }
 
   public void setImagePath(String imagePath) {

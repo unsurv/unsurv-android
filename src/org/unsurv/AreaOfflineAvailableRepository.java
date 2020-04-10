@@ -23,7 +23,7 @@ class AreaOfflineAvailableRepository {
   }
 
   void deleteAll() {
-    new deleteAsyncTask(areaOfflineAvailableDao).execute();
+    new DeleteAsyncTask(areaOfflineAvailableDao).execute();
   }
 
   List<AreaOfflineAvailable> isOfflineavailable(double latMin, double latMax, double lonMin, double lonMax) {
@@ -31,19 +31,19 @@ class AreaOfflineAvailableRepository {
   }
 
   void insert(AreaOfflineAvailable areaOfflineAvailable) {
-    new insertAsyncTask(areaOfflineAvailableDao).execute(areaOfflineAvailable);
+    new InsertAsyncTask(areaOfflineAvailableDao).execute(areaOfflineAvailable);
   }
 
   void update(AreaOfflineAvailable areaOfflineAvailable) {
-    new updateAsyncTask(areaOfflineAvailableDao).execute(areaOfflineAvailable);
+    new UpdateAsyncTask(areaOfflineAvailableDao).execute(areaOfflineAvailable);
   }
 
 
-  private static class insertAsyncTask extends AsyncTask<AreaOfflineAvailable, Void, Void> {
+  private static class InsertAsyncTask extends AsyncTask<AreaOfflineAvailable, Void, Void> {
 
     private AreaOfflineAvailableDao mAsyncTaskDao;
 
-    insertAsyncTask(AreaOfflineAvailableDao dao) {
+    InsertAsyncTask(AreaOfflineAvailableDao dao) {
       mAsyncTaskDao = dao;
     }
 
@@ -55,11 +55,11 @@ class AreaOfflineAvailableRepository {
     }
   }
 
-  private static class updateAsyncTask extends AsyncTask<AreaOfflineAvailable, Void, Void> {
+  private static class UpdateAsyncTask extends AsyncTask<AreaOfflineAvailable, Void, Void> {
 
     private AreaOfflineAvailableDao mAsyncTaskDao;
 
-    updateAsyncTask(AreaOfflineAvailableDao dao) {
+    UpdateAsyncTask(AreaOfflineAvailableDao dao) {
       mAsyncTaskDao = dao;
     }
 
@@ -79,11 +79,11 @@ class AreaOfflineAvailableRepository {
     }
   }
 
-  private static class deleteAsyncTask extends AsyncTask<Void, Void, Void> {
+  private static class DeleteAsyncTask extends AsyncTask<Void, Void, Void> {
 
     private AreaOfflineAvailableDao mAsyncTaskDao;
 
-    deleteAsyncTask(AreaOfflineAvailableDao dao) {
+    DeleteAsyncTask(AreaOfflineAvailableDao dao) {
       mAsyncTaskDao = dao;
     }
 

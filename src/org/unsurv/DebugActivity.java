@@ -323,6 +323,10 @@ public class DebugActivity extends AppCompatActivity {
             "test_pixel_2.jpg",
             "asd",
             2,
+            0,
+            0,
+            0,
+            0,
             49.99819,
             8.25949,
             "no comments",
@@ -464,6 +468,10 @@ public class DebugActivity extends AppCompatActivity {
 
         SurveillanceCamera randomCamera = new SurveillanceCamera(
                 0,
+                0,
+                0,
+                0,
+                0,
                 "test_pixel_2.jpg",
                 "test_nexus_10.jpg",
                 null,
@@ -481,6 +489,10 @@ public class DebugActivity extends AppCompatActivity {
 
         SurveillanceCamera randomCamera2 = new SurveillanceCamera(
                 1,
+                0,
+                0,
+                0,
+                0,
                 "test_pixel_2.jpg",
                 "test_nexus_10.jpg",
                 null,
@@ -497,6 +509,10 @@ public class DebugActivity extends AppCompatActivity {
                 "\"[test_pixel_2.jpg,1562076737965_thumbnail.jpg,1562076726264_thumbnail.jpg]\"");
 
         SurveillanceCamera notRandomCamera = new SurveillanceCamera(
+                0,
+                0,
+                0,
+                0,
                 0,
                 "test_pixel_2.jpg",
                 "asd.jpg",
@@ -516,6 +532,10 @@ public class DebugActivity extends AppCompatActivity {
                 "test_pixel_2.jpg",
                 "asdf",
                 0,
+                0,
+                0,
+                0,
+                0,
                 49.99827,
                 8.28407,
                 "no comments",
@@ -529,6 +549,10 @@ public class DebugActivity extends AppCompatActivity {
                 "test_pixel_2.jpg",
                 "asdfg",
                 1,
+                0,
+                0,
+                0,
+                0,
                 49.9976,
                 8.28489,
                 "no comments",
@@ -542,6 +566,10 @@ public class DebugActivity extends AppCompatActivity {
                 "test_pixel_2.jpg",
                 "asdfgh",
                 2,
+                0,
+                0,
+                0,
+                0,
                 49.9969,
                 8.28570,
                 "no comments",
@@ -646,6 +674,10 @@ public class DebugActivity extends AppCompatActivity {
     computedCamerasInArea.add(computedCamera);
 
     SurveillanceCamera testCamera = new SurveillanceCamera(
+            0,
+            0,
+            0,
+            0,
             0,
             "test_pixel_2.jpg",
             "asd",
@@ -1028,18 +1060,45 @@ public class DebugActivity extends AppCompatActivity {
                 try {
 
                   for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
+
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
+                    int area = 0;
+                    int mount = 0;
+                    int direction = 0;
+                    int height = 0;
+
+                    if (JSONToSynchronize.has("area")) {
+                      area = JSONToSynchronize.getInt("area");
+                    }
+
+                    if (JSONToSynchronize.has("mount")) {
+                      mount = JSONToSynchronize.getInt("mount");
+                    }
+
+                    if (JSONToSynchronize.has("direction")) {
+                      direction = JSONToSynchronize.getInt("direction");
+                    }
+
+                    if (JSONToSynchronize.has("height")) {
+                      height = JSONToSynchronize.getInt("height");
+                    }
+
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
-                            null,
+                            JSONToSynchronize.getString("id") + ".jpg",
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getInt("type"),
+                            area,
+                            mount,
+                            direction,
+                            height,
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("lastUpdated"),
-                            JSONToSynchronize.getString("uploadedAt"),
-                            false
+                            JSONToSynchronize.getString("last_updated"),
+                            JSONToSynchronize.getString("uploaded_at"),
+                            JSONToSynchronize.getBoolean("manual_capture")
+
 
                     );
 
@@ -1426,6 +1485,10 @@ public class DebugActivity extends AppCompatActivity {
 
         return new SurveillanceCamera(
                 mostCommonTypeInPool,
+                0,
+                0,
+                0,
+                0,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,
@@ -1447,6 +1510,10 @@ public class DebugActivity extends AppCompatActivity {
 
         return new SurveillanceCamera(
                 mostCommonTypeInPool,
+                0,
+                0,
+                0,
+                0,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,

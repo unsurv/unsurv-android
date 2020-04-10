@@ -980,6 +980,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
         cameraRepository.insert(new SurveillanceCamera(
                 mostCommonTypeInPool,
+                0,
+                0,
+                0,
+                0,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,
@@ -1004,6 +1008,10 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
         cameraRepository.insert(new SurveillanceCamera(
                 mostCommonTypeInPool,
+                0,
+                0,
+                0,
+                0,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,

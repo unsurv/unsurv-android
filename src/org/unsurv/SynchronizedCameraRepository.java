@@ -236,7 +236,7 @@ public class SynchronizedCameraRepository {
   private static class insertSingleAsyncTask extends AsyncTask<SynchronizedCamera, Void, Void> {
 
         private SynchronizedCameraDao mAsyncTaskDao;
-        String TAG = "SynchronizedCameraRepository insertAsyncTask";
+        String TAG = "SynchronizedCameraRepository InsertAsyncTask";
 
         insertSingleAsyncTask(SynchronizedCameraDao dao) {
             mAsyncTaskDao = dao;

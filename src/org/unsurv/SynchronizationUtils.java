@@ -168,10 +168,35 @@ class SynchronizationUtils {
                   for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
+                    int area = 0;
+                    int mount = 0;
+                    int direction = 0;
+                    int height = 0;
+
+                    if (JSONToSynchronize.has("area")) {
+                      area = JSONToSynchronize.getInt("area");
+                    }
+
+                    if (JSONToSynchronize.has("mount")) {
+                      mount = JSONToSynchronize.getInt("mount");
+                    }
+
+                    if (JSONToSynchronize.has("direction")) {
+                      direction = JSONToSynchronize.getInt("direction");
+                    }
+
+                    if (JSONToSynchronize.has("height")) {
+                      height = JSONToSynchronize.getInt("height");
+                    }
+
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
                             null,
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getInt("type"),
+                            area,
+                            mount,
+                            direction,
+                            height,
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),

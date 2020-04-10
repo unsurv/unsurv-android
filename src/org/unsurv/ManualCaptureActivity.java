@@ -160,6 +160,10 @@ public class ManualCaptureActivity extends AppCompatActivity {
         // get center coordinates when save button is pressed
         SurveillanceCamera manualCamera = new SurveillanceCamera(
                 cameraType,
+                0,
+                0,
+                0,
+                0,
                 null,
                 null,
                 null,

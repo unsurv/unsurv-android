@@ -19,7 +19,14 @@ public class SurveillanceCamera {
   @PrimaryKey(autoGenerate = true)
   private int id;
 
-  private int cameraType;
+
+  // openstreetmap tags
+  private int cameraType; // fixed, dome, panning
+
+  private int area; // unknown, outdoor, public, indoor, traffic
+  private int mount; // unknown, pole, wall, ceiling, streetlamp
+  private int direction; // unknown, pole, wall, ceiling, streetlamp
+  private int height; // 0 = unknown, in meters editable by user
 
   private String thumbnailPath;
 
@@ -50,6 +57,10 @@ public class SurveillanceCamera {
 
 
   public SurveillanceCamera(int cameraType,
+                            int area,
+                            int mount,
+                            int direction,
+                            int height,
                             @Nullable String thumbnailPath,
                             @Nullable String imagePath,
                             @Nullable String externalId,
@@ -66,6 +77,11 @@ public class SurveillanceCamera {
                             String captureFilenames){
 
     this.cameraType = cameraType;
+    this.area = area;
+    this.mount = mount;
+    this.direction = direction;
+    this.height = height;
+
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;
 
@@ -99,6 +115,22 @@ public class SurveillanceCamera {
   }
 
   public int getCameraType(){return cameraType;}
+
+  public int getArea() {
+    return area;
+  }
+
+  public int getMount() {
+    return mount;
+  }
+
+  public int getDirection() {
+    return direction;
+  }
+
+  public int getHeight() {
+    return height;
+  }
 
   public String getThumbnailPath() {
     return thumbnailPath;
@@ -180,6 +212,22 @@ public class SurveillanceCamera {
   }
 
   public void setCameraType(int type){this.cameraType = type;}
+
+  public void setArea(int area) {
+    this.area = area;
+  }
+
+  public void setDirection(int direction) {
+    this.direction = direction;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
+  }
+
+  public void setMount(int mount) {
+    this.mount = mount;
+  }
 
   public void setThumbnailPath(String mThumbnailPath) {
     this.thumbnailPath = mThumbnailPath;
