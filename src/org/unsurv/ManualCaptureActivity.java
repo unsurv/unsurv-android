@@ -68,7 +68,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
     cameraRepository = new CameraRepository(getApplication());
 
     // choose standard type as default
-    cameraType = StorageUtils.STANDARD_CAMERA;
+    cameraType = StorageUtils.FIXED_CAMERA;
 
     mapView = findViewById(R.id.manual_capture_map);
 
@@ -115,7 +115,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
     addStandardCameraButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        cameraType = StorageUtils.STANDARD_CAMERA;
+        cameraType = StorageUtils.FIXED_CAMERA;
         marker.setImageDrawable(getDrawable(R.drawable.standard_camera_marker_5_dpi));
       }
     });
@@ -132,7 +132,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
     addUnknownCameraButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        cameraType = StorageUtils.UNKNOWN_CAMERA;
+        cameraType = StorageUtils.PANNING_CAMERA;
         marker.setImageDrawable(getDrawable(R.drawable.unknown_camera_marker_5dpi));
 
       }
@@ -162,8 +162,8 @@ public class ManualCaptureActivity extends AppCompatActivity {
                 cameraType,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 null,
                 null,
                 null,

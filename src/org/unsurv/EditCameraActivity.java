@@ -12,13 +12,18 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -61,7 +66,19 @@ public class EditCameraActivity extends AppCompatActivity {
 
   TextView timestampTextView;
   TextView uploadTextView;
-  TextView commentsTextView;
+
+  Spinner cameraTypeSpinner;
+
+  SeekBar directionSeekBar;
+  TextView directionTextView;
+
+  Spinner areaSpinner;
+
+  SeekBar heightSeekBar;
+  TextView heightTextView;
+
+  Spinner mountSpinner;
+
   Button saveButton;
   Button editButton;
   ImageButton resetMapButton;
@@ -108,13 +125,26 @@ public class EditCameraActivity extends AppCompatActivity {
     map = findViewById(R.id.edit_camera_map);
 
     // check boxes for camera types
-    standardCheckBox = findViewById(R.id.edit_camera_checkbox_standard);
-    domeCheckBox = findViewById(R.id.edit_camera_checkbox_dome);
-    unknownCheckBox = findViewById(R.id.edit_camera_checkbox_unknown);
+
+
+    cameraTypeSpinner = findViewById(R.id.edit_camera_type_selection);
+
+    directionSeekBar = findViewById(R.id.edit_camera_direction_seekbar);
+    directionSeekBar.setMax(360);
+    directionTextView = findViewById(R.id.edit_camera_direction_text);
+
+    areaSpinner = findViewById(R.id.edit_camera_area_selection);
+
+    heightSeekBar = findViewById(R.id.edit_camera_height_seekbar);
+    heightSeekBar.setMax(20);
+    heightTextView = findViewById(R.id.edit_camera_height_text);
+
+    mountSpinner = findViewById(R.id.edit_camera_mount_selection);
 
     timestampTextView = findViewById(R.id.edit_camera_timestamp_text);
     uploadTextView = findViewById(R.id.edit_camera_upload_text);
-    commentsTextView = findViewById(R.id.edit_camera_comments_text);
+
+
     saveButton = findViewById(R.id.camera_edit_save_button);
     editButton = findViewById(R.id.camera_edit_edit_button);
     resetMapButton = findViewById(R.id.edit_camera_reset_map_position);
@@ -172,110 +202,210 @@ public class EditCameraActivity extends AppCompatActivity {
     mapController.setCenter(cameraLocation);
 
 
-    // set marker according to type on the map
-    switch (cameraType){
+    // Spinner for camera type selection
 
-      case StorageUtils.STANDARD_CAMERA:
-        standardCheckBox.setChecked(true);
+    // Create an ArrayAdapter using the string array and a default spinner layout
+    ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getApplicationContext(),
+            R.array.edit_camera_type, android.R.layout.simple_spinner_item);
 
-        map.getOverlays().remove(iconOverlay);
-        map.invalidate();
-        cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
-        iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
-        map.getOverlays().add(iconOverlay);
-        map.invalidate();
-        break;
+    // Specify the layout to use when the list of choices appears
+    typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-      case StorageUtils.DOME_CAMERA:
-        domeCheckBox.setChecked(true);
+    // Apply the adapter to the spinners
+    cameraTypeSpinner.setAdapter(typeAdapter);
 
-        map.getOverlays().remove(iconOverlay);
-        map.invalidate();
-        cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.dome_camera_marker_5_dpi, 12, null);
-        iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
-        map.getOverlays().add(iconOverlay);
-        map.invalidate();
-        break;
+    cameraTypeSpinner.setSelection(cameraType);
 
-      case StorageUtils.UNKNOWN_CAMERA:
-        unknownCheckBox.setChecked(true);
+    cameraTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-        map.getOverlays().remove(iconOverlay);
-        map.invalidate();
-        cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.unknown_camera_marker_5dpi, 12, null);
-        iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
-        map.getOverlays().add(iconOverlay);
-        map.invalidate();
-        break;
+        ((TextView) adapterView.getChildAt(0))
+                .setTextColor(getResources().getColor(R.color.textWhite, null));
 
+        cameraToEdit.setCameraType(i);
 
+        switch (i){
+          case StorageUtils.FIXED_CAMERA:
+
+            map.getOverlays().remove(iconOverlay);
+            map.invalidate();
+
+            cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(),
+                    R.drawable.standard_camera_marker_5_dpi, 12, null);
+            iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+            map.getOverlays().add(iconOverlay);
+            map.invalidate();
+            break;
+
+          case StorageUtils.DOME_CAMERA:
+
+            map.getOverlays().remove(iconOverlay);
+            map.invalidate();
+
+            cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(),
+                    R.drawable.dome_camera_marker_5_dpi, 12, null);
+            iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+            map.getOverlays().add(iconOverlay);
+            map.invalidate();
+            break;
+
+          case StorageUtils.PANNING_CAMERA:
+
+            map.getOverlays().remove(iconOverlay);
+            map.invalidate();
+
+            cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(),
+                    R.drawable.unknown_camera_marker_5dpi, 12, null);
+            iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+            map.getOverlays().add(iconOverlay);
+            map.invalidate();
+            break;
+        }
+
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
+
+      }
+    });
+
+    int cameraDirection = cameraToEdit.getDirection();
+
+    if (cameraDirection != -1) {
+      directionTextView.setText(String.valueOf(cameraDirection));
+      directionSeekBar.setProgress(cameraDirection);
+    } else {
+      directionTextView.setText("?");
+      directionSeekBar.setProgress(0);
     }
 
-    standardCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+    directionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
-      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        directionTextView.setText(String.valueOf(i));
 
-        if (b){
-          cameraToEdit.setCameraType(StorageUtils.STANDARD_CAMERA);
+        // TODO draw area or line on map to represent direction
+        // TODO different area shapes for fixed dome panning
+      }
 
-          domeCheckBox.setChecked(false);
-          unknownCheckBox.setChecked(false);
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
 
-          map.getOverlays().remove(iconOverlay);
-          map.invalidate();
+      }
 
-          cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.standard_camera_marker_5_dpi, 12, null);
-          iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
+        int progress = seekBar.getProgress();
+        cameraToEdit.setDirection(progress);
+      }
+    });
 
-          map.getOverlays().add(iconOverlay);
-          map.invalidate();
 
-        }
+    int area = cameraToEdit.getArea();
+
+    // Spinner for camera type selection
+
+    // Create an ArrayAdapter using the string array and a default spinner layout
+    ArrayAdapter<CharSequence> areaAdapter = ArrayAdapter.createFromResource(getApplicationContext(),
+            R.array.edit_camera_area, android.R.layout.simple_spinner_item);
+
+    // Specify the layout to use when the list of choices appears
+    areaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+    // Apply the adapter to the spinners
+    areaSpinner.setAdapter(areaAdapter);
+
+    areaSpinner.setSelection(area);
+
+    areaSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+        ((TextView) adapterView.getChildAt(0))
+                .setTextColor(getResources().getColor(R.color.textWhite, null));
+
+        cameraToEdit.setArea(i);
+
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
 
       }
     });
 
-    domeCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+    int cameraHeight = cameraToEdit.getHeight();
+
+    if (cameraHeight != -1) {
+      heightTextView.setText(String.valueOf(cameraHeight));
+      heightSeekBar.setProgress(cameraHeight);
+    } else {
+      heightTextView.setText("?");
+      heightSeekBar.setProgress(0);
+    }
+
+    heightSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
-      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        heightTextView.setText(String.valueOf(i));
 
-        if (b){
-          cameraToEdit.setCameraType(StorageUtils.DOME_CAMERA);
-          standardCheckBox.setChecked(false);
-          unknownCheckBox.setChecked(false);
+        // TODO draw area or line on map to represent direction
+        // TODO different area shapes for fixed dome panning
+      }
 
-          map.getOverlays().remove(iconOverlay);
-          map.invalidate();
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
 
-          cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.dome_camera_marker_5_dpi, 12, null);
-          iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+      }
 
-          map.getOverlays().add(iconOverlay);
-          map.invalidate();
-        }
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
+        int progress = seekBar.getProgress();
+        cameraToEdit.setHeight(progress);
       }
     });
 
-    unknownCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+    int mount = cameraToEdit.getMount();
+
+    // Spinner for camera type selection
+
+    // Create an ArrayAdapter using the string array and a default spinner layout
+    ArrayAdapter<CharSequence> mountAdapter = ArrayAdapter.createFromResource(getApplicationContext(),
+            R.array.edit_camera_mount, android.R.layout.simple_spinner_item);
+
+    // Specify the layout to use when the list of choices appears
+    areaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+    // Apply the adapter to the spinners
+    mountSpinner.setAdapter(mountAdapter);
+
+    mountSpinner.setSelection(mount);
+
+    mountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
-      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-        if (b){
-          cameraToEdit.setCameraType(StorageUtils.UNKNOWN_CAMERA);
-          standardCheckBox.setChecked(false);
-          domeCheckBox.setChecked(false);
+        ((TextView) adapterView.getChildAt(0))
+                .setTextColor(getResources().getColor(R.color.textWhite, null));
 
-          map.getOverlays().remove(iconOverlay);
-          map.invalidate();
+        cameraToEdit.setMount(i);
 
-          cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(), R.drawable.unknown_camera_marker_5dpi, 12, null);
-          iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
-          map.getOverlays().add(iconOverlay);
-          map.invalidate();
-        }
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
 
       }
     });
+
 
     String timestampAsDate = cameraToEdit.getTimestamp();
 
@@ -289,13 +419,6 @@ public class EditCameraActivity extends AppCompatActivity {
 
     String uploadDate = cameraToEdit.getTimeToSync();
     uploadTextView.setText(uploadDate);
-
-
-    String comment = cameraToEdit.getComment();
-
-    if (comment.isEmpty() || comment.equals("no comment")){
-      commentsTextView.setText(getString(R.string.no_comment));
-    }
 
 
     editButton.setOnClickListener(new View.OnClickListener() {
@@ -313,6 +436,28 @@ public class EditCameraActivity extends AppCompatActivity {
 
           map.getOverlays().removeAll(map.getOverlays());
           EditCameraActivity.this.map.invalidate();
+
+          switch (cameraToEdit.getCameraType()) {
+            case StorageUtils.FIXED_CAMERA:
+
+              Picasso.get().load(R.drawable.standard_camera_marker_5_dpi)
+                      .into(editLocationMarker);
+              break;
+
+            case StorageUtils.DOME_CAMERA:
+
+              Picasso.get().load(R.drawable.dome_camera_marker_5_dpi)
+                      .into(editLocationMarker);
+              break;
+
+            case StorageUtils.PANNING_CAMERA:
+
+              Picasso.get().load(R.drawable.unknown_camera_marker_5dpi)
+                      .into(editLocationMarker);
+              break;
+
+          }
+
           editLocationMarker.setVisibility(View.VISIBLE);
           EditCameraActivity.this.map.invalidate();
         }

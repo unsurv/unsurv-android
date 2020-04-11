@@ -49,7 +49,6 @@
             android:layout_weight="3">
 
             <org.osmdroid.views.MapView
-                android:layout_margin="8dp"
                 android:id="@+id/edit_camera_map"
                 android:layout_width="match_parent"
                 android:layout_height="200dp">
@@ -86,153 +85,169 @@
         </RelativeLayout>
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:orientation="horizontal">
-
-            <RelativeLayout
-                android:layout_width="0sp"
-                android:layout_weight="3"
-                android:layout_height="match_parent">
-
-                <CheckBox
-                    android:id="@+id/edit_camera_checkbox_standard"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/edit_camera_type_standard"
-                    android:layout_centerVertical="true"
-                    />
-
-                <ImageView
-                    android:id="@+id/edit_camera_type_standard"
-                    android:layout_centerHorizontal="true"
-                    android:src="@drawable/standard_type_mdpi"
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="0sp"
-                android:layout_weight="3"
-                android:layout_height="match_parent">
-
-                <CheckBox
-                    android:id="@+id/edit_camera_checkbox_dome"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/edit_camera_type_dome"
-                    android:layout_centerVertical="true"
-                    android:padding="5dp"/>
-
-                <ImageView
-                    android:id="@+id/edit_camera_type_dome"
-                    android:layout_centerHorizontal="true"
-                    android:src="@drawable/dome_type_mdpi"
-                    android:layout_width="30dp"
-                    android:layout_height="match_parent" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="0sp"
-                android:layout_weight="3"
-                android:layout_height="match_parent">
-
-                <CheckBox
-                    android:id="@+id/edit_camera_checkbox_unknown"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/edit_camera_type_unknown"
-                    android:layout_centerVertical="true"
-                    />
-
-                <ImageView
-                    android:id="@+id/edit_camera_type_unknown"
-                    android:layout_centerHorizontal="true"
-                    android:src="@drawable/unknown_type_mdpi"
-                    android:layout_width="20dp"
-                    android:layout_height="match_parent" />
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-
-
-
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0sp"
             android:layout_weight="3"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+            android:scrollbarSize="6dp"
+            android:fadeScrollbars="false">
+
 
             <LinearLayout
-                android:layout_width="0sp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
-                android:orientation="vertical">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="@string/timestamp_text"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="end|center_vertical"/>
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="@string/upload_text"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="end|center_vertical"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="@string/comment_text"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="end|center_vertical"
-                    android:visibility="gone"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:text="@string/type_text"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="end|center_vertical"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:text="@string/direction_text"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="end|center_vertical"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:text="@string/area_text"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="end|center_vertical"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:text="@string/height_text"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="end|center_vertical"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:text="@string/mount_text"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="end|center_vertical"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:text="@string/timestamp_text"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="end|center_vertical"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:text="@string/upload_text"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="end|center_vertical"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:layout_marginStart="4dp"
+                    android:orientation="vertical">
+
+                    <Spinner
+                        android:id="@+id/edit_camera_type_selection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:gravity="start|center_vertical"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/edit_camera_direction_seekbar"
+                            android:layout_width="0sp"
+                            android:layout_weight="7"
+                            android:layout_height="match_parent"
+                            />
+
+                        <TextView
+                            android:id="@+id/edit_camera_direction_text"
+                            android:layout_width="0sp"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:textSize="24sp"
+                            android:layout_height="44dp"/>
+
+
+                    </LinearLayout>
+
+
+
+                    <Spinner
+                        android:id="@+id/edit_camera_area_selection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:gravity="start|center_vertical"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/edit_camera_height_seekbar"
+                            android:layout_width="0sp"
+                            android:layout_weight="7"
+                            android:layout_height="match_parent"
+                            />
+
+                        <TextView
+                            android:id="@+id/edit_camera_height_text"
+                            android:layout_width="0sp"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:textSize="24sp"
+                            android:layout_height="44dp"/>
+
+                    </LinearLayout>
+
+                    <Spinner
+                        android:id="@+id/edit_camera_mount_selection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:gravity="start|center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/edit_camera_timestamp_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:gravity="start|center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/edit_camera_upload_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:gravity="start|center_vertical"/>
+
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="5"
-                android:orientation="vertical">
+        </ScrollView>
 
-                <TextView
-                    android:id="@+id/edit_camera_timestamp_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="4dp"
-                    android:gravity="start|center_vertical"/>
-
-                <TextView
-                    android:id="@+id/edit_camera_upload_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="4dp"
-                    android:gravity="start|center_vertical"/>
-
-                <TextView
-                    android:id="@+id/edit_camera_comments_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="4dp"
-                    android:gravity="start|center_vertical"
-                    android:visibility="gone"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

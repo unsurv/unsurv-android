@@ -22,12 +22,19 @@
     <string name="title_activity_main">MainActivity</string>
 
 
-    <!--general-->
+    <!--in EditCamera-->
     <string name="timestamp_not_available">not available</string>
     <string name="no_comment">no comments available</string>
     <string name="timestamp_text">Camera captured on:</string>
     <string name="upload_text">Camera upload on:</string>
     <string name="comment_text">Comments:</string>
+
+
+    <string name="type_text">Type:</string>
+    <string name="area_text">Area:</string>
+    <string name="mount_text">Mounted on:</string>
+    <string name="direction_text">Direction:</string>
+    <string name="height_text">Height (m):</string>
 
 
     <!-- App and toolbar labels-->

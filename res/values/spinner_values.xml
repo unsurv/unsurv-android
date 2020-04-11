@@ -28,7 +28,32 @@
         <item>day[s]</item>
         <item>week[s]</item>
 
+    </string-array>
 
+
+    <string-array name="edit_camera_type">
+
+        <item>fixed</item>
+        <item>dome</item>
+        <item>panning</item>
+
+    </string-array>
+
+
+    <string-array name="edit_camera_area">
+        <item>\?</item>
+        <item>outdoor</item>
+        <item>public</item>
+        <item>indoor</item>
+        <item>traffic</item>
+    </string-array>
+
+    <string-array name="edit_camera_mount">
+        <item>\?</item>
+        <item>pole</item>
+        <item>wall</item>
+        <item>ceiling</item>
+        <item>street lamp</item>
     </string-array>
 
 </resources>

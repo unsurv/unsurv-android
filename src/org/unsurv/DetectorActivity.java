@@ -65,7 +65,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -889,17 +888,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     int standardCount = 0;
     int domeCount = 0;
     int unknownCount = 0;
-    occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
+    occurencesPerType.put(StorageUtils.FIXED_CAMERA, standardCount);
     occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
-    occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
+    occurencesPerType.put(StorageUtils.PANNING_CAMERA, unknownCount);
 
     for (CameraCapture capture : cameraPool){
 
       switch (capture.getCameraType()){
 
-        case StorageUtils.STANDARD_CAMERA:
+        case StorageUtils.FIXED_CAMERA:
           standardCount++;
-          occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
+          occurencesPerType.put(StorageUtils.FIXED_CAMERA, standardCount);
           break;
 
         case StorageUtils.DOME_CAMERA:
@@ -907,9 +906,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
           occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
           break;
 
-        case StorageUtils.UNKNOWN_CAMERA:
+        case StorageUtils.PANNING_CAMERA:
           unknownCount++;
-          occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
+          occurencesPerType.put(StorageUtils.PANNING_CAMERA, unknownCount);
           break;
 
       }
@@ -982,8 +981,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 mostCommonTypeInPool,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,
@@ -1010,8 +1009,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 mostCommonTypeInPool,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,

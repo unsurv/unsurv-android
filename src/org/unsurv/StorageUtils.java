@@ -14,9 +14,27 @@ class StorageUtils {
 
   static String TAG = "StorageUtils";
 
-  final static int STANDARD_CAMERA = 0;
+
+  final static int UNKNOWN = -1;
+
+  // openstreetmap camera types
+  final static int FIXED_CAMERA = 0;
   final static int DOME_CAMERA = 1;
-  final static int UNKNOWN_CAMERA = 2;
+  final static int PANNING_CAMERA = 2;
+
+  // osm "surveillance" tag
+  final static int AREA_UNKNOWN = 0;
+  final static int AREA_OUTDOOR = 1;
+  final static int AREA_PUBLIC = 2;
+  final static int AREA_INDOOR = 3;
+  final static int AREA_TRAFFIC = 4;
+
+  // osm mount types
+  final static int MOUNT_UNKNOWN = 0;
+  final static int MOUNT_POLE = 1;
+  final static int MOUNT_WALL = 2;
+  final static int MOUNT_CEILING = 3;
+  final static int MOUNT_STREET_LAMP = 4;
 
   // accessible for every app for now
   final static String SYNCHRONIZED_PATH = Environment.getExternalStoragePublicDirectory(

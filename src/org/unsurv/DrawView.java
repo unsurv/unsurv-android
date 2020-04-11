@@ -162,7 +162,7 @@ public class DrawView extends ImageView {
 
 
     // set color for different types
-    if (cameraType == StorageUtils.STANDARD_CAMERA){
+    if (cameraType == StorageUtils.FIXED_CAMERA){
       mPaint = mRegularPaint;
     }
 
@@ -406,7 +406,7 @@ public class DrawView extends ImageView {
         JSONObject tmpObj = (JSONObject) rectArray.get(i);
 
         // key sets type of camera, see static ints in StorageUtils for types
-        if (tmpObj.keys().next().equals(String.valueOf(StorageUtils.STANDARD_CAMERA))){
+        if (tmpObj.keys().next().equals(String.valueOf(StorageUtils.FIXED_CAMERA))){
           mPaint = mRegularPaint;
         } else {
           mPaint = mDomePaint;

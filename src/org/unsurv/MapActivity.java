@@ -1312,7 +1312,7 @@ public class MapActivity extends AppCompatActivity {
           // TODO switch case here
 
           // if filters are active only add corresponding cameras to items to display
-          if (showStandardCameras && cameraType == StorageUtils.STANDARD_CAMERA){
+          if (showStandardCameras && cameraType == StorageUtils.FIXED_CAMERA){
 
             overlayItemsToDisplay.add(new OverlayItem(
                     camera.getExternalID(),
@@ -1336,7 +1336,7 @@ public class MapActivity extends AppCompatActivity {
             counter++;
           }
 
-          if (showUnknownCameras && cameraType == StorageUtils.UNKNOWN_CAMERA){
+          if (showUnknownCameras && cameraType == StorageUtils.PANNING_CAMERA){
 
             overlayItemsToDisplay.add(new OverlayItem(
                     camera.getExternalID(),

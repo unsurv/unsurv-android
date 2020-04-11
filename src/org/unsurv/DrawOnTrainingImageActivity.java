@@ -82,7 +82,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
 
     currentTrainingCamera = cameraRepository.findByDbId(dbId);
 
-    cameraType = StorageUtils.STANDARD_CAMERA;
+    cameraType = StorageUtils.FIXED_CAMERA;
 
     pathToImage = StorageUtils.TRAINING_CAPTURES_PATH + currentTrainingCamera.getImagePath();
 
@@ -139,7 +139,7 @@ public class DrawOnTrainingImageActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        cameraType = StorageUtils.STANDARD_CAMERA;
+        cameraType = StorageUtils.FIXED_CAMERA;
         drawView.setCameraType(cameraType);
 
       }

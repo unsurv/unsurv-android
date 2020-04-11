@@ -470,8 +470,8 @@ public class DebugActivity extends AppCompatActivity {
                 0,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 "test_pixel_2.jpg",
                 "test_nexus_10.jpg",
                 null,
@@ -491,8 +491,8 @@ public class DebugActivity extends AppCompatActivity {
                 1,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 "test_pixel_2.jpg",
                 "test_nexus_10.jpg",
                 null,
@@ -512,8 +512,8 @@ public class DebugActivity extends AppCompatActivity {
                 0,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 "test_pixel_2.jpg",
                 "asd.jpg",
                 null,
@@ -534,8 +534,8 @@ public class DebugActivity extends AppCompatActivity {
                 0,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 49.99827,
                 8.28407,
                 "no comments",
@@ -551,8 +551,8 @@ public class DebugActivity extends AppCompatActivity {
                 1,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 49.9976,
                 8.28489,
                 "no comments",
@@ -568,8 +568,8 @@ public class DebugActivity extends AppCompatActivity {
                 2,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 49.9969,
                 8.28570,
                 "no comments",
@@ -1394,17 +1394,17 @@ public class DebugActivity extends AppCompatActivity {
     int standardCount = 0;
     int domeCount = 0;
     int unknownCount = 0;
-    occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
+    occurencesPerType.put(StorageUtils.FIXED_CAMERA, standardCount);
     occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
-    occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
+    occurencesPerType.put(StorageUtils.PANNING_CAMERA, unknownCount);
 
     for (CameraCapture capture : cameraPool){
 
       switch (capture.getCameraType()){
 
-        case StorageUtils.STANDARD_CAMERA:
+        case StorageUtils.FIXED_CAMERA:
           standardCount++;
-          occurencesPerType.put(StorageUtils.STANDARD_CAMERA, standardCount);
+          occurencesPerType.put(StorageUtils.FIXED_CAMERA, standardCount);
           break;
 
         case StorageUtils.DOME_CAMERA:
@@ -1412,9 +1412,9 @@ public class DebugActivity extends AppCompatActivity {
           occurencesPerType.put(StorageUtils.DOME_CAMERA, domeCount);
           break;
 
-        case StorageUtils.UNKNOWN_CAMERA:
+        case StorageUtils.PANNING_CAMERA:
           unknownCount++;
-          occurencesPerType.put(StorageUtils.UNKNOWN_CAMERA, unknownCount);
+          occurencesPerType.put(StorageUtils.PANNING_CAMERA, unknownCount);
           break;
 
       }
@@ -1487,8 +1487,8 @@ public class DebugActivity extends AppCompatActivity {
                 mostCommonTypeInPool,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,
@@ -1512,8 +1512,8 @@ public class DebugActivity extends AppCompatActivity {
                 mostCommonTypeInPool,
                 0,
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 biggestConfidence.getThumbnailPath(),
                 biggestConfidence.getImagePath(),
                 null,

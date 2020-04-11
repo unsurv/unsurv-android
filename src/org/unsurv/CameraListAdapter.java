@@ -127,7 +127,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
         imageFile = new File(StorageUtils.CAMERA_CAPTURES_PATH + current.getThumbnailPath());
 
         switch (cameraType){
-          case StorageUtils.STANDARD_CAMERA:
+          case StorageUtils.FIXED_CAMERA:
             holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#ff5555")); // red
 
             break;
@@ -137,7 +137,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
             break;
 
-          case StorageUtils.UNKNOWN_CAMERA:
+          case StorageUtils.PANNING_CAMERA:
             holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#9101b5")); // purple
         }
 
