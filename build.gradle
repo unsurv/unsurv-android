@@ -227,7 +227,7 @@ dependencies {
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
 
     //osmdroid openstreetmap
-    implementation 'org.osmdroid:osmdroid-android:6.1.0'
+    implementation 'org.osmdroid:osmdroid-android:6.1.6'
 
     // bonus functionality (clustering / routing)
     implementation 'com.github.MKergall:osmbonuspack:6.6.0'
