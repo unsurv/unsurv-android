@@ -42,7 +42,7 @@ public class HistoryActivity extends AppCompatActivity {
   private Context context;
 
 
-  // TODO add refresh button
+  // TODO First capture gets eaten!!
   // TODO fix upload state when syncjob is complete
 
   @Override

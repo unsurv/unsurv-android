@@ -28,6 +28,10 @@ import java.util.Locale;
  * Allows the user to manually create a SurveillanceCamera without having to use the camera and
  * expose his/her actions
  */
+
+// TODO save position of last aquired camera and start from there
+
+
 public class ManualCaptureActivity extends AppCompatActivity {
 
   private BottomNavigationView bottomNavigationView;

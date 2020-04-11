@@ -86,6 +86,8 @@ import java.util.concurrent.TimeUnit;
  * resolution of 1024 px x 768 px
  */
 
+// TODO back button crashes app, should lead back to detector
+
 public class CaptureTrainingImageActivity extends AppCompatActivity
         implements View.OnClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback{

@@ -3,7 +3,9 @@ package org.unsurv;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -35,12 +38,16 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.IconOverlay;
+import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 
-// TODO check if cameratype is correctly parsed from detector
-// TODO change markers for map depending on type
+// TODO add angle to bottom
+// TODO auto open this activity after capture
 
 /**
  * Allows the user to review and edit SurveillanceCamera captures, launched if user clicks on a
@@ -60,9 +67,6 @@ public class EditCameraActivity extends AppCompatActivity {
 
   ImageView cameraImageView;
   MapView map;
-  CheckBox standardCheckBox;
-  CheckBox domeCheckBox;
-  CheckBox unknownCheckBox;
 
   TextView timestampTextView;
   TextView uploadTextView;
@@ -92,6 +96,8 @@ public class EditCameraActivity extends AppCompatActivity {
 
   IconOverlay iconOverlay;
   GeoPoint cameraLocation;
+
+  Polyline line = new Polyline();
 
   int cameraType;
 
@@ -124,9 +130,8 @@ public class EditCameraActivity extends AppCompatActivity {
     recyclerView = findViewById(R.id.edit_camera_choose_recyclerview);
     map = findViewById(R.id.edit_camera_map);
 
-    // check boxes for camera types
 
-
+    // user edit area
     cameraTypeSpinner = findViewById(R.id.edit_camera_type_selection);
 
     directionSeekBar = findViewById(R.id.edit_camera_direction_seekbar);
@@ -150,12 +155,11 @@ public class EditCameraActivity extends AppCompatActivity {
     resetMapButton = findViewById(R.id.edit_camera_reset_map_position);
     editLocationMarker = findViewById(R.id.edit_camera_center_marker);
 
-    // Activity gets startet with db id in IntentExtra, get id
+    // Activity gets started with db id in IntentExtra, get id
     Intent startIntent = getIntent();
     int dbId = startIntent.getIntExtra("surveillanceCameraId", 0);
 
     cameraRepository = new CameraRepository(getApplication());
-
 
     cameraToEdit = cameraRepository.findByDbId(dbId);
     cameraType = cameraToEdit.getCameraType();
@@ -203,7 +207,6 @@ public class EditCameraActivity extends AppCompatActivity {
 
 
     // Spinner for camera type selection
-
     // Create an ArrayAdapter using the string array and a default spinner layout
     ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getApplicationContext(),
             R.array.edit_camera_type, android.R.layout.simple_spinner_item);
@@ -276,13 +279,7 @@ public class EditCameraActivity extends AppCompatActivity {
 
     int cameraDirection = cameraToEdit.getDirection();
 
-    if (cameraDirection != -1) {
-      directionTextView.setText(String.valueOf(cameraDirection));
-      directionSeekBar.setProgress(cameraDirection);
-    } else {
-      directionTextView.setText("?");
-      directionSeekBar.setProgress(0);
-    }
+
 
 
     directionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -292,6 +289,9 @@ public class EditCameraActivity extends AppCompatActivity {
 
         // TODO draw area or line on map to represent direction
         // TODO different area shapes for fixed dome panning
+
+        drawLine(cameraLocation, i, cameraToEdit.getHeight());
+
       }
 
       @Override
@@ -306,11 +306,18 @@ public class EditCameraActivity extends AppCompatActivity {
       }
     });
 
+    if (cameraDirection != -1) {
+      directionTextView.setText(String.valueOf(cameraDirection));
+      directionSeekBar.setProgress(cameraDirection);
+    } else {
+      directionTextView.setText("?");
+      directionSeekBar.setProgress(0);
+    }
+
 
     int area = cameraToEdit.getArea();
 
     // Spinner for camera type selection
-
     // Create an ArrayAdapter using the string array and a default spinner layout
     ArrayAdapter<CharSequence> areaAdapter = ArrayAdapter.createFromResource(getApplicationContext(),
             R.array.edit_camera_area, android.R.layout.simple_spinner_item);
@@ -343,14 +350,6 @@ public class EditCameraActivity extends AppCompatActivity {
 
     int cameraHeight = cameraToEdit.getHeight();
 
-    if (cameraHeight != -1) {
-      heightTextView.setText(String.valueOf(cameraHeight));
-      heightSeekBar.setProgress(cameraHeight);
-    } else {
-      heightTextView.setText("?");
-      heightSeekBar.setProgress(0);
-    }
-
     heightSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
       public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -358,6 +357,8 @@ public class EditCameraActivity extends AppCompatActivity {
 
         // TODO draw area or line on map to represent direction
         // TODO different area shapes for fixed dome panning
+
+        drawLine(cameraLocation, cameraToEdit.getDirection(), i);
       }
 
       @Override
@@ -372,11 +373,18 @@ public class EditCameraActivity extends AppCompatActivity {
       }
     });
 
+    if (cameraHeight != -1) {
+      heightTextView.setText(String.valueOf(cameraHeight));
+      heightSeekBar.setProgress(cameraHeight);
+    } else {
+      heightTextView.setText("?");
+      heightSeekBar.setProgress(0);
+    }
+
 
     int mount = cameraToEdit.getMount();
 
     // Spinner for camera type selection
-
     // Create an ArrayAdapter using the string array and a default spinner layout
     ArrayAdapter<CharSequence> mountAdapter = ArrayAdapter.createFromResource(getApplicationContext(),
             R.array.edit_camera_mount, android.R.layout.simple_spinner_item);
@@ -459,7 +467,13 @@ public class EditCameraActivity extends AppCompatActivity {
           }
 
           editLocationMarker.setVisibility(View.VISIBLE);
-          EditCameraActivity.this.map.invalidate();
+
+          IGeoPoint center = map.getMapCenter();
+          double lat = center.getLatitude();
+          double lon = center.getLongitude();
+
+
+
         }
 
 
@@ -579,6 +593,58 @@ public class EditCameraActivity extends AppCompatActivity {
     }
     editLocationMarker.setVisibility(View.INVISIBLE);
     generateMarkerOverlayWithCurrentLocation();
+  }
+
+
+  void drawLine(GeoPoint currentPos, int direction, int height){
+
+    int cameraViewDistance = 50; // in m
+
+
+
+
+    // if height entered by user
+    if (height >= 0) {
+      // TODO use formula from surveillance under surveillance https://sunders.uber.space
+      // add 20% viewdistance per meter of height
+
+      double heightFactor = 1 + (0.2 * height);
+      cameraViewDistance *= heightFactor;
+    }
+
+
+    double startLat = currentPos.getLatitude();
+    double startLon = currentPos.getLongitude();
+
+    // in meters
+    double xDiff = Math.cos(Math.toRadians(90 - direction)) * cameraViewDistance;
+    double yDiff = Math.sin(Math.toRadians(90 - direction)) * cameraViewDistance;
+
+    Location endpoint = LocationUtils.getNewLocation(startLat, startLon, yDiff, xDiff);
+
+    GeoPoint endGeoPoint = new GeoPoint(endpoint.getLatitude(), endpoint.getLongitude());
+
+    map.getOverlayManager().remove(line);
+
+    List<GeoPoint> geoPoints = new ArrayList<>();
+    //add your points here
+    geoPoints.add(cameraLocation);
+    geoPoints.add(endGeoPoint);
+    line.setPoints(geoPoints);
+    line.setOnClickListener(new Polyline.OnClickListener() {
+      @Override
+      public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
+        Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
+        return false;
+      }
+    });
+    map.getOverlayManager().add(line);
+
+
+    EditCameraActivity.this.map.invalidate();
+
+
+
   }
 
 

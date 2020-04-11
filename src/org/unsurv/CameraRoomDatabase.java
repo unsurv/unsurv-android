@@ -83,7 +83,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
                 0,
                 0,
                 0,
-                -1,
+                35,
                 -1,
                 "test_pixel_2.jpg", "asd.jpg",
                 null,
@@ -119,7 +119,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
                 "");
 
 
-        // mDao.insert(trainingCamera);
+        mDao.insert(surveillanceCamera);
       }
 
 
