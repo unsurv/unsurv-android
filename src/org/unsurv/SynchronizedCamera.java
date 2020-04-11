@@ -20,6 +20,7 @@ public class SynchronizedCamera {
   private int mount; // unknown, pole, wall, ceiling, streetlamp
   private int direction; // unknown, pole, wall, ceiling, streetlamp
   private int height; // 0 = unknown, in meters editable by user
+  private int angle; // -1 = unknown,  15 to 90 Degree from horizontal
 
   private String imagePath;
 
@@ -38,9 +39,10 @@ public class SynchronizedCamera {
                              String externalID,
                              int type,
                              int area,
-                             int mount,
                              int direction,
+                             int mount,
                              int height,
+                             int angle,
                              double latitude,
                              double longitude,
                              String comments,
@@ -53,9 +55,10 @@ public class SynchronizedCamera {
 
     this.type = type;
     this.area = area;
-    this.mount = mount;
     this.direction = direction;
+    this.mount = mount;
     this.height = height;
+    this.angle = angle;
     this.latitude = latitude;
     this.longitude = longitude;
     this.comments = comments;
@@ -80,16 +83,20 @@ public class SynchronizedCamera {
     return area;
   }
 
-  public int getMount() {
-    return mount;
-  }
-
   public int getDirection() {
     return direction;
   }
 
+  public int getMount() {
+    return mount;
+  }
+
   public int getHeight() {
     return height;
+  }
+
+  public int getAngle() {
+    return angle;
   }
 
   public String getImagePath() {
@@ -134,16 +141,20 @@ public class SynchronizedCamera {
     this.area = area;
   }
 
-  public void setMount(int mount) {
-    this.mount = mount;
-  }
-
   public void setDirection(int direction) {
     this.direction = direction;
   }
 
+  public void setMount(int mount) {
+    this.mount = mount;
+  }
+
   public void setHeight(int height) {
     this.height = height;
+  }
+
+  public void setAngle(int angle) {
+    this.angle = angle;
   }
 
   public void setImagePath(String imagePath) {

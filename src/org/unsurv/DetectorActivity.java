@@ -980,6 +980,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         cameraRepository.insert(new SurveillanceCamera(
                 mostCommonTypeInPool,
                 0,
+                -1,
                 0,
                 -1,
                 -1,
@@ -1008,6 +1009,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         cameraRepository.insert(new SurveillanceCamera(
                 mostCommonTypeInPool,
                 0,
+                -1,
                 0,
                 -1,
                 -1,

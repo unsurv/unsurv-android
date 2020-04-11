@@ -143,6 +143,13 @@
 
                     <TextView
                         android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:text="@string/angle_text"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="end|center_vertical"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
                         android:layout_height="36dp"
                         android:text="@string/timestamp_text"
                         android:layout_marginEnd="4dp"
@@ -228,6 +235,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:gravity="start|center_vertical"/>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/edit_camera_angle_seekbar"
+                            android:layout_width="0sp"
+                            android:layout_weight="7"
+                            android:layout_height="match_parent"
+                            />
+
+                        <TextView
+                            android:id="@+id/edit_camera_angle_text"
+                            android:layout_width="0sp"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:textSize="24sp"
+                            android:layout_height="44dp"/>
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/edit_camera_timestamp_text"

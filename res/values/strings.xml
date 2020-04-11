@@ -28,6 +28,7 @@
     <string name="timestamp_text">Camera captured on:</string>
     <string name="upload_text">Camera upload on:</string>
     <string name="comment_text">Comments:</string>
+    <string name="angle_text">Angle (from horizontal):</string>
 
 
     <string name="type_text">Type:</string>

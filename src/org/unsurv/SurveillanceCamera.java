@@ -27,6 +27,7 @@ public class SurveillanceCamera {
   private int mount; // unknown, pole, wall, ceiling, streetlamp
   private int direction; // -1 = unknown, 0 - 360 degrees
   private int height; // -1 = unknown,  0 - 20 m
+  private int angle; // -1 = unknown,  15 to 90 Degree from horizontal
 
   private String thumbnailPath;
 
@@ -58,9 +59,10 @@ public class SurveillanceCamera {
 
   public SurveillanceCamera(int cameraType,
                             int area,
-                            int mount,
                             int direction,
+                            int mount,
                             int height,
+                            int angle,
                             @Nullable String thumbnailPath,
                             @Nullable String imagePath,
                             @Nullable String externalId,
@@ -81,6 +83,7 @@ public class SurveillanceCamera {
     this.mount = mount;
     this.direction = direction;
     this.height = height;
+    this.angle = angle;
 
     this.thumbnailPath = thumbnailPath;
     this.imagePath = imagePath;
@@ -130,6 +133,10 @@ public class SurveillanceCamera {
 
   public int getHeight() {
     return height;
+  }
+
+  public int getAngle() {
+    return angle;
   }
 
   public String getThumbnailPath() {
@@ -221,12 +228,16 @@ public class SurveillanceCamera {
     this.direction = direction;
   }
 
+  public void setMount(int mount) {
+    this.mount = mount;
+  }
+
   public void setHeight(int height) {
     this.height = height;
   }
 
-  public void setMount(int mount) {
-    this.mount = mount;
+  public void setAngle(int angle) {
+    this.angle = angle;
   }
 
   public void setThumbnailPath(String mThumbnailPath) {

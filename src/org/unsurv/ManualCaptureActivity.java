@@ -165,6 +165,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
         SurveillanceCamera manualCamera = new SurveillanceCamera(
                 cameraType,
                 0,
+                -1,
                 0,
                 -1,
                 -1,

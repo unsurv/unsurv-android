@@ -1113,6 +1113,7 @@ public class CaptureTrainingImageActivity extends AppCompatActivity
         SurveillanceCamera trainingCamera = new SurveillanceCamera(
                 0,
                 0,
+                -1,
                 0,
                 -1,
                 -1,

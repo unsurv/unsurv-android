@@ -84,6 +84,9 @@ public class EditCameraActivity extends AppCompatActivity {
 
   Spinner mountSpinner;
 
+  SeekBar angleSeekBar;
+  TextView angleTextView;
+
   Button saveButton;
   Button editButton;
   ImageButton resetMapButton;
@@ -145,11 +148,14 @@ public class EditCameraActivity extends AppCompatActivity {
     heightSeekBar.setMax(20);
     heightTextView = findViewById(R.id.edit_camera_height_text);
 
+    angleSeekBar = findViewById(R.id.edit_camera_angle_seekbar);
+    angleSeekBar.setMax(75); // start at 15 deg + 75 steps. maximum = 90
+    angleTextView = findViewById(R.id.edit_camera_angle_text);
+
     mountSpinner = findViewById(R.id.edit_camera_mount_selection);
 
     timestampTextView = findViewById(R.id.edit_camera_timestamp_text);
     uploadTextView = findViewById(R.id.edit_camera_upload_text);
-
 
     saveButton = findViewById(R.id.camera_edit_save_button);
     editButton = findViewById(R.id.camera_edit_edit_button);
@@ -200,7 +206,6 @@ public class EditCameraActivity extends AppCompatActivity {
     double lat = cameraToEdit.getLatitude();
     double lon = cameraToEdit.getLongitude();
 
-
     // Setting starting position and zoom level.
     cameraLocation = new GeoPoint(lat, lon);
     mapController.setZoom(16.0);
@@ -239,8 +244,10 @@ public class EditCameraActivity extends AppCompatActivity {
                     R.drawable.standard_camera_marker_5_dpi, 12, null);
             iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
 
-            // reactivate directionseekbar
+            // reactivate all edits
             directionSeekBar.setEnabled(true);
+            angleSeekBar.setEnabled(true);
+
 
             map.getOverlays().add(iconOverlay);
             map.invalidate();
@@ -257,8 +264,9 @@ public class EditCameraActivity extends AppCompatActivity {
 
             // TODO draw circle instead of triangle
 
-            // direction for dome cameras is obsolete
+            // disable redundant edits
             directionSeekBar.setEnabled(false);
+            angleSeekBar.setEnabled(false);
 
             map.getOverlays().add(iconOverlay);
             map.invalidate();
@@ -274,8 +282,10 @@ public class EditCameraActivity extends AppCompatActivity {
                     R.drawable.unknown_camera_marker_5dpi, 12, null);
             iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
 
-            // reactivate directionseekbar
+            // reactivate all edits
             directionSeekBar.setEnabled(true);
+            angleSeekBar.setEnabled(true);
+
 
             map.getOverlays().add(iconOverlay);
             map.invalidate();
@@ -303,7 +313,7 @@ public class EditCameraActivity extends AppCompatActivity {
         // TODO draw area or line on map to represent direction
         // TODO different area shapes for fixed dome panning
 
-        drawLine(cameraLocation, i, cameraToEdit.getHeight());
+        drawLine(cameraLocation, i, cameraToEdit.getHeight(), cameraToEdit.getAngle());
 
       }
 
@@ -371,7 +381,7 @@ public class EditCameraActivity extends AppCompatActivity {
         // TODO draw area or line on map to represent direction
         // TODO different area shapes for fixed dome panning
 
-        drawLine(cameraLocation, cameraToEdit.getDirection(), i);
+        drawLine(cameraLocation, cameraToEdit.getDirection(), i, cameraToEdit.getAngle());
       }
 
       @Override
@@ -392,6 +402,41 @@ public class EditCameraActivity extends AppCompatActivity {
     } else {
       heightTextView.setText("?");
       heightSeekBar.setProgress(0);
+    }
+
+
+    int cameraAngle = cameraToEdit.getAngle();
+
+    angleSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+      @Override
+      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        angleTextView.setText(String.valueOf(i + 15));
+
+        drawLine(cameraLocation, cameraToEdit.getDirection(), cameraToEdit.getHeight(), i + 15);
+
+      }
+
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
+
+      }
+
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
+        int progress = seekBar.getProgress();
+        cameraToEdit.setAngle(progress + 15);
+
+      }
+    });
+
+    if (cameraAngle != -1){
+      angleTextView.setText(String.valueOf(cameraAngle));
+
+      // seekbar has only 0-75 range, cameraAngle from 15 -90
+      angleSeekBar.setProgress(cameraAngle - 15);
+    } else {
+      angleTextView.setText("?");
+      angleSeekBar.setProgress(0);
     }
 
 
@@ -445,7 +490,6 @@ public class EditCameraActivity extends AppCompatActivity {
     editButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-
 
         if(isBeingEdited) {
           // stop editing
@@ -615,22 +659,27 @@ public class EditCameraActivity extends AppCompatActivity {
   }
 
 
-  void drawLine(GeoPoint currentPos, int direction, int height){
+  void drawLine(GeoPoint currentPos, int direction, int height, int angle){
 
-    int cameraViewDistance = 50; // in m
-
-
-
+    int cameraViewDistance = 15; // in m
 
     // if height entered by user
     if (height >= 0) {
       // TODO use formula from surveillance under surveillance https://sunders.uber.space
       // add 20% viewdistance per meter of height
 
-      double heightFactor = 1 + (0.2 * height);
+      double heightFactor = 1 + (0.3 * height);
       cameraViewDistance *= heightFactor;
     }
 
+    if (angle != -1) {
+      // TODO use formula from surveillance under surveillance https://sunders.uber.space
+
+      // add 50% viewdistance per
+      // TODO find suitable formula for height / angle factors
+      double angleFactor = Math.pow(45f / angle, 2) * 0.4;
+      cameraViewDistance *= angleFactor;
+    }
 
     double startLat = currentPos.getLatitude();
     double startLon = currentPos.getLongitude();

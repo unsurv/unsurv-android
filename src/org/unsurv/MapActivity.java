@@ -1513,9 +1513,11 @@ public class MapActivity extends AppCompatActivity {
                     JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
 
                     int area = 0;
+                    int direction = -1;
                     int mount = 0;
-                    int direction = 0;
-                    int height = 0;
+                    int height = -1;
+                    int angle = -1;
+
 
                     if (JSONToSynchronize.has("area")) {
                       area = JSONToSynchronize.getInt("area");
@@ -1538,9 +1540,10 @@ public class MapActivity extends AppCompatActivity {
                             JSONToSynchronize.getString("id"),
                             JSONToSynchronize.getInt("type"),
                             area,
-                            mount,
                             direction,
+                            mount,
                             height,
+                            angle,
                             JSONToSynchronize.getDouble("lat"),
                             JSONToSynchronize.getDouble("lon"),
                             JSONToSynchronize.getString("comments"),
