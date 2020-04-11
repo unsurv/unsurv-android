@@ -47,6 +47,7 @@ import java.util.List;
 
 
 // TODO add angle to bottom
+// TODO NEW MARKERS
 // TODO auto open this activity after capture
 
 /**
@@ -238,6 +239,9 @@ public class EditCameraActivity extends AppCompatActivity {
                     R.drawable.standard_camera_marker_5_dpi, 12, null);
             iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
 
+            // reactivate directionseekbar
+            directionSeekBar.setEnabled(true);
+
             map.getOverlays().add(iconOverlay);
             map.invalidate();
             break;
@@ -251,8 +255,14 @@ public class EditCameraActivity extends AppCompatActivity {
                     R.drawable.dome_camera_marker_5_dpi, 12, null);
             iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
 
+            // TODO draw circle instead of triangle
+
+            // direction for dome cameras is obsolete
+            directionSeekBar.setEnabled(false);
+
             map.getOverlays().add(iconOverlay);
             map.invalidate();
+
             break;
 
           case StorageUtils.PANNING_CAMERA:
@@ -263,6 +273,9 @@ public class EditCameraActivity extends AppCompatActivity {
             cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(),
                     R.drawable.unknown_camera_marker_5dpi, 12, null);
             iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+            // reactivate directionseekbar
+            directionSeekBar.setEnabled(true);
 
             map.getOverlays().add(iconOverlay);
             map.invalidate();
@@ -486,7 +499,6 @@ public class EditCameraActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-
         if (isBeingEdited){
 
           IGeoPoint center = map.getMapCenter();
@@ -506,6 +518,13 @@ public class EditCameraActivity extends AppCompatActivity {
 
 
         } else {
+
+          // set direction / angle to unknown if type DOME
+          if (cameraToEdit.getCameraType() == StorageUtils.DOME_CAMERA) {
+            cameraToEdit.setDirection(-1); // unknown
+            // cameraToEdit.setAngle(-1); // unknown
+
+          }
           cameraRepository.updateCameras(cameraToEdit);
           adapter.notifyDataSetChanged();
 
