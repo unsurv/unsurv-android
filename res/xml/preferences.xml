@@ -23,6 +23,11 @@
             android:key="clear_training"
             android:title="Clear your training images" />
 
+        <Preference
+            android:key="export_data"
+            android:title="Export to Files"
+            />
+
     </PreferenceCategory>
 
 

@@ -1,12 +1,19 @@
 package org.unsurv;
 
+import android.app.Application;
+import android.content.Context;
 import android.os.Environment;
+import android.os.FileUtils;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -283,5 +290,86 @@ class StorageUtils {
 
     return result;
   }
+
+  /**
+   * exports captures to a csv file
+   * @param camerasToExport
+   * @return true if successful
+   */
+
+  static boolean exportCaptures(List<SurveillanceCamera> camerasToExport) {
+
+
+    String exportPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .getAbsolutePath() + "/unsurv/export/";
+
+    String filename = "export.txt";
+
+    String header = "TYPE,AREA,DIRECTION,MOUNT,HEIGHT,ANGLE,THUMBNAIL,IMAGE,LAT,LON,ISTRAINING,BOXES\n";
+
+    File exportDir = new File(exportPath);
+    exportDir.mkdirs();
+
+    File exportFile = new File(exportPath + filename);
+
+    // delete old export file
+    if (exportFile.isFile()) {
+      exportFile.delete();
+    }
+
+      try {
+        FileWriter writer = new FileWriter(exportPath + filename);
+        writer.write(header);
+
+        for (SurveillanceCamera camera : camerasToExport) {
+          writer.write(camera.toString() + "\n");
+        }
+
+        writer.close();
+
+      } catch (IOException ioe) {
+        return false;
+      }
+
+    return true;
+
+  }
+
+  static boolean exportImages(List<SurveillanceCamera> camerasToExport) {
+
+    String exportPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .getAbsolutePath() + "/unsurv/export/";
+
+    for (SurveillanceCamera camera : camerasToExport) {
+
+      boolean isTrainingImage = camera.getTrainingCapture();
+
+      // TODO copy files instead of moving them
+      if (isTrainingImage) {
+        // for training captures the complete image is needed
+
+        String trainingImagePath = camera.getImagePath();
+
+        File src = new File(TRAINING_CAPTURES_PATH + trainingImagePath);
+        File dest = new File(exportPath + trainingImagePath);
+
+        src.renameTo(dest);
+
+      } else {
+        // for regular captures use detection box image
+        String thumbnailPath = camera.getThumbnailPath();
+
+        File src = new File(CAMERA_CAPTURES_PATH + thumbnailPath);
+        File dest = new File(exportPath + thumbnailPath);
+
+        src.renameTo(dest);
+
+        // Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      }
+    }
+
+    return true;
+  }
+
 
 }

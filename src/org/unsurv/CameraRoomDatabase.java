@@ -122,6 +122,7 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
 
 
         mDao.insert(surveillanceCamera);
+        mDao.insert(trainingCamera);
       }
 
 

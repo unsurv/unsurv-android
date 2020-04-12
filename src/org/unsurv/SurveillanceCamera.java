@@ -1,5 +1,6 @@
 package org.unsurv;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.annotation.Nullable;
@@ -7,6 +8,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * Object representing a local camera capture by the user. Either manual, via object detection or
@@ -279,6 +281,28 @@ public class SurveillanceCamera {
 
   public void setCaptureFilenames(String captureFilenames) {
     this.captureFilenames = captureFilenames;
+  }
+
+  @Override
+  @NonNull
+  public String toString(){
+
+
+    StringJoiner joiner = new StringJoiner(",");
+
+    joiner.add(String.valueOf(cameraType))
+            .add(String.valueOf(area))
+            .add(String.valueOf(direction))
+            .add(String.valueOf(mount))
+            .add(String.valueOf(height))
+            .add(String.valueOf(angle))
+            .add(thumbnailPath)
+            .add(imagePath)
+            .add(String.valueOf(latitude))
+            .add(String.valueOf(longitude))
+            .add(String.valueOf(trainingCapture));
+
+    return joiner.toString() + drawnRectsAsString; // don't end with comma
   }
 
 //TODO add delete function to delete all Files connected to specific camera

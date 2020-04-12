@@ -36,6 +36,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   private Preference clearSynchronizedImages;
   private Preference clearCapturedImages;
   private Preference clearTrainingImages;
+  private Preference exportData;
   private Preference databaseSize;
 
   private SharedPreferences sharedPreferences;
@@ -148,6 +149,27 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         return true;
 
+      }
+    });
+
+
+    exportData = findPreference("export_data");
+
+    exportData.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+
+        List<SurveillanceCamera> camerasToExport = cameraRepository.getAllCameras();
+
+        // ~~~~~~~~~~~~~ pasta time
+
+        if (StorageUtils.exportCaptures(camerasToExport)){
+          if(StorageUtils.exportImages(camerasToExport)) {
+            Toast.makeText(ctx, "Successfully exported data to /Pictures/unsurv/export/", Toast.LENGTH_LONG).show();
+          }
+        }
+
+        return true;
       }
     });
 
