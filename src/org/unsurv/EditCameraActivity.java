@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -102,6 +103,7 @@ public class EditCameraActivity extends AppCompatActivity {
   GeoPoint cameraLocation;
 
   Polyline line = new Polyline();
+  Polygon polygon = new Polygon();
 
   int cameraType;
 
@@ -211,6 +213,16 @@ public class EditCameraActivity extends AppCompatActivity {
     mapController.setZoom(16.0);
     mapController.setCenter(cameraLocation);
 
+    int asd = Color.argb(127,255,0,255);
+    polygon.setFillColor(asd);
+    polygon.setStrokeColor(asd);
+
+    drawCameraArea(cameraLocation,
+            cameraToEdit.getDirection(),
+            cameraToEdit.getHeight(),
+            cameraToEdit.getAngle(),
+            cameraToEdit.getCameraType());
+
 
     // Spinner for camera type selection
     // Create an ArrayAdapter using the string array and a default spinner layout
@@ -248,6 +260,11 @@ public class EditCameraActivity extends AppCompatActivity {
             directionSeekBar.setEnabled(true);
             angleSeekBar.setEnabled(true);
 
+            drawCameraArea(cameraLocation,
+                    cameraToEdit.getDirection(),
+                    cameraToEdit.getHeight(),
+                    cameraToEdit.getAngle(),
+                    cameraToEdit.getCameraType());
 
             map.getOverlays().add(iconOverlay);
             map.invalidate();
@@ -264,9 +281,16 @@ public class EditCameraActivity extends AppCompatActivity {
 
             // TODO draw circle instead of triangle
 
-            // disable redundant edits
+            // set non used values to "unknown" and disable edits
+
             directionSeekBar.setEnabled(false);
             angleSeekBar.setEnabled(false);
+
+            drawCameraArea(cameraLocation,
+                    cameraToEdit.getDirection(),
+                    cameraToEdit.getHeight(),
+                    cameraToEdit.getAngle(),
+                    cameraToEdit.getCameraType());
 
             map.getOverlays().add(iconOverlay);
             map.invalidate();
@@ -286,6 +310,11 @@ public class EditCameraActivity extends AppCompatActivity {
             directionSeekBar.setEnabled(true);
             angleSeekBar.setEnabled(true);
 
+            drawCameraArea(cameraLocation,
+                    cameraToEdit.getDirection(),
+                    cameraToEdit.getHeight(),
+                    cameraToEdit.getAngle(),
+                    cameraToEdit.getCameraType());
 
             map.getOverlays().add(iconOverlay);
             map.invalidate();
@@ -300,7 +329,7 @@ public class EditCameraActivity extends AppCompatActivity {
       }
     });
 
-    int cameraDirection = cameraToEdit.getDirection();
+    final int cameraDirection = cameraToEdit.getDirection();
 
 
 
@@ -313,7 +342,12 @@ public class EditCameraActivity extends AppCompatActivity {
         // TODO draw area or line on map to represent direction
         // TODO different area shapes for fixed dome panning
 
-        drawLine(cameraLocation, i, cameraToEdit.getHeight(), cameraToEdit.getAngle());
+        drawCameraArea(
+                new GeoPoint(cameraToEdit.getLatitude(), cameraToEdit.getLongitude()),
+                i,
+                cameraToEdit.getHeight(),
+                cameraToEdit.getAngle(),
+                cameraToEdit.getCameraType());
 
       }
 
@@ -381,7 +415,12 @@ public class EditCameraActivity extends AppCompatActivity {
         // TODO draw area or line on map to represent direction
         // TODO different area shapes for fixed dome panning
 
-        drawLine(cameraLocation, cameraToEdit.getDirection(), i, cameraToEdit.getAngle());
+        drawCameraArea(
+                new GeoPoint(cameraToEdit.getLatitude(), cameraToEdit.getLongitude()),
+                cameraToEdit.getDirection(),
+                i,
+                cameraToEdit.getAngle(),
+                cameraToEdit.getCameraType());
       }
 
       @Override
@@ -412,7 +451,12 @@ public class EditCameraActivity extends AppCompatActivity {
       public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
         angleTextView.setText(String.valueOf(i + 15));
 
-        drawLine(cameraLocation, cameraToEdit.getDirection(), cameraToEdit.getHeight(), i + 15);
+        drawCameraArea(
+                new GeoPoint(cameraToEdit.getLatitude(), cameraToEdit.getLongitude()),
+                cameraToEdit.getDirection(),
+                cameraToEdit.getHeight(),
+                i + 15, // + 15 because we cant set seekbarmin in API 24
+                cameraToEdit.getCameraType());
 
       }
 
@@ -556,6 +600,12 @@ public class EditCameraActivity extends AppCompatActivity {
 
           generateMarkerOverlayWithCurrentLocation();
 
+          drawCameraArea(new GeoPoint(newLat, newLon),
+                  cameraToEdit.getDirection(),
+                  cameraToEdit.getHeight(),
+                  cameraToEdit.getAngle(),
+                  cameraToEdit.getCameraType());
+
           cameraRepository.updateCameras(cameraToEdit);
           adapter.notifyDataSetChanged();
           isBeingEdited = false;
@@ -566,7 +616,7 @@ public class EditCameraActivity extends AppCompatActivity {
           // set direction / angle to unknown if type DOME
           if (cameraToEdit.getCameraType() == StorageUtils.DOME_CAMERA) {
             cameraToEdit.setDirection(-1); // unknown
-            // cameraToEdit.setAngle(-1); // unknown
+            cameraToEdit.setAngle(-1); // unknown
 
           }
           cameraRepository.updateCameras(cameraToEdit);
@@ -659,9 +709,9 @@ public class EditCameraActivity extends AppCompatActivity {
   }
 
 
-  void drawLine(GeoPoint currentPos, int direction, int height, int angle){
+  void drawCameraArea(GeoPoint currentPos, int direction, int height, int horizontalAngle, int cameraType) {
 
-    int cameraViewDistance = 15; // in m
+    int baseViewDistance = 15; // in m
 
     // if height entered by user
     if (height >= 0) {
@@ -669,51 +719,71 @@ public class EditCameraActivity extends AppCompatActivity {
       // add 20% viewdistance per meter of height
 
       double heightFactor = 1 + (0.3 * height);
-      cameraViewDistance *= heightFactor;
+      baseViewDistance *= heightFactor;
     }
 
-    if (angle != -1) {
+    if (horizontalAngle != -1) {
       // TODO use formula from surveillance under surveillance https://sunders.uber.space
 
       // add 50% viewdistance per
       // TODO find suitable formula for height / angle factors
-      double angleFactor = Math.pow(45f / angle, 2) * 0.4;
-      cameraViewDistance *= angleFactor;
+      double angleFactor = Math.pow(45f / horizontalAngle, 2) * 0.4;
+      baseViewDistance *= angleFactor;
     }
 
-    double startLat = currentPos.getLatitude();
-    double startLon = currentPos.getLongitude();
-
-    // in meters
-    double xDiff = Math.cos(Math.toRadians(90 - direction)) * cameraViewDistance;
-    double yDiff = Math.sin(Math.toRadians(90 - direction)) * cameraViewDistance;
-
-    Location endpoint = LocationUtils.getNewLocation(startLat, startLon, yDiff, xDiff);
-
-    GeoPoint endGeoPoint = new GeoPoint(endpoint.getLatitude(), endpoint.getLongitude());
-
+    // remove old drawings
+    map.getOverlayManager().remove(polygon);
     map.getOverlayManager().remove(line);
 
-    List<GeoPoint> geoPoints = new ArrayList<>();
-    //add your points here
-    geoPoints.add(cameraLocation);
-    geoPoints.add(endGeoPoint);
-    line.setPoints(geoPoints);
-    line.setOnClickListener(new Polyline.OnClickListener() {
-      @Override
-      public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
-        Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
-        return false;
+    List<GeoPoint> geoPoints;
+
+    if (cameraType == StorageUtils.FIXED_CAMERA || cameraType == StorageUtils.PANNING_CAMERA) {
+
+      int viewAngle;
+
+      if (cameraType == StorageUtils.FIXED_CAMERA) {
+        viewAngle = 60; // fixed camera
+      } else {
+        viewAngle = 120; // panning camera
       }
-    });
-    map.getOverlayManager().add(line);
+
+      // calculate geopoints for triangle
+
+      double startLat = currentPos.getLatitude();
+      double startLon = currentPos.getLongitude();
+
+      // triangle sides direction
+      int direction1 = direction - viewAngle / 2;
+      int direction2 = direction + viewAngle / 2;
+
+      // in meters, simulate a 2d coordinate system, known values are: hyp length, and inside angles
+      double xDiff1 = Math.cos(Math.toRadians(90 - direction1)) * baseViewDistance;
+      double yDiff1 = Math.sin(Math.toRadians(90 - direction1)) * baseViewDistance;
+
+      double xDiff2 = Math.cos(Math.toRadians(90 - direction2)) * baseViewDistance;
+      double yDiff2 = Math.sin(Math.toRadians(90 - direction2)) * baseViewDistance;
 
 
+      Location endpoint1 = LocationUtils.getNewLocation(startLat, startLon, yDiff1, xDiff1);
+      Location endpoint2 = LocationUtils.getNewLocation(startLat, startLon, yDiff2, xDiff2);
+
+      geoPoints = new ArrayList<>();
+
+      geoPoints.add(new GeoPoint(startLat, startLon));
+      geoPoints.add(new GeoPoint(endpoint1.getLatitude(), endpoint1.getLongitude()));
+      geoPoints.add(new GeoPoint(endpoint2.getLatitude(), endpoint2.getLongitude()));
+
+    } else {
+
+      // circle for dome cameras
+      geoPoints = Polygon.pointsAsCircle(currentPos, baseViewDistance);
+
+    }
+
+    polygon.setPoints(geoPoints);
+    map.getOverlayManager().add(polygon);
     EditCameraActivity.this.map.invalidate();
 
-
-
   }
-
 
 }
