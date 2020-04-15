@@ -3,6 +3,7 @@ package org.unsurv;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -39,6 +41,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.IconOverlay;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
 
@@ -110,6 +113,7 @@ public class EditCameraActivity extends AppCompatActivity {
   boolean isBeingEdited = false;
 
   Context context;
+  Resources resources;
 
   private static String picturesPath = StorageUtils.CAMERA_CAPTURES_PATH;
 
@@ -129,6 +133,7 @@ public class EditCameraActivity extends AppCompatActivity {
     setContentView(R.layout.activity_edit_camera);
 
     context = this;
+    resources = context.getResources();
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -177,8 +182,8 @@ public class EditCameraActivity extends AppCompatActivity {
 
 
     Picasso.get().load(cameraImage)
-              .placeholder(R.drawable.ic_camera_alt_grey_50dp)
-              .into(cameraImageView);
+            .placeholder(R.drawable.ic_camera_alt_grey_50dp)
+            .into(cameraImageView);
 
     recyclerView.setHasFixedSize(true);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -213,9 +218,9 @@ public class EditCameraActivity extends AppCompatActivity {
     mapController.setZoom(16.0);
     mapController.setCenter(cameraLocation);
 
-    int asd = Color.argb(127,255,0,255);
-    polygon.setFillColor(asd);
-    polygon.setStrokeColor(asd);
+    int hotPink = Color.argb(127, 255, 0, 255);
+    polygon.setFillColor(hotPink);
+    polygon.setStrokeColor(hotPink);
 
     drawCameraArea(cameraLocation,
             cameraToEdit.getDirection(),
@@ -246,80 +251,27 @@ public class EditCameraActivity extends AppCompatActivity {
 
         cameraToEdit.setCameraType(i);
 
-        switch (i){
-          case StorageUtils.FIXED_CAMERA:
+        cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(resources,
+                chooseMarker(i, cameraToEdit.getArea()), 12, null);
 
-            map.getOverlays().remove(iconOverlay);
-            map.invalidate();
+        map.getOverlays().remove(iconOverlay);
 
-            cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(),
-                    R.drawable.standard_camera_marker_5_dpi, 12, null);
-            iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+        iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
 
-            // reactivate all edits
-            directionSeekBar.setEnabled(true);
-            angleSeekBar.setEnabled(true);
+        // reactivate all edits
+        directionSeekBar.setEnabled(true);
+        angleSeekBar.setEnabled(true);
 
-            drawCameraArea(cameraLocation,
-                    cameraToEdit.getDirection(),
-                    cameraToEdit.getHeight(),
-                    cameraToEdit.getAngle(),
-                    cameraToEdit.getCameraType());
+        drawCameraArea(cameraLocation,
+                cameraToEdit.getDirection(),
+                cameraToEdit.getHeight(),
+                cameraToEdit.getAngle(),
+                cameraToEdit.getCameraType());
 
-            map.getOverlays().add(iconOverlay);
-            map.invalidate();
-            break;
+        List<Overlay> asdf = map.getOverlays();
+        map.getOverlays().add(iconOverlay);
+        map.invalidate();
 
-          case StorageUtils.DOME_CAMERA:
-
-            map.getOverlays().remove(iconOverlay);
-            map.invalidate();
-
-            cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(),
-                    R.drawable.dome_camera_marker_5_dpi, 12, null);
-            iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
-
-            // TODO draw circle instead of triangle
-
-            // set non used values to "unknown" and disable edits
-
-            directionSeekBar.setEnabled(false);
-            angleSeekBar.setEnabled(false);
-
-            drawCameraArea(cameraLocation,
-                    cameraToEdit.getDirection(),
-                    cameraToEdit.getHeight(),
-                    cameraToEdit.getAngle(),
-                    cameraToEdit.getCameraType());
-
-            map.getOverlays().add(iconOverlay);
-            map.invalidate();
-
-            break;
-
-          case StorageUtils.PANNING_CAMERA:
-
-            map.getOverlays().remove(iconOverlay);
-            map.invalidate();
-
-            cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(context.getResources(),
-                    R.drawable.unknown_camera_marker_5dpi, 12, null);
-            iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
-
-            // reactivate all edits
-            directionSeekBar.setEnabled(true);
-            angleSeekBar.setEnabled(true);
-
-            drawCameraArea(cameraLocation,
-                    cameraToEdit.getDirection(),
-                    cameraToEdit.getHeight(),
-                    cameraToEdit.getAngle(),
-                    cameraToEdit.getCameraType());
-
-            map.getOverlays().add(iconOverlay);
-            map.invalidate();
-            break;
-        }
 
       }
 
@@ -330,8 +282,6 @@ public class EditCameraActivity extends AppCompatActivity {
     });
 
     final int cameraDirection = cameraToEdit.getDirection();
-
-
 
 
     directionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -395,6 +345,28 @@ public class EditCameraActivity extends AppCompatActivity {
                 .setTextColor(getResources().getColor(R.color.textWhite, null));
 
         cameraToEdit.setArea(i);
+
+        cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(resources,
+                chooseMarker(cameraToEdit.getCameraType(), i), 12, null);
+
+        map.getOverlays().remove(iconOverlay);
+        List<Overlay> asdf = map.getOverlays();
+
+        iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
+
+        // reactivate all edits
+        directionSeekBar.setEnabled(true);
+        angleSeekBar.setEnabled(true);
+
+        drawCameraArea(cameraLocation,
+                cameraToEdit.getDirection(),
+                cameraToEdit.getHeight(),
+                cameraToEdit.getAngle(),
+                cameraToEdit.getCameraType());
+
+        map.getOverlays().add(iconOverlay);
+        map.invalidate();
+
 
       }
 
@@ -473,7 +445,7 @@ public class EditCameraActivity extends AppCompatActivity {
       }
     });
 
-    if (cameraAngle != -1){
+    if (cameraAngle != -1) {
       angleTextView.setText(String.valueOf(cameraAngle));
 
       // seekbar has only 0-75 range, cameraAngle from 15 -90
@@ -521,7 +493,7 @@ public class EditCameraActivity extends AppCompatActivity {
 
     boolean showTimestamps = sharedPreferences.getBoolean("showCaptureTimestamps", false);
 
-    if (timestampAsDate == null || !showTimestamps){
+    if (timestampAsDate == null || !showTimestamps) {
       timestampTextView.setText(getString(R.string.timestamp_not_available));
     } else {
       timestampTextView.setText(timestampAsDate);
@@ -535,7 +507,7 @@ public class EditCameraActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        if(isBeingEdited) {
+        if (isBeingEdited) {
           // stop editing
           isBeingEdited = false;
           resetMap();
@@ -546,39 +518,12 @@ public class EditCameraActivity extends AppCompatActivity {
           map.getOverlays().removeAll(map.getOverlays());
           EditCameraActivity.this.map.invalidate();
 
-          switch (cameraToEdit.getCameraType()) {
-            case StorageUtils.FIXED_CAMERA:
-
-              Picasso.get().load(R.drawable.standard_camera_marker_5_dpi)
-                      .into(editLocationMarker);
-              break;
-
-            case StorageUtils.DOME_CAMERA:
-
-              Picasso.get().load(R.drawable.dome_camera_marker_5_dpi)
-                      .into(editLocationMarker);
-              break;
-
-            case StorageUtils.PANNING_CAMERA:
-
-              Picasso.get().load(R.drawable.unknown_camera_marker_5dpi)
-                      .into(editLocationMarker);
-              break;
-
-          }
+          Picasso.get().load(chooseMarker(cameraToEdit.getCameraType(), cameraToEdit.getArea()))
+                  .into(editLocationMarker);
 
           editLocationMarker.setVisibility(View.VISIBLE);
 
-          IGeoPoint center = map.getMapCenter();
-          double lat = center.getLatitude();
-          double lon = center.getLongitude();
-
-
-
         }
-
-
-
 
       }
     });
@@ -587,7 +532,7 @@ public class EditCameraActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        if (isBeingEdited){
+        if (isBeingEdited) {
 
           IGeoPoint center = map.getMapCenter();
           double newLat = center.getLatitude();
@@ -644,7 +589,7 @@ public class EditCameraActivity extends AppCompatActivity {
       @Override
       public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
 
           case R.id.bottom_navigation_history:
             Intent historyIntent = new Intent(EditCameraActivity.this, HistoryActivity.class);
@@ -683,15 +628,16 @@ public class EditCameraActivity extends AppCompatActivity {
     bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_history).setChecked(true);
 
 
-
   }
 
-  void generateMarkerOverlayWithCurrentLocation(){
+  void generateMarkerOverlayWithCurrentLocation() {
 
     // Setting starting position and zoom level.
     GeoPoint cameraLocation = new GeoPoint(cameraToEdit.getLatitude(), cameraToEdit.getLongitude());
     mapController.setZoom(16.0);
     mapController.setCenter(cameraLocation);
+
+    map.getOverlays().remove(iconOverlay);
 
     iconOverlay = new BottomAnchorIconOverlay(cameraLocation, cameraMarkerIcon);
 
@@ -700,8 +646,8 @@ public class EditCameraActivity extends AppCompatActivity {
 
   }
 
-  void resetMap(){
-    if (isBeingEdited){
+  void resetMap() {
+    if (isBeingEdited) {
       isBeingEdited = false;
     }
     editLocationMarker.setVisibility(View.INVISIBLE);
@@ -783,6 +729,86 @@ public class EditCameraActivity extends AppCompatActivity {
     polygon.setPoints(geoPoints);
     map.getOverlayManager().add(polygon);
     EditCameraActivity.this.map.invalidate();
+
+  }
+
+
+  int chooseMarker(int cameraType, int cameraArea) {
+
+    // TODO lookup table instead of ugly nested switches
+
+    switch (cameraType) {
+
+      case StorageUtils.FIXED_CAMERA:
+
+        // inside switch for area
+        switch (cameraArea) {
+
+          case StorageUtils.AREA_OUTDOOR:
+            return R.drawable.fixed_outdoor;
+
+
+          case StorageUtils.AREA_PUBLIC:
+            return R.drawable.fixed_public;
+
+
+          case StorageUtils.AREA_INDOOR:
+
+            return R.drawable.fixed_indoor;
+
+          default: // for clarity
+            Log.i("nested switch", "default area fixed");
+            return R.drawable.fixed_outdoor;
+
+        }
+
+      case StorageUtils.DOME_CAMERA:
+
+        // inside switch for area
+        switch (cameraArea) {
+
+          case StorageUtils.AREA_OUTDOOR:
+            return R.drawable.dome_outdoor;
+
+
+          case StorageUtils.AREA_PUBLIC:
+            return R.drawable.dome_public;
+
+
+          case StorageUtils.AREA_INDOOR:
+            return R.drawable.dome_indoor;
+
+
+          default:
+            return R.drawable.dome_outdoor;
+
+        }
+
+      case StorageUtils.PANNING_CAMERA:
+
+        // inside switch for area
+        switch (cameraArea) {
+
+          case StorageUtils.AREA_OUTDOOR:
+            return R.drawable.panning_outdoor;
+
+
+          case StorageUtils.AREA_PUBLIC:
+            return R.drawable.panning_public;
+
+
+          case StorageUtils.AREA_INDOOR:
+            return R.drawable.panning_indoor;
+
+
+          default:
+            return R.drawable.panning_outdoor;
+        }
+
+    }
+
+
+    return R.drawable.fixed_outdoor;
 
   }
 
