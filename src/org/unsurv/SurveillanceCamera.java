@@ -302,7 +302,7 @@ public class SurveillanceCamera {
             .add(String.valueOf(longitude))
             .add(String.valueOf(trainingCapture));
 
-    return joiner.toString() + drawnRectsAsString; // don't end with comma
+    return joiner.toString() + "," + drawnRectsAsString; // don't end with comma
   }
 
 //TODO add delete function to delete all Files connected to specific camera

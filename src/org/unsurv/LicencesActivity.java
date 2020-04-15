@@ -26,6 +26,7 @@ public class LicencesActivity extends AppCompatActivity {
     TextView tensorflowText;
     TextView osmdroidText;
     TextView osmdroidBonusText;
+    TextView sundersTextView;
     TextView picassoText;
     TextView googleTinkText;
     TextView googleVolleyText;
@@ -40,6 +41,7 @@ public class LicencesActivity extends AppCompatActivity {
         tensorflowText = findViewById(R.id.licences_tensorflow);
         osmdroidText = findViewById(R.id.licences_osmdroid);
         osmdroidBonusText = findViewById(R.id.licences_osmdroid_bonus);
+        sundersTextView = findViewById(R.id.licences_sunders);
         picassoText = findViewById(R.id.licences_picasso);
         googleTinkText = findViewById(R.id.licences_tink);
         googleVolleyText = findViewById(R.id.licences_volley);
@@ -69,6 +71,14 @@ public class LicencesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 licenceTextView.setText(R.string.osmdroid_bonuspack_licence);
+                licenceTextView.scrollTo(0,0);
+            }
+        });
+
+        sundersTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                licenceTextView.setText(R.string.sunders_licence);
                 licenceTextView.scrollTo(0,0);
             }
         });

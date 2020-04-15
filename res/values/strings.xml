@@ -156,11 +156,12 @@ To access the online database an access key is generated every week. Your captur
 
 
     <!--in LicencesActivity-->
-    <string name="licennce_title">Licences:</string>
+    <string name="licence_title">Licences:</string>
 
     <string name="tensorflow_source">Tensorflow Android Example Application</string>
     <string name="osmdroid_source">Osmdroid / OpenStreetMap</string>
     <string name="osmdroidbonus_source">Osmdroid Bonuspack</string>
+    <string name="sunders_source">Surveillance Under Surveillance</string>
     <string name="picasso_source">Picasso</string>
     <string name="google_tink_source">Google Tink</string>
     <string name="google_volley_source">Google Volley</string>
@@ -170,8 +171,12 @@ To access the online database an access key is generated every week. Your captur
 
     <!-- LICENCES -->
 
+    <string name="sunders_licence">This project has been inspired by \nhttps://sunders.uber.space the increasing amount of everyday surveillance\n
 
-    <string name="tensorflow_licence"> https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android \n\nCopyright 2016 The TensorFlow Authors. All Rights Reserved.
+    </string>
+
+
+    <string name="tensorflow_licence">https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android \n\nCopyright 2016 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the \"License");
 you may not use this file except in compliance with the License.
