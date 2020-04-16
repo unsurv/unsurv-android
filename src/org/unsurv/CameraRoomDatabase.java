@@ -82,9 +82,9 @@ public abstract class CameraRoomDatabase extends RoomDatabase {
         SurveillanceCamera surveillanceCamera = new SurveillanceCamera(
                 0,
                 0,
-                35,
+                160,
                 0,
-                -1,
+                5,
                 -1,
                 "test_pixel_2.jpg", "asd.jpg",
                 null,

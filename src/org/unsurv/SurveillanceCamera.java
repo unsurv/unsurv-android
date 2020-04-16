@@ -28,7 +28,7 @@ public class SurveillanceCamera {
   private int area; // unknown, outdoor, public, indoor, traffic
   private int mount; // unknown, pole, wall, ceiling, streetlamp
   private int direction; // -1 = unknown, 0 - 360 degrees
-  private int height; // -1 = unknown,  0 - 20 m
+  private int height; // -1 = unknown,  0 - 20 m default 5 m
   private int angle; // -1 = unknown,  15 to 90 Degree from horizontal
 
   private String thumbnailPath;

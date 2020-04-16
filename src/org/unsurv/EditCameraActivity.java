@@ -671,9 +671,8 @@ public class EditCameraActivity extends AppCompatActivity {
     if (horizontalAngle != -1) {
       // TODO use formula from surveillance under surveillance https://sunders.uber.space
 
-      // add 50% viewdistance per
-      // TODO find suitable formula for height / angle factors
-      double angleFactor = Math.pow(45f / horizontalAngle, 2) * 0.4;
+      // about the same as SurveillanceUnderSurveillance https://sunders.uber.space
+      double angleFactor = Math.pow(25f / horizontalAngle, 2) * 0.4;
       baseViewDistance *= angleFactor;
     }
 
@@ -722,7 +721,7 @@ public class EditCameraActivity extends AppCompatActivity {
     } else {
 
       // circle for dome cameras
-      geoPoints = Polygon.pointsAsCircle(currentPos, baseViewDistance);
+      geoPoints = Polygon.pointsAsCircle(currentPos, height * 7);
 
     }
 
