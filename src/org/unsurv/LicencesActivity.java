@@ -48,7 +48,6 @@ public class LicencesActivity extends AppCompatActivity {
 
         licenceTextView = findViewById(R.id.licence_text);
 
-        licenceTextView.setMovementMethod(new ScrollingMovementMethod());
 
         // set licence text and scroll to top
         tensorflowText.setOnClickListener(new View.OnClickListener() {

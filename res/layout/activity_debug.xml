@@ -135,7 +135,8 @@
         android:id="@+id/debug_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="This is a debug-activity"/>
+        android:autoLink="web"
+        android:text="This is a debug-activity https://unsurv.org"/>
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

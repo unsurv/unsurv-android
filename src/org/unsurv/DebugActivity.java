@@ -288,7 +288,7 @@ public class DebugActivity extends AppCompatActivity {
 
     layoutInflater = (LayoutInflater) DebugActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    debugTextView.setText(String.valueOf(notificationPreference));
+    // debugTextView.setText(String.valueOf(notificationPreference));
 
     wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
