@@ -643,8 +643,16 @@ public class DebugActivity extends AppCompatActivity {
 
         List<SurveillanceCamera> cameras = cameraRepository.getAllCameras();
 
-        if (StorageUtils.exportCaptures(cameras)) {
-          StorageUtils.exportImages(cameras);
+        List<SurveillanceCamera> filteredCameras = new ArrayList<>();
+
+        for (SurveillanceCamera camera: cameras) {
+          if (!camera.getTrainingCapture()){
+            filteredCameras.add(camera);
+          }
+        }
+
+        if (StorageUtils.exportCaptures(filteredCameras)) {
+          StorageUtils.exportImages(filteredCameras, true);
         }
 
       }

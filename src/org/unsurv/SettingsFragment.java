@@ -21,6 +21,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -36,7 +37,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
   private Preference clearSynchronizedImages;
   private Preference clearCapturedImages;
   private Preference clearTrainingImages;
-  private Preference exportData;
+  private Preference exportCapturesData;
+  private Preference exportTrainingData;
   private Preference databaseSize;
 
   private SharedPreferences sharedPreferences;
@@ -153,19 +155,54 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     });
 
 
-    exportData = findPreference("export_data");
+    exportCapturesData = findPreference("export_data");
 
-    exportData.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+    exportCapturesData.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override
       public boolean onPreferenceClick(Preference preference) {
 
         List<SurveillanceCamera> camerasToExport = cameraRepository.getAllCameras();
 
+        List<SurveillanceCamera> filteredCameras = new ArrayList<>();
+
+        for (SurveillanceCamera camera: camerasToExport) {
+          if (!camera.getTrainingCapture()){
+            filteredCameras.add(camera);
+          }
+        }
+
         // ~~~~~~~~~~~~~ pasta time
 
-        if (StorageUtils.exportCaptures(camerasToExport)){
-          if(StorageUtils.exportImages(camerasToExport)) {
-            Toast.makeText(ctx, "Successfully exported data to /Pictures/unsurv/export/", Toast.LENGTH_LONG).show();
+        if (StorageUtils.exportCaptures(filteredCameras)){
+          if(StorageUtils.exportImages(filteredCameras, true)) {
+            Toast.makeText(ctx, "Successfully exported data to /Pictures/unsurv/export/captures/", Toast.LENGTH_LONG).show();
+          }
+        }
+
+        return true;
+      }
+    });
+
+
+    exportTrainingData = findPreference("export_data_training");
+
+    exportTrainingData.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+
+        List<SurveillanceCamera> camerasToExport = cameraRepository.getAllCameras();
+
+        List<SurveillanceCamera> filteredCameras = new ArrayList<>();
+
+        for (SurveillanceCamera camera: camerasToExport) {
+          if (camera.getTrainingCapture()){
+            filteredCameras.add(camera);
+          }
+        }
+
+        if (StorageUtils.exportTraining(filteredCameras)){
+          if(StorageUtils.exportImages(filteredCameras, false)) {
+            Toast.makeText(ctx, "Successfully exported data to /Pictures/unsurv/export/training/", Toast.LENGTH_LONG).show();
           }
         }
 

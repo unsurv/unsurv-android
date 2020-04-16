@@ -283,26 +283,44 @@ public class SurveillanceCamera {
     this.captureFilenames = captureFilenames;
   }
 
-  @Override
   @NonNull
-  public String toString(){
-
+  public String toString(boolean onlyCaptures){
 
     StringJoiner joiner = new StringJoiner(",");
 
-    joiner.add(String.valueOf(cameraType))
-            .add(String.valueOf(area))
-            .add(String.valueOf(direction))
-            .add(String.valueOf(mount))
-            .add(String.valueOf(height))
-            .add(String.valueOf(angle))
-            .add(thumbnailPath)
-            .add(imagePath)
-            .add(String.valueOf(latitude))
-            .add(String.valueOf(longitude))
-            .add(String.valueOf(trainingCapture));
 
-    return joiner.toString() + "," + drawnRectsAsString; // don't end with comma
+    if (onlyCaptures) {
+
+      joiner.add(String.valueOf(cameraType))
+              .add(String.valueOf(area))
+              .add(String.valueOf(direction))
+              .add(String.valueOf(mount))
+              .add(String.valueOf(height))
+              .add(String.valueOf(angle))
+              .add(thumbnailPath)
+              .add(imagePath)
+              .add(String.valueOf(latitude));
+
+      return joiner.toString() + "," + longitude; // don't end with comma
+
+    } else {
+
+      joiner.add(String.valueOf(cameraType))
+              .add(String.valueOf(area))
+              .add(String.valueOf(direction))
+              .add(String.valueOf(mount))
+              .add(String.valueOf(height))
+              .add(String.valueOf(angle))
+              .add(thumbnailPath)
+              .add(imagePath)
+              .add(String.valueOf(latitude))
+              .add(String.valueOf(longitude))
+              .add(String.valueOf(trainingCapture));
+
+      return joiner.toString() + "," + drawnRectsAsString; // don't end with comma
+
+    }
+
   }
 
 //TODO add delete function to delete all Files connected to specific camera

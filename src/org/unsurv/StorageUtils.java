@@ -296,11 +296,11 @@ class StorageUtils {
 
 
     String exportPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            .getAbsolutePath() + "/unsurv/export/";
+            .getAbsolutePath() + "/unsurv/export/captures/";
 
     String filename = "export.txt";
 
-    String header = "TYPE,AREA,DIRECTION,MOUNT,HEIGHT,ANGLE,THUMBNAIL,IMAGE,LAT,LON,ISTRAINING,BOXES\n";
+    String header = "TYPE,AREA,DIRECTION,MOUNT,HEIGHT,ANGLE,THUMBNAIL,IMAGE,LAT,LON\n";
 
     File exportDir = new File(exportPath);
     exportDir.mkdirs();
@@ -317,7 +317,7 @@ class StorageUtils {
         writer.write(header);
 
         for (SurveillanceCamera camera : camerasToExport) {
-          writer.write(camera.toString() + "\n");
+          writer.write(camera.toString(true) + "\n");
         }
 
         writer.close();
@@ -330,10 +330,55 @@ class StorageUtils {
 
   }
 
-  static boolean exportImages(List<SurveillanceCamera> camerasToExport) {
+  static boolean exportTraining(List<SurveillanceCamera> camerasToExport) {
+
 
     String exportPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            .getAbsolutePath() + "/unsurv/export/";
+            .getAbsolutePath() + "/unsurv/export/training/";
+
+    String filename = "export.txt";
+
+    String header = "TYPE,AREA,DIRECTION,MOUNT,HEIGHT,ANGLE,THUMBNAIL,IMAGE,LAT,LON,ISTRAINING,BOXES\n";
+
+    File exportDir = new File(exportPath);
+    exportDir.mkdirs();
+
+    File exportFile = new File(exportPath + filename);
+
+    // delete old export file
+    if (exportFile.isFile()) {
+      exportFile.delete();
+    }
+
+    try {
+      FileWriter writer = new FileWriter(exportPath + filename);
+      writer.write(header);
+
+      for (SurveillanceCamera camera : camerasToExport) {
+        writer.write(camera.toString(false) + "\n");
+      }
+
+      writer.close();
+
+    } catch (IOException ioe) {
+      return false;
+    }
+
+    return true;
+
+  }
+
+  static boolean exportImages(List<SurveillanceCamera> camerasToExport, boolean onlyCaptures) {
+
+    String exportPath;
+
+    if (onlyCaptures) {
+      exportPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+              .getAbsolutePath() + "/unsurv/export/captures/";
+    } else {
+      exportPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+              .getAbsolutePath() + "/unsurv/export/training/";
+    }
 
     for (SurveillanceCamera camera : camerasToExport) {
 

@@ -25,7 +25,12 @@
 
         <Preference
             android:key="export_data"
-            android:title="Export to Files"
+            android:title="Export Captures to Files"
+            />
+
+        <Preference
+            android:key="export_data_training"
+            android:title="Export Training to Files"
             />
 
     </PreferenceCategory>
