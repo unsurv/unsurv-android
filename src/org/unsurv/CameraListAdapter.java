@@ -44,21 +44,26 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
     private final View cameraTypeBar;
 
     private final ImageView thumbnailImageView;
-    // private final TextView topTextViewInItem;
+    private final TextView topTextViewInItem;
+    private final TextView middleTextViewInItem;
     private final TextView bottomTextViewInItem;
 
     private final ImageButton deleteButton;
     private final ImageButton uploadButton;
+
+    private final Context ctx;
 
 
     private CameraViewHolder(View itemView) {
       super(itemView);
       cameraTypeBar = itemView.findViewById(R.id.type_bar);
       thumbnailImageView = itemView.findViewById(R.id.thumbnail_image);
-      // topTextViewInItem = itemView.findViewById(R.id.history_item_text_view_top);
+      topTextViewInItem = itemView.findViewById(R.id.history_item_text_view_top);
+      middleTextViewInItem = itemView.findViewById(R.id.history_item_text_view_middle);
       bottomTextViewInItem = itemView.findViewById(R.id.history_item_text_view_bottom);
       deleteButton = itemView.findViewById(R.id.history_item_delete_button);
       uploadButton = itemView.findViewById(R.id.history_item_upload_button);
+      ctx = itemView.getContext();
 
     }
 
@@ -112,6 +117,7 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
       File imageFile;
       final boolean trainingCapture = current.getTrainingCapture();
       int cameraType = current.getCameraType();
+      int cameraArea = current.getArea();
 
       if (trainingCapture){
         // camera is a training image not a capture with obj detection
@@ -119,37 +125,53 @@ public class CameraListAdapter extends RecyclerView.Adapter<CameraListAdapter.Ca
 
         //holder.detailLinearLayout.setBackgroundColor(Color.GRAY);
 
-        holder.cameraTypeBar.setBackgroundColor(Color.GREEN);
+        holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#9101b5")); // purple
+
+        // training captures don't have an area and can have multiple types
+        holder.middleTextViewInItem.setText(R.string.history_training_text);
+
+        holder.topTextViewInItem.setText("");
+        holder.bottomTextViewInItem.setText("");
+
 
       } else {
 
         // not a training capture, use correct storage path
         imageFile = new File(StorageUtils.CAMERA_CAPTURES_PATH + current.getThumbnailPath());
 
-        switch (cameraType){
-          case StorageUtils.FIXED_CAMERA:
+        holder.cameraTypeBar.setBackgroundColor(Color.TRANSPARENT);
+
+        switch (cameraArea){
+          case StorageUtils.AREA_PUBLIC:
             holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#ff5555")); // red
-
             break;
 
-          case StorageUtils.DOME_CAMERA:
+          case StorageUtils.AREA_OUTDOOR:
             holder.cameraTypeBar.setBackgroundColor(Color.BLUE);
-
             break;
 
-          case StorageUtils.PANNING_CAMERA:
-            holder.cameraTypeBar.setBackgroundColor(Color.parseColor("#9101b5")); // purple
+          case StorageUtils.AREA_INDOOR:
+            holder.cameraTypeBar.setBackgroundColor(Color.GREEN);
+            break;
         }
+
+        String uploadDate = current.getTimeToSync();
+
+
+        // display type, area and upload date for regular captures
+        holder.topTextViewInItem.setText(
+                ctx.getString(R.string.history_type_text, StorageUtils.typeList.get(cameraType)));
+
+        holder.middleTextViewInItem.setText(
+                ctx.getString(R.string.history_area_text, StorageUtils.areaList.get(cameraArea)));
+
+        holder.bottomTextViewInItem.setText(
+                ctx.getString(R.string.history_upload_text, uploadDate));
 
       }
 
 
-      String uploadDate = current.getTimeToSync();
-
       // String mComment = current.getComment();
-
-      holder.bottomTextViewInItem.setText(uploadDate);
-
 
       Picasso.get().load(imageFile)
               .placeholder(R.drawable.ic_camera_alt_grey_50dp)

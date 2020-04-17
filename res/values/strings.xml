@@ -54,6 +54,11 @@
     <!--in HistoryActivity-->
     <string name="dont_ask_again">Don\'t ask again</string>
     <string name="permanently_delete_camera">Permanently delete this camera?</string>
+    <string name="history_type_text">Type: %s</string>
+    <string name="history_area_text">Area: %s</string>
+    <string name="history_training_text">Training Capture</string>
+    <string name="history_upload_text">Upload: %s</string>
+
 
 
     <!--in DetectorActivity-->
@@ -171,7 +176,7 @@ To access the online database an access key is generated every week. Your captur
 
     <!-- LICENCES -->
 
-    <string name="sunders_licence">This project has been inspired by \nhttps://sunders.uber.space the increasing amount of everyday surveillance\n
+    <string name="sunders_licence">This project has been inspired by \nhttps://sunders.uber.space , new and more intrusive laws and the increasing amount of everyday surveillance\n
 
     </string>
 

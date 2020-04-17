@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +26,23 @@ class StorageUtils {
   final static int DOME_CAMERA = 1;
   final static int PANNING_CAMERA = 2;
 
+  // strings in order of types for easy access
+  final static List<String> typeList = new ArrayList<>(Arrays.asList("fixed", "dome", "panning"));
+
   // osm "surveillance" tag
   final static int AREA_UNKNOWN = 0;
   final static int AREA_OUTDOOR = 1;
   final static int AREA_PUBLIC = 2;
   final static int AREA_INDOOR = 3;
   final static int AREA_TRAFFIC = 4;
+
+  final static List<String> areaList = new ArrayList<>(Arrays.asList(
+          "unknown",
+          "outdoor",
+          "public",
+          "indoor",
+          "traffic"));
+
 
   // osm mount types
   final static int MOUNT_UNKNOWN = 0;

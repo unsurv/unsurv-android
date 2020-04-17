@@ -55,9 +55,19 @@
             android:layout_weight="1"
             android:gravity="bottom"
             android:text="@string/upload_text"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:textAppearance="?android:textAppearanceSmall"
             android:textColor="@android:color/white"
             tools:text="lutti" />
+
+        <TextView
+            android:id="@+id/history_item_text_view_middle"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="top"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="@android:color/white"
+            tools:text="one" />
 
         <TextView
             android:id="@+id/history_item_text_view_bottom"
@@ -65,9 +75,11 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="top"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:textAppearance="?android:textAppearanceSmall"
             android:textColor="@android:color/white"
             tools:text="one" />
+
+
     </LinearLayout>
 
     <LinearLayout
