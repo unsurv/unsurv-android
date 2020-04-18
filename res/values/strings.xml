@@ -45,6 +45,7 @@
     <string name="map_label">Map</string>
     <string name="statistics_label">Statistics</string>
     <string name="settings_label">Settings</string>
+    <string name="organize_label">Scan your city</string>
     <string name="manual_capture_label">Manual Capture</string>
     <string name="draw_on_training_image_label">Draw Cameras</string>
     <string name="training_capture_label">Training</string>
@@ -75,6 +76,27 @@
 
     <string name="timemachine_text">All cameras until: %s</string>
     <string name="window_upload_text">Camera uploaded on: \n%s</string>
+
+
+    <!--in OrganizeActivity-->
+
+    <string name="organize_center_lat">Center latitude:</string>
+    <string name="organize_center_lon">Center longitude:</string>
+    <string name="organize_y_size">Height (m):</string>
+    <string name="organize_x_size">Length (m):</string>
+    <string name="organize_rows">Rows:</string>
+    <string name="organize_columns">Columns:</string>
+
+    <string name="organize_reset_button">reset</string>
+    <string name="organize_draw_button">Draw Grid</string>
+
+    <string name="organize_hint_lat">Latitude</string>
+    <string name="organize_hint_lon">Longitude</string>
+    <string name="organize_hint_length">Length</string>
+    <string name="organize_hint_height">Height</string>
+    <string name="organize_hint_rows">Rows</string>
+    <string name="organize_hint_columns">Columns</string>
+
 
     <!--in StatisticsActivity-->
 
