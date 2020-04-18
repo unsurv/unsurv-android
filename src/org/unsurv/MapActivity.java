@@ -66,6 +66,7 @@ import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.CopyrightOverlay;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
@@ -224,6 +225,9 @@ public class MapActivity extends AppCompatActivity {
 
     mapView = findViewById(R.id.tutorial_map);
     mapScrollingEnabled = true;
+
+    CopyrightOverlay copyrightOverlay = new CopyrightOverlay(context);
+    mapView.getOverlays().add(copyrightOverlay);
 
     // sets timemachine spinner to default value
     isInitialSpinnerSelection = true;

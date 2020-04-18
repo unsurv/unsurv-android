@@ -40,6 +40,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.CopyrightOverlay;
 import org.osmdroid.views.overlay.IconOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
@@ -141,6 +142,8 @@ public class EditCameraActivity extends AppCompatActivity {
     recyclerView = findViewById(R.id.edit_camera_choose_recyclerview);
     map = findViewById(R.id.edit_camera_map);
 
+    CopyrightOverlay copyrightOverlay = new CopyrightOverlay(context);
+    map.getOverlays().add(copyrightOverlay);
 
     // user edit area
     cameraTypeSpinner = findViewById(R.id.edit_camera_type_selection);
