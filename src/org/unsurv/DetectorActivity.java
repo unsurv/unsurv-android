@@ -51,6 +51,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -216,6 +217,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   Button manualCameraCapture;
   Button trainingCameraCapture;
+  ImageButton toOrganize;
 
   private SharedPreferences sharedPreferences;
 
@@ -268,6 +270,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     manualCameraCapture = findViewById(R.id.manual_capture_button);
     trainingCameraCapture = findViewById(R.id.training_capture_button);
+    toOrganize = findViewById(R.id.detector_to_grid_button);
 
     manualCameraCapture.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -282,6 +285,14 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       public void onClick(View view) {
         Intent trainingCaptureIntent = new Intent(DetectorActivity.this, CaptureTrainingImageActivity.class);
         startActivity(trainingCaptureIntent);
+      }
+    });
+
+    toOrganize.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent organizeIntent = new Intent(DetectorActivity.this, OrganizeActivity.class);
+        startActivity(organizeIntent);
       }
     });
 

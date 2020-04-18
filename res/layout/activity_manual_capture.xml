@@ -99,6 +99,16 @@
                 android:layout_marginBottom="20dp"
                 android:layout_marginEnd="20dp"/>
 
+            <ImageButton
+                android:id="@+id/manual_to_grid"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_grid_on_grey_40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_toStartOf="@+id/manual_save_button"
+                android:layout_marginBottom="20dp"
+                android:layout_marginEnd="20dp"/>
+
         </RelativeLayout>
 
 

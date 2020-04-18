@@ -43,6 +43,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
   ImageButton addStandardCameraButton;
   ImageButton addDomeCameraButton;
   ImageButton addUnknownCameraButton;
+  ImageButton manualToGrid;
 
   ImageView marker;
 
@@ -82,6 +83,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
     addStandardCameraButton = findViewById(R.id.manual_capture_add_standard_camera_button);
     addDomeCameraButton = findViewById(R.id.manual_capture_add_dome_camera_button);
     addUnknownCameraButton = findViewById(R.id.manual_capture_add_unknown_camera_button);
+    manualToGrid = findViewById(R.id.manual_to_grid);
 
     mapView.setTilesScaledToDpi(true);
     mapView.setClickable(true);
@@ -192,6 +194,14 @@ public class ManualCaptureActivity extends AppCompatActivity {
         BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 1);
 
 
+      }
+    });
+
+    manualToGrid.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent organizeIntent = new Intent(ManualCaptureActivity.this, OrganizeActivity.class);
+        startActivity(organizeIntent);
       }
     });
 

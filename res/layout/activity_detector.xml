@@ -82,12 +82,23 @@
             </LinearLayout>
 
 
+
+        <ImageButton
+            android:id="@+id/detector_to_grid_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_grid_on_grey_40dp"
+            android:layout_above="@+id/detector_status_bar"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="5dp"/>
+
+
         <ImageButton
             android:id="@+id/detector_capture_zoom_in_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_toEndOf="@+id/detector_capture_zoom_seekbar"
             android:src="@drawable/ic_zoom_in_grey_24dp"
-            android:layout_alignParentEnd="true"
             android:layout_above="@+id/detector_status_bar"
             android:layout_marginBottom="5dp"/>
 
@@ -95,8 +106,8 @@
             android:id="@+id/detector_capture_zoom_seekbar"
             android:layout_width="120dp"
             android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
             android:layout_above="@+id/detector_status_bar"
-            android:layout_toStartOf="@id/detector_capture_zoom_in_button"
             android:layout_marginBottom="5dp"/>
 
         <ImageButton

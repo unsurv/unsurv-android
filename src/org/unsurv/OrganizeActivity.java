@@ -103,6 +103,8 @@ public class OrganizeActivity extends AppCompatActivity {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+
+
     centerLat = findViewById(R.id.organize_center_lat_edit);
     centerLon = findViewById(R.id.organize_center_lon_edit);
 
@@ -145,13 +147,25 @@ public class OrganizeActivity extends AppCompatActivity {
     zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 
 
-    standardZoom = 4.0;
+    standardZoom = 5.0;
     sharedPreferences.edit().putString("gridZoom", String.valueOf(standardZoom)).apply();
 
-    // Setting starting position and zoom level.
-    centerMap = new GeoPoint(50.972, 10.107);
-    mapController.setZoom(standardZoom);
-    mapController.setCenter(centerMap);
+    String oldLat = sharedPreferences.getString("gridCenterLat", "");
+    String oldLon = sharedPreferences.getString("gridCenterLon", "");
+    String oldZoom = sharedPreferences.getString("gridZoom", "");
+
+    if (!oldLat.isEmpty() && !oldLon.isEmpty() && !oldZoom.isEmpty()) {
+      centerMap = new GeoPoint(Double.parseDouble(oldLat), Double.parseDouble(oldLon));
+      mapController.setZoom(Double.parseDouble(oldZoom));
+      mapController.setCenter(centerMap);
+    } else {
+      // Setting starting position and zoom level.
+      centerMap = new GeoPoint(50.972, 10.107);
+      mapController.setZoom(standardZoom);
+      mapController.setCenter(centerMap);
+    }
+
+
 
     // refresh values after 200ms delay
     map.addMapListener(new DelayedMapListener(new MapListener() {
