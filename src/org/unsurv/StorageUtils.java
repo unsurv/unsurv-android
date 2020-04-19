@@ -424,5 +424,84 @@ class StorageUtils {
     return true;
   }
 
+  static int chooseMarker(int cameraType, int cameraArea) {
+
+    // TODO lookup table instead of ugly nested switches
+
+    switch (cameraType) {
+
+      case StorageUtils.FIXED_CAMERA:
+
+        // inside switch for area
+        switch (cameraArea) {
+
+          case StorageUtils.AREA_OUTDOOR:
+            return R.drawable.fixed_outdoor;
+
+
+          case StorageUtils.AREA_PUBLIC:
+            return R.drawable.fixed_public;
+
+
+          case StorageUtils.AREA_INDOOR:
+
+            return R.drawable.fixed_indoor;
+
+          default: // for clarity
+            Log.i("nested switch", "default area fixed");
+            return R.drawable.fixed_outdoor;
+
+        }
+
+      case StorageUtils.DOME_CAMERA:
+
+        // inside switch for area
+        switch (cameraArea) {
+
+          case StorageUtils.AREA_OUTDOOR:
+            return R.drawable.dome_outdoor;
+
+
+          case StorageUtils.AREA_PUBLIC:
+            return R.drawable.dome_public;
+
+
+          case StorageUtils.AREA_INDOOR:
+            return R.drawable.dome_indoor;
+
+
+          default:
+            return R.drawable.dome_outdoor;
+
+        }
+
+      case StorageUtils.PANNING_CAMERA:
+
+        // inside switch for area
+        switch (cameraArea) {
+
+          case StorageUtils.AREA_OUTDOOR:
+            return R.drawable.panning_outdoor;
+
+
+          case StorageUtils.AREA_PUBLIC:
+            return R.drawable.panning_public;
+
+
+          case StorageUtils.AREA_INDOOR:
+            return R.drawable.panning_indoor;
+
+
+          default:
+            return R.drawable.panning_outdoor;
+        }
+
+    }
+
+
+    return R.drawable.fixed_outdoor;
+
+  }
+
 
 }

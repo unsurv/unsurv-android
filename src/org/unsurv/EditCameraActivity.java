@@ -255,7 +255,7 @@ public class EditCameraActivity extends AppCompatActivity {
         cameraToEdit.setCameraType(i);
 
         cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(resources,
-                chooseMarker(i, cameraToEdit.getArea()), 12, null);
+                StorageUtils.chooseMarker(i, cameraToEdit.getArea()), 12, null);
 
         map.getOverlays().remove(iconOverlay);
 
@@ -350,7 +350,7 @@ public class EditCameraActivity extends AppCompatActivity {
         cameraToEdit.setArea(i);
 
         cameraMarkerIcon = ResourcesCompat.getDrawableForDensity(resources,
-                chooseMarker(cameraToEdit.getCameraType(), i), 12, null);
+                StorageUtils.chooseMarker(cameraToEdit.getCameraType(), i), 12, null);
 
         map.getOverlays().remove(iconOverlay);
         List<Overlay> asdf = map.getOverlays();
@@ -521,7 +521,8 @@ public class EditCameraActivity extends AppCompatActivity {
           map.getOverlays().removeAll(map.getOverlays());
           EditCameraActivity.this.map.invalidate();
 
-          Picasso.get().load(chooseMarker(cameraToEdit.getCameraType(), cameraToEdit.getArea()))
+          Picasso.get().load(
+                  StorageUtils.chooseMarker(cameraToEdit.getCameraType(), cameraToEdit.getArea()))
                   .into(editLocationMarker);
 
           editLocationMarker.setVisibility(View.VISIBLE);
@@ -734,84 +735,5 @@ public class EditCameraActivity extends AppCompatActivity {
 
   }
 
-
-  int chooseMarker(int cameraType, int cameraArea) {
-
-    // TODO lookup table instead of ugly nested switches
-
-    switch (cameraType) {
-
-      case StorageUtils.FIXED_CAMERA:
-
-        // inside switch for area
-        switch (cameraArea) {
-
-          case StorageUtils.AREA_OUTDOOR:
-            return R.drawable.fixed_outdoor;
-
-
-          case StorageUtils.AREA_PUBLIC:
-            return R.drawable.fixed_public;
-
-
-          case StorageUtils.AREA_INDOOR:
-
-            return R.drawable.fixed_indoor;
-
-          default: // for clarity
-            Log.i("nested switch", "default area fixed");
-            return R.drawable.fixed_outdoor;
-
-        }
-
-      case StorageUtils.DOME_CAMERA:
-
-        // inside switch for area
-        switch (cameraArea) {
-
-          case StorageUtils.AREA_OUTDOOR:
-            return R.drawable.dome_outdoor;
-
-
-          case StorageUtils.AREA_PUBLIC:
-            return R.drawable.dome_public;
-
-
-          case StorageUtils.AREA_INDOOR:
-            return R.drawable.dome_indoor;
-
-
-          default:
-            return R.drawable.dome_outdoor;
-
-        }
-
-      case StorageUtils.PANNING_CAMERA:
-
-        // inside switch for area
-        switch (cameraArea) {
-
-          case StorageUtils.AREA_OUTDOOR:
-            return R.drawable.panning_outdoor;
-
-
-          case StorageUtils.AREA_PUBLIC:
-            return R.drawable.panning_public;
-
-
-          case StorageUtils.AREA_INDOOR:
-            return R.drawable.panning_indoor;
-
-
-          default:
-            return R.drawable.panning_outdoor;
-        }
-
-    }
-
-
-    return R.drawable.fixed_outdoor;
-
-  }
 
 }

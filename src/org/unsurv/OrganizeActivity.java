@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
@@ -31,6 +32,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.Polyline;
 
@@ -49,6 +53,11 @@ public class OrganizeActivity extends AppCompatActivity {
   BottomNavigationView bottomNavigationView;
 
   SharedPreferences sharedPreferences;
+  CameraRepository cameraRepository;
+
+  List<SurveillanceCamera> cameras;
+  List<OverlayItem> overlayItemsToDisplay;
+  ItemizedIconOverlay<OverlayItem> itemizedIconOverlay;
 
   MapView map;
   IMapController mapController;
@@ -88,6 +97,10 @@ public class OrganizeActivity extends AppCompatActivity {
       mapController.setCenter(centerMap);
     }
 
+    cameras = cameraRepository.getAllCameras();
+
+    deleteMarkers();
+    populateWithMarkers();
 
     super.onResume();
   }
@@ -102,8 +115,7 @@ public class OrganizeActivity extends AppCompatActivity {
     resources = context.getResources();
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-
+    cameraRepository = new CameraRepository(getApplication());
 
     centerLat = findViewById(R.id.organize_center_lat_edit);
     centerLon = findViewById(R.id.organize_center_lon_edit);
@@ -124,6 +136,7 @@ public class OrganizeActivity extends AppCompatActivity {
     resetButton = findViewById(R.id.organize_reset);
     drawButton = findViewById(R.id.organize_draw);
 
+    overlayItemsToDisplay = new ArrayList<>();
 
     map = findViewById(R.id.organize_camera_map);
 
@@ -160,8 +173,8 @@ public class OrganizeActivity extends AppCompatActivity {
       mapController.setCenter(centerMap);
     } else {
       // Setting starting position and zoom level.
-      centerMap = new GeoPoint(50.972, 10.107);
-      mapController.setZoom(standardZoom);
+      centerMap = new GeoPoint(49.9955, 8.2856);
+      mapController.setZoom(13.0);
       mapController.setCenter(centerMap);
     }
 
@@ -397,6 +410,61 @@ public class OrganizeActivity extends AppCompatActivity {
 
   void deleteGrid() {
     overlayManager.removeAll(lines);
+    redrawMap();
+  }
+
+
+  // use different Markers for different types when moving marker bug is fixed
+  void populateWithMarkers() {
+    List<SurveillanceCamera> filteredCameras = new ArrayList<>();
+
+    // TODO create db call for non training captures
+    // filter for non training captures
+    for (SurveillanceCamera camera : cameras) {
+      if (!camera.getTrainingCapture()) {
+        filteredCameras.add(camera);
+      }
+    }
+
+    for (SurveillanceCamera nonTrainingCapture : filteredCameras) {
+
+      GeoPoint geoPoint = new GeoPoint(
+              nonTrainingCapture.getLatitude(),
+              nonTrainingCapture.getLongitude());
+
+      OverlayItem marker = new OverlayItem("placeholder", "placeholder", geoPoint);
+
+
+      overlayItemsToDisplay.add(marker);
+
+    }
+
+    Drawable cameraMarkerIcon = getDrawable(R.drawable.simple_marker_5dpi);
+
+    itemizedIconOverlay = new ItemizedIconOverlay<>(overlayItemsToDisplay,
+            cameraMarkerIcon,
+            new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+
+
+      @Override
+      public boolean onItemSingleTapUp(int index, OverlayItem item) {
+        return false;
+      }
+
+      @Override
+      public boolean onItemLongPress(int index, OverlayItem item) {
+        return false;
+      }
+
+      }, context);
+
+    overlayManager.add(itemizedIconOverlay);
+
+
+  }
+
+  void deleteMarkers(){
+    overlayManager.remove(itemizedIconOverlay);
     redrawMap();
   }
 
