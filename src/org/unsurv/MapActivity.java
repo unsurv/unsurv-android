@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
@@ -61,7 +62,11 @@ import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.modules.ArchiveFileFactory;
+import org.osmdroid.tileprovider.modules.OfflineTileProvider;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
@@ -286,11 +291,62 @@ public class MapActivity extends AppCompatActivity {
     //enable pinch to zoom
     mapView.setMultiTouchControls(true);
 
-    // MAPNIK fix
-    // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+    if (offlineMode) {
 
-    // TODO add choice + backup strategy here
-    mapView.setTileSource(TileSourceFactory.OpenTopo);
+      //first we'll look at the default location for tiles that we support
+      File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/osmdroid/");
+      if (f.exists()) {
+
+        File[] list = f.listFiles();
+        if (list != null) {
+          for (int i = 0; i < list.length; i++) {
+            if (list[i].isDirectory()) {
+              continue;
+            }
+            String name = list[i].getName().toLowerCase();
+            if (!name.contains(".")) {
+              continue; //skip files without an extension
+            }
+            name = name.substring(name.lastIndexOf(".") + 1);
+            if (name.length() == 0) {
+              continue;
+            }
+            if (ArchiveFileFactory.isFileExtensionRegistered(name)) {
+
+
+              try {
+                //ok found a file we support and have a driver for the format, for this demo, we'll just use the first one
+
+                //create the offline tile provider, it will only do offline file archives
+                //again using the first file
+                OfflineTileProvider tileProvider = new OfflineTileProvider(new SimpleRegisterReceiver(getApplication()),
+                        new File[]{list[i]});
+                //tell osmdroid to use that provider instead of the default rig which is (asserts, cache, files/archives, online
+                mapView.setTileProvider(tileProvider);
+
+                mapView.setTileSource(new XYTileSource(
+                        "tiles",
+                        6,
+                        16,
+                        256,
+                        ".png",
+                        new String[]{""}));
+
+              } catch (Exception ex) {
+                Toast.makeText(context, "Could not load offline tiles", Toast.LENGTH_LONG).show();
+              }
+            }
+          }
+        }
+      }
+
+    } else {
+
+      // MAPNIK fix
+      // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+      // TODO add choice + backup strategy here
+      mapView.setTileSource(TileSourceFactory.OpenTopo);
+    }
 
     final IMapController mapController = mapView.getController();
 

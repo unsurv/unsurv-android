@@ -1,6 +1,7 @@
 package org.unsurv;
 
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,7 +29,11 @@ import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.modules.ArchiveFileFactory;
+import org.osmdroid.tileprovider.modules.OfflineTileProvider;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
@@ -38,6 +44,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,6 +61,8 @@ public class OrganizeActivity extends AppCompatActivity {
 
   SharedPreferences sharedPreferences;
   CameraRepository cameraRepository;
+
+  boolean offlineMode;
 
   List<SurveillanceCamera> cameras;
   List<OverlayItem> overlayItemsToDisplay;
@@ -98,6 +107,10 @@ public class OrganizeActivity extends AppCompatActivity {
     }
 
     cameras = cameraRepository.getAllCameras();
+
+    //sharedPreferences.edit().putBoolean("offlineMode", true).apply();
+    // offlineMode = sharedPreferences.getBoolean("offlineMode", true);
+
 
     deleteMarkers();
     populateWithMarkers();
@@ -150,10 +163,66 @@ public class OrganizeActivity extends AppCompatActivity {
     map.setClickable(false);
     map.setMultiTouchControls(true);
 
-    // MAPNIK fix
-    // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
-    // TODO add choice + backup strategy here
-    map.setTileSource(TileSourceFactory.OpenTopo);
+    offlineMode = true;
+
+
+    if (offlineMode) {
+
+      //first we'll look at the default location for tiles that we support
+      File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/osmdroid/");
+      if (f.exists()) {
+
+        File[] list = f.listFiles();
+        if (list != null) {
+          for (int i = 0; i < list.length; i++) {
+            if (list[i].isDirectory()) {
+              continue;
+            }
+            String name = list[i].getName().toLowerCase();
+            if (!name.contains(".")) {
+              continue; //skip files without an extension
+            }
+            name = name.substring(name.lastIndexOf(".") + 1);
+            if (name.length() == 0) {
+              continue;
+            }
+            if (ArchiveFileFactory.isFileExtensionRegistered(name)) {
+
+              try {
+                //ok found a file we support and have a driver for the format, for this demo, we'll just use the first one
+
+                //create the offline tile provider, it will only do offline file archives
+                //again using the first file
+                OfflineTileProvider tileProvider = new OfflineTileProvider(new SimpleRegisterReceiver(getApplication()),
+                        new File[]{list[i]});
+                //tell osmdroid to use that provider instead of the default rig which is (asserts, cache, files/archives, online
+                map.setTileProvider(tileProvider);
+
+                map.setTileSource(new XYTileSource(
+                        "tiles",
+                        10,
+                        15,
+                        256,
+                        ".png",
+                        new String[]{""}
+                ));
+
+              } catch (Exception ex) {
+                Toast.makeText(context, "Could not load offline tiles", Toast.LENGTH_LONG).show();
+              }
+            }
+          }
+        }
+      }
+
+    } else {
+
+      // MAPNIK fix
+      // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+      // TODO add choice + backup strategy here
+      map.setTileSource(TileSourceFactory.OpenTopo);
+    }
+
 
     // remove big + and - buttons at the bottom of the map
     final CustomZoomButtonsController zoomController = map.getZoomController();
@@ -166,6 +235,8 @@ public class OrganizeActivity extends AppCompatActivity {
     String oldLat = sharedPreferences.getString("gridCenterLat", "");
     String oldLon = sharedPreferences.getString("gridCenterLon", "");
     String oldZoom = sharedPreferences.getString("gridZoom", "");
+
+
 
     if (!oldLat.isEmpty() && !oldLon.isEmpty() && !oldZoom.isEmpty()) {
       centerMap = new GeoPoint(Double.parseDouble(oldLat), Double.parseDouble(oldLon));
@@ -448,6 +519,11 @@ public class OrganizeActivity extends AppCompatActivity {
 
       @Override
       public boolean onItemSingleTapUp(int index, OverlayItem item) {
+        Toast.makeText(context, "id:" + index +
+                        ", lat:" + item.getPoint().getLatitude() +
+                        ", lon:" + item.getPoint().getLongitude(),
+                Toast.LENGTH_LONG).show();
+
         return false;
       }
 
