@@ -416,7 +416,7 @@ public class DebugActivity extends AppCompatActivity {
     debugTutorial.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Intent tutorialIntent = new Intent(DebugActivity.this, OrganizeActivity.class);
+        Intent tutorialIntent = new Intent(DebugActivity.this, TutorialActivity.class);
         startActivity(tutorialIntent);
       }
     });

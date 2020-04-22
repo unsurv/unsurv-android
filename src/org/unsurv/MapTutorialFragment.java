@@ -1,24 +1,24 @@
 
 package org.unsurv;
 
-        import android.content.SharedPreferences;
-        import android.os.Bundle;
-        import android.preference.PreferenceManager;
-        import androidx.annotation.Nullable;
-        import android.view.LayoutInflater;
-        import android.view.MotionEvent;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.Button;
-        import android.widget.TextView;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import androidx.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
-        import androidx.fragment.app.Fragment;
+import androidx.fragment.app.Fragment;
 
-        import org.osmdroid.api.IMapController;
-        import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-        import org.osmdroid.util.BoundingBox;
-        import org.osmdroid.util.GeoPoint;
-        import org.osmdroid.views.MapView;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 
 /**
  * This Fragment is part of the tutorial the user sees when first launching the app.

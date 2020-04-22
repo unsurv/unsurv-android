@@ -157,7 +157,8 @@ public class SynchronizationTutorialFragment extends Fragment {
       }
     });
 
-
+    // enable offline mode as default for now
+    offlineModeSwitch.setChecked(true);
 
 
     // Create an ArrayAdapter using the string array and a default spinner layout
