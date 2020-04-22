@@ -50,6 +50,8 @@ public class SynchronizationTutorialFragment extends Fragment {
 
   private TutorialViewPager tutorialViewPager;
 
+  Button saveSynchronizationSettings;
+
   private EditText userIntervalChoice;
   private EditText userMinDelayChoice;
   private EditText userMaxDelayChoice;
@@ -103,6 +105,8 @@ public class SynchronizationTutorialFragment extends Fragment {
     minDelaySpinner = rootView.findViewById(R.id.sync_tutorial_min_delay_spinner);
     maxDelaySpinner = rootView.findViewById(R.id.sync_tutorial_max_delay_spinner);
 
+    saveSynchronizationSettings = rootView.findViewById(R.id.sync_tutorial_save_button);
+
     sharedPreferences.edit().putBoolean("offlineMode", false).apply();
 
     offlineModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -110,6 +114,8 @@ public class SynchronizationTutorialFragment extends Fragment {
       public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         if (b) {
           sharedPreferences.edit().putBoolean("offlineMode", true).apply();
+
+          saveSynchronizationSettings.setText(R.string.tutorial_save_exit);
 
           // half transparent + unclickable when offline mode is chosen
           intervalChoiceLayout.setAlpha(0.5f);
@@ -134,6 +140,8 @@ public class SynchronizationTutorialFragment extends Fragment {
 
         } else {
           sharedPreferences.edit().putBoolean("offlineMode", false).apply();
+
+          saveSynchronizationSettings.setText(R.string.tutorial_sync_save_exit);
 
           intervalChoiceLayout.setAlpha(1);
           minDelayChoiceLayout.setAlpha(1);
@@ -309,7 +317,7 @@ public class SynchronizationTutorialFragment extends Fragment {
     });
 
 
-    Button saveSynchronizationSettings = rootView.findViewById(R.id.sync_tutorial_save_button);
+
 
     saveSynchronizationSettings.setOnClickListener(new View.OnClickListener() {
       @Override

@@ -149,6 +149,7 @@
     <string name="tutorial_map_message">Please select an area for offline availability</string>
 
     <string name="tutorial_sync_save_exit">SYNCHRONIZE, SAVE AND EXIT</string>
+    <string name="tutorial_save_exit">SAVE AND EXIT</string>
     <string name="tutorial_sync_interval_text">Synchronization interval:</string>
     <string name="tutorial_sync_offline_mode_text">Enable offline mode:</string>
     <string name="tutorial_sync_min_delay_text">Min delay before upload:</string>
