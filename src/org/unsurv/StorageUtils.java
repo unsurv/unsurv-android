@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,17 @@ class StorageUtils {
   static String TAG = "StorageUtils";
 
 
+  // osm data model for surveillance cameras
+  // see https://taginfo.openstreetmap.org/tags/man_made=surveillance#combinations
+
+  final static List<String> usefulTags = new ArrayList<>(
+          Arrays.asList("surveillance",
+                  "camera:type",
+                  "camera:mount",
+                  "camera:direction",
+                  "height"));
+
+  // used for height and angle
   final static int UNKNOWN = -1;
 
   // openstreetmap camera types
@@ -50,6 +63,13 @@ class StorageUtils {
   final static int MOUNT_WALL = 2;
   final static int MOUNT_CEILING = 3;
   final static int MOUNT_STREET_LAMP = 4;
+
+  final static List<String> mountList = new ArrayList<>(Arrays.asList(
+          "unknown",
+          "pole",
+          "wall",
+          "ceiling",
+          "street_lamp"));
 
   // accessible for every app for now
   final static String SYNCHRONIZED_PATH = Environment.getExternalStoragePublicDirectory(

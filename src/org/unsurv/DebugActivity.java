@@ -51,6 +51,7 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NoCache;
+import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -78,6 +79,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -91,6 +93,8 @@ import static org.unsurv.StorageUtils.SYNCHRONIZED_PATH;
 public class DebugActivity extends AppCompatActivity {
 
   private String TAG = "DebugActivity";
+
+  private Context context;
 
   private BottomNavigationView bottomNavigationView;
 
@@ -135,8 +139,6 @@ public class DebugActivity extends AppCompatActivity {
 
   private CameraViewModel cameraViewModel;
 
-  private Context context;
-
   int readStoragePermission;
   int writeStoragePermission;
   int fineLocationPermission;
@@ -180,7 +182,7 @@ public class DebugActivity extends AppCompatActivity {
   protected void onResume() {
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
     // sharedPreferences.edit().clear().apply();
 
@@ -365,14 +367,8 @@ public class DebugActivity extends AppCompatActivity {
         String homeArea = sharedPreferences.getString("area", null);
 
 
-        SynchronizationUtils.downloadCamerasFromServer(
-                baseURL,
-                "area=" + homeArea,
-                sharedPreferences,
-                true,
-                null,
-                synchronizedCameraRepository,
-                context);
+        overpass_api_query("https://overpass-api.de/api/interpreter?", true, null, synchronizedCameraRepository);
+
 
       }
     });
@@ -1173,6 +1169,154 @@ public class DebugActivity extends AppCompatActivity {
 
       }
     });
+
+    mRequestQueue.add(jsonObjectRequest);
+
+  }
+
+
+  void overpass_api_query(String baseURL, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository){
+
+    //TODO check api for negative values in left right top bottom see if still correct
+
+    camerasToSync.clear();
+
+    baseURL = "https://overpass-api.de/api/interpreter?data=[out:json];node[man_made=surveillance](52.5082248,13.3780064,52.515041,13.3834472);out;";
+
+    final SynchronizedCameraRepository crep = synchronizedCameraRepository;
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            baseURL,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+
+                JSONObject cameraJSON;
+
+                try {
+
+                  String osm_db_timestamp = response.getJSONObject("osm3s").getString("timestamp_osm_base");
+
+                  for (int i = 0; i < response.getJSONArray("elements").length(); i++) {
+
+                    cameraJSON = new JSONObject(String.valueOf(response.getJSONArray("elements").get(i)));
+
+                    JSONObject tags = cameraJSON.getJSONObject("tags");
+
+                    int type = 0; // default for fixed camera
+                    int area = 0; // outdoor
+                    int direction = -1; // unknown
+                    int mount = 0; // unknown
+                    int height = -1; // unknown
+                    int angle = -1; // unknown
+
+                    List<String> tagsAvailable = new ArrayList<>();
+
+                    // loop through tag keys for more information: area, angle, height etc.
+                    Iterator<String> iterTags = tags.keys();
+                    while (iterTags.hasNext()) {
+                      String key = iterTags.next();
+                      tagsAvailable.add(key);
+                    }
+
+                    for (String tag : tagsAvailable){
+
+                      switch (tag) {
+
+                        case "surveillance":
+                          area = StorageUtils.areaList.indexOf(tag);
+                          break;
+
+                        case "camera:type":
+                          type = StorageUtils.typeList.indexOf(tag);
+                          break;
+
+                        case "camera:mount":
+                          mount = StorageUtils.mountList.indexOf(tag);
+                          break;
+
+                        case "camera:direction":
+                          direction = tags.getInt("camera:direction");
+                          break;
+
+                        case "height":
+                          height = tags.getInt("height");
+                          break;
+                      }
+
+                    }
+
+                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(
+                            cameraJSON.getString("id") + ".jpg",
+                            cameraJSON.getString("id"),
+                            type,
+                            area,
+                            mount,
+                            direction,
+                            height,
+                            angle,
+                            cameraJSON.getDouble("lat"),
+                            cameraJSON.getDouble("lon"),
+                            "",
+                            osm_db_timestamp,
+                            "",
+                            false
+
+
+                    );
+
+                    camerasToSync.add(cameraToAdd);
+
+                  }
+
+                  if (insertIntoDb) {
+                    crep.insertAll(camerasToSync);
+                  }
+
+                } catch (Exception e) {
+                  Log.i(TAG, "onResponse: " + e.toString());
+
+                }
+
+              }
+            }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        // TODO: Handle Errors
+        Log.i(TAG, "Error in connection " + error.toString());
+      }
+    }) {
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+
+        Map<String, String> headers = new HashMap<>();
+        // headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
 
     mRequestQueue.add(jsonObjectRequest);
 
