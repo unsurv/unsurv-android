@@ -366,6 +366,7 @@ public class DebugActivity extends AppCompatActivity {
         String baseURL = sharedPreferences.getString("synchronizationUrl", null);
         String homeArea = sharedPreferences.getString("area", null);
 
+        // synchronizedCameraRepository.deleteAll();
 
         overpass_api_query("https://overpass-api.de/api/interpreter?", true, null, synchronizedCameraRepository);
 
@@ -1181,7 +1182,22 @@ public class DebugActivity extends AppCompatActivity {
 
     camerasToSync.clear();
 
-    baseURL = "https://overpass-api.de/api/interpreter?data=[out:json];node[man_made=surveillance](52.5082248,13.3780064,52.515041,13.3834472);out;";
+    // baseURL = "https://overpass-api.de/api/interpreter?data=[out:json];node[man_made=surveillance](52.5082248,13.3780064,52.515041,13.3834472);out meta;";
+
+    // https://overpass-api.de/api/interpreter?
+
+    String homeZone = sharedPreferences.getString("area", null);
+
+    // String homeZone = "52.5082248,52.515041,13.3780064,13.3834472";
+
+    String[] coordinates = homeZone.split(",");
+
+    double latMin = Double.valueOf(coordinates[0]);
+    double latMax = Double.valueOf(coordinates[1]);
+    double lonMin = Double.valueOf(coordinates[2]);
+    double lonMax = Double.valueOf(coordinates[3]);
+
+    String completeURL = String.format(baseURL + "data=[out:json];node[man_made=surveillance](%s,%s,%s,%s);out meta;", latMin, lonMin, latMax, lonMax);
 
     final SynchronizedCameraRepository crep = synchronizedCameraRepository;
 
@@ -1199,7 +1215,7 @@ public class DebugActivity extends AppCompatActivity {
 
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.GET,
-            baseURL,
+            completeURL,
             null,
             new Response.Listener<JSONObject>() {
               @Override
@@ -1215,6 +1231,7 @@ public class DebugActivity extends AppCompatActivity {
                   for (int i = 0; i < response.getJSONArray("elements").length(); i++) {
 
                     cameraJSON = new JSONObject(String.valueOf(response.getJSONArray("elements").get(i)));
+                    String timestamp = cameraJSON.getString("timestamp");
 
                     JSONObject tags = cameraJSON.getJSONObject("tags");
 
@@ -1236,28 +1253,37 @@ public class DebugActivity extends AppCompatActivity {
 
                     for (String tag : tagsAvailable){
 
-                      switch (tag) {
+                      try {
 
-                        case "surveillance":
-                          area = StorageUtils.areaList.indexOf(tag);
-                          break;
+                        switch (tag) {
 
-                        case "camera:type":
-                          type = StorageUtils.typeList.indexOf(tag);
-                          break;
+                          case "surveillance":
+                            area = StorageUtils.areaList.indexOf(tags.getString(tag));
+                            break;
 
-                        case "camera:mount":
-                          mount = StorageUtils.mountList.indexOf(tag);
-                          break;
+                          case "camera:type":
+                            type = StorageUtils.typeList.indexOf(tags.getString(tag));
+                            break;
 
-                        case "camera:direction":
-                          direction = tags.getInt("camera:direction");
-                          break;
+                          case "camera:mount":
+                            mount = StorageUtils.mountList.indexOf(tags.getString(tag));
+                            break;
 
-                        case "height":
-                          height = tags.getInt("height");
-                          break;
+                          case "camera:direction":
+                            direction = tags.getInt("camera:direction");
+                            break;
+
+                          case "height":
+                            height = tags.getInt("height");
+                            break;
+                        }
+
+                      } catch (Exception ex) {
+                        Log.i(TAG, "Error creating value from overpass api response: " + ex.toString());
+                        continue;
                       }
+
+
 
                     }
 
@@ -1274,7 +1300,7 @@ public class DebugActivity extends AppCompatActivity {
                             cameraJSON.getDouble("lon"),
                             "",
                             osm_db_timestamp,
-                            "",
+                            timestamp,
                             false
 
 

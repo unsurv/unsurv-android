@@ -178,9 +178,8 @@ public class SynchronizedCameraRepository {
   }
 
   public void deleteAll() {
-    List<SynchronizedCamera> allCameras = mSynchronizedCameraDao.getAllCameras();
 
-
+    List<SynchronizedCamera> allCameras = getAllSynchronizedCameras(true);
 
     for (SynchronizedCamera camera : allCameras) {
       String current_path = StorageUtils.SYNCHRONIZED_PATH + camera.getImagePath();
@@ -190,7 +189,7 @@ public class SynchronizedCameraRepository {
 
     }
 
-    mSynchronizedCameraDao.deleteAll();
+    new deleteAllAsyncTask(mSynchronizedCameraDao);
   }
 
 
@@ -207,6 +206,25 @@ public class SynchronizedCameraRepository {
     protected List<SynchronizedCamera> doInBackground(Void... voids) {
 
       return mAsyncTaskDao.getAllCameras();
+
+
+    }
+  }
+
+  private static class deleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
+
+    private SynchronizedCameraDao mAsyncTaskDao;
+
+    deleteAllAsyncTask(SynchronizedCameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected Void doInBackground(Void... voids) {
+
+      mAsyncTaskDao.deleteAll();
+
+      return null;
 
 
     }

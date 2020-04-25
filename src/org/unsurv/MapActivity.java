@@ -1328,8 +1328,8 @@ public class MapActivity extends AppCompatActivity {
 
           while (iter.hasNext()) {
             SynchronizedCamera nextCamera = iter.next();
-            Date cameraLastUpdated = timestampIso8601DaysAccuracy.parse(nextCamera.getLastUpdated());
-            if (cameraLastUpdated.before(currentSeekBarDate) && cameraLastUpdated.after(timemachineMaxInterval)) {
+            Date cameraUploaded = timestampIso8601DaysAccuracy.parse(nextCamera.getUploadedAt());
+            if (cameraUploaded.before(currentSeekBarDate) && cameraUploaded.after(timemachineMaxInterval)) {
 
               overlayItemsToDisplay.add(new OverlayItem(
                       nextCamera.getExternalID(),
@@ -1494,7 +1494,7 @@ public class MapActivity extends AppCompatActivity {
 
 
                       //infoLatestTimestamp.setText(highlightedCamera.getLastUpdated());
-                      infoLatestTimestamp.setText(getString(R.string.window_upload_text, highlightedCamera.getLastUpdated()));
+                      infoLatestTimestamp.setText(getString(R.string.window_upload_text, highlightedCamera.getUploadedAt()));
                       //infoComment.setText(highlightedCamera.getComments());
 
                     }
