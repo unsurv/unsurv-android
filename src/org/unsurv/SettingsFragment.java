@@ -260,43 +260,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
           // If api key is expired set up a LocalBroadCastReceiver to start the synchronization
           // as soon as a new api key has been acquired. Then start getting a new API key.
 
-          if (SynchronizationUtils.isApiKeyExpiredOrMissing(sharedPreferences)) {
-
-            apiKeyBroadcastListener = new BroadcastReceiver() {
-              @Override
-              public void onReceive(Context context, Intent intent) {
-                SynchronizationUtils.downloadCamerasFromServer(
-                        baseURL,
-                        "area=" + homeArea,
-                        sharedPreferences,
-                        true,
-                        null,
-                        synchronizedCameraRepository,
-                        ctx);
-
-                localBroadcastManager.unregisterReceiver(apiKeyBroadcastListener);
-              }
-            };
-
-            intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
-
-            localBroadcastManager.registerReceiver(apiKeyBroadcastListener, intentFilter);
-
-            SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, ctx);
+          SynchronizationUtils.downloadCamerasFromServer(
+                  baseURL,
+                  homeArea,
+                  true,
+                  synchronizedCameraRepository,
+                  sharedPreferences,
+                  ctx);
 
 
-          } else {
-
-
-            SynchronizationUtils.downloadCamerasFromServer(
-                    baseURL,
-                    "area=" + homeArea,
-                    sharedPreferences,
-                    true,
-                    null,
-                    synchronizedCameraRepository,
-                    ctx);
-          }
 
           return true;
         }

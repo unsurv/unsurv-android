@@ -49,7 +49,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
     PersistableBundle intervalSchedulerExtras = jobParameters.getExtras();
 
     baseUrl = intervalSchedulerExtras.getString("baseUrl");
-    areaQuery = "area=" + intervalSchedulerExtras.getString("area");
+    areaQuery = intervalSchedulerExtras.getString("area");
     startQuery = "start=" + sharedPreferences.getString("lastUpdated", "01-01-2000");
     downloadImages = intervalSchedulerExtras.getBoolean("downloadImages");
 
@@ -78,12 +78,10 @@ public class SyncIntervalSchedulerJobService extends JobService {
     SynchronizationUtils.downloadCamerasFromServer(
             baseUrl,
             areaQuery,
-            sharedPreferences,
             true,
-            startQuery,
             synchronizedCameraRepository,
-            this
-            );
+            sharedPreferences,
+            this);
 
     if (downloadImages) {
 
@@ -105,9 +103,9 @@ public class SyncIntervalSchedulerJobService extends JobService {
 
     }
 
-    List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
+    //List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
 
-    SynchronizationUtils.uploadSurveillanceCameras(camerasToUpload, baseUrl, sharedPreferences, null, cameraRepository, true);
+    // SynchronizationUtils.uploadSurveillanceCameras(camerasToUpload, baseUrl, sharedPreferences, null, cameraRepository, true);
 
     SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -150,12 +148,10 @@ public class SyncIntervalSchedulerJobService extends JobService {
           SynchronizationUtils.downloadCamerasFromServer(
                   baseUrl,
                   areaQuery,
-                  sharedPreferences,
                   true,
-                  startQuery,
                   synchronizedCameraRepository,
-                  getBaseContext()
-          );
+                  sharedPreferences,
+                  getBaseContext());
         }
       }, 10000);
 

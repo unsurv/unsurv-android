@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -128,7 +129,7 @@ class SynchronizationUtils {
    * @param startQuery "start=latmin,latmax,lonmin,lonmax"
    * @param synchronizedCameraRepository synchronizedCameraRepository object
    */
-  static void downloadCamerasFromServer(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository, final Context context){
+  static void downloadCamerasFromServerOld(String baseUrl, String areaQuery, final SharedPreferences sharedPreferences, final boolean insertIntoDb, @Nullable String startQuery, @Nullable SynchronizedCameraRepository synchronizedCameraRepository, final Context context){
 
     //TODO check api for negative values in left right top bottom see if still correct
 
@@ -273,6 +274,202 @@ class SynchronizationUtils {
     mRequestQueue.add(jsonObjectRequest);
 
   }
+
+
+
+  static void downloadCamerasFromServer(String baseUrl, String area, final boolean insertIntoDb, @Nullable SynchronizedCameraRepository synchronizedCameraRepository, final SharedPreferences sharedPreferences, final Context context){
+
+
+    // baseURL = "https://overpass-api.de/api/interpreter?data=[out:json];node[man_made=surveillance](52.5082248,13.3780064,52.515041,13.3834472);out meta;";
+
+    // https://overpass-api.de/api/interpreter?
+
+    // String homeZone = "52.5082248,52.515041,13.3780064,13.3834472";
+
+    String[] coordinates = area.split(",");
+
+    double latMin = Double.valueOf(coordinates[0]);
+    double latMax = Double.valueOf(coordinates[1]);
+    double lonMin = Double.valueOf(coordinates[2]);
+    double lonMax = Double.valueOf(coordinates[3]);
+
+    String completeURL = String.format(baseUrl + "data=[out:json];node[man_made=surveillance](%s,%s,%s,%s);out meta;", latMin, lonMin, latMax, lonMax);
+
+    final SynchronizedCameraRepository crep = synchronizedCameraRepository;
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.GET,
+            completeURL,
+            null,
+            new Response.Listener<JSONObject>() {
+              @Override
+              public void onResponse(JSONObject response) {
+
+                List<SynchronizedCamera> camerasToSync = new ArrayList<>();
+
+                JSONObject cameraJSON;
+
+                try {
+
+                  String osm_db_timestamp = response.getJSONObject("osm3s").getString("timestamp_osm_base");
+
+                  for (int i = 0; i < response.getJSONArray("elements").length(); i++) {
+
+                    cameraJSON = new JSONObject(String.valueOf(response.getJSONArray("elements").get(i)));
+                    String timestamp = cameraJSON.getString("timestamp");
+
+                    JSONObject tags = cameraJSON.getJSONObject("tags");
+
+                    int type = 0; // default for fixed camera
+                    int area = 0; // outdoor
+                    int direction = -1; // unknown
+                    int mount = 0; // unknown
+                    int height = -1; // unknown
+                    int angle = -1; // unknown
+
+                    List<String> tagsAvailable = new ArrayList<>();
+
+                    // loop through tag keys for more information: area, angle, height etc.
+                    Iterator<String> iterTags = tags.keys();
+                    while (iterTags.hasNext()) {
+                      String key = iterTags.next();
+                      tagsAvailable.add(key);
+                    }
+
+                    for (String tag : tagsAvailable){
+
+                      try {
+
+                        switch (tag) {
+
+                          case "surveillance":
+                            area = StorageUtils.areaList.indexOf(tags.getString(tag));
+                            break;
+
+                          case "camera:type":
+                            type = StorageUtils.typeList.indexOf(tags.getString(tag));
+                            break;
+
+                          case "camera:mount":
+                            mount = StorageUtils.mountList.indexOf(tags.getString(tag));
+                            break;
+
+                          case "camera:direction":
+                            direction = tags.getInt("camera:direction");
+                            break;
+
+                          case "height":
+                            height = tags.getInt("height");
+                            break;
+                        }
+
+                      } catch (Exception ex) {
+                        Log.i(TAG, "Error creating value from overpass api response: " + ex.toString());
+                        continue;
+                      }
+
+
+
+                    }
+
+                    SynchronizedCamera cameraToAdd = new SynchronizedCamera(
+                            cameraJSON.getString("id") + ".jpg",
+                            cameraJSON.getString("id"),
+                            type,
+                            area,
+                            mount,
+                            direction,
+                            height,
+                            angle,
+                            cameraJSON.getDouble("lat"),
+                            cameraJSON.getDouble("lon"),
+                            "",
+                            osm_db_timestamp,
+                            timestamp,
+                            false
+
+
+                    );
+
+                    camerasToSync.add(cameraToAdd);
+
+                  }
+
+                  if (insertIntoDb) {
+                    crep.insertAll(camerasToSync);
+                  }
+
+                } catch (Exception e) {
+                  Log.i(TAG, "onResponse: " + e.toString());
+
+                }
+
+              }
+            }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        // TODO: Handle Errors
+        Log.i(TAG, "Error in connection " + error.toString());
+      }
+    }) {
+      @Override
+      public Map<String, String> getHeaders() throws AuthFailureError {
+
+        Map<String, String> headers = new HashMap<>();
+        // headers.put("Content-Type", "application/json");
+
+        return headers;
+      }
+    };
+
+    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+            30000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
+
+
+
+    mRequestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+
+      @Override
+      public void onRequestFinished(Request<Object> request) {
+        if (request.hasHadResponseDelivered()){
+          Intent intent = new Intent();
+          intent.setAction("org.unsurv.SYNCHRONIZATION_SUCCESSFUL");
+          LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
+          localBroadcastManager.sendBroadcast(intent);
+
+          long currentTime = System.currentTimeMillis();
+          SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+          sharedPreferences.edit().putString("lastUpdated", timestampIso8601.format(new Date(currentTime))).apply();
+
+        }
+
+
+      }
+    });
+
+
+    mRequestQueue.add(jsonObjectRequest);
+
+  }
+
+
+
 
 
   /**

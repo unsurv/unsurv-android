@@ -333,48 +333,17 @@ public class SynchronizationTutorialFragment extends Fragment {
 
           synchronizedCameraRepository = new SynchronizedCameraRepository(getActivity().getApplication());
 
+          // api key is present and not expired
+          String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
+          String homeArea = sharedPreferences.getString("area", null);
 
-          if (SynchronizationUtils.isApiKeyExpiredOrMissing(sharedPreferences)){
-
-            br = new BroadcastReceiver() {
-              @Override
-              public void onReceive(Context context, Intent intent) {
-                String baseURL = userServerUrlChoice.getText().toString();
-                String homeArea = sharedPreferences.getString("area", null);
-
-
-                SynchronizationUtils.downloadCamerasFromServer(
-                        baseURL,
-                        "area=" + homeArea,
-                        sharedPreferences,
-                        true,
-                        null,
-                        synchronizedCameraRepository,
-                        context);
-              }
-            };
-
-            intentFilter = new IntentFilter("org.unsurv.API_KEY_CHANGED");
-
-            localBroadcastManager.registerReceiver(br, intentFilter);
-
-            SynchronizationUtils.getAPIkey(context, sharedPreferences);
-
-          } else {
-            // api key is present and not expired
-            String baseURL = sharedPreferences.getString("synchronizationUrl", null);
-            String homeArea = sharedPreferences.getString("area", null);
-
-
-            SynchronizationUtils.downloadCamerasFromServer(
-                    baseURL,
-                    "area=" + homeArea,
-                    sharedPreferences,
-                    true,
-                    null,
-                    synchronizedCameraRepository,
-                    context);
-          }
+          SynchronizationUtils.downloadCamerasFromServer(
+                  baseUrl,
+                  homeArea,
+                  true,
+                  synchronizedCameraRepository,
+                  sharedPreferences,
+                  context);
 
         } // TODO use local file included with app to populate db
 
