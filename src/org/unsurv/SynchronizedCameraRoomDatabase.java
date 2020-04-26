@@ -68,7 +68,7 @@ public abstract class SynchronizedCameraRoomDatabase extends RoomDatabase {
 
     @Override
     protected Void doInBackground(final Void... params) {
-      //mDao.deleteAll();
+      mDao.deleteAll();
 
       SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
       timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));

@@ -286,12 +286,12 @@ class SynchronizationUtils {
 
     // String homeZone = "52.5082248,52.515041,13.3780064,13.3834472";
 
-    String[] coordinates = area.split(",");
+    String[] borders = area.split(",");
 
-    double latMin = Double.valueOf(coordinates[0]);
-    double latMax = Double.valueOf(coordinates[1]);
-    double lonMin = Double.valueOf(coordinates[2]);
-    double lonMax = Double.valueOf(coordinates[3]);
+    double latMin = Double.valueOf(borders[0]);
+    double latMax = Double.valueOf(borders[1]);
+    double lonMin = Double.valueOf(borders[2]);
+    double lonMax = Double.valueOf(borders[3]);
 
     String completeURL = String.format(baseUrl + "data=[out:json];node[man_made=surveillance](%s,%s,%s,%s);out meta;", latMin, lonMin, latMax, lonMax);
 
@@ -435,7 +435,7 @@ class SynchronizationUtils {
     };
 
     jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-            30000,
+            10000,
             0,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
     ));

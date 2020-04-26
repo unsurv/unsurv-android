@@ -856,7 +856,7 @@ public class MapActivity extends AppCompatActivity {
       case R.id.action_refresh:
 
         if (!offlineMode) {
-          queryServerForCameras("area=" + areaString);
+          queryServerForCameras(areaString);
           updateAllCamerasInArea(true);
           redrawMarkers(allCamerasInArea);
         } else {
@@ -1138,7 +1138,7 @@ public class MapActivity extends AppCompatActivity {
           if (allowServerQueries || allowOneServerQuery) {
 
             // TODO add start value to only update not download all everytime. need per area lastUpdated in own db
-            String areaQuery = "area=" + areaString;
+            String areaQuery = areaString;
 
             String currentQuery = areaQuery; // TODO add startQuery when needed
 
@@ -1524,19 +1524,13 @@ public class MapActivity extends AppCompatActivity {
 
   /**
    *
-   * @param queryString url query string i.e. "area=8.2699,50.0201,8.2978,50.0005&start=2018-01-01"
+   * @param areaString url query string i.e. "area=8.2699,50.0201,8.2978,50.0005&start=2018-01-01"
    */
-  void queryServerForCameras(String queryString) {
+  void queryServerForCameras(String areaString) {
 
     // aborts current query if API key expired. starts same query after a new API key is aquired
     refreshSharedPreferencesObject();
 
-    if (SynchronizationUtils.refreshApiKeyIfExpired(sharedPreferences, getApplicationContext())){
-      abortedServerQuery = true;
-      lastArea = queryString;
-      // abort current query
-      return;
-    }
 
     camerasInAreaFromServer.clear();
 
@@ -1553,97 +1547,137 @@ public class MapActivity extends AppCompatActivity {
 
     // String url = "http://192.168.2.159:5000/cameras/?area=8.2699,50.0201,8.2978,50.0005";
     refreshSharedPreferencesObject();
-    String baseURL = sharedPreferences.getString("synchronizationUrl", null) + "cameras/?";
+    String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
 
-    String url = baseURL + queryString;
+    String[] borders = areaString.split(",");
+
+    double queryLatMin = Double.valueOf(borders[0]);
+    double queryLatMax = Double.valueOf(borders[1]);
+    double queryLonMin = Double.valueOf(borders[2]);
+    double queryLonMax = Double.valueOf(borders[3]);
+
+    String comepleteUrl = String.format(baseUrl + "data=[out:json];node[man_made=surveillance](%s,%s,%s,%s);out meta;", queryLatMin, queryLonMin, queryLatMax, queryLonMax);
 
     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
             Request.Method.GET,
-            url,
+            comepleteUrl,
             null,
             new Response.Listener<JSONObject>() {
               @Override
               public void onResponse(JSONObject response) {
 
-                JSONObject JSONToSynchronize;
+                List<SynchronizedCamera> camerasToSync = new ArrayList<>();
+
+                JSONObject cameraJSON;
 
                 try {
 
-                  for (int i = 0; i < response.getJSONArray("cameras").length(); i++) {
-                    JSONToSynchronize = new JSONObject(String.valueOf(response.getJSONArray("cameras").get(i)));
+                  String osm_db_timestamp = response.getJSONObject("osm3s").getString("timestamp_osm_base");
 
-                    int area = 0;
-                    int direction = -1;
-                    int mount = 0;
-                    int height = -1;
-                    int angle = -1;
+                  for (int i = 0; i < response.getJSONArray("elements").length(); i++) {
 
+                    cameraJSON = new JSONObject(String.valueOf(response.getJSONArray("elements").get(i)));
+                    String timestamp = cameraJSON.getString("timestamp");
 
-                    if (JSONToSynchronize.has("area")) {
-                      area = JSONToSynchronize.getInt("area");
+                    JSONObject tags = cameraJSON.getJSONObject("tags");
+
+                    int type = 0; // default for fixed camera
+                    int area = 0; // outdoor
+                    int direction = -1; // unknown
+                    int mount = 0; // unknown
+                    int height = -1; // unknown
+                    int angle = -1; // unknown
+
+                    List<String> tagsAvailable = new ArrayList<>();
+
+                    // loop through tag keys for more information: area, angle, height etc.
+                    Iterator<String> iterTags = tags.keys();
+                    while (iterTags.hasNext()) {
+                      String key = iterTags.next();
+                      tagsAvailable.add(key);
                     }
 
-                    if (JSONToSynchronize.has("mount")) {
-                      mount = JSONToSynchronize.getInt("mount");
-                    }
+                    for (String tag : tagsAvailable){
 
-                    if (JSONToSynchronize.has("direction")) {
-                      direction = JSONToSynchronize.getInt("direction");
-                    }
+                      try {
 
-                    if (JSONToSynchronize.has("height")) {
-                      height = JSONToSynchronize.getInt("height");
+                        switch (tag) {
+
+                          case "surveillance":
+                            area = StorageUtils.areaList.indexOf(tags.getString(tag));
+                            break;
+
+                          case "camera:type":
+                            type = StorageUtils.typeList.indexOf(tags.getString(tag));
+                            break;
+
+                          case "camera:mount":
+                            mount = StorageUtils.mountList.indexOf(tags.getString(tag));
+                            break;
+
+                          case "camera:direction":
+                            direction = tags.getInt("camera:direction");
+                            break;
+
+                          case "height":
+                            height = tags.getInt("height");
+                            break;
+                        }
+
+                      } catch (Exception ex) {
+                        Log.i(TAG, "Error creating value from overpass api response: " + ex.toString());
+                        continue;
+                      }
+
+
+
                     }
 
                     SynchronizedCamera cameraToAdd = new SynchronizedCamera(
-                            JSONToSynchronize.getString("id") + ".jpg",
-                            JSONToSynchronize.getString("id"),
-                            JSONToSynchronize.getInt("type"),
+                            cameraJSON.getString("id") + ".jpg",
+                            cameraJSON.getString("id"),
+                            type,
                             area,
-                            direction,
                             mount,
+                            direction,
                             height,
                             angle,
-                            JSONToSynchronize.getDouble("lat"),
-                            JSONToSynchronize.getDouble("lon"),
-                            JSONToSynchronize.getString("comments"),
-                            JSONToSynchronize.getString("last_updated"),
-                            JSONToSynchronize.getString("uploaded_at"),
-                            JSONToSynchronize.getBoolean("manual_capture")
+                            cameraJSON.getDouble("lat"),
+                            cameraJSON.getDouble("lon"),
+                            "",
+                            osm_db_timestamp,
+                            timestamp,
+                            false
 
 
                     );
 
-                    camerasInAreaFromServer.add(cameraToAdd);
+                    camerasToSync.add(cameraToAdd);
 
                   }
+
+
+                  synchronizedCameraRepository.insertAll(camerasToSync);
+
 
                 } catch (Exception e) {
                   Log.i(TAG, "onResponse: " + e.toString());
 
-                  Toast.makeText(
-                          MapActivity.this,
-                          "Error retrieving data from Server. Try again later.", Toast.LENGTH_LONG).show();
-
                 }
-              }
 
+              }
             }, new Response.ErrorListener() {
       @Override
       public void onErrorResponse(VolleyError error) {
-        // TODO: Handle different http Errors
-        Log.i(TAG, "HTTP Error: " + error.toString());
+        // TODO: Handle Errors
+        Log.i(TAG, "Error in connection " + error.toString());
       }
-
     }) {
       @Override
       public Map<String, String> getHeaders() throws AuthFailureError {
 
         Map<String, String> headers = new HashMap<>();
-        refreshSharedPreferencesObject();
-        String apiKey = sharedPreferences.getString("apiKey", null);
-        headers.put("Authorization", apiKey);
-        headers.put("Content-Type", "application/json");
+        // headers.put("Content-Type", "application/json");
 
         return headers;
       }
