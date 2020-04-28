@@ -396,11 +396,13 @@ public class DebugActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null, 0);
+        // SynchronizationUtils.scheduleSyncIntervalJob(getApplicationContext(), null, 0);
 
         // JobScheduler jobScheduler = getApplicationContext().getSystemService(JobScheduler.class);
 
         // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
+
+        SynchronizationUtils.download_image("https://unsurv.org/static/images/", "favicon");
 
         SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));

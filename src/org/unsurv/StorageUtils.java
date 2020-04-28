@@ -1,5 +1,6 @@
 package org.unsurv;
 
+import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 
@@ -195,6 +196,34 @@ class StorageUtils {
     fileOutputStream.write(bytes);
     fileOutputStream.close();
   }
+
+
+  static void saveBitmap(final Bitmap bitmap, final String filename) {
+    final String path = StorageUtils.SYNCHRONIZED_PATH;
+    Log.i("StorageUtils: ", String.format("Saving %dx%d bitmap to %s.", bitmap.getWidth(), bitmap.getHeight(), path));
+    final File myDir = new File(path);
+
+    if (!myDir.mkdirs()) {
+      Log.i("StorageUtils: ", "Make dir failed");
+    }
+
+    final String fname = filename;
+    final File file = new File(myDir, fname);
+    if (file.exists()) {
+      file.delete();
+    }
+    try {
+      final FileOutputStream out = new FileOutputStream(file);
+      bitmap.compress(Bitmap.CompressFormat.JPEG, 99, out);
+      out.flush();
+      out.close();
+    } catch (final Exception e) {
+      Log.i("StorageUtils: ", "Exception!" + e.toString());
+    }
+  }
+
+
+
 
   /**
    * Deletes saved files for a single SurveillanceCamera

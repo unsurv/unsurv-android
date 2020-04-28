@@ -6,12 +6,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -22,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NoCache;
 
@@ -583,6 +586,48 @@ class SynchronizationUtils {
 
   }
 
+
+  static void download_image(String baseUrl, final String id) {
+
+    RequestQueue mRequestQueue;
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    mRequestQueue = new RequestQueue(new NoCache(), network);
+
+    // Start the queue
+    mRequestQueue.start();
+
+    String queryUrl = baseUrl + id + ".jpg";
+
+
+    ImageRequest imageRequest = new ImageRequest(
+            queryUrl,
+            new Response.Listener<Bitmap>() {
+              @Override
+              public void onResponse(Bitmap response) {
+
+                StorageUtils.saveBitmap(response, id + ".jpg");
+
+              }
+            },
+            256,
+            256,
+            ImageView.ScaleType.CENTER_CROP,
+            Bitmap.Config.ALPHA_8,
+            new Response.ErrorListener() {
+              @Override
+              public void onErrorResponse(VolleyError error) {
+                Log.i("SyncUtils: ", "Error in ImageRequest: " + error.toString());
+              }
+            }
+    );
+
+    mRequestQueue.add(imageRequest);
+
+  }
 
   /**
    * Requests a new api key and saves it to SharedPreferences. Uses LocalBroadCastManager from
