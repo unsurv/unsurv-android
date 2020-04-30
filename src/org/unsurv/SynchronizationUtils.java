@@ -481,7 +481,7 @@ class SynchronizationUtils {
    * @param cameras List of SynchronizedCameras
    * @param sharedPreferences SharePreferences object
    */
-  static void downloadImagesFromServer(String baseUrl, final List<SynchronizedCamera> cameras, final SharedPreferences sharedPreferences) {
+  static void downloadImagesFromServerOld(String baseUrl, final List<SynchronizedCamera> cameras, final SharedPreferences sharedPreferences) {
 
     final List<String> idsFromCameras = new ArrayList<>();
 
@@ -587,7 +587,7 @@ class SynchronizationUtils {
   }
 
 
-  static void download_image(String baseUrl, final String id) {
+  static void downloadImagesFromServer(String baseUrl, final String id) {
 
     RequestQueue mRequestQueue;
 
@@ -624,6 +624,12 @@ class SynchronizationUtils {
               }
             }
     );
+
+    imageRequest.setRetryPolicy(new DefaultRetryPolicy(
+            10000,
+            0,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
 
     mRequestQueue.add(imageRequest);
 

@@ -83,25 +83,7 @@ public class SyncIntervalSchedulerJobService extends JobService {
             sharedPreferences,
             this);
 
-    if (downloadImages) {
 
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-
-          List<SynchronizedCamera> recentCameras = synchronizedCameraRepository.getCamerasAddedInLastTwoMinutes();
-
-          SynchronizationUtils.downloadImagesFromServer(
-                  baseUrl,
-                  recentCameras,
-                  sharedPreferences
-                  );
-        }
-      }, 30000);
-
-
-    }
 
     //List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
 
@@ -156,26 +138,6 @@ public class SyncIntervalSchedulerJobService extends JobService {
       }, 10000);
 
 
-
-      if (downloadImages) {
-
-        Handler imageDownloadHandler = new Handler();
-        imageDownloadHandler.postDelayed(new Runnable() {
-          @Override
-          public void run() {
-
-            List<SynchronizedCamera> recentCameras = synchronizedCameraRepository.getCamerasAddedInLastTwoMinutes();
-
-            SynchronizationUtils.downloadImagesFromServer(
-                    baseUrl,
-                    recentCameras,
-                    sharedPreferences
-            );
-          }
-        }, 30000);
-
-
-      }
 
       List<SurveillanceCamera> camerasToUpload = cameraRepository.getCamerasForUpload();
 

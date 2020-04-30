@@ -1469,8 +1469,7 @@ public class MapActivity extends AppCompatActivity {
                           String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
                           SynchronizationUtils.downloadImagesFromServer(
                                   baseUrl,
-                                  Collections.singletonList(highlightedCamera),
-                                  sharedPreferences);
+                                  highlightedCamera.getExternalID());
                           highlightedCamera.setImagePath(highlightedCamera.getExternalID() + ".jpg");
                           synchronizedCameraRepository.update(highlightedCamera);
 
@@ -1482,7 +1481,7 @@ public class MapActivity extends AppCompatActivity {
                               File updatedThumbnail = new File(picturesPath + highlightedCamera.getImagePath());
 
                               Picasso.get().load(updatedThumbnail)
-                                      .placeholder(R.drawable.ic_file_download_grey_48dp)
+                                      .placeholder(R.drawable.ic_do_not_disturb_red_48dp)
                                       .into(infoImage);
 
                             }

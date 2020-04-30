@@ -71,9 +71,7 @@ public class CustomInfoWindow extends MarkerInfoWindow {
 
         String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
         SynchronizationUtils.downloadImagesFromServer(
-                baseUrl,
-                Collections.singletonList(selectedCamera),
-                sharedPreferences);
+                baseUrl, selectedCamera.getExternalID());
 
         selectedCamera.setImagePath(selectedCamera.getExternalID() + ".jpg");
         mSynchronizedCameraRepository.update(selectedCamera);
@@ -87,7 +85,7 @@ public class CustomInfoWindow extends MarkerInfoWindow {
 
             infoImage.setImageDrawable(null);
             Picasso.get().load(updatedThumbnail)
-                    .placeholder(R.drawable.ic_file_download_grey_48dp)
+                    .placeholder(R.drawable.ic_do_not_disturb_red_48dp)
                     .into(infoImage);
 
           }
