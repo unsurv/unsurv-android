@@ -122,6 +122,7 @@
 
     <string name="edit_button">EDIT LOCATION</string>
     <string name="save_button">SAVE</string>
+    <string name="take_picture_button">TAKE PIC</string>
 
     <!--in CaptureTrainingImageActivity-->
     <string name="capture">CAPTURE</string>

@@ -516,8 +516,8 @@ public class DebugActivity extends AppCompatActivity {
                 0,
                 -1,
                 -1,
-                "test_pixel_2.jpg",
-                "asd.jpg",
+                "",
+                "",
                 null,
                 0, 0,
                 "",
@@ -525,9 +525,9 @@ public class DebugActivity extends AppCompatActivity {
                 "2018-02-02",
                 false,
                 false,
-                false,
                 true,
-                "[{\"1\":\"420 709 863 1069\"},{\"0\":\"859 656 1432 1044\"},{\"0\":\"81 1018 460 1334\"},{\"0\":\"48 678 385 1049\"}]",
+                false,
+                "",
                 "");
 
         SynchronizedCamera debugCamera1 = new SynchronizedCamera(
@@ -593,9 +593,9 @@ public class DebugActivity extends AppCompatActivity {
 
         // cameraRepository.insert(randomCamera);
         // cameraRepository.insert(randomCamera2);
-        BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 2);
+        BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 1);
 
-        // cameraRepository.insertAll(notRandomCamera);
+        cameraRepository.insert(notRandomCamera);
 
 
         randomCamerasAdded += 1;

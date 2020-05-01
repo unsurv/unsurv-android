@@ -198,8 +198,8 @@ class StorageUtils {
   }
 
 
-  static void saveBitmap(final Bitmap bitmap, final String filename) {
-    final String path = StorageUtils.SYNCHRONIZED_PATH;
+  static void saveBitmap(final Bitmap bitmap, final String path, final String filename) {
+
     Log.i("StorageUtils: ", String.format("Saving %dx%d bitmap to %s.", bitmap.getWidth(), bitmap.getHeight(), path));
     final File myDir = new File(path);
 

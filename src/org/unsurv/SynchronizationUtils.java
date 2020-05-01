@@ -610,7 +610,7 @@ class SynchronizationUtils {
               @Override
               public void onResponse(Bitmap response) {
 
-                StorageUtils.saveBitmap(response, id + ".jpg");
+                StorageUtils.saveBitmap(response, StorageUtils.SYNCHRONIZED_PATH,  id + ".jpg");
 
               }
             },

@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -18,14 +19,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
+import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -77,7 +76,7 @@ public class EditCameraActivity extends AppCompatActivity {
 
   Drawable cameraMarkerIcon;
 
-  ImageView cameraImageView;
+  ImageView detailCameraImageView;
   MapView map;
 
   TextView timestampTextView;
@@ -101,6 +100,7 @@ public class EditCameraActivity extends AppCompatActivity {
   Button saveButton;
   Button editButton;
   ImageButton resetMapButton;
+  ImageButton takePictureButton;
   ImageView editLocationMarker;
 
   File cameraImage;
@@ -122,7 +122,7 @@ public class EditCameraActivity extends AppCompatActivity {
   Context context;
   Resources resources;
 
-  private static String picturesPath = StorageUtils.CAMERA_CAPTURES_PATH;
+  private static String captureImagePath = StorageUtils.CAMERA_CAPTURES_PATH;
 
 
   @Override
@@ -145,7 +145,7 @@ public class EditCameraActivity extends AppCompatActivity {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     offlineMode = sharedPreferences.getBoolean("offlineMode", true);
 
-    cameraImageView = findViewById(R.id.edit_camera_detail_image);
+    detailCameraImageView = findViewById(R.id.edit_camera_detail_image);
     recyclerView = findViewById(R.id.edit_camera_choose_recyclerview);
     map = findViewById(R.id.edit_camera_map);
 
@@ -174,10 +174,11 @@ public class EditCameraActivity extends AppCompatActivity {
     timestampTextView = findViewById(R.id.edit_camera_timestamp_text);
     uploadTextView = findViewById(R.id.edit_camera_upload_text);
 
-    saveButton = findViewById(R.id.camera_edit_save_button);
-    editButton = findViewById(R.id.camera_edit_edit_button);
+    saveButton = findViewById(R.id.edit_camera_save_button);
+    editButton = findViewById(R.id.edit_camera_edit_button);
     resetMapButton = findViewById(R.id.edit_camera_reset_map_position);
     editLocationMarker = findViewById(R.id.edit_camera_center_marker);
+    takePictureButton = findViewById(R.id.edit_camera_take_picture_button);
 
     // Activity gets started with db id in IntentExtra, get id
     Intent startIntent = getIntent();
@@ -188,12 +189,30 @@ public class EditCameraActivity extends AppCompatActivity {
     cameraToEdit = cameraRepository.findByDbId(dbId);
     cameraType = cameraToEdit.getCameraType();
     String thumbnailPath = cameraToEdit.getThumbnailPath();
-    cameraImage = new File(picturesPath + thumbnailPath);
+    cameraImage = new File(captureImagePath + thumbnailPath);
+
+    if (thumbnailPath == null || thumbnailPath.isEmpty()) {
+
+      detailCameraImageView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          dispatchTakePictureIntent();
+        }
+      });
+    }
+
+    takePictureButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        dispatchTakePictureIntent();
+      }
+    });
+
 
 
     Picasso.get().load(cameraImage)
             .placeholder(R.drawable.ic_camera_alt_grey_50dp)
-            .into(cameraImageView);
+            .into(detailCameraImageView);
 
     recyclerView.setHasFixedSize(true);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -201,7 +220,7 @@ public class EditCameraActivity extends AppCompatActivity {
     //example data: ""[asd.jpg, bsd.jpg]""
     String[] filenames = cameraToEdit.getThumbnailFiles();
 
-    adapter = new ChooseImageAdapter(this, filenames, cameraImageView, cameraToEdit, cameraRepository);
+    adapter = new ChooseImageAdapter(this, filenames, detailCameraImageView, cameraToEdit, cameraRepository);
     recyclerView.setAdapter(adapter);
 
 
@@ -693,6 +712,32 @@ public class EditCameraActivity extends AppCompatActivity {
 
   }
 
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+
+      Bundle extras = data.getExtras();
+      Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+      Matrix turnMatrix = new Matrix();
+      turnMatrix.postRotate(90);
+
+      Bitmap rotatedBitmap = Bitmap.createBitmap(imageBitmap, 0, 0,
+              imageBitmap.getWidth(),
+              imageBitmap.getHeight(),
+              turnMatrix, true);
+
+      cameraToEdit.setThumbnailPath(cameraToEdit.getId() + ".jpg");
+      StorageUtils.saveBitmap(rotatedBitmap, StorageUtils.CAMERA_CAPTURES_PATH, cameraToEdit.getId() + ".jpg");
+
+
+      detailCameraImageView.setImageBitmap(rotatedBitmap);
+    }
+
+    super.onActivityResult(requestCode, resultCode, data);
+  }
+
+
   void generateMarkerOverlayWithCurrentLocation() {
 
     // Setting starting position and zoom level.
@@ -793,6 +838,19 @@ public class EditCameraActivity extends AppCompatActivity {
     EditCameraActivity.this.map.invalidate();
 
   }
+
+  static final int REQUEST_IMAGE_CAPTURE = 1;
+
+  private void dispatchTakePictureIntent() {
+    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+      startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+    }
+
+
+
+  }
+
 
 
 }

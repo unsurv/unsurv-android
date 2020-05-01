@@ -286,15 +286,24 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/camera_edit_edit_button"
+                android:id="@+id/edit_camera_edit_button"
                 android:text="@string/edit_button"
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight="5"
                 android:layout_margin="5dp"/>
 
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/edit_camera_take_picture_button"
+                android:layout_width="0sp"
+                android:src="@drawable/ic_camera_grey_24dp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:layout_margin="5dp"
+                />
+
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/camera_edit_save_button"
+                android:id="@+id/edit_camera_save_button"
                 android:text="@string/save_button"
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
