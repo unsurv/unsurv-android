@@ -40,6 +40,10 @@
         android:key="@string/general_title"
         android:layout="@layout/preference_category_general">
 
+        <Preference
+            android:key="startDebug"
+            android:title="Start DebugActivity" />
+
         <SwitchPreference
             android:key="offlineMode"
             android:title="Offline mode" />

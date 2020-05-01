@@ -86,6 +86,7 @@ public class OrganizeActivity extends AppCompatActivity {
 
   Button resetButton;
   Button drawButton;
+  Button backButton;
 
   Context context;
   Resources resources;
@@ -93,8 +94,6 @@ public class OrganizeActivity extends AppCompatActivity {
 
   @Override
   protected void onResume() {
-
-    BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
 
     String oldLat = sharedPreferences.getString("gridCenterLat", "");
     String oldLon = sharedPreferences.getString("gridCenterLon", "");
@@ -148,6 +147,7 @@ public class OrganizeActivity extends AppCompatActivity {
 
     resetButton = findViewById(R.id.organize_reset);
     drawButton = findViewById(R.id.organize_draw);
+    backButton = findViewById(R.id.organize_back);
 
     overlayItemsToDisplay = new ArrayList<>();
 
@@ -331,8 +331,24 @@ public class OrganizeActivity extends AppCompatActivity {
       }
     });
 
+    backButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
 
-    // TODO listview with different images, save abort buttons, editable mapview, change upload date with + /- buttons
+        if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+          Intent manualCaptureIntent = new Intent(OrganizeActivity.this, ManualCaptureActivity.class);
+          startActivity(manualCaptureIntent);
+        } else {
+          Intent cameraIntent = new Intent(OrganizeActivity.this, DetectorActivity.class);
+          startActivity(cameraIntent);
+
+        }
+
+
+      }
+    });
+
+
 
     bottomNavigationView = findViewById(R.id.navigation);
     bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -376,10 +392,7 @@ public class OrganizeActivity extends AppCompatActivity {
       }
     });
 
-    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_history).setChecked(false);
-    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_camera).setChecked(false);
-    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_map).setChecked(false);
-    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_stats).setChecked(false);
+    bottomNavigationView.getMenu().findItem(R.id.bottom_navigation_map).setChecked(true);
 
   }
 

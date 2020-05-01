@@ -177,6 +177,15 @@
                 android:layout_margin="5dp"
                 />
 
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/organize_back"
+                android:text="@string/organize_back"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:layout_margin="5dp"
+                />
+
 
 
         </LinearLayout>

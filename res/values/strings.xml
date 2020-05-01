@@ -89,6 +89,7 @@
 
     <string name="organize_reset_button">reset</string>
     <string name="organize_draw_button">Draw Grid</string>
+    <string name="organize_back">Back</string>
 
     <string name="organize_hint_lat">Latitude</string>
     <string name="organize_hint_lon">Longitude</string>

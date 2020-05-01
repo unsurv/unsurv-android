@@ -69,7 +69,8 @@
 
         <activity
             android:name=".OrganizeActivity"
-            android:label="@string/organize_label">
+            android:label="@string/organize_label"
+            android:parentActivityName=".DetectorActivity">
 
         </activity>
 
@@ -85,7 +86,8 @@
             android:name=".SettingsActivity"
             android:label="@string/settings_label" />
 
-        <activity android:name=".TutorialActivity" />
+        <activity android:name=".TutorialActivity"
+            android:parentActivityName=".DetectorActivity"/>
 
         <activity
             android:name=".ManualCaptureActivity"
