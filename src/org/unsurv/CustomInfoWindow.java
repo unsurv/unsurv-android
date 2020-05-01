@@ -14,7 +14,6 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.io.File;
-import java.util.Collections;
 
 /**
  * Used when clustering in MapActivity is used.
@@ -70,8 +69,7 @@ public class CustomInfoWindow extends MarkerInfoWindow {
       public void onClick(View view) {
 
         String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
-        SynchronizationUtils.downloadImagesFromServer(
-                baseUrl, selectedCamera.getExternalID());
+        SynchronizationUtils.downloadImageFromServer(selectedCamera.getExternalID());
 
         selectedCamera.setImagePath(selectedCamera.getExternalID() + ".jpg");
         mSynchronizedCameraRepository.update(selectedCamera);

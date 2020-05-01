@@ -86,7 +86,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1466,11 +1465,13 @@ public class MapActivity extends AppCompatActivity {
                       infoImage.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                          String baseUrl = sharedPreferences.getString("synchronizationUrl", null);
-                          SynchronizationUtils.downloadImagesFromServer(
-                                  baseUrl,
+
+                          SynchronizationUtils.downloadImageFromServer(
                                   highlightedCamera.getExternalID());
-                          highlightedCamera.setImagePath(highlightedCamera.getExternalID() + ".jpg");
+
+                          highlightedCamera.setImagePath(
+                                  highlightedCamera.getExternalID() + ".jpg");
+
                           synchronizedCameraRepository.update(highlightedCamera);
 
                           Handler handler = new Handler();
@@ -1527,7 +1528,6 @@ public class MapActivity extends AppCompatActivity {
    */
   void queryServerForCameras(String areaString) {
 
-    // aborts current query if API key expired. starts same query after a new API key is aquired
     refreshSharedPreferencesObject();
 
 
@@ -1722,7 +1722,7 @@ public class MapActivity extends AppCompatActivity {
 
         // TODO add area to db
 
-        updateAllCamerasInArea(false);
+        updateAllCamerasInArea(true);
         redrawMarkers(allCamerasInArea);
       }
     });

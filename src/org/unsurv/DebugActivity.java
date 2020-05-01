@@ -51,7 +51,6 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NoCache;
-import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -190,7 +189,7 @@ public class DebugActivity extends AppCompatActivity {
 
     sharedPreferences.edit().putString("lastUpdated", "2018-01-01").apply();
     sharedPreferences.edit().putString("synchronizationInterval", String.valueOf(1000*60*60*24)).apply(); // 24 h,  using strings because arrays in preferences can only take strings
-    sharedPreferences.edit().putString("synchronizationUrl", "https://api.unsurv.org/").apply();
+    sharedPreferences.edit().putString("synchronizationUrl", "https://overpass-api.de/api/interpreter?").apply();
     // sharedPreferences.edit().putString("synchronizationUrl", "http://192.168.178.137:5000/").apply();
     sharedPreferences.edit().putString("area", "49.6391,50.3638,7.8648,8.6888").apply();
     sharedPreferences.edit().putBoolean("buttonCapture", false).apply();
@@ -402,7 +401,7 @@ public class DebugActivity extends AppCompatActivity {
 
         // List<JobInfo> allJobsPending = jobScheduler.getAllPendingJobs();
 
-        SynchronizationUtils.download_image("https://unsurv.org/static/images/", "favicon");
+        // SynchronizationUtils.downloadImageFromServer("favicon");
 
         SimpleDateFormat timestampIso8601 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         timestampIso8601.setTimeZone(TimeZone.getTimeZone("UTC"));

@@ -587,7 +587,7 @@ class SynchronizationUtils {
   }
 
 
-  static void downloadImagesFromServer(String baseUrl, final String id) {
+  static void downloadImageFromServer(final String id) {
 
     RequestQueue mRequestQueue;
 
@@ -600,7 +600,8 @@ class SynchronizationUtils {
     // Start the queue
     mRequestQueue.start();
 
-    String queryUrl = baseUrl + id + ".jpg";
+    // always download images from unsurv.org
+    String queryUrl = "https://unsurv.org/static/images/" + id + ".jpg";
 
 
     ImageRequest imageRequest = new ImageRequest(
@@ -613,6 +614,7 @@ class SynchronizationUtils {
 
               }
             },
+
             256,
             256,
             ImageView.ScaleType.CENTER_CROP,
