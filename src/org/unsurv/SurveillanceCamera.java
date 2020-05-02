@@ -194,7 +194,7 @@ public class SurveillanceCamera {
   }
 
 
-  public String[] getThumbnailFiles(){
+  public String[] getThumbnailFilesAsStringArray(){
 
     String[] allCaptureFilenames = captureFilenames
             .replace("\"", "")

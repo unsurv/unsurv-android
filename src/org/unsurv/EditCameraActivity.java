@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,6 +35,8 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.modules.ArchiveFileFactory;
@@ -218,7 +221,7 @@ public class EditCameraActivity extends AppCompatActivity {
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     //example data: ""[asd.jpg, bsd.jpg]""
-    String[] filenames = cameraToEdit.getThumbnailFiles();
+    String[] filenames = cameraToEdit.getThumbnailFilesAsStringArray();
 
     adapter = new ChooseImageAdapter(this, filenames, detailCameraImageView, cameraToEdit, cameraRepository);
     recyclerView.setAdapter(adapter);
@@ -716,6 +719,10 @@ public class EditCameraActivity extends AppCompatActivity {
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
+      long currentTime = System.currentTimeMillis();
+
+      String thumbnailFilename = currentTime + "_thumbnail.jpg";
+
       Bundle extras = data.getExtras();
       Bitmap imageBitmap = (Bitmap) extras.get("data");
 
@@ -727,11 +734,34 @@ public class EditCameraActivity extends AppCompatActivity {
               imageBitmap.getHeight(),
               turnMatrix, true);
 
+      try {
+
+        JSONArray allCaptureFilenames = new JSONArray(cameraToEdit.getCaptureFilenames());
+        allCaptureFilenames.put(thumbnailFilename);
+        cameraToEdit.setCaptureFilenames(allCaptureFilenames.toString());
+
+
+      } catch (JSONException jse) {
+        Log.i("EditCamera: ",  jse.toString());
+      }
+
       cameraToEdit.setThumbnailPath(cameraToEdit.getId() + ".jpg");
-      StorageUtils.saveBitmap(rotatedBitmap, StorageUtils.CAMERA_CAPTURES_PATH, cameraToEdit.getId() + ".jpg");
+      StorageUtils.saveBitmap(rotatedBitmap, StorageUtils.CAMERA_CAPTURES_PATH, thumbnailFilename);
 
 
       detailCameraImageView.setImageBitmap(rotatedBitmap);
+      cameraRepository.updateCameras(cameraToEdit);
+
+
+      String[] filenames = cameraToEdit.getThumbnailFilesAsStringArray();
+
+      recyclerView.setAdapter(null);
+
+      adapter = new ChooseImageAdapter(this, filenames, detailCameraImageView, cameraToEdit, cameraRepository);
+      recyclerView.setAdapter(adapter);
+
+      Toast.makeText(context, "Successfully added new image and updated camera.",
+              Toast.LENGTH_LONG).show();
     }
 
     super.onActivityResult(requestCode, resultCode, data);
