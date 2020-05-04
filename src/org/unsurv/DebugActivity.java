@@ -991,7 +991,7 @@ public class DebugActivity extends AppCompatActivity {
                         // Setting content for infoWindow.
                         infoImage = infoWindow.getView().findViewById(R.id.info_image);
                         infoLatestTimestamp = infoWindow.getView().findViewById(R.id.info_latest_timestamp);
-                        infoComment = infoWindow.getView().findViewById(R.id.info_comment);
+                        infoComment = infoWindow.getView().findViewById(R.id.info_type);
 
 
                         File thumbnail = new File(allCamerasInArea.get(cameraIndex).getThumbnailPath());

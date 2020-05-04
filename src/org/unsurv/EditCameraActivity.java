@@ -736,17 +736,31 @@ public class EditCameraActivity extends AppCompatActivity {
 
       try {
 
-        JSONArray allCaptureFilenames = new JSONArray(cameraToEdit.getCaptureFilenames());
+        JSONArray allCaptureFilenames;
+        String previousFilenames = cameraToEdit.getCaptureFilenames();
+
+        if (!previousFilenames.isEmpty()) {
+
+          allCaptureFilenames = new JSONArray(cameraToEdit.getCaptureFilenames());
+
+        } else {
+
+          allCaptureFilenames = new JSONArray();
+
+        }
+
         allCaptureFilenames.put(thumbnailFilename);
         cameraToEdit.setCaptureFilenames(allCaptureFilenames.toString());
 
+        cameraToEdit.setThumbnailPath(thumbnailFilename + ".jpg");
+
+        StorageUtils.saveBitmap(rotatedBitmap, StorageUtils.CAMERA_CAPTURES_PATH, thumbnailFilename);
 
       } catch (JSONException jse) {
         Log.i("EditCamera: ",  jse.toString());
       }
 
-      cameraToEdit.setThumbnailPath(cameraToEdit.getId() + ".jpg");
-      StorageUtils.saveBitmap(rotatedBitmap, StorageUtils.CAMERA_CAPTURES_PATH, thumbnailFilename);
+
 
 
       detailCameraImageView.setImageBitmap(rotatedBitmap);

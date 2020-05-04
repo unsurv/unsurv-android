@@ -33,7 +33,7 @@ public class CameraRepository {
     try {
       return new insertAsyncTask(mCameraDao).execute(surveillanceCamera).get();
     } catch (Exception e) {
-      Log.i("Background findByID Error: " , e.toString());
+      Log.i("Background insert Error: " , e.toString());
       return 0;
     }
 
