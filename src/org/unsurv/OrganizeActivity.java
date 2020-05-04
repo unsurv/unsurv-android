@@ -229,8 +229,8 @@ public class OrganizeActivity extends AppCompatActivity {
     zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 
 
-    standardZoom = 5.0;
-    sharedPreferences.edit().putString("gridZoom", String.valueOf(standardZoom)).apply();
+    //standardZoom = 5.0;
+    // sharedPreferences.edit().putString("gridZoom", String.valueOf(standardZoom)).apply();
 
     String oldLat = sharedPreferences.getString("gridCenterLat", "");
     String oldLon = sharedPreferences.getString("gridCenterLon", "");
@@ -265,6 +265,11 @@ public class OrganizeActivity extends AppCompatActivity {
         centerLat.setText(String.valueOf(centerAfterScroll.getLatitude()));
         centerLon.setText(String.valueOf(centerAfterScroll.getLongitude()));
 
+
+        // onZoom triggers only when there is absolutely no movement too, save zoom level here too
+        Double zoomLevel = map.getZoomLevelDouble();
+        sharedPreferences.edit().putString("gridZoom", String.valueOf(zoomLevel)).apply();
+
         return false;
 
       }
@@ -272,7 +277,8 @@ public class OrganizeActivity extends AppCompatActivity {
       @Override
       public boolean onZoom(ZoomEvent event) {
 
-        sharedPreferences.edit().putString("gridZoom", String.valueOf(map.getZoomLevelDouble())).apply();
+        Double zoomLevel = map.getZoomLevelDouble();
+        sharedPreferences.edit().putString("gridZoom", String.valueOf(zoomLevel)).apply();
 
 
         return false;
