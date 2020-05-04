@@ -179,8 +179,6 @@ public class OrganizeActivity extends AppCompatActivity {
     map.setClickable(false);
     map.setMultiTouchControls(true);
 
-    offlineMode = true;
-
 
     if (offlineMode) {
 
@@ -323,7 +321,7 @@ public class OrganizeActivity extends AppCompatActivity {
                     deleteGrid();
 
                     centerMap = new GeoPoint(50.972, 10.107);
-                    mapController.setZoom(standardZoom);
+                    mapController.setZoom(7.0);
                     mapController.setCenter(centerMap);
                     redrawMap();
 

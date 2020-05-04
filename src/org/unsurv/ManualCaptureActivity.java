@@ -16,6 +16,10 @@ import android.widget.ImageView;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.events.DelayedMapListener;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -38,6 +42,8 @@ public class ManualCaptureActivity extends AppCompatActivity {
   private SharedPreferences sharedPreferences;
 
   private MapView mapView;
+  IMapController mapController;
+  GeoPoint centerMap;
 
   ImageButton manualSaveButton;
   ImageButton addStandardCameraButton;
@@ -58,6 +64,19 @@ public class ManualCaptureActivity extends AppCompatActivity {
   protected void onResume() {
 
     BottomNavigationBadgeHelper.setBadgesFromSharedPreferences(bottomNavigationView, context);
+
+    String oldLat = sharedPreferences.getString("manualCenterLat", "");
+    String oldLon = sharedPreferences.getString("manualCenterLon", "");
+    String oldZoom = sharedPreferences.getString("manualZoom", "");
+
+    if (!oldLat.isEmpty() && !oldLon.isEmpty() && !oldZoom.isEmpty()) {
+
+      centerMap = new GeoPoint(Double.parseDouble(oldLat), Double.parseDouble(oldLon));
+      mapController.setZoom(Double.parseDouble(oldZoom));
+      mapController.setCenter(centerMap);
+
+    }
+
 
     super.onResume();
   }
@@ -97,7 +116,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
     // TODO add choice + backup strategy here
     mapView.setTileSource(TileSourceFactory.OpenTopo);
 
-    IMapController mapController = mapView.getController();
+    mapController = mapView.getController();
 
     String homeZone = sharedPreferences.getString("area", null);
 
@@ -115,6 +134,39 @@ public class ManualCaptureActivity extends AppCompatActivity {
     GeoPoint startPoint = new GeoPoint(centerLat, centerLon);
     mapController.setZoom(10.0);
     mapController.setCenter(startPoint);
+
+
+    // refresh values after 200ms delay
+    mapView.addMapListener(new DelayedMapListener(new MapListener() {
+      @Override
+      public boolean onScroll(ScrollEvent event) {
+        IGeoPoint centerAfterScroll = mapView.getMapCenter();
+
+
+        centerMap = new GeoPoint(centerAfterScroll);
+        sharedPreferences.edit().putString("manualCenterLat", String.valueOf(centerMap.getLatitude())).apply();
+        sharedPreferences.edit().putString("manualCenterLon", String.valueOf(centerMap.getLongitude())).apply();
+
+
+        // onZoom triggers only when there is absolutely no movement too, save zoom level here too
+        Double zoomLevel = mapView.getZoomLevelDouble();
+        sharedPreferences.edit().putString("manualZoom", String.valueOf(zoomLevel)).apply();
+
+        return false;
+
+      }
+
+      @Override
+      public boolean onZoom(ZoomEvent event) {
+
+        Double zoomLevel = mapView.getZoomLevelDouble();
+        sharedPreferences.edit().putString("manualZoom", String.valueOf(zoomLevel)).apply();
+
+        return false;
+
+      }
+    }, 200));
+
 
 
     // add different types depending on user choice
