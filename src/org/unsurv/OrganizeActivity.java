@@ -105,10 +105,26 @@ public class OrganizeActivity extends AppCompatActivity {
       mapController.setCenter(centerMap);
     }
 
-    cameras = cameraRepository.getAllCameras();
 
-    //sharedPreferences.edit().putBoolean("offlineMode", true).apply();
-    // offlineMode = sharedPreferences.getBoolean("offlineMode", true);
+    // load and show old grid if chosen before
+    // values are saved as "centerLat,centerLon,length,height,rows,columns"
+    String oldGrid = sharedPreferences.getString("organizeGrid", "");
+
+    if (!oldGrid.isEmpty()) {
+
+      String[] gridValues = oldGrid.split(",");
+      double gridLat = Double.parseDouble(gridValues[0]);
+      double gridLon = Double.parseDouble(gridValues[1]);
+
+      int gridLength = Integer.parseInt(gridValues[2]);
+      int gridHeight = Integer.parseInt(gridValues[3]);
+      int gridRows = Integer.parseInt(gridValues[4]);
+      int gridColumns = Integer.parseInt(gridValues[5]);
+
+      drawGrid(gridLat, gridLon, gridLength, gridHeight, gridRows, gridColumns);
+    }
+
+    cameras = cameraRepository.getAllCameras();
 
 
     deleteMarkers();
@@ -473,7 +489,9 @@ public class OrganizeActivity extends AppCompatActivity {
 
     }
 
+    String gridValues = String.format("%s,%s,%s,%s,%s,%s", centerLat, centerLon, length, height, rows, columns);
 
+    sharedPreferences.edit().putString("organizeGrid", gridValues).apply();
   }
 
   void drawLine(List<GeoPoint> geoPoints){
