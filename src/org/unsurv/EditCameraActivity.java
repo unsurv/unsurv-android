@@ -814,7 +814,7 @@ public class EditCameraActivity extends AppCompatActivity {
     // if height entered by user
     if (height >= 0) {
       // TODO use formula from surveillance under surveillance https://sunders.uber.space
-      // add 20% viewdistance per meter of height
+      // add 30% viewdistance per meter of height
 
       double heightFactor = 1 + (0.3 * height);
       baseViewDistance *= heightFactor;
@@ -838,37 +838,74 @@ public class EditCameraActivity extends AppCompatActivity {
 
       int viewAngle;
 
-      if (cameraType == StorageUtils.FIXED_CAMERA) {
-        viewAngle = 60; // fixed camera
-      } else {
-        viewAngle = 120; // panning camera
-      }
-
       // calculate geopoints for triangle
 
       double startLat = currentPos.getLatitude();
       double startLon = currentPos.getLongitude();
 
-      // triangle sides direction
-      int direction1 = direction - viewAngle / 2;
-      int direction2 = direction + viewAngle / 2;
-
-      // in meters, simulate a 2d coordinate system, known values are: hyp length, and inside angles
-      double xDiff1 = Math.cos(Math.toRadians(90 - direction1)) * baseViewDistance;
-      double yDiff1 = Math.sin(Math.toRadians(90 - direction1)) * baseViewDistance;
-
-      double xDiff2 = Math.cos(Math.toRadians(90 - direction2)) * baseViewDistance;
-      double yDiff2 = Math.sin(Math.toRadians(90 - direction2)) * baseViewDistance;
-
-
-      Location endpoint1 = LocationUtils.getNewLocation(startLat, startLon, yDiff1, xDiff1);
-      Location endpoint2 = LocationUtils.getNewLocation(startLat, startLon, yDiff2, xDiff2);
-
       geoPoints = new ArrayList<>();
 
-      geoPoints.add(new GeoPoint(startLat, startLon));
-      geoPoints.add(new GeoPoint(endpoint1.getLatitude(), endpoint1.getLongitude()));
-      geoPoints.add(new GeoPoint(endpoint2.getLatitude(), endpoint2.getLongitude()));
+
+      if (cameraType == StorageUtils.FIXED_CAMERA) {
+        viewAngle = 60; // fixed camera
+
+        // triangle sides compass direction
+        int direction1 = direction - viewAngle / 2;
+        int direction2 = direction + viewAngle / 2;
+
+        // in meters, simulate a 2d coordinate system, known values are: hyp length, and inside angles
+        double xDiff1 = Math.cos(Math.toRadians(90 - direction1)) * baseViewDistance;
+        double yDiff1 = Math.sin(Math.toRadians(90 - direction1)) * baseViewDistance;
+
+        double xDiff2 = Math.cos(Math.toRadians(90 - direction2)) * baseViewDistance;
+        double yDiff2 = Math.sin(Math.toRadians(90 - direction2)) * baseViewDistance;
+
+
+        Location endpoint1 = LocationUtils.getNewLocation(startLat, startLon, yDiff1, xDiff1);
+        Location endpoint2 = LocationUtils.getNewLocation(startLat, startLon, yDiff2, xDiff2);
+
+
+
+        geoPoints.add(new GeoPoint(startLat, startLon));
+        geoPoints.add(new GeoPoint(endpoint1.getLatitude(), endpoint1.getLongitude()));
+        geoPoints.add(new GeoPoint(endpoint2.getLatitude(), endpoint2.getLongitude()));
+
+
+      } else {
+        viewAngle = 120; // panning camera
+
+        // triangle sides compass direction
+        int direction1 = direction - viewAngle / 2;
+        int direction2 = direction;
+        int direction3 = direction + viewAngle / 2;
+
+
+        // in meters, simulate a 2d coordinate system, known values are: hyp length, and inside angles
+        double xDiff1 = Math.cos(Math.toRadians(90 - direction1)) * baseViewDistance;
+        double yDiff1 = Math.sin(Math.toRadians(90 - direction1)) * baseViewDistance;
+
+        double xDiff2 = Math.cos(Math.toRadians(90 - direction2)) * baseViewDistance;
+        double yDiff2 = Math.sin(Math.toRadians(90 - direction2)) * baseViewDistance;
+
+        double xDiff3 = Math.cos(Math.toRadians(90 - direction3)) * baseViewDistance;
+        double yDiff3 = Math.sin(Math.toRadians(90 - direction3)) * baseViewDistance;
+
+
+        Location endpoint1 = LocationUtils.getNewLocation(startLat, startLon, yDiff1, xDiff1);
+        Location endpoint2 = LocationUtils.getNewLocation(startLat, startLon, yDiff2, xDiff2);
+        Location endpoint3 = LocationUtils.getNewLocation(startLat, startLon, yDiff3, xDiff3);
+
+        geoPoints.add(new GeoPoint(startLat, startLon));
+        geoPoints.add(new GeoPoint(endpoint1.getLatitude(), endpoint1.getLongitude()));
+        geoPoints.add(new GeoPoint(endpoint2.getLatitude(), endpoint2.getLongitude()));
+        geoPoints.add(new GeoPoint(endpoint3.getLatitude(), endpoint3.getLongitude()));
+
+
+      }
+
+
+
+
 
     } else {
 
