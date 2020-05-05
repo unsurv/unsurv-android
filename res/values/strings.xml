@@ -80,6 +80,7 @@
 
     <!--in OrganizeActivity-->
 
+    <string name="organize_lock_grid">Lock grid + map:</string>
     <string name="organize_center_lat">Center latitude:</string>
     <string name="organize_center_lon">Center longitude:</string>
     <string name="organize_y_size">Height (m):</string>

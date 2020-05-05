@@ -874,6 +874,8 @@ public class EditCameraActivity extends AppCompatActivity {
       } else {
         viewAngle = 120; // panning camera
 
+        // using two 60 degree cones instead of one 120 cone
+
         // triangle sides compass direction
         int direction1 = direction - viewAngle / 2;
         int direction2 = direction;

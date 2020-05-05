@@ -20,7 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import org.osmdroid.api.IGeoPoint;
@@ -73,10 +75,11 @@ public class OrganizeActivity extends AppCompatActivity {
   OverlayManager overlayManager;
 
   GeoPoint centerMap;
-  double standardZoom;
+  boolean lockState;
 
   List<Polyline> lines = new ArrayList<>();
 
+  Switch lockSwitch;
   EditText centerLat;
   EditText centerLon;
   EditText gridLength;
@@ -94,6 +97,9 @@ public class OrganizeActivity extends AppCompatActivity {
 
   @Override
   protected void onResume() {
+
+    lockState = sharedPreferences.getBoolean("organizeLockState", false);
+    lockSwitch.setChecked(lockState);
 
     String oldLat = sharedPreferences.getString("gridCenterLat", "");
     String oldLon = sharedPreferences.getString("gridCenterLon", "");
@@ -145,6 +151,7 @@ public class OrganizeActivity extends AppCompatActivity {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     cameraRepository = new CameraRepository(getApplication());
 
+    lockSwitch = findViewById(R.id.organize_lock_grid);
     centerLat = findViewById(R.id.organize_center_lat_edit);
     centerLon = findViewById(R.id.organize_center_lon_edit);
 
@@ -301,35 +308,52 @@ public class OrganizeActivity extends AppCompatActivity {
     }, 200));
 
 
+    lockSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        lockState = b;
+        sharedPreferences.edit().putBoolean("organizeLockState", b).apply();
+      }
+    });
+
 
     resetButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
 
+        if (lockState) {
 
-        new AlertDialog.Builder(context)
-                .setTitle("Clear Data?")
-                .setMessage("Do you want to clear this data?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                  @Override
-                  public void onClick(DialogInterface dialogInterface, int i) {
+          Toast.makeText(context, "Grid and map locked", Toast.LENGTH_LONG).show();
 
-                    sharedPreferences.edit().remove("gridCenterLat").apply();
-                    sharedPreferences.edit().remove("gridCenterLon").apply();
-                    sharedPreferences.edit().remove("gridZoom").apply();
+        } else {
 
-                    deleteGrid();
+          new AlertDialog.Builder(context)
+                  .setTitle("Clear Data?")
+                  .setMessage("Do you want to clear this data?")
+                  .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                    centerMap = new GeoPoint(50.972, 10.107);
-                    mapController.setZoom(7.0);
-                    mapController.setCenter(centerMap);
-                    redrawMap();
+                      sharedPreferences.edit().remove("gridCenterLat").apply();
+                      sharedPreferences.edit().remove("gridCenterLon").apply();
+                      sharedPreferences.edit().remove("gridZoom").apply();
 
-                    Toast.makeText(context, "Successfully cleared data.", Toast.LENGTH_LONG).show();
-                  }
-                })
-                .setNegativeButton("No", null)
-                .show();
+                      deleteGrid();
+
+                      centerMap = new GeoPoint(50.972, 10.107);
+                      mapController.setZoom(7.0);
+                      mapController.setCenter(centerMap);
+                      redrawMap();
+
+                      Toast.makeText(context, "Successfully cleared data.", Toast.LENGTH_LONG).show();
+                    }
+                  })
+                  .setNegativeButton("No", null)
+                  .show();
+
+        }
+
+
 
       }
     });
@@ -338,14 +362,23 @@ public class OrganizeActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
 
-        int length = Integer.parseInt(gridLength.getText().toString());
-        int height = Integer.parseInt(gridHeight.getText().toString());
+        if (lockState) {
 
-        int rows = Integer.parseInt(gridRows.getText().toString());
-        int columns = Integer.parseInt(gridColumns.getText().toString());
+          Toast.makeText(context, "Grid and map locked", Toast.LENGTH_LONG).show();
 
-        deleteGrid();
-        drawGrid(centerMap.getLatitude(), centerMap.getLongitude(), length, height, rows, columns);
+        } else {
+
+          int length = Integer.parseInt(gridLength.getText().toString());
+          int height = Integer.parseInt(gridHeight.getText().toString());
+
+          int rows = Integer.parseInt(gridRows.getText().toString());
+          int columns = Integer.parseInt(gridColumns.getText().toString());
+
+          deleteGrid();
+          drawGrid(centerMap.getLatitude(), centerMap.getLongitude(), length, height, rows, columns);
+        }
+
+
 
 
       }

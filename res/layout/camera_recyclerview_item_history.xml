@@ -77,7 +77,8 @@
             android:gravity="top"
             android:textAppearance="?android:textAppearanceSmall"
             android:textColor="@android:color/white"
-            tools:text="one" />
+            tools:text="one"
+            android:visibility="gone"/>
 
 
     </LinearLayout>
