@@ -24,7 +24,7 @@ public interface CameraDao {
   @Query("DELETE FROM local_surveillance_cameras")
   void deleteAll();
 
-  @Query("SELECT * FROM local_surveillance_cameras")
+  @Query("SELECT * FROM local_surveillance_cameras ORDER BY -id")
   LiveData<List<SurveillanceCamera>> getAllCamerasAsLiveData();
 
   @Query("SELECT * FROM local_surveillance_cameras " +
