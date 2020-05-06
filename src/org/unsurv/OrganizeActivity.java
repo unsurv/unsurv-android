@@ -132,59 +132,7 @@ public class OrganizeActivity extends AppCompatActivity {
 
     cameras = cameraRepository.getAllCameras();
 
-
-    deleteMarkers();
-    populateWithMarkers();
-
-    super.onResume();
-  }
-
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_organize);
-
-    context = this;
-    resources = context.getResources();
-
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-    cameraRepository = new CameraRepository(getApplication());
-
-    lockSwitch = findViewById(R.id.organize_lock_grid);
-    centerLat = findViewById(R.id.organize_center_lat_edit);
-    centerLon = findViewById(R.id.organize_center_lon_edit);
-
-    // default grid is 1000m x 1000m, 5 rows 5 columns
-    gridLength = findViewById(R.id.organize_length_edit);
-    gridLength.setText("3000");
-
-    gridHeight = findViewById(R.id.organize_height_edit);
-    gridHeight.setText("3000");
-
-    gridRows = findViewById(R.id.organize_rows_edit);
-    gridRows.setText("5");
-
-    gridColumns = findViewById(R.id.organize_columns_edit);
-    gridColumns.setText("5");
-
-    resetButton = findViewById(R.id.organize_reset);
-    drawButton = findViewById(R.id.organize_draw);
-    backButton = findViewById(R.id.organize_back);
-
-    overlayItemsToDisplay = new ArrayList<>();
-
-    map = findViewById(R.id.organize_camera_map);
-
-    mapController = map.getController();
-    overlayManager = map.getOverlayManager();
-
-    CopyrightOverlay copyrightOverlay = new CopyrightOverlay(context);
-    overlayManager.add(copyrightOverlay);
-
-    map.setTilesScaledToDpi(true);
-    map.setClickable(false);
-    map.setMultiTouchControls(true);
+    offlineMode = sharedPreferences.getBoolean("offlineMode", true);
 
 
     if (offlineMode) {
@@ -243,6 +191,61 @@ public class OrganizeActivity extends AppCompatActivity {
       // TODO add choice + backup strategy here
       map.setTileSource(TileSourceFactory.OpenTopo);
     }
+
+
+    deleteMarkers();
+    populateWithMarkers();
+
+    super.onResume();
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_organize);
+
+    context = this;
+    resources = context.getResources();
+
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    cameraRepository = new CameraRepository(getApplication());
+
+    lockSwitch = findViewById(R.id.organize_lock_grid);
+    centerLat = findViewById(R.id.organize_center_lat_edit);
+    centerLon = findViewById(R.id.organize_center_lon_edit);
+
+    // default grid is 1000m x 1000m, 5 rows 5 columns
+    gridLength = findViewById(R.id.organize_length_edit);
+    gridLength.setText("3000");
+
+    gridHeight = findViewById(R.id.organize_height_edit);
+    gridHeight.setText("3000");
+
+    gridRows = findViewById(R.id.organize_rows_edit);
+    gridRows.setText("5");
+
+    gridColumns = findViewById(R.id.organize_columns_edit);
+    gridColumns.setText("5");
+
+    resetButton = findViewById(R.id.organize_reset);
+    drawButton = findViewById(R.id.organize_draw);
+    backButton = findViewById(R.id.organize_back);
+
+    overlayItemsToDisplay = new ArrayList<>();
+
+    map = findViewById(R.id.organize_camera_map);
+
+    mapController = map.getController();
+    overlayManager = map.getOverlayManager();
+
+    CopyrightOverlay copyrightOverlay = new CopyrightOverlay(context);
+    overlayManager.add(copyrightOverlay);
+
+    map.setTilesScaledToDpi(true);
+    map.setClickable(false);
+    map.setMultiTouchControls(true);
+
 
 
     // remove big + and - buttons at the bottom of the map

@@ -86,41 +86,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
 
     }
 
-
-    super.onResume();
-  }
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_manual_capture);
-
-    context = this;
-
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
     offlineMode = sharedPreferences.getBoolean("offlineMode", true);
-
-    cameraRepository = new CameraRepository(getApplication());
-
-    // choose standard type as default
-    cameraType = StorageUtils.FIXED_CAMERA;
-
-    mapView = findViewById(R.id.manual_capture_map);
-
-    marker = findViewById(R.id.manual_capture_marker);
-
-    manualSaveButton = findViewById(R.id.manual_save_button);
-    addStandardCameraButton = findViewById(R.id.manual_capture_add_standard_camera_button);
-    addDomeCameraButton = findViewById(R.id.manual_capture_add_dome_camera_button);
-    addUnknownCameraButton = findViewById(R.id.manual_capture_add_unknown_camera_button);
-    manualToGrid = findViewById(R.id.manual_to_grid);
-
-    mapView.setTilesScaledToDpi(true);
-    mapView.setClickable(true);
-
-    //enable pinch to zoom
-    mapView.setMultiTouchControls(true);
 
     if (offlineMode) {
 
@@ -178,6 +144,43 @@ public class ManualCaptureActivity extends AppCompatActivity {
       // TODO add choice + backup strategy here
       mapView.setTileSource(TileSourceFactory.OpenTopo);
     }
+
+
+    super.onResume();
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_manual_capture);
+
+    context = this;
+
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+
+    cameraRepository = new CameraRepository(getApplication());
+
+    // choose standard type as default
+    cameraType = StorageUtils.FIXED_CAMERA;
+
+    mapView = findViewById(R.id.manual_capture_map);
+
+    marker = findViewById(R.id.manual_capture_marker);
+
+    manualSaveButton = findViewById(R.id.manual_save_button);
+    addStandardCameraButton = findViewById(R.id.manual_capture_add_standard_camera_button);
+    addDomeCameraButton = findViewById(R.id.manual_capture_add_dome_camera_button);
+    addUnknownCameraButton = findViewById(R.id.manual_capture_add_unknown_camera_button);
+    manualToGrid = findViewById(R.id.manual_to_grid);
+
+    mapView.setTilesScaledToDpi(true);
+    mapView.setClickable(true);
+
+    //enable pinch to zoom
+    mapView.setMultiTouchControls(true);
+
+
 
     mapController = mapView.getController();
 
