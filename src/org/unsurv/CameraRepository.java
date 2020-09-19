@@ -111,6 +111,19 @@ public class CameraRepository {
 
   }
 
+  SurveillanceCamera getLastCamera(){
+
+    try {
+
+      return new getLastCameraAsyncTask(mCameraDao).execute().get();
+
+    } catch (Exception e) {
+      Log.i("Background findByDbId Error: " , e.toString());
+      return null;
+    }
+
+  }
+
 
 
   private static class insertAsyncTask extends AsyncTask<SurveillanceCamera, Void, Long> {
@@ -230,6 +243,23 @@ public class CameraRepository {
     protected SurveillanceCamera doInBackground(final Integer... params) {
 
       return mAsyncTaskDao.findById(params[0]);
+    }
+
+  }
+
+
+  private static class getLastCameraAsyncTask extends AsyncTask<Void, Void, SurveillanceCamera> {
+
+    private CameraDao mAsyncTaskDao;
+
+    getLastCameraAsyncTask(CameraDao dao) {
+      mAsyncTaskDao = dao;
+    }
+
+    @Override
+    protected SurveillanceCamera doInBackground(Void... params) {
+
+      return mAsyncTaskDao.getLastCamera();
     }
 
   }

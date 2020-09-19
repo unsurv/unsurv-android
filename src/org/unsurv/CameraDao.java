@@ -58,7 +58,8 @@ public interface CameraDao {
   @Query("SELECT * from local_surveillance_cameras WHERE id = :id")
   SurveillanceCamera findById(long id);
 
-
+  @Query("SELECT * FROM local_surveillance_cameras ORDER BY id DESC LIMIT 1")
+  SurveillanceCamera getLastCamera();
 
 
 }

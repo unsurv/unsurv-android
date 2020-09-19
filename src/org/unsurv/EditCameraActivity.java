@@ -205,6 +205,8 @@ public class EditCameraActivity extends AppCompatActivity {
     context = this;
     resources = context.getResources();
 
+    cameraRepository = new CameraRepository(getApplication());
+
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     offlineMode = sharedPreferences.getBoolean("offlineMode", true);
 
@@ -247,9 +249,10 @@ public class EditCameraActivity extends AppCompatActivity {
     Intent startIntent = getIntent();
     int dbId = startIntent.getIntExtra("surveillanceCameraId", 0);
 
-    cameraRepository = new CameraRepository(getApplication());
 
     cameraToEdit = cameraRepository.findByDbId(dbId);
+
+    List<SurveillanceCamera> allCams = cameraRepository.getAllCameras();
     cameraType = cameraToEdit.getCameraType();
     String thumbnailPath = cameraToEdit.getThumbnailPath();
     cameraImage = new File(captureImagePath + thumbnailPath);
@@ -658,6 +661,20 @@ public class EditCameraActivity extends AppCompatActivity {
           adapter.notifyDataSetChanged();
 
           resetMap();
+
+
+        }
+
+
+        if (sharedPreferences.getBoolean("alwaysEnableManualCapture", false)) {
+          Intent manualCaptureIntent = new Intent(EditCameraActivity.this, ManualCaptureActivity.class);
+          startActivity(manualCaptureIntent);
+
+        } else {
+          Intent cameraIntent = new Intent(EditCameraActivity.this, DetectorActivity.class);
+          startActivity(cameraIntent);
+
+
         }
 
       }

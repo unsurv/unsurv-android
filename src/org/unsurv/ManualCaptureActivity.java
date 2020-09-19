@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -306,10 +307,28 @@ public class ManualCaptureActivity extends AppCompatActivity {
 
         );
 
-        cameraRepository.insert(manualCamera);
+        final long idFromInsert = cameraRepository.insert(manualCamera);
 
         // create small notification for history activity
         BottomNavigationBadgeHelper.incrementBadge(bottomNavigationView, context, R.id.bottom_navigation_history, 1);
+
+
+        // start drawing activity .5 sec after capture to give db some time to save data
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+
+            Intent editCameraIntent = new Intent(context, EditCameraActivity.class);
+
+            editCameraIntent.putExtra("surveillanceCameraId", (int) idFromInsert);
+
+            context.startActivity(editCameraIntent);
+
+          }
+        }, 500);
+
+
 
 
       }

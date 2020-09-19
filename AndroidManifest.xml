@@ -3,9 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.unsurv">
 
-    <uses-sdk
-        android:minSdkVersion="24"
-        android:targetSdkVersion="29" />
+    <uses-sdk android:targetSdkVersion="29" />
 
     <uses-permission android:name="android.permission.CAMERA" />
 
