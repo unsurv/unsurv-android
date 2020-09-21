@@ -326,7 +326,7 @@ public class ManualCaptureActivity extends AppCompatActivity {
             context.startActivity(editCameraIntent);
 
           }
-        }, 500);
+        }, 1000);
 
 
 

@@ -307,7 +307,7 @@ public class EditCameraActivity extends AppCompatActivity {
 
     // Setting starting position and zoom level.
     cameraLocation = new GeoPoint(lat, lon);
-    mapController.setZoom(16.0);
+    mapController.setZoom(17.0);
     mapController.setCenter(cameraLocation);
 
     int hotPink = Color.argb(127, 255, 0, 255);
