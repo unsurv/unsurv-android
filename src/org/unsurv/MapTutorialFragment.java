@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
@@ -69,7 +70,9 @@ public class MapTutorialFragment extends Fragment {
     //enable pinch to zoom
     tutorialMapView.setMultiTouchControls(true);
 
-    tutorialMapView.setTileSource(TileSourceFactory.OpenTopo);
+    // MAPNIK fix
+    Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+    tutorialMapView.setTileSource(TileSourceFactory.MAPNIK);
 
     final IMapController mapController = tutorialMapView.getController();
 
@@ -88,7 +91,7 @@ public class MapTutorialFragment extends Fragment {
     } else {
 
       GeoPoint startPoint = new GeoPoint(51.481, 10.800);
-      mapController.setZoom(5.5);
+      mapController.setZoom(3);
       mapController.setCenter(startPoint);
 
     }

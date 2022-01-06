@@ -162,8 +162,10 @@
     <string name="tutorial_sync_default_interval">1</string>
     <string name="tutorial_sync_default_min_delay">6</string>
     <string name="tutorial_sync_default_max_delay">3</string>
-    <string name="tutorial_sync_info_text">- Offline mode disables ALL connections; the app just works with the default database\n\n
+    <string name="tutorial_sync_info_text">- Offline mode disables ALL connections; OpenStreetMap maps will not render and need a x/y/z tile data from th internal storage to work.\n\n
 - Synchronization interval is the time between each update from the database server. Uploads will only take place with each synchronization interval. If you choose a long interval uploads might take longer than max delay.\n\n
+
+OPTIONS BELOW ARE DISABLED\n
 - Min upload delay specifies the minimum time that has to pass after a camera is captured before the upload happens. This is to protect your privacy by giving you some time to leave the area before the camera appears in the database. You can always manually upload a camera before the time has passed.\n\n
 - Max upload delay specifies a limit to how much time passes at the maximum between a camera capture and the upload to the database.</string>
 
@@ -173,7 +175,6 @@
     <string name="tutorial_camera_permission_button">GRANT CAMERA</string>
     <string name="tutorial_storage_permission_button">GRANT STORAGE</string>
     <string name="tutorial_permissions_info_text">This application needs some permissions to function properly. Absolutely no personal data is gathered.
-To access the online database an access key is generated every week. Your captures are linked to that key. No record connecting keys to devices is kept. This is done to ensure data integrity and remove malicious entries.\nYou can always check the database source code at\nhttps://github.com/unsurv/flask_api\nThe only thing uploaded will be the position, type and method of capture of the surveillance camera and optionally an image. You can always check the source code yourself to see what information is sent to the server at\nhttps://github.com/unsurv/unsurv-android.\n\n
 
 - Storage permissions are needed to save images and read map data from your phone\'s storage.\n\n
 - Camera permission is needed to use the object detection model to automatically capture surveillance cameras.\n\n
@@ -182,7 +183,7 @@ To access the online database an access key is generated every week. Your captur
     <string name="tutorial_capture_info_text">This application has different methods to capture and map surveillance cameras.
 \n\n- By default it uses a self trained object detection model to detect surveillance cameras through the device\'s camera. This mode uses the device\'s orientation and location to calculate the camera position. It\'s most accurate if you move by the camera and capture it from different angles. You can always edit the exact location in your local history before uploading.
 \n\n- You can choose to manually capture surveillance cameras. This can be set as the default method.
-\n\n- A third way is to capture training images to improve the object detection
+\n\n- A third way is to capture training images to improve the object detection CURRENTLY NO UPLOAD
 \n\n All these options are available via buttons from the default detection method</string>
 
 

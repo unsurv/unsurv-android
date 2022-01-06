@@ -11,7 +11,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
@@ -78,6 +80,8 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -119,7 +123,6 @@ public class MapActivity extends AppCompatActivity {
   private ItemizedOverlay<OverlayItem> cameraOverlay;
 
   ImageButton myLocationButton;
-
 
   private SynchronizedCameraRepository synchronizedCameraRepository;
 
@@ -172,6 +175,9 @@ public class MapActivity extends AppCompatActivity {
   String latMaxString;
   String lonMinString;
   String lonMaxString;
+
+  private List<Polygon> polygonsOnMap;
+  private List<Polyline> polylinesOnMap;
 
   private String areaString;
 
@@ -327,12 +333,16 @@ public class MapActivity extends AppCompatActivity {
     amountOnMapTextView.setVisibility(View.GONE);
     infoTextView.setVisibility(View.GONE);
 
+    polylinesOnMap = new ArrayList<>();
+    polygonsOnMap = new ArrayList<>();
+
     // info button
     infoButton = findViewById(R.id.map_info_button);
     infoButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
 
+        clearMapDrawings();
         // activates info overlay if not already present, deactivates it if present
         if (!infoIsShown){
           amountOnMapTextView.setVisibility(View.VISIBLE);
@@ -1245,7 +1255,7 @@ public class MapActivity extends AppCompatActivity {
    * Draws camera markers on the map.
    * @param camerasToDisplay list of SynchronizedCameras to display
    */
-  private void redrawMarkers(List<SynchronizedCamera> camerasToDisplay) {
+  private void redrawMarkers(final List<SynchronizedCamera> camerasToDisplay) {
 
     itemsToDisplay.clear();
     overlayItemsToDisplay.clear();
@@ -1442,6 +1452,16 @@ public class MapActivity extends AppCompatActivity {
                 public boolean onItemSingleTapUp(final int index, final OverlayItem cameraItem) {
                   GeoPoint markerLocation = new GeoPoint(cameraItem.getPoint().getLatitude(), cameraItem.getPoint().getLongitude());
 
+
+                  String uid = cameraItem.getUid();
+                  SynchronizedCamera highlightedCamera = camerasToDisplay.get(index);
+                  drawCameraArea(new GeoPoint(highlightedCamera.getLatitude(), highlightedCamera.getLongitude()),
+                          highlightedCamera.getDirection(),
+                          highlightedCamera.getHeight(),
+                          highlightedCamera.getAngle(),
+                          highlightedCamera.getType());
+
+                  /*
                   //close existing infoWindow
                   if (infoWindow != null) {
                     infoWindow.close();
@@ -1511,6 +1531,9 @@ public class MapActivity extends AppCompatActivity {
                   };
 
                   infoWindow.open(cameraItem, markerLocation, 0, 0);
+                  */
+
+
                   return true; // We 'handled' this event.
                 }
 
@@ -1642,8 +1665,8 @@ public class MapActivity extends AppCompatActivity {
                             cameraJSON.getString("id"),
                             type,
                             area,
-                            mount,
                             direction,
+                            mount,
                             height,
                             angle,
                             cameraJSON.getDouble("lat"),
@@ -1737,6 +1760,147 @@ public class MapActivity extends AppCompatActivity {
   private void refreshSharedPreferencesObject() {
 
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+  }
+
+  Polygon drawCameraArea(GeoPoint currentPos, int direction, int height, int horizontalAngle, int cameraType) {
+
+    if (height  == -1) {
+      // height unknown
+      height = 5;
+    }
+
+    if (cameraType == StorageUtils.UNKNOWN) {
+      // empty polygon for unknown type
+      Toast.makeText(context, "Not enough data to estimate camera viewing area.", Toast.LENGTH_SHORT).show();
+      return new Polygon();
+    }
+
+    Polygon polygon = new Polygon();
+
+    int hotPink = Color.argb(50, 255, 0, 255);
+    polygon.setFillColor(hotPink);
+    polygon.setStrokeColor(hotPink);
+
+
+
+    int baseViewDistance = 15; // in m
+
+    // if height entered by user
+    if (height >= 0) {
+
+      // add 30% viewdistance per meter of height
+
+      double heightFactor = 1 + (0.3 * height);
+      baseViewDistance *= heightFactor;
+    }
+
+    if (horizontalAngle != -1) {
+      // TODO use formula from surveillance under surveillance https://sunders.uber.space
+
+      // about the same as SurveillanceUnderSurveillance https://sunders.uber.space
+      double angleFactor = Math.pow(25f / horizontalAngle, 2) * 0.4;
+      baseViewDistance *= angleFactor;
+    }
+
+    List<GeoPoint> geoPoints;
+
+    if (cameraType == StorageUtils.FIXED_CAMERA || cameraType == StorageUtils.PANNING_CAMERA) {
+
+      int viewAngle;
+
+      // calculate geopoints for triangle
+
+      double startLat = currentPos.getLatitude();
+      double startLon = currentPos.getLongitude();
+
+      geoPoints = new ArrayList<>();
+
+
+      if (cameraType == StorageUtils.FIXED_CAMERA) {
+        viewAngle = 60; // fixed camera
+
+        // triangle sides compass direction
+        int direction1 = direction - viewAngle / 2;
+        int direction2 = direction + viewAngle / 2;
+
+        // in meters, simulate a 2d coordinate system, known values are: hyp length, and inside angles
+        double xDiff1 = Math.cos(Math.toRadians(90 - direction1)) * baseViewDistance;
+        double yDiff1 = Math.sin(Math.toRadians(90 - direction1)) * baseViewDistance;
+
+        double xDiff2 = Math.cos(Math.toRadians(90 - direction2)) * baseViewDistance;
+        double yDiff2 = Math.sin(Math.toRadians(90 - direction2)) * baseViewDistance;
+
+
+        Location endpoint1 = LocationUtils.getNewLocation(startLat, startLon, yDiff1, xDiff1);
+        Location endpoint2 = LocationUtils.getNewLocation(startLat, startLon, yDiff2, xDiff2);
+
+
+        geoPoints.add(new GeoPoint(startLat, startLon));
+        geoPoints.add(new GeoPoint(endpoint1.getLatitude(), endpoint1.getLongitude()));
+        geoPoints.add(new GeoPoint(endpoint2.getLatitude(), endpoint2.getLongitude()));
+
+
+      } else {
+        viewAngle = 120; // panning camera
+
+        // using two 60 degree cones instead of one 120 cone
+
+        // triangle sides compass direction
+        int direction1 = direction - viewAngle / 2;
+        int direction2 = direction;
+        int direction3 = direction + viewAngle / 2;
+
+
+        // in meters, simulate a 2d coordinate system, known values are: hyp length, and inside angles
+        double xDiff1 = Math.cos(Math.toRadians(90 - direction1)) * baseViewDistance;
+        double yDiff1 = Math.sin(Math.toRadians(90 - direction1)) * baseViewDistance;
+
+        double xDiff2 = Math.cos(Math.toRadians(90 - direction2)) * baseViewDistance;
+        double yDiff2 = Math.sin(Math.toRadians(90 - direction2)) * baseViewDistance;
+
+        double xDiff3 = Math.cos(Math.toRadians(90 - direction3)) * baseViewDistance;
+        double yDiff3 = Math.sin(Math.toRadians(90 - direction3)) * baseViewDistance;
+
+
+        Location endpoint1 = LocationUtils.getNewLocation(startLat, startLon, yDiff1, xDiff1);
+        Location endpoint2 = LocationUtils.getNewLocation(startLat, startLon, yDiff2, xDiff2);
+        Location endpoint3 = LocationUtils.getNewLocation(startLat, startLon, yDiff3, xDiff3);
+
+        geoPoints.add(new GeoPoint(startLat, startLon));
+        geoPoints.add(new GeoPoint(endpoint1.getLatitude(), endpoint1.getLongitude()));
+        geoPoints.add(new GeoPoint(endpoint2.getLatitude(), endpoint2.getLongitude()));
+        geoPoints.add(new GeoPoint(endpoint3.getLatitude(), endpoint3.getLongitude()));
+
+
+      }
+
+    } else {
+
+      // circle for dome cameras
+      geoPoints = Polygon.pointsAsCircle(currentPos, height * 7);
+
+    }
+
+    polygon.setPoints(geoPoints);
+
+    if (!polygonsOnMap.contains(polygon)) {
+      polygonsOnMap.add(polygon);
+    }
+
+    mapView.getOverlayManager().add(polygon);
+    mapView.invalidate();
+
+    return polygon;
+
+  }
+
+  void clearMapDrawings() {
+    mapView.getOverlayManager().removeAll(polygonsOnMap);
+    mapView.getOverlayManager().removeAll(polylinesOnMap);
+    polygonsOnMap.clear();
+    polylinesOnMap.clear();
+    mapView.invalidate();
 
   }
 
