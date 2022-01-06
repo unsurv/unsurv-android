@@ -58,6 +58,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -763,9 +764,9 @@ public class MapActivity extends AppCompatActivity {
     } else {
 
       // MAPNIK fix
-      // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+      Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
       // TODO add choice + backup strategy here
-      mapView.setTileSource(TileSourceFactory.OpenTopo);
+      mapView.setTileSource(TileSourceFactory.MAPNIK);
     }
 
     // refresh markers when api key is changed, useful if user is on an area outside of his homezone

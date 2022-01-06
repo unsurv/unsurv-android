@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -141,9 +142,9 @@ public class ManualCaptureActivity extends AppCompatActivity {
     } else {
 
       // MAPNIK fix
-      // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+      Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
       // TODO add choice + backup strategy here
-      mapView.setTileSource(TileSourceFactory.OpenTopo);
+      mapView.setTileSource(TileSourceFactory.MAPNIK);
     }
 
 

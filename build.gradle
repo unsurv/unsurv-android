@@ -165,7 +165,11 @@ task buildNativeBazel(type: Exec) {
 }
 
 task buildNativeMake(type: Exec) {
-    environment "NDK_ROOT", android.ndkDirectory
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    def ndkDir = properties.getProperty('ndk.dir')
+
+    environment "NDK_ROOT", ndkDir
     // Tip: install ccache and uncomment the following to speed up
     // builds significantly.
     // environment "CC_PREFIX", 'ccache'

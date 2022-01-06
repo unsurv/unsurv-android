@@ -39,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.modules.ArchiveFileFactory;
 import org.osmdroid.tileprovider.modules.OfflineTileProvider;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -188,9 +189,9 @@ public class EditCameraActivity extends AppCompatActivity {
     } else {
 
       // MAPNIK fix
-      // Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
+      Configuration.getInstance().setUserAgentValue("github-unsurv-unsurv-android");
       // TODO add choice + backup strategy here
-      map.setTileSource(TileSourceFactory.OpenTopo);
+      map.setTileSource(TileSourceFactory.MAPNIK);
     }
 
     super.onResume();
