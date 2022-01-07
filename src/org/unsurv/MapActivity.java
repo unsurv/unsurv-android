@@ -275,7 +275,7 @@ public class MapActivity extends AppCompatActivity {
         lastZoomLevel = event.getZoomLevel();
         return false;
       }
-    }, 150)); // delay for updating in ms after zooming/scrolling
+    }, 75)); // delay for updating in ms after zooming/scrolling
 
     // blocks zooming and moving when needed
     mapView.setOnTouchListener(new View.OnTouchListener() {
@@ -1685,6 +1685,7 @@ public class MapActivity extends AppCompatActivity {
 
 
                   synchronizedCameraRepository.insertAll(camerasToSync);
+                  Toast.makeText(context, String.format(Locale.GERMANY, "added %d cameras to the database", camerasToSync.size()) , Toast.LENGTH_SHORT).show();
 
 
                 } catch (Exception e) {
@@ -1806,6 +1807,11 @@ public class MapActivity extends AppCompatActivity {
     List<GeoPoint> geoPoints;
 
     if (cameraType == StorageUtils.FIXED_CAMERA || cameraType == StorageUtils.PANNING_CAMERA) {
+
+      if (direction < 0) {
+        Toast.makeText(context, "MISSING DATA - camera are could not be rendered", Toast.LENGTH_SHORT).show();
+        return polygon;
+      }
 
       int viewAngle;
 

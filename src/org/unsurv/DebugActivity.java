@@ -807,6 +807,7 @@ public class DebugActivity extends AppCompatActivity {
   private class DbAsyncTask extends AsyncTask<Void, Void, Void> {
 
     final TextView debugTextView = findViewById(R.id.debug_textview);
+    private CameraRepository cameraRepository;
     private SynchronizedCameraRepository synchronizedCameraRepository;
     private int dbSize;
     private int MODE;
@@ -819,6 +820,7 @@ public class DebugActivity extends AppCompatActivity {
 
     DbAsyncTask(Application application, int DbMode) {
       synchronizedCameraRepository = new SynchronizedCameraRepository(application);
+      cameraRepository = new CameraRepository(application);
       MODE = DbMode;
     }
 
@@ -829,7 +831,7 @@ public class DebugActivity extends AppCompatActivity {
       //synchronizedCameraRepository.deleteAll();
 
       if (MODE == CHECK_DB_SIZE) {
-        dbSize = synchronizedCameraRepository.getAllSynchronizedCameras(false).size();
+        dbSize = cameraRepository.getAllCameras().size();
         Log.i(TAG, "doInBackground: " + dbSize);
         runOnUiThread(new Runnable() {
           @Override

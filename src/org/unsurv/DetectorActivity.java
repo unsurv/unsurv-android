@@ -882,7 +882,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     // Adds a new SurveillanceCamera to database when done processing.
 
     // repository to get db access
-    CameraRepository cameraRepository = new CameraRepository(getApplication());
+    CameraViewModel cameraViewModel = new CameraViewModel(getApplication());
 
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -988,7 +988,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
       if (useTimestamp) {
 
-        cameraRepository.insert(new SurveillanceCamera(
+        cameraViewModel.insert(new SurveillanceCamera(
                 mostCommonTypeInPool,
                 0,
                 -1,
@@ -1017,7 +1017,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
       } else {
 
-        cameraRepository.insert(new SurveillanceCamera(
+        cameraViewModel.insert(new SurveillanceCamera(
                 mostCommonTypeInPool,
                 0,
                 -1,

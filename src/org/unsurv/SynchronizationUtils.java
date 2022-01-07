@@ -14,6 +14,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -412,6 +413,7 @@ class SynchronizationUtils {
 
                   if (insertIntoDb) {
                     crep.insertAll(camerasToSync);
+
                   }
 
                 } catch (Exception e) {
